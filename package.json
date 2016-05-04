@@ -1,0 +1,50 @@
+{
+  "name": "xlib",
+  "version": "0.0.7",
+  "description": "A Cross Platform, Monolithic Core Library for Node.js and Browsers.  Typescript friendly!",
+  "private": false,
+  "author": "jason swearingen <jasons@novaleaf.com>",
+  "dependencies": {
+    "aguid": "^1.0.4",
+    "async": "^1.5.0",
+    "axios": "^0.8.1",
+    "base64url": "^1.0.5",
+    "bluebird": "^3.3.5",
+    "bluebird-retry": "^0.5.3",
+    "chalk": "^1.1.1",
+    "commondir": "^1.0.1",
+    "d3-dsv": "^0.1.6",
+    "decimal.js": "^5.0.8",
+    "json5": "^0.5.0",
+    "jsonwebtoken": "^5.5.0",
+    "lodash": "^3.10.1",
+    "moment": "^2.10.6",
+    "moment-timezone": "^0.4.1",
+    "paralleljs": "^0.2.1",
+    "rwlock": "^5.0.0",
+    "rx": "^4.0.6",
+    "sanitize-html": "^1.11.3",
+    "source-map-support": "^0.3.3",
+    "sprintf-js": "^1.0.3",
+    "validator": "^4.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha"
+  },
+  "main": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Novaleaf/xlib"
+  },
+  "keywords": [
+    "monolithic",
+    "corelib",
+    "typescript"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Novaleaf/xlib/issues"
+  }
+}

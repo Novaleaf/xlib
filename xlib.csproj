@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <ProjectGuid>{CC904EBF-34F6-48FF-B3E3-DBC5A4A73EF3}</ProjectGuid>
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>xlib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets')" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>48911</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48911/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="dev\browser\browserhelper.ts" />
+    <TypeScriptCompile Include="dev\core\arrayhelper.ts" />
+    <TypeScriptCompile Include="dev\core\classbase.ts" />
+    <TypeScriptCompile Include="dev\core\collections.ts" />
+    <TypeScriptCompile Include="dev\core\design-patterns\atomic-cache.ts" />
+    <TypeScriptCompile Include="dev\core\design-patterns\design-patterns.ts" />
+    <TypeScriptCompile Include="dev\core\jsshims.ts" />
+    <TypeScriptCompile Include="dev\core\security.ts" />
+    <TypeScriptCompile Include="dev\core\compression.ts" />
+    <TypeScriptCompile Include="dev\core\datetime.ts" />
+    <TypeScriptCompile Include="dev\core\diagnostics.ts" />
+    <TypeScriptCompile Include="dev\core\diagnostics\logging.ts" />
+    <TypeScriptCompile Include="dev\core\diagnostics\mockmocha.ts" />
+    <TypeScriptCompile Include="dev\core\diagnostics\racecheck.ts" />
+    <TypeScriptCompile Include="dev\core\diagnostics\stacktrace.ts" />
+    <TypeScriptCompile Include="dev\core\lolo.ts" />
+    <TypeScriptCompile Include="dev\core\environment.ts" />
+    <TypeScriptCompile Include="dev\core\exception.ts" />
+    <TypeScriptCompile Include="dev\core\net.ts" />
+    <TypeScriptCompile Include="dev\core\jshelper.ts" />
+    <TypeScriptCompile Include="dev\core\cache.ts" />
+    <TypeScriptCompile Include="dev\core\numhelper.ts" />
+    <TypeScriptCompile Include="dev\core\promise.ts" />
+    <TypeScriptCompile Include="dev\core\reflection.ts" />
+    <TypeScriptCompile Include="dev\core\serialization.ts" />
+    <TypeScriptCompile Include="dev\core\stringhelper.ts" />
+    <TypeScriptCompile Include="dev\core\threading.ts" />
+    <TypeScriptCompile Include="dev\core\validation.ts" />
+    <TypeScriptCompile Include="dev\definitions\definitions.ts" />
+    <TypeScriptCompile Include="dev\definitions\stripe-d.ts" />
+    <TypeScriptCompile Include="dev\microclib.ts" />
+    <TypeScriptCompile Include="dev\node\nodehelper.ts" />
+    <TypeScriptCompile Include="dev\xlib.ts" />
+    <TypeScriptCompile Include="index.ts" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+</Project>
