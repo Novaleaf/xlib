@@ -1,6 +1,6 @@
 {
   "name": "xlib",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A Base Platform Library for Typescript.  For Node.js and Browsers.",
   "private": false,
   "author": "jason swearingen <jasons@novaleaf.com>",
