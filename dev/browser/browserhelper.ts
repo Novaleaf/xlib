@@ -1,6 +1,6 @@
 "use strict";
-import jsHelper = require("../core/jshelper");
-import ex = require("../core/exception");
+import jsHelper = require("../jshelper");
+import ex = require("../exception");
 
 
 /** low-level javascript helpers for use in the browser. graceful fallbacks if not a browser*/

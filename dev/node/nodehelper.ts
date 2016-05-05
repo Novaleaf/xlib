@@ -1,5 +1,5 @@
 "use strict";
-import ex = require("../core/exception");
+import ex = require("../exception");
 
 
 /** helpers for backend node.js stuff  NODE.JS ONLY!!! */

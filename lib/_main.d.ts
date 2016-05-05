@@ -1,30 +1,30 @@
-export import lolo = require("./core/lolo");
-export import jsHelper = require("./core/jshelper");
-export import arrayHelper = require("./core/arrayhelper");
-export import ClassBase = require("./core/classbase");
-export import diagnostics = require("./core/diagnostics");
-export import exception = require("./core/exception");
-export import collections = require("./core/collections");
+export import lolo = require("./lolo");
+export import jsHelper = require("./jshelper");
+export import arrayHelper = require("./arrayhelper");
+export import ClassBase = require("./classbase");
+export import diagnostics = require("./diagnostics/_main");
+export import exception = require("./exception");
+export import collections = require("./collections");
 /** various math and numerical conversion/manipulation related helper functions */
-export import numHelper = require("./core/numhelper");
-export import stringHelper = require("./core/stringhelper");
-export import reflection = require("./core/reflection");
-export import environment = require("./core/environment");
-export import dateTime = require("./core/datetime");
-export import validation = require("./core/validation");
-export import serialization = require("./core/serialization");
-export import compression = require("./core/compression");
-export import threading = require("./core/threading");
+export import numHelper = require("./numhelper");
+export import stringHelper = require("./stringhelper");
+export import reflection = require("./reflection");
+export import environment = require("./environment");
+export import dateTime = require("./datetime");
+export import validation = require("./validation");
+export import serialization = require("./serialization");
+export import compression = require("./compression");
+export import threading = require("./threading");
 export import lodash = require("lodash");
-export import promise = require("./core/promise");
-export import net = require("./core/net");
-export import cache = require("./core/cache");
+export import promise = require("./promise");
+export import net = require("./net");
+export import cache = require("./cache");
 /** templates for various design patterns */
-export import designPatterns = require("./core/design-patterns/design-patterns");
+export import designPatterns = require("./design-patterns/_main");
 /** security and cryptographic helpers.   (cross-platform)
  *  note:  our ```KDF``` is nodejs only, and can be found in the ```nlib.security``` module.
  * */
-export import security = require("./core/security");
+export import security = require("./security");
 /** decimal.js: high precision numbers
 https://www.npmjs.com/package/decimal.js
 */

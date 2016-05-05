@@ -22,7 +22,6 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="dev\browser\browserhelper.js" />
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
@@ -30,41 +29,37 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="dev\browser\browserhelper.ts" />
-    <TypeScriptCompile Include="dev\core\arrayhelper.ts" />
-    <TypeScriptCompile Include="dev\core\cache.ts" />
-    <TypeScriptCompile Include="dev\core\classbase.ts" />
-    <TypeScriptCompile Include="dev\core\collections.ts" />
-    <TypeScriptCompile Include="dev\core\compression.ts" />
-    <TypeScriptCompile Include="dev\core\datetime.ts" />
-    <TypeScriptCompile Include="dev\core\design-patterns\atomic-cache.ts" />
-    <TypeScriptCompile Include="dev\core\design-patterns\design-patterns.ts" />
-    <TypeScriptCompile Include="dev\core\diagnostics.ts" />
-    <TypeScriptCompile Include="dev\core\diagnostics\logging.ts" />
-    <TypeScriptCompile Include="dev\core\diagnostics\mockmocha.ts" />
-    <TypeScriptCompile Include="dev\core\diagnostics\racecheck.ts" />
-    <TypeScriptCompile Include="dev\core\diagnostics\stacktrace.ts" />
-    <TypeScriptCompile Include="dev\core\environment.ts" />
-    <TypeScriptCompile Include="dev\core\exception.ts" />
-    <TypeScriptCompile Include="dev\core\jshelper.ts" />
-    <TypeScriptCompile Include="dev\core\jsshims.ts" />
-    <TypeScriptCompile Include="dev\core\lolo.ts" />
-    <TypeScriptCompile Include="dev\core\net.ts" />
-    <TypeScriptCompile Include="dev\core\numhelper.ts" />
-    <TypeScriptCompile Include="dev\core\promise.ts" />
-    <TypeScriptCompile Include="dev\core\reflection.ts" />
-    <TypeScriptCompile Include="dev\core\security.ts" />
-    <TypeScriptCompile Include="dev\core\serialization.ts" />
-    <TypeScriptCompile Include="dev\core\stringhelper.ts" />
-    <TypeScriptCompile Include="dev\core\threading.ts" />
-    <TypeScriptCompile Include="dev\core\validation.ts" />
+    <TypeScriptCompile Include="dev\arrayhelper.ts" />
+    <TypeScriptCompile Include="dev\cache.ts" />
+    <TypeScriptCompile Include="dev\classbase.ts" />
+    <TypeScriptCompile Include="dev\collections.ts" />
+    <TypeScriptCompile Include="dev\compression.ts" />
+    <TypeScriptCompile Include="dev\datetime.ts" />
+    <TypeScriptCompile Include="dev\design-patterns\atomic-cache.ts" />
+    <TypeScriptCompile Include="dev\design-patterns\_main.ts" />
+    <TypeScriptCompile Include="dev\diagnostics\_main.ts" />
+    <TypeScriptCompile Include="dev\diagnostics\logging.ts" />
+    <TypeScriptCompile Include="dev\diagnostics\mockmocha.ts" />
+    <TypeScriptCompile Include="dev\diagnostics\racecheck.ts" />
+    <TypeScriptCompile Include="dev\diagnostics\stacktrace.ts" />
+    <TypeScriptCompile Include="dev\environment.ts" />
+    <TypeScriptCompile Include="dev\exception.ts" />
+    <TypeScriptCompile Include="dev\jshelper.ts" />
+    <TypeScriptCompile Include="dev\jsshims.ts" />
+    <TypeScriptCompile Include="dev\lolo.ts" />
+    <TypeScriptCompile Include="dev\net.ts" />
+    <TypeScriptCompile Include="dev\numhelper.ts" />
+    <TypeScriptCompile Include="dev\promise.ts" />
+    <TypeScriptCompile Include="dev\reflection.ts" />
+    <TypeScriptCompile Include="dev\security.ts" />
+    <TypeScriptCompile Include="dev\serialization.ts" />
+    <TypeScriptCompile Include="dev\stringhelper.ts" />
+    <TypeScriptCompile Include="dev\threading.ts" />
+    <TypeScriptCompile Include="dev\validation.ts" />
     <TypeScriptCompile Include="dev\definitions\definitions.ts" />
     <TypeScriptCompile Include="dev\definitions\stripe-d.ts" />
-    <TypeScriptCompile Include="dev\microclib.ts" />
     <TypeScriptCompile Include="dev\node\nodehelper.ts" />
-    <TypeScriptCompile Include="dev\xlib.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="dev\browser\browserhelper.js.map" />
+    <TypeScriptCompile Include="dev\_main.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
