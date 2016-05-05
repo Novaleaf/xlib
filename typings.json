@@ -10,7 +10,6 @@
     "async": "registry:dt/async#1.4.2+20160501155344",
     "axios": "registry:dt/axios#0.9.1+20160317120654",
     "d3-dsv": "registry:dt/d3-dsv#0.0.0+20160316155526",
-    "decimal.js": "registry:dt/decimal.js#0.0.0+20160317120654",
     "json5": "registry:dt/json5#0.0.0+20160316155526",
     "node": "registry:dt/node#4.0.0+20160501135006",
     "sanitize-html": "registry:dt/sanitize-html#0.0.0+20160316155526",

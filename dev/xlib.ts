@@ -61,10 +61,10 @@ export import designPatterns = require("./core/design-patterns/design-patterns")
  *  note:  our ```KDF``` is nodejs only, and can be found in the ```nlib.security``` module.
  * */
 export import security = require("./core/security");
-/** decimal.js: high precision numbers
-https://www.npmjs.com/package/decimal.js
-*/
-export import decimal = require("decimal.js");
+///** decimal.js: high precision numbers
+//https://www.npmjs.com/package/decimal.js
+//*/
+//export import decimal = require("decimal.js");
 
 
 
