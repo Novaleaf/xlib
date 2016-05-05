@@ -21,8 +21,8 @@
     "forceConsistentCasingInFileNames": true,
 
     "outDir": "./lib",
+    "rootDir": "./dev",
 
-    "allowSyntheticDefaultImports": true,
     "suppressImplicitAnyIndexErrors": true
     
 
