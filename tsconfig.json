@@ -20,7 +20,11 @@
     "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
 
-    "outDir": "./lib"
+    "outDir": "./lib",
+
+    "allowSyntheticDefaultImports": true,
+    "suppressImplicitAnyIndexErrors": true
+    
 
   },
   "exclude": [
@@ -29,6 +33,8 @@
     "typings/browser.d.ts",
     "typings/browser",
     "obj",
-    "bin"
+    "bin",
+    "dev/graveyard"
+
   ]
 }

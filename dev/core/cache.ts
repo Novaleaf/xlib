@@ -13,9 +13,13 @@ import exception = require("./exception");
 import reflection = require("./reflection");
 
 import diagnostics = require("./diagnostics")
+
+//import promise = require("./promise");
+import Promise = require("bluebird");
+
 var log = new diagnostics.logging.Logger(__filename);
 
-interface ICacheItem<TValue> {
+export interface ICacheItem<TValue> {
     /** if UNDEFINED the cache is invalid.   Important note:  NULL is a valid cached value.*/
     value: TValue;
     expires: moment.Moment;

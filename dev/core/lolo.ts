@@ -11,7 +11,7 @@ export var JSONX = serialization.JSONX;
 import validation = require("./validation");
 export var scrub = validation.scrub;
 
-
+import Promise = require("bluebird");
 
 export var defaultIfNull = _jsHelper.defaultIfNull;
 

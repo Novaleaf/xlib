@@ -9,14 +9,14 @@ import ex = require("../exception");
  * why use? otherwise your unit tests will throw type error when running mocha "describe" calls
  */
 export function _initialize() {
-	if (typeof (global["describe"]) === "undefined") {
+	if (typeof ((global as any)["describe"]) === "undefined") {
 		//var log = new logging.Logger(__filename);
 		//log.trace("mocha not present.  nooping describe function");
 		/* tslint:disable */
 		var noop: any = () => { };
 		/* tslint:enable */
-		global["describe"] = noop;
-		if (typeof (global["describe"]) === "undefined") {
+		(global as any)["describe"] = noop;
+		if (typeof ((global as any)["describe"]) === "undefined") {
 			throw new ex.CorelibException("unable to sham describe.  files containing mocha unit tests will fail, thus we failfast here.");
 		}
 	}

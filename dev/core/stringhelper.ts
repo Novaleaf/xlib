@@ -2,52 +2,55 @@
 
 import _ = require("lodash");
 
-
-import _sanitizeHtml = require("sanitize-html");
-
-/**
- * takes our normal "escaped at rest" user input and unescapes it, then sanitizes
- * @param html
- */
-export function htmlSanitizeEscapedUserInput(html:string){
-    return _sanitizeHtml(unescapeUserInput(html));
-    }
-
-/**
- * escapes strings for html presentation.
- * firstly decodeUriComponent's the string, then html escapes it
- * @param value
- * @param disableAutoUriDecode
- */
-export function htmlEscapeEscapedUserInput(value:string):string{
-
-    return _.escape(decodeURIComponent(value));
-
-    }
+/** Clean up user-submitted HTML, preserving whitelisted elements and whitelisted attributes on a per-element basis
+ https://www.npmjs.com/package/sanitize-html
+*/
+export import sanitizeHtml = require("sanitize-html");
 
 
-/**
- * converts escaped string back to the encudeUriComponent value
- * @param value
- */
-export function htmlUnescapeEscapedUserInput(value:string):string{
-    return encodeURIComponent(_.unescape(value));
-    }
+///**
+// * takes our normal "escaped at rest" user input and unescapes it, then sanitizes
+// * @param html
+// */
+//export function htmlSanitizeEscapedUserInput(html:string){
+//    return _sanitizeHtml(unescapeUserInput(html));
+//    }
 
-/**
- *  sanitizes strings by escaping most non-alphanumerics
- * @param value
- */
-export function escapeUserInput(value:string):string{
-    return encodeURIComponent(value);
-    }
-/**
- *  unsanitizes strings sanitized via .sanitizeUserInput();
- * @param value
- */
-export function unescapeUserInput(value:string):string{
-    return decodeURIComponent(value);
-}
+///**
+// * escapes strings for html presentation.
+// * firstly decodeUriComponent's the string, then html escapes it
+// * @param value
+// * @param disableAutoUriDecode
+// */
+//export function htmlEscapeEscapedUserInput(value:string):string{
+
+//    return _.escape(decodeURIComponent(value));
+
+//    }
+
+
+///**
+// * converts escaped string back to the encudeUriComponent value
+// * @param value
+// */
+//export function htmlUnescapeEscapedUserInput(value:string):string{
+//    return encodeURIComponent(_.unescape(value));
+//    }
+
+///**
+// *  sanitizes strings by escaping most non-alphanumerics
+// * @param value
+// */
+//export function escapeUserInput(value:string):string{
+//    return encodeURIComponent(value);
+//    }
+///**
+// *  unsanitizes strings sanitized via .sanitizeUserInput();
+// * @param value
+// */
+//export function unescapeUserInput(value:string):string{
+//    return decodeURIComponent(value);
+//}
 
 /**
  * basic, simple check if the string has been encoded via encodeURIComponent() or encodeURI()
@@ -198,7 +201,7 @@ export function intToIpV4(int: number): string {
     return part4 + "." + part3 + "." + part2 + "." + part1;
 }
 
-export function capitalize(str): string {
+export function capitalize(str:string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 export function repeat(toRepeate: string, numberOfTimes: number): string {
@@ -222,7 +225,7 @@ export function remove(target: string, ...textToRemove: string[]): string {
     if (target == null) {
         return target;
     }
-    var loop;
+    var loop:boolean;
     do {
         loop = false;
         for (var i = 0; i < textToRemove.length; i++) {
@@ -245,7 +248,7 @@ export function removePrefix(target: string, ...prefixToRemove: string[]): strin
     if (target == null) {
         return target;
     }
-    var loop;
+    var loop: boolean;
     do {
         loop = false;
         for (var i = 0; i < prefixToRemove.length; i++) {
@@ -268,7 +271,7 @@ export function removeSuffix(target: string, ...suffixToRemove: string[]): strin
     if (target == null) {
         return target;
     }
-    var loop;
+    var loop: boolean;
     do {
         loop = false;
         for (var i = 0; i < suffixToRemove.length; i++) {
@@ -438,7 +441,7 @@ export module base64 {
 /** returns a 32bit integer.  same algorithm as used with java, so output should match */
 export function hash(input: string): number {
     /* tslint:disable */
-    var hash = 0, i, c, l;
+    var hash = 0, i: number, c: number, l: number;
     if (input.length == 0) { return hash; }
     for (i = 0, l = input.length; i < l; i++) {
         c = input.charCodeAt(i);
@@ -449,6 +452,7 @@ export function hash(input: string): number {
     return hash;
 }
 
+/**format strings */
 import _sprintf = require("sprintf-js");
 export var format = _sprintf.sprintf;
 export var format2 = _sprintf.vsprintf;

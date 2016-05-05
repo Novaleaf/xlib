@@ -46,10 +46,10 @@ export var getNetworkIPs = (function () {
 			return;
 		}
 		// system call
-		exec(command, function (error, stdout, sterr) {
+		exec(command, function (error: any, stdout: any, sterr: any) {
 			cachedV4 = [];
 			cachedV6 = [];
-			var ip;
+			var ip:string;
 			var i: number;
 			//if (!error) {
 			//ipv4

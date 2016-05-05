@@ -30,11 +30,11 @@ if (typeof (window) !== "undefined") {
 			],
 			DontEnumsLength = DontEnums.length;
 
-		return function (o) {
+		return function (o:any) {
 			if (typeof o !== "object" && typeof o !== "function" || o === null)
 				throw new TypeError("Object.keys called on a non-object");
 
-			var result = [];
+			var result:any[] = [];
 			for (var name in o) {
 				if (o.hasOwnProperty(name)) {
 					result.push(name);
@@ -55,7 +55,7 @@ if (typeof (window) !== "undefined") {
 
 	if (Object.create === undefined) {
 		Object.create = function (o) {
-			function F() { }
+			let F:any = function() { }
 			F.prototype = o;
 			return new F();
 		};
@@ -74,7 +74,7 @@ if (typeof (window) !== "undefined") {
 			if (typeof fun !== "function")
 				throw new TypeError();
 
-			var res = [];
+			var res:any[] = [];
 			var thisp = arguments[1];
 			for (var i = 0; i < len; i++) {
 				if (<any>i in <any>t) {

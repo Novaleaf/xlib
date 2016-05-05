@@ -48,20 +48,20 @@ lock.readLock(function (release) {
  */
 export interface ReadWriteLock {
 
-    readLock(wrapFcn: (release: () => void) => any);
+    readLock(wrapFcn: (release: () => void) => any): void;
     readLock(
         /**
          * Every ReadWriteLock instance allows you to work on a virtually unlimited number of completely independent read/write locks.
 Locks are identified by names called "keys". Every exposed method has an optional "key" first argument indicating the lock to work on; if you don't specify a key, the default lock is used.
          */
-        key: string, wrapFcn: (release: () => void) => any);
-    writeLock(wrapFcn: (release: () => void) => any);
+        key: string, wrapFcn: (release: () => void) => any): void;
+    writeLock(wrapFcn: (release: () => void) => any): void;
     writeLock(
         /**
          * Every ReadWriteLock instance allows you to work on a virtually unlimited number of completely independent read/write locks.
 Locks are identified by names called "keys". Every exposed method has an optional "key" first argument indicating the lock to work on; if you don't specify a key, the default lock is used.
          */
-        key: string, wrapFcn: (release: () => void) => any);
+        key: string, wrapFcn: (release: () => void) => any):void;
 
 }
 

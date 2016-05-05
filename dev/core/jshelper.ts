@@ -1,7 +1,7 @@
 "use strict";
 
 
-
+import _ = require("lodash");
 
 import ex = require("./exception");
 
@@ -87,7 +87,7 @@ this is useful if you wish to add/remove from the original collection while enum
 	): boolean {
 	if (!collection) { return; }
     if (collection["length"] == null) {
-		throw new ex.CorelibException("should have length property");
+		throw new Error("should have length property");
 	}
 
 	if (enumerateCopy) {
@@ -124,7 +124,7 @@ this is useful if you wish to add/remove from the original collection while enum
 	): boolean {
 	if (!collection) { return; }
 	if (!(length in collection)) {
-		throw new ex.CorelibException("should have length property");
+		throw new Error("should have length property");
 	}
 
 	if (enumerateCopy) {
@@ -141,24 +141,24 @@ this is useful if you wish to add/remove from the original collection while enum
 }
 export function forEachProperty<T>(
 	/** enumerate hasOwnProperties of this   */
-	object
+	object:any
 	, func: (
 		/** null values are not discarded (unlike most foreach methods do!) */
 		value: T
 	/** the name of the property the value is assigned to */
 		, key: string
-		, collection
+		, collection: any
 	) => void
 	, recursive?: boolean): void;
 export function forEachProperty<T>(
 	/** enumerate hasOwnProperties of this   */
-	object
+	object: any
 	, func: (
 		/** null values are not discarded (unlike most foreach methods do!) */
 		value: T
 	/** the name of the property the value is assigned to */
 		, key: string
-		, collection
+		, collection: any
 	) => boolean
 	, recursive = false): boolean {
 	if (!object) { return; }
@@ -189,9 +189,9 @@ export function forEachProperty<T>(
 //export function rateLimitFacade<T>(
 
 /** simple ratelimiter, executes at most N times per second.  rate limit is shared by all calls to this method, even for dissimilar functions.*/
-export function rateLimit(perSecondLimit, fn) {
+export function rateLimit(perSecondLimit:number, fn:Function) {
     var callsInLastSecond = 0;
-    var queue = [];
+    var queue:any[] = [];
     return function limited() {
         if (callsInLastSecond >= perSecondLimit) {
             queue.push([this, arguments]);
@@ -201,7 +201,7 @@ export function rateLimit(perSecondLimit, fn) {
         callsInLastSecond++;
         setTimeout(function () {
             callsInLastSecond--;
-            var parms;
+            var parms: any;
             if (parms = queue.shift()) {
                 limited.apply(parms[0], parms[1]);
             }
@@ -244,7 +244,7 @@ from http://stackoverflow.com/questions/3362471/how-can-i-call-a-javascript-cons
 export function apply<TReturn>(targetFcn: (...args: any[]) => TReturn, thisObj: any, argArray: any[], argsToPrepend: any[] = [], argsToPostpend: any[] = []): TReturn {
 	//in case this is IArguments or something of the sort, make a new array
 	if (argArray.unshift == null) {
-		var tmp = [];
+		var tmp:any[] = [];
 		for (var i = 0; i < argArray.length; i++) {
 			tmp.push(argArray[i]);
 		}
@@ -270,7 +270,7 @@ export function applyOrNoop(targetFcn: Function, thisObj: any, argArray: any[], 
 	}
 	//in case this is IArguments or something of the sort, make a new array
 	if (argArray.unshift == null) {
-		var tmp = [];
+		var tmp:any[] = [];
 		for (var i = 0; i < argArray.length; i++) {
 			tmp.push(argArray[i]);
 		}
@@ -305,7 +305,7 @@ export function clone(fn: Function, targetThis: any = {}) {
  */
 export function mixin(
 	/** the object that will have it's members added/replaced by the source's members */
-	target, source,
+	target: any, source: any,
 	/** if true, overwrites existing properties in the target if they exist in the source*/
 	overwriteExisting = false,
 	/** if non-zero, walks through source child members, copying their members to new objects (copy-by-value).

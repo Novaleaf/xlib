@@ -6,6 +6,8 @@ import ex = require("./exception");
 
 import json5 = require("json5");
 import stringHelper = require("./stringhelper");
+import Promise = require("bluebird");
+import moment = require("moment");
 
 
 /** An optional options object may be passed that alters certain aspects of the formatted string:
@@ -109,7 +111,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 
                 var nodeType = typeof (node);
                 if (nodeType === "string") {
-                    var sanitizedValue = stringHelper.escapeUserInput(node as string);// encodeURIComponent(_sanitizeHtml(node as string));
+                    var sanitizedValue = encodeURIComponent(node as string);// stringHelper.escapeUserInput(node as string);// encodeURIComponent(_sanitizeHtml(node as string));
                     return sanitizedValue;
                 } else if (nodeType === "object") {
                     jsHelper.forEachProperty(node, (nodeValue, nodeKey) => {
@@ -247,11 +249,11 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 
         var _superStringifyTokenId = "$$___corelib.serialization.superStringify.tokenId";
         /** tracks objects that are flagged as circular references (we remove our tracking tag at the end) */
-        var _processedNodes = [];
+        var _processedNodes: any[] = [];
 
         /** recurses through a node's key/value pairs (all properties) */
         function _nodePropertyRecurser(node: any, depth: number, typeName: string, nodeDepthSearchDisabled = false): any {
-            var objResult = {};
+            var objResult: {[key:string]:any} = {};
 
             if (!hideType && typeName !== "[*POJO*]") { //never show type for pojo's
                 objResult["[*TYPE*]"] = typeName;
@@ -344,10 +346,13 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                         switch (typeName) {
 							case "Promise":
 								var promise = (node as Promise<any>);
-								
-								var promiseDetails = promise.toJSON();
-								promiseDetails["[*TYPE*]"] = typeName;
-								return promiseDetails;
+
+								if ((promise as any)["toJSON"] != null) {
+									var promiseDetails = (promise as any).toJSON();
+									promiseDetails["[*TYPE*]"] = typeName;
+									return promiseDetails;
+								}
+								return { "[*TYPE*]": typeName, value: promise.toString() };
                             case "Buffer":
                                 var buffer = (node as Buffer);
                                 var bufferDetails = { "[*TYPE*]": typeName, value: stringHelper.summarize(buffer.toString(), 200), length: buffer.length };
@@ -533,7 +538,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 
 
         /** helper to recursively walk through both our templateObj and parseFirstPass, attempting to deserialize */
-        var recursive = (templateCurrentNode, outputCurrentNode) => {
+        var recursive = (templateCurrentNode:any, outputCurrentNode:any) => {
             jsHelper.forEachProperty(outputCurrentNode, (value, key) => {
 
                 var parseType = typeof (outputCurrentNode[key]);

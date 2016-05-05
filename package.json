@@ -1,7 +1,7 @@
 {
   "name": "xlib",
   "version": "0.0.7",
-  "description": "A Cross Platform, Monolithic Core Library for Node.js and Browsers.  Typescript friendly!",
+  "description": "A Base Platform Library for Typescript.  For Node.js and Browsers.",
   "private": false,
   "author": "jason swearingen <jasons@novaleaf.com>",
   "dependencies": {
@@ -22,13 +22,12 @@
     "moment-timezone": "^0.4.1",
     "paralleljs": "^0.2.1",
     "rwlock": "^5.0.0",
-    "rx": "^4.0.6",
-    "sanitize-html": "^1.11.3",
+    "sanitize-html": "^1.11.4",
     "source-map-support": "^0.3.3",
     "sprintf-js": "^1.0.3",
     "validator": "^4.2.1"
   },
-  "devDependencies": {},
+  "devDependencies": { },
   "scripts": {
     "test": "mocha"
   },

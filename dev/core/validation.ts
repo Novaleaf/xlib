@@ -25,14 +25,18 @@ var log = new logging.Logger(__filename);
 export class Scrub<T>{
 
 	public isValid = true;
-    public valid: {};
-	public invalid = {}
+    public valid: { [key: string]: T };
+	public invalid: { [key: string]: T } = {}
 	public errorMessages: string[] = [];
 
-    constructor(inputs: {}, clone = false, deepClone = false, /** fail message if the inputs are not an object */ errorMessage = "Scrub.ctor(inputs) invalid Arguments. 'inputs' must be an 'object'. Instead it was of type '"+typeof(inputs)+"'. ", printInvalidValues = true) {
+    constructor(inputs: { [key: string]: T }, clone = false, deepClone = false, /** fail message if the inputs are not an object */ errorMessage = "Scrub.ctor(inputs) invalid Arguments. 'inputs' must be an 'object'. Instead it was of type '"+typeof(inputs)+"'. ", printInvalidValues = true) {
 
         if (clone === true) {
-            inputs = _.clone(inputs, deepClone);
+			if (deepClone === true) {
+				inputs = _.cloneDeep(inputs);
+			} else {
+				inputs = _.clone(inputs);
+			}
         } else {
             inputs = inputs;
         }
@@ -216,7 +220,7 @@ export class Scrub<T>{
 				errorMessage += ": " + stringHelper.summarize(validationFunction.toString());
 			}
 		}
-		this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key) => {
+		this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key:string) => {
 			let isValid = validationFunction(value, key);
 			return !isValid;
 		});
@@ -230,7 +234,7 @@ export class Scrub<T>{
 	 * @param printInvalidValues
 	 */
 	public isReal(errorMessage = "Inputs must be string (not null or empty) or number (not NaN).", printInvalidValues = true): Scrub<T> {
-		this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key) => {
+		this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key: string) => {
 			if (value == null) { return true; }
 			if (typeof value === "string" && stringHelper.isNullOrEmpty(value) === true) { return true; }
 			if (typeof value === "number" && numHelper.isReal(value) === false) { return true; }
@@ -240,7 +244,7 @@ export class Scrub<T>{
 		return this;
 	}
 	public isUUID(errorMessage = "Inputs must be UUID (GUID).", printInvalidValues = true): Scrub<T> {
-		this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key) => {
+		this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key: string) => {
 			return validator.isUUID(value) ? false : true;
 		});
         return this;
@@ -248,7 +252,7 @@ export class Scrub<T>{
         
 	}
 	public isString(errorMessage = "Inputs must be of type string.", printInvalidValues = true): Scrub<string> {
-		this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key) => {
+		this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key: string) => {
 			if (value == null) { return true; }
 			if (typeof value !== "string") { return true; }
 			return false;
@@ -257,7 +261,7 @@ export class Scrub<T>{
 		return <any>this;
 	}
 	public isNumber(errorMessage = "Inputs must be of type number.", printInvalidValues = true): Scrub<number> {
-		this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key) => {
+		this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key: string) => {
 			if (value == null) { return true; }
 			if (typeof value !== "number") { return true; }
 			return false;
@@ -269,7 +273,7 @@ export class Scrub<T>{
     
 
     public isType<U>(typeName: string, errorMessage = "Inputs must be of type " + typeName, printInvalidValues = true): Scrub<U> {
-        this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key) => {
+        this._enumerationHelper(errorMessage, printInvalidValues, (value: any, key: string) => {
             if (value == null) { return true; }
             if (typeof value !== typeName) { return true; }
             return false;
@@ -337,7 +341,7 @@ export class Scrub<T>{
 	//	return <any>this;
 	//}
 
-	public getValid<U>(key, valueIfInvalid: U = null): T|U {
+	public getValid<U>(key: string, valueIfInvalid: U = null): T|U {
 		var value = this.valid[key];
 		if (value !== undefined) {
 			return value;

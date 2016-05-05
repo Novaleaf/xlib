@@ -13,6 +13,7 @@ import _ = require("lodash");
 import moment = require("moment");
 import assert = require("assert");
 import Exception = ex.Exception;
+import Promise = require("bluebird");
 class LoggerFatalException extends Exception { }
 
 /** coloring for node console */
@@ -220,7 +221,7 @@ export class Logger {
 
             switch (type) {
                 case reflection.Type.Error:
-                    var objArg;
+                    var objArg:any;
                     try {
                         objArg = (serialization.JSONX.inspectStringify(arg, 3, false, true, undefined, undefined, "\t"));
                         //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
@@ -231,7 +232,7 @@ export class Logger {
                     finalArgs.push(Chalk.red.bold(objArg));
                     break;
                 case reflection.Type.object:
-                    var objArg;
+                    var objArg: any;
                     try {
                         objArg = (serialization.JSONX.inspectStringify(arg, 3, false, false, undefined, undefined, "\t"));
                         //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
@@ -269,7 +270,7 @@ export class Logger {
                 break;
             }
 
-        var logLevelColor;
+        var logLevelColor = Chalk.bgBlack;
         switch(targetLogLevel){
             case environment.LogLevel.TRACE:
                 logLevelColor=Chalk.bgWhite;
@@ -462,7 +463,7 @@ export function logPromiseUnhandledRejections(logger = _unhandledDefaultLogger) 
             });
             break;
         case environment.PlatformType.NodeJs:
-            process.on("unhandledRejection", function (reason, promise) {
+            process.on("unhandledRejection", function (reason:string, promise:Promise<any>) {
 				try {
 					//console.log("unhandled");
 					//console.log("xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection " + JSON.stringify({ arguments }));

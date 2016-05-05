@@ -6,7 +6,11 @@ import numHelper = require("./numhelper");
 import ex = require("./exception")
 //import runtime = require("./runtime");
 //import diagnostics = require("./diagnostics");
+//import datetime = require("./datetime");
+import moment = require("moment");
 
+//import promise = require("./promise");
+import Promise = require("bluebird");
 
 /** up to 32 true/false values stored in 32bits (a bitmask) */
 export class BitFlags {
@@ -88,9 +92,9 @@ export class BitFlags {
 	}
 
 	/** sets any flags that are set in the input */
-	public add(flags: BitFlags);
-	public add(rawBuffer: number);
-	public add(bitFlagsOrRawBuffer: any) {
+	public add(flags: BitFlags):void;
+	public add(rawBuffer: number): void;
+	public add(bitFlagsOrRawBuffer: any): void {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			this.rawBuffer |= rawBufferInput;
@@ -99,9 +103,9 @@ export class BitFlags {
 			this.rawBuffer |= flags.rawBuffer;
 		}
 	}
-	public static add(rawBuffer: number, flags: BitFlags);
-	public static add(rawBuffer: number, rawBufferOther: number);
-	public static add(rawBuffer: number, bitFlagsOrRawBuffer: any) {
+	public static add(rawBuffer: number, flags: BitFlags): void;
+	public static add(rawBuffer: number, rawBufferOther: number): void;
+	public static add(rawBuffer: number, bitFlagsOrRawBuffer: any): void {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			rawBuffer |= rawBufferInput;
@@ -112,9 +116,9 @@ export class BitFlags {
 	}
 
 	/** unsets any set flags that are set in the input */
-	public subtract(flags: BitFlags);
-	public subtract(rawBuffer: number);
-	public subtract(bitFlagsOrRawBuffer: any) {
+	public subtract(flags: BitFlags): void;
+	public subtract(rawBuffer: number): void;
+	public subtract(bitFlagsOrRawBuffer: any): void {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			this.rawBuffer &= ~rawBufferInput;
@@ -125,9 +129,9 @@ export class BitFlags {
 	}
 
 	/** unsets any set flags that are set in the input */
-	public static subtract(rawBuffer: number, flags: BitFlags);
-	public static subtract(rawBuffer: number, rawBufferOther: number);
-	public static subtract(rawBuffer: number, bitFlagsOrRawBuffer: any) {
+	public static subtract(rawBuffer: number, flags: BitFlags): void;
+	public static subtract(rawBuffer: number, rawBufferOther: number): void;
+	public static subtract(rawBuffer: number, bitFlagsOrRawBuffer: any): void {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			rawBuffer &= ~rawBufferInput;
@@ -139,9 +143,9 @@ export class BitFlags {
 
 
 	/** flips the value of any flags set in the input */
-	public flip(flags: BitFlags);
-	public flip(rawBuffer: number);
-	public flip(bitFlagsOrRawBuffer: any) {
+	public flip(flags: BitFlags): void;
+	public flip(rawBuffer: number): void;
+	public flip(bitFlagsOrRawBuffer: any): void {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			this.rawBuffer ^= rawBufferInput;
@@ -152,9 +156,9 @@ export class BitFlags {
 	}
 
 	/** flips the value of any flags set in the input */
-	public static flip(rawBuffer: number, flags: BitFlags);
-	public static flip(rawBuffer: number, rawBufferOther: number);
-	public static flip(rawBuffer: number, bitFlagsOrRawBuffer: any) {
+	public static flip(rawBuffer: number, flags: BitFlags): void;
+	public static flip(rawBuffer: number, rawBufferOther: number): void;
+	public static flip(rawBuffer: number, bitFlagsOrRawBuffer: any): void {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			rawBuffer ^= rawBufferInput;
@@ -165,9 +169,9 @@ export class BitFlags {
 	}
 
 	/** returns true if all the set flags in the input are also set in this. */
-	public isAllOn(flags: BitFlags);
-	public isAllOn(rawBuffer: number);
-	public isAllOn(bitFlagsOrRawBuffer: any) {
+	public isAllOn(flags: BitFlags):boolean;
+	public isAllOn(rawBuffer: number): boolean;
+	public isAllOn(bitFlagsOrRawBuffer: any): boolean {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			return (this.rawBuffer & rawBufferInput) === rawBufferInput;
@@ -179,9 +183,9 @@ export class BitFlags {
 
 
 	/** returns true if all the set flags in the input are also set in this. */
-	public static isAllOn(rawBuffer: number, flags: BitFlags);
-	public static isAllOn(rawBuffer: number, rawBufferOther: number);
-	public static isAllOn(rawBuffer: number, bitFlagsOrRawBuffer: any) {
+	public static isAllOn(rawBuffer: number, flags: BitFlags): boolean;
+	public static isAllOn(rawBuffer: number, rawBufferOther: number): boolean;
+	public static isAllOn(rawBuffer: number, bitFlagsOrRawBuffer: any): boolean {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			return (rawBuffer & rawBufferInput) === rawBufferInput;
@@ -192,9 +196,9 @@ export class BitFlags {
 	}
 
 	/** returns true if any of the set flags in the input are set in this. */
-	public isAnyOn(flags: BitFlags);
-	public isAnyOn(rawBuffer: number);
-	public isAnyOn(bitFlagsOrRawBuffer: any) {
+	public isAnyOn(flags: BitFlags): boolean;
+	public isAnyOn(rawBuffer: number): boolean;
+	public isAnyOn(bitFlagsOrRawBuffer: any): boolean {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			return (this.rawBuffer & rawBufferInput) !== 0;
@@ -205,9 +209,9 @@ export class BitFlags {
 	}
 
 	/** returns true if any of the set flags in the input are set in this. */
-	public static isAnyOn(rawBuffer: number, flags: BitFlags);
-	public static isAnyOn(rawBuffer: number, rawBufferOther: number);
-	public static isAnyOn(rawBuffer: number, bitFlagsOrRawBuffer: any) {
+	public static isAnyOn(rawBuffer: number, flags: BitFlags): boolean;
+	public static isAnyOn(rawBuffer: number, rawBufferOther: number): boolean;
+	public static isAnyOn(rawBuffer: number, bitFlagsOrRawBuffer: any): boolean {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			return (rawBuffer & rawBufferInput) !== 0;
@@ -218,9 +222,9 @@ export class BitFlags {
 	}
 
 	/** returns true if the set and unset flags exactly match */
-	public equals(flags: BitFlags);
-	public equals(rawBuffer: number);
-	public equals(bitFlagsOrRawBuffer: any) {
+	public equals(flags: BitFlags): boolean;
+	public equals(rawBuffer: number): boolean;
+	public equals(bitFlagsOrRawBuffer: any): boolean {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			return this.rawBuffer === rawBufferInput;
@@ -231,9 +235,9 @@ export class BitFlags {
 	}
 
 	/** returns true if the set and unset flags exactly match */
-	public static equals(rawBuffer: number, flags: BitFlags);
-	public static equals(rawBuffer: number, rawBufferOther: number);
-	public static equals(rawBuffer: number, bitFlagsOrRawBuffer: any) {
+	public static equals(rawBuffer: number, flags: BitFlags): boolean;
+	public static equals(rawBuffer: number, rawBufferOther: number): boolean;
+	public static equals(rawBuffer: number, bitFlagsOrRawBuffer: any): boolean {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
 			var rawBufferInput = <number>bitFlagsOrRawBuffer;
 			return rawBuffer === rawBufferInput;
@@ -264,7 +268,7 @@ export class ExpiresDictionary<TValue> {
 
 	constructor(public autoTryCleanupInterval: moment.Duration, public defaultLifetime: moment.Duration) {
 		setInterval(() => {
-			this._tryCleanupOne();
+			this._tryCleanupOne(); 
 		}, this.autoTryCleanupInterval.asMilliseconds());
 	}
 
@@ -343,7 +347,8 @@ export function ezForEachAndRemove<TItem>(collection: { [key: string]: TItem }, 
 	let toReturn = new Promise<void>((resolve, reject) => {
 		function _iterationWorker() {
 			if (nextIndex >= keys.length) {
-				return resolve();
+				resolve(null);
+				return;
 			}
 			let currentIndex = nextIndex;
 			nextIndex++;

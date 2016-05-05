@@ -9,7 +9,7 @@ export interface StripeStatic {
 export interface IMetadata {
     [key: string]: string
 }
-interface IList<T> {
+export interface IList<T> {
     /**
      * Value is 'list'
      */
@@ -124,7 +124,7 @@ export interface ICard {
 }
 
 
-interface IRefund {
+export interface IRefund {
     id: string;
 
     /**
@@ -175,7 +175,7 @@ interface IRefund {
  * evidence that shows the charge is legitimate. You can find more information about the dispute process 
  * in our disputes FAQ: https://stripe.com/help/disputes
  */
-interface IDispute {
+export interface IDispute {
     /**
      * Valud is 'dispute'
      */
@@ -262,7 +262,7 @@ interface IDispute {
     metadata: IMetadata;
 }
 
-interface IDisputeEvidence {
+export interface IDisputeEvidence {
     /**
      * Any server or activity logs showing proof that the customer accessed or downloaded the purchased 
      * digital product. This information should include IP addresses, corresponding timestamps, and any 
@@ -411,7 +411,7 @@ interface IDisputeEvidence {
 }
 
 
-interface IShippingInformation {
+export interface IShippingInformation {
     /**
      * Shipping address.
      */
@@ -471,7 +471,7 @@ interface IShippingInformation {
 
 
 
-interface IBalanceTransaction {
+export interface IBalanceTransaction {
     id: string;
 
     /**
@@ -544,7 +544,7 @@ interface IBalanceTransaction {
 }
 
 
-interface IReversal {
+export interface IReversal {
     id: string;
 
     /**
@@ -574,7 +574,7 @@ interface IReversal {
      */
     transfer: string;
 }
-interface ITransfer {
+export interface ITransfer {
     id: string;
     object: string;
     livemode: boolean;
@@ -797,7 +797,7 @@ export interface ICharge {
     shipping?: IShippingInformation;
 }
 
-interface IChargeCreateOptions {
+export interface IChargeCreateOptions {
     /**
      * A positive integer in the smallest currency unit (e.g 100 cents to charge $1.00, or 1 to charge ¥1, a 0-decimal currency) 
      * representing how much to charge the card. The minimum amount is $0.50 (or equivalent in charge currency).
@@ -936,7 +936,7 @@ export interface IPlan {
   * A discount represents the actual application of a coupon to a particular customer. It contains information 
   * about when the discount began and when it will end.
   */
-interface IDiscount {
+export interface IDiscount {
     /**
      * Value is 'discount'
      */
@@ -969,7 +969,7 @@ interface IDiscount {
  * A coupon contains information about a percent-off or amount-off discount you might want to apply to a customer. 
  * Coupons only apply to invoices; they do not apply to one-off charges.
  */
-interface ICoupon {
+export interface ICoupon {
     id: string;
 
     /**
@@ -1129,7 +1129,7 @@ export interface IBitcoinReceiver {
     used_for_payment: boolean;
 }
 
-interface IBitcoinTransaction {
+export interface IBitcoinTransaction {
     id: string;
 
     /**
@@ -1288,7 +1288,7 @@ True if you can create multiple payments using this account. If the account is r
 Whether this Alipay account object has ever been used for a payment.*/
     used: boolean;
     /** The username for the Alipay account.*/
-    username;
+    username:string;
 
 }
 
@@ -1384,7 +1384,7 @@ Hash describing the bank account, i supposed used when type=bank_account */
 }
 
 
-interface IInvoiceLineItem {
+export interface IInvoiceLineItem {
 	/**
 	 * The ID of the source of this line item, either an invoice item or a subscription
 	 */
@@ -1475,7 +1475,7 @@ interface IInvoiceLineItem {
  * not include unpaid invoices; it only includes balances that need to be taken into account when calculating 
  * the amount due for the next invoice.
  */
-interface IInvoice {
+export interface IInvoice {
 	id: string;
 
 	/**
@@ -1631,15 +1631,15 @@ interface IInvoice {
 
 export interface StripeInstance {
     /** When we make backwards-incompatible changes to the API, we release new, dated versions. example version is "2016-02-03" */
-    setApiVersion(versionDate: string);
+    setApiVersion(versionDate: string):void;
     /** To charge a credit or a debit card, you create a charge object. You can retrieve and refund individual charges as well as list all charges. Charges are identified by a unique random ID.*/
     charges: {
         /** To charge a credit card, you create a charge object. If your API key is in test mode, the supplied payment source (e.g., card or Bitcoin receiver) won't actually be charged, though everything else will occur as if in live mode. (Stripe assumes that the charge would have completed successfully).*/
-        create(options: IChargeCreateOptions): Promise<ICharge>;
+        create(options: IChargeCreateOptions): PromiseLike<ICharge>;
         /** Retrieves the details of a charge that has previously been created. Supply the unique charge ID that was returned from your previous request, and Stripe will return the corresponding charge information. The same information is returned when creating or refunding the charge.*/
-        retrieve(/** The identifier of the charge to be retrieved.*/charge: string): Promise<ICharge>;
-        update(charge: string, options: any): Promise<ICharge>;
-        capture(charge: string): Promise<ICharge>;
+        retrieve(/** The identifier of the charge to be retrieved.*/charge: string): PromiseLike<ICharge>;
+        update(charge: string, options: any): PromiseLike<ICharge>;
+        capture(charge: string): PromiseLike<ICharge>;
 		/** List all charges
 Returns a list of charges you’ve previously created. The charges are returned in sorted order, with the most recent charges appearing first.
 		Returns
@@ -1665,22 +1665,22 @@ A filter on the list based on the source of the charge. The value can be a dicti
 A cursor for use in pagination. starting_after is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include starting_after=obj_foo in order to fetch the next page of the list.*/
 			starting_after?: any;
 
-		}): Promise<IList<ICharge>>;
+		}): PromiseLike<IList<ICharge>>;
 
 
     };
     /** You can create plans easily via the plan management page of the Stripe dashboard. Plan creation is also accessible via the API if you need to create plans on the fly. */
     plans: {
         /** todo: document*/
-        create(...args: any[]);
+        create(...args: any[]): PromiseLike<IPlan>;
         /** Retrieves the plan with the given ID. */
         retrieve(
             /** The ID of the desired plan. */
-            plan: string): Promise<IPlan>;
+            plan: string): PromiseLike<IPlan>;
         /** todo: document*/
-        update(...args: any[]);
+        update(...args: any[]): PromiseLike<IPlan>;
         /** todo: document*/
-        del(...args: any[]);
+        del(...args: any[]): PromiseLike<any>;
         /** Returns a list of your plans. 
         
         Returns
@@ -1715,7 +1715,7 @@ A cursor for use in pagination. starting_after is an object ID that defines your
             A cursor for use in pagination. starting_after is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include starting_after=obj_foo in order to fetch the next page of the list.*/
             starting_after?: any;
 
-        }): Promise<IList<IPlan>>;
+        }): PromiseLike<IList<IPlan>>;
 
     };
 	/** Customer objects allow you to perform recurring charges and track multiple charges that are associated with the same customer. The API allows you to create, delete, and update your customers. You can retrieve individual customers as well as a list of all your customers.*/
@@ -1757,11 +1757,11 @@ A cursor for use in pagination. starting_after is an object ID that defines your
 			Unix timestamp representing the end of the trial period the customer will get before being charged. If set, trial_end will override the default trial period of the plan the customer is being subscribed to. The special value now can be provided to end the customer’s trial immediately. Only applies when the plan parameter is also provided.*/
 			trial_end?: number;
 
-		}): Promise<ICustomer>;
+		}): PromiseLike<ICustomer>;
 		/** Retrieves the details of an existing customer. You need only supply the unique customer identifier that was returned upon customer creation.
 		Returns
 		Returns a customer object if a valid identifier was provided. When requesting the ID of a customer that has been deleted, a subset of the customer’s information will be returned, including a deleted property, which will be true.*/
-		retrieve(customerId: string): Promise<ICustomer>;
+		retrieve(customerId: string): PromiseLike<ICustomer>;
 		/** Updates the specified customer by setting the values of the parameters passed. Any parameters not provided will be left unchanged. For example, if you pass the source parameter, that becomes the customer's active source (e.g., a card) to be used for all charges in the future. When you update a customer to a new valid source: for each of the customer's current subscriptions, if the subscription is in the past_due state, then the latest unpaid, unclosed invoice for the subscription will be retried (note that this retry will not count as an automatic retry, and will not affect the next regularly scheduled payment for the invoice). (Note also that no invoices pertaining to subscriptions in the unpaid state, or invoices pertaining to canceled subscriptions, will be retried as a result of updating the customer's source.)
 This request accepts mostly the same arguments as the customer creation call.
 		Returns
@@ -1808,24 +1808,24 @@ Returns the customer object if the update succeeded. Throws an error if update p
 				child arguments*/
 				source?:string|ICard;
 
-			}):Promise<ICustomer>
+			}):PromiseLike<ICustomer>
 		/** Delete a card
 		You can delete cards from a customer, recipient, or managed account.
 		For customers: if you delete a card that is currently the default source, then the most recently added source will become the new default. If you delete a card that is the last remaining source on the customer then the default_source attribute will become null.
 		For recipients: if you delete the default card, then the most recently added card will become the new default. If you delete the last remaining card on a recipient, then the default_card attribute will become null.
 		For accounts: if a card's default_for_currency property is true, it can only be deleted if it is the only external account for its currency, and the currency is not the Stripe account's default currency. Otherwise, before deleting the card, you must set another external account to be the default for the currency.
 		Note that for cards belonging to customers, you may want to prevent customers on paid subscriptions from deleting all cards on file so that there is at least one default card for the next invoice payment attempt.*/
-		deleteCard(customerId: string, cardId: string): Promise<{ deleted: boolean; id: string }>;
+		deleteCard(customerId: string, cardId: string): PromiseLike<{ deleted: boolean; id: string }>;
 		/** Create a card
 		When you create a new credit card, you must specify a customer, recipient, or managed account to create it on.
 		If the card's owner has no default card, then the new card will become the default. However, if the owner already has a default then it will not change. To change the default, you should either update the customer to have a new default_source, update the recipient to have a new default_card, or set default_for_currency to true when creating a card for a managed account. */
-		createSource(customerId: string, options: {/** token from stripe checkout */source: string }): Promise<ICard | IAlipayAccount>;
-		createSource(customerId: string, options: {/** token from stripe checkout */source: string }, /** optional A set of key/value pairs that you can attach to a card object. It can be useful for storing additional information about the card in a structured format. */ metadata: IMetadata): Promise<ICard | IAlipayAccount | IBitcoinReceiver>;
+		createSource(customerId: string, options: {/** token from stripe checkout */source: string }): PromiseLike<ICard | IAlipayAccount>;
+		createSource(customerId: string, options: {/** token from stripe checkout */source: string }, /** optional A set of key/value pairs that you can attach to a card object. It can be useful for storing additional information about the card in a structured format. */ metadata: IMetadata): PromiseLike<ICard | IAlipayAccount | IBitcoinReceiver>;
 
 
 		/** Cancels a customer’s subscription. If you set the at_period_end parameter to true, the subscription will remain active until the end of the period, at which point it will be canceled and not renewed. By default, the subscription is terminated immediately. In either case, the customer will not be charged again for the subscription. Note, however, that any pending invoice items that you’ve created will still be charged for at the end of the period unless manually deleted. If you’ve set the subscription to cancel at period end, any pending prorations will also be left in place and collected at the end of the period, but if the subscription is set to cancel immediately, pending prorations will be removed.
 		By default, all unpaid invoices for the customer will be closed upon subscription cancellation. We do this in order to prevent unexpected payment retries once the customer has canceled a subscription. However, you can reopen the invoices manually after subscription cancellation to have us proceed with automatic retries, or you could even re-attempt payment yourself on all unpaid invoices before allowing the customer to cancel the subscription at all.*/
-		cancelSubscription(customerId: string, subscriptionId: string, options: { at_period_end?: boolean }): Promise<ISubscription>;
+		cancelSubscription(customerId: string, subscriptionId: string, options: { at_period_end?: boolean }): PromiseLike<ISubscription>;
 		/** Creates a new subscription on an existing customer.*/
 		createSubscription(customerId: string, options: {
 			/** REQUIRED
@@ -1854,7 +1854,7 @@ Returns the customer object if the update succeeded. Throws an error if update p
 			trial_end?: number;
 
 
-		}): Promise<ISubscription>;
+		}): PromiseLike<ISubscription>;
 
 		/** Updates an existing subscription on a customer to match the specified parameters. When changing plans or quantities, we will optionally prorate the price we charge next month to make up for any price changes. To preview how the proration will be calculated, use the upcoming invoice endpoint.
 		By default, we prorate subscription changes. For example, if a customer signs up on May 1 for a $10 plan, she'll be billed $10 immediately. If she then switches to a $20 plan on May 15, on June 1 she'll be billed $25 ($20 for a renewal of her subscription and a $5 prorating adjustment for the previous month). Similarly, a downgrade will generate a credit to be applied to the next invoice. We also prorate when you make quantity changes. Switching plans does not change the billing date or generate an immediate charge unless you're switching between different intervals (e.g. monthly to yearly), in which case we apply a credit for the time unused on the old plan and charge for the new plan starting right away, resetting the billing date. (Note that if we charge for the new plan, and that payment fails, the plan change will not go into effect).
@@ -1900,7 +1900,7 @@ Unix timestamp representing the end of the trial period the customer will get be
 
 
 
-		}): Promise<ISubscription>;
+		}): PromiseLike<ISubscription>;
 
     }
 
@@ -1911,7 +1911,7 @@ Returns an invoice object if a valid invoice ID was provided. Throws an error ot
 The invoice object contains a lines hash that contains information about the subscriptions and invoice items that have been applied to the invoice, as well as any prorations that Stripe has automatically calculated. Each line on the invoice has an amount attribute that represents the amount actually contributed to the invoice’s total. For invoice items and prorations, the amount attribute is the same as for the invoice item or proration respectively. For subscriptions, the amount may be different from the plan’s regular price depending on whether the invoice covers a trial period or the invoice period differs from the plan’s usual interval.
 The invoice object has both a subtotal and a total. The subtotal represents the total before any discounts, while the total is the final amount to be charged to the customer after all coupons have been applied.
 The invoice also has a next_payment_attempt attribute that tells you the next time (as a Unix timestamp) payment for the invoice will be automatically attempted. For invoices that have been closed or that have reached the maximum number of retries (specified in your retry settings), the next_payment_attempt will be null.*/
-		retrieve(invoice: string): Promise<IInvoice>;
+		retrieve(invoice: string): PromiseLike<IInvoice>;
 		/** When retrieving an invoice, you'll get a lines property containing the total count of line items and the first handful of those items. There is also a URL where you can retrieve the full (paginated) list of line items.
 		FULL DEFINITION NOT IMPLEMENTED.  
 		*/
@@ -1934,7 +1934,7 @@ The invoice also has a next_payment_attempt attribute that tells you the next ti
 			/** optional, default is 10
 A limit on the number of objects to be returned. Limit can range between 1 and 100 items.*/
 			limit?: number;
-		}): Promise<IList<IInvoice>>;
+		}): PromiseLike<IList<IInvoice>>;
 	}
 
 }

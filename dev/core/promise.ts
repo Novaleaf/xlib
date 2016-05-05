@@ -8,6 +8,7 @@ import __ = require("./lolo");
  * global.Promise is aliased to this.
  */
 export import bluebird = require("bluebird");
+import Promise = require("bluebird");
 //bluebird.longStackTraces();
 
 if (__.isDebug == true) {
@@ -28,21 +29,22 @@ if (__.isDebug == true) {
 
 global.Promise = bluebird;
 
-/** Reactive Extensions https://github.com/Reactive-Extensions/RxJS 
-...is a set of libraries to compose asynchronous and event-based programs using observable collections and Array#extras style composition in JavaScript
- * global.Rx is aliased to this.
- */
-export import rx = require("rx");
-global["Rx"] = rx;
-rx.config.Promise = bluebird;
+
+///** Reactive Extensions https://github.com/Reactive-Extensions/RxJS 
+//...is a set of libraries to compose asynchronous and event-based programs using observable collections and Array#extras style composition in JavaScript
+// * global.Rx is aliased to this.
+// */
+//export import rx = require("rx.all");
+//(global as any)["Rx"] = rx;
+//(rx as any).config.Promise = bluebird;
 
 /** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/
-export function CreateExposedPromise<T>(callback?: (resolve: (resultOrThenable: T | PromiseLike<T>) => void, reject: (error: any) => void) => void): IExposedPromise<T> {
+export function CreateExposedPromise<T>(callback?: (resolve: (resultOrThenable: T | Promise<T>) => void, reject: (error: any) => void) => void): IExposedPromise<T> {
 
-	var resolver: (resultOrThenable: T|PromiseLike<T>) => void;
+	var resolver: (resultOrThenable: T|Promise<T>) => void;
 	var rejector: (error: any) => void;
 
-	var toReturn: IExposedPromise<T> = <any> new Promise<T>(function (resolve, reject) {
+	var toReturn: IExposedPromise<T> = <any> new bluebird<T>(function (resolve, reject) {
 		resolver = resolve;
 		rejector = reject;
 		if (callback != null) {
@@ -56,8 +58,8 @@ export function CreateExposedPromise<T>(callback?: (resolve: (resultOrThenable: 
 	return toReturn;
 }
 
-export interface IExposedPromise<R> extends Promise <R> {
-	resolve: (resultOrThenable: R|PromiseLike<R>) => void;
+export interface IExposedPromise<R> extends Promise<R> {
+	resolve: (resultOrThenable: R|Promise<R>) => void;
 	reject: (error: any) => void;
 
 }
@@ -134,10 +136,10 @@ export function forEach<TIn, TOut>(array: TIn[], callback: (value: TIn) => TOut 
 			var resultPromise = callback(value);
 			results.push(<any>resultPromise);
 		});
-
-		return Promise.all(results);
+		
+		return bluebird.all(results);
 	} catch (ex) {
-		return <any>Promise.reject(ex);
+		return <any>bluebird.reject(ex);
 	}
 }
 
@@ -193,7 +195,7 @@ The StopError constructor accepts one argument. If it is invoked with an instanc
 	}
 
 	export interface IRetryStatic {
-		<TValue>(fn: () => PromiseLike<TValue>, options?: IOptions): Promise<TValue>;
+		<TValue>(fn: () => Promise<TValue>, options?: IOptions): Promise<TValue>;
 		/** Stopping
 The library also supports stopping the retry loop before the timeout occurs by throwing a new instance of retry.StopError from within the called function.
 		The StopError constructor accepts one argument. If it is invoked with an instance of Error, then the promise is rejected with that error argument. Otherwise the promise is rejected with the StopError itself.*/

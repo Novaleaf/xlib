@@ -39,6 +39,8 @@ export var platformType: PlatformType = function (): PlatformType {
 } ();
 
 
+
+
 export enum OsName {
 	unknown,
 	/** mac */
@@ -53,7 +55,7 @@ export enum OsName {
 /** the name of the os we detect running.  uses user agent in browsers, process.platform in nodejs */
 export var osName: OsName = (() => {
 	if (typeof (process) !== "undefined") {
-		return OsName[process.platform];
+		return (OsName as any)[process.platform];
 	}
 	try {
 		if (navigator.appVersion.indexOf("Win") !== -1) { return OsName.win32; }
@@ -95,7 +97,7 @@ export enum LogLevel {
  * nodejs: set by running "node entrypoint.js logLevel=DEBUG" or by setting your systemenv var: logLevel=DEBUG
  * browser: set by adding "logLevel=DEBUG" in your querystring, add a cookie, or as a attribute of your html tag
   */
-export var logLevel: LogLevel = LogLevel[getEnvironmentVariable("logLevel", null)];
+export var logLevel: LogLevel = (LogLevel as any)[getEnvironmentVariable("logLevel", null)];
 if (logLevel == null) {
 	logLevel = LogLevel.TRACE;
 	console.info("logLevel varible is not set.  \n\tdefaulting to logLevel=TRACE.");
@@ -123,7 +125,7 @@ export enum EnvLevel {
 	//PREPROD = 30,
 	PROD = 40,
 }
-export var envLevel: EnvLevel = EnvLevel[getEnvironmentVariable("envLevel", null)];
+export var envLevel: EnvLevel = (EnvLevel as any)[getEnvironmentVariable("envLevel", null)];
 if (envLevel == null) {
 	envLevel = EnvLevel.DEV;
 	console.info("envLevel varible is not set.  \n\tdefaulting to envLevel=DEV.");
@@ -143,7 +145,7 @@ export enum TestLevel {
 	//PREPROD = 30,
 	FULL = 40,
 }
-export var testLevel: TestLevel = TestLevel[getEnvironmentVariable("testLevel", null)];
+export var testLevel: TestLevel = (TestLevel as any)[getEnvironmentVariable("testLevel", null)];
 if (testLevel == null) {
 	testLevel = TestLevel.FULL;
 	console.info("testLevel varible is not set.  \n\tdefaulting to testLevel=FULL.");

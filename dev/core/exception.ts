@@ -1,9 +1,9 @@
-declare class Error {
-	public name: string;
-	public message: string;
-	public stack: string;
-	constructor(message?: string);
-}
+//declare class Error {
+//	public name: string;
+//	public message: string;
+//	public stack: string;
+//	constructor(message?: string);
+//}
 import environment = require("./environment");
 //let err: Error;
 

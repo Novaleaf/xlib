@@ -18,7 +18,7 @@ export var ieVersion: number = (function () {
 	if (typeof (document) === "undefined") {
 		return null;
 	}
-	var undef,
+	var undef:any,
 		v = 3,
 		div = document.createElement("div"),
 		all = div.getElementsByTagName("i");
@@ -93,7 +93,7 @@ export function getDomElement(elementType: string,
 	if (typeof (document) === "undefined") {
 		return null;
 	}
-	var foundElement;
+	var foundElement: any;
 	var elements: HTMLElement[];
 	elements = <any> document.getElementsByTagName(elementType);
 	if (attribute == null) {
@@ -104,7 +104,7 @@ export function getDomElement(elementType: string,
 	} else {
 		//search for attribute name
 
-		var searchPredicate = (element) => {
+		var searchPredicate = (element: any) => {
 			var foundAttributeValue = element.getAttribute(attribute);
 			if (foundAttributeValue) {
 				if (attributeValue == null) {
@@ -119,6 +119,7 @@ export function getDomElement(elementType: string,
 					}
 				}
 			}
+			return false;
 		};
 
 		if (searchTopDown) {
@@ -251,7 +252,7 @@ export var getQuerystringVariables = (() => {
 
 export function getQuerystringVariable(key: string, valueIfNullOrEmpty?: string): string {
 	//from: https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-	var parsedQuerystrings = getQuerystringVariables();
+	var parsedQuerystrings : {[key:string]:string} = getQuerystringVariables() as any;
 
 	var result = parsedQuerystrings[key];
 	if (valueIfNullOrEmpty != null) {

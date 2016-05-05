@@ -31,7 +31,7 @@ export module hashHelper {
     }
 
     /** internal helper. if no hashcode, null is returned */
-    export function getHashCode(item): string {
+    export function getHashCode(item:any): string {
         if (item.__noenum_novaleaf_corelib_collections_hashCode != null) { return item.__noenum_novaleaf_corelib_collections_hashCode; }
         if (item.hashCode != null) {
             return item.hashCode.toString();
@@ -62,7 +62,7 @@ export module hashHelper {
     }
 
     /** if hashCode exists, returns it.  otherwise will create one */
-    export function tryCreateHashCode(item): string {
+    export function tryCreateHashCode(item: any): string {
         //return existing hashcode, if any
         var hashCode = getHashCode(item);
         if (hashCode != null) { return hashCode; }
@@ -165,10 +165,10 @@ export function round(value: number,
 
 
 /** randomize order of elements in this array */
-export function randomizeArray(myArray: any[]) {
+export function randomizeArray(myArray: any[]):void {
     //from here http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
-    var i = myArray.length, j, temp;
-    if (i === 0) { return false; }
+    var i = myArray.length, j:number, temp:any;
+    if (i === 0) { return; }
     while (--i) {
         j = Math.floor(Math.random() * (i + 1));
         temp = myArray[i];
@@ -181,7 +181,7 @@ export function randomizeArray(myArray: any[]) {
  * @param length
  * @param chars
  */
-export function randomStringCrypto(length, chars) {
+export function randomStringCrypto(length:number, chars:string) {
 	if (!chars) {
 		throw new Error('Argument \'chars\' is undefined');
 	}
@@ -207,7 +207,7 @@ export function randomStringCrypto(length, chars) {
  *  ex: randomAsciiString(20); // Returns 'rmRptK5niTSey7NlDk5y' which is 20 characters length.
  * @param length
  */
-export function randomAsciiStringCrypto(length) {
+export function randomAsciiStringCrypto(length:number) {
 	return randomStringCrypto(length,
 		'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 }
@@ -336,10 +336,10 @@ export function clamp(value: number, min_inc: number, max_inc: number, clampType
 /** interpolate between values
 base implementation works for numbers.  override .update() to extend functionality to other types */
 export class Interpolater {
-    public current;
-    public startRate;
+    public current: number;
+    public startRate: number;
     private clampType: ClampType;
-    constructor(public start, public min, public max, public rate: number, public isBounce: boolean, public isEnabled = true) {
+    constructor(public start: number, public min: number, public max: number, public rate: number, public isBounce: boolean, public isEnabled = true) {
         this.clampType = isBounce ? ClampType.bounce : ClampType.loop;
         this.current = start;
         this.startRate = rate;

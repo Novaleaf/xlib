@@ -34,7 +34,7 @@ export enum Type {
 
 
 /** provides the primitive type of a variable. better than using 'typeof()' because this handles array and null. */
-export function getType(obj): Type {
+export function getType(obj:any): Type {
 	if (obj === null) {
 		return Type.null;
 	}
@@ -45,7 +45,7 @@ export function getType(obj): Type {
 		case "boolean":
 		case "function":
 		case "undefined":
-			return Type[type];
+			return (Type as any)[type];
 		case "object":
 			var name: string;
 			if (obj instanceof Array) {
@@ -59,14 +59,14 @@ export function getType(obj): Type {
 			} else {
 				name = "object";
 			}
-			return Type[name];
+			return (Type as any)[name];
 		default:
 			throw new ex.CorelibException("getType(), unknown primitive type: " + String(type));
 	}
 }
 
 /** get the name of an object's type. better than using 'typeof()' because this handles array and null.*/
-export function getTypeName(obj): string {
+export function getTypeName(obj:any): string {
 	var type = getType(obj);
 	switch (type) {
 		case Type.object:
@@ -106,7 +106,7 @@ export function getArgumentNames(argsOrFunction: any): string[] {
 	}
 	var reg = /\(([\s\S]*?)\)/;
 	var params = reg.exec(func.toString());
-	var paramNames;
+	var paramNames:string[];
 	if (params) {
 		paramNames = params[1].split(",");
 	} else {
