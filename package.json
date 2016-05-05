@@ -1,6 +1,6 @@
 {
   "name": "xlib",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A Base Platform Library for Typescript.  For Node.js and Browsers.",
   "private": false,
   "author": "jason swearingen <jasons@novaleaf.com>",
@@ -27,7 +27,7 @@
     "sprintf-js": "^1.0.3",
     "validator": "^4.2.1"
   },
-  "devDependencies": { },
+  "devDependencies": {},
   "scripts": {
     "test": "mocha"
   },
