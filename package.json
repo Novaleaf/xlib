@@ -1,38 +1,22 @@
 {
   "name": "xlib",
-  "version": "0.0.12",
-  "description": "A Base Platform Library for Typescript.  For Node.js and Browsers.",
+  "version": "4.0.0",
+  "description": "A cross platform (nodejs/browser) common utilities library, written in Typescript",
   "private": false,
   "author": "jason swearingen <jasons@novaleaf.com>",
   "dependencies": {
-    "aguid": "^1.0.4",
-    "async": "^1.5.0",
-    "axios": "^0.8.1",
-    "base64url": "^1.0.5",
-    "bluebird": "^3.3.5",
-    "bluebird-retry": "^0.5.3",
-    "chalk": "^1.1.1",
-    "commondir": "^1.0.1",
-    "d3-dsv": "^0.1.6",
-    "decimal.js": "^5.0.8",
-    "json5": "^0.5.0",
-    "jsonwebtoken": "^5.5.0",
-    "lodash": "^3.10.1",
-    "moment": "^2.10.6",
-    "moment-timezone": "^0.4.1",
-    "paralleljs": "^0.2.1",
-    "rwlock": "^5.0.0",
-    "sanitize-html": "^1.11.4",
-    "source-map-support": "^0.3.3",
-    "sprintf-js": "^1.0.3",
-    "validator": "^4.2.1"
+    "@types/lodash": "^4.14.34",
+    "@types/node": "^6.0.38",
+    "lodash": "^4.15.0"
   },
   "devDependencies": {},
   "scripts": {
     "test": "mocha"
+    "dev": "webpack --watch --progress --colors --config webpack.dev.config.js",
+    "build": "webpack && webpack --config webpack.dev.config.js",
   },
-  "main": "./lib/_main.js",
-  "typings": "./lib/_main.d.ts",
+  "main": "./dist/bundle.js",
+  "typings": "./src/index.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/Novaleaf/xlib"
@@ -40,7 +24,8 @@
   "keywords": [
     "monolithic",
     "corelib",
-    "typescript"
+    "typescript",
+    "bcl"
   ],
   "license": "MIT",
   "bugs": {

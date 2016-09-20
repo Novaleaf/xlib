@@ -8,7 +8,7 @@
     "sourceMap": true,
     "inlineSources": false,
     "inlineSourceMap": false,
-    "declaration": true,
+    "declaration": false,
     "jsx": "react",
     "newLine": "LF",
     "pretty": true,
@@ -20,21 +20,13 @@
     "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
 
-    "outDir": "./lib",
-    "rootDir": "./dev",
-
-    "suppressImplicitAnyIndexErrors": true
-    
+    "outDir": "./dist",
+    "rootDir": "./src"
 
   },
   "exclude": [
     "node_modules",
-    "lib",
-    "typings/browser.d.ts",
-    "typings/browser",
-    "obj",
-    "bin",
-    "dev/graveyard"
-
+    "dist",
+    "src/graveyard"
   ]
 }
