@@ -5,6 +5,8 @@
 //	constructor(message?: string);
 //}
 import environment = require("./environment");
+//import * as environment from "./environment";
+
 //let err: Error;
 
 //err.

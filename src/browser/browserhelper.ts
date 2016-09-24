@@ -1,4 +1,8 @@
 "use strict";
+
+//import * as jsHelper from "../jshelper";
+//import * as ex from "../exception";
+
 import jsHelper = require("../jshelper");
 import ex = require("../exception");
 
@@ -44,15 +48,17 @@ export var isIE: boolean = (function () {
 } ());
 
 /** provides onload() capabilities that work on old versions of IE too */
-export function onLoad(domElement: any, callback: any): void {
+export function onLoad(domElement: HTMLElement | any, callback: any): void {
 	//throw new ex.CorelibException("depricated.  still used?");
 	//jquery handling of callbacks, taken from http://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
 	if (typeof domElement.onload === "undefined" && domElement.onreadystatechange !== "undefined") {
 		throw new ex.CorelibException("the element you wish to attach the callback does not have a .onload() method to attach to!");
 	}
-	var done = false;
-	domElement.onload = domElement.onreadystatechange = function (ev: Event) {
-		if (!done && (!this.readyState ||
+    var done = false;
+    
+
+    domElement.onload = domElement.onreadystatechange = function (this: any, ev: Event) {
+		if (!done && (! this.readyState ||
 			this.readyState === "loaded" || this.readyState === "complete")) {
 			done = true;
 			//jQuery.handleSuccess(s, xhr, status, data);
@@ -62,7 +68,7 @@ export function onLoad(domElement: any, callback: any): void {
 
 			//if (!environment._DEBUG_MODE) {
 			// Handle memory leak in IE
-			domElement.onload = domElement.onreadystatechange = null;
+			domElement.onload = domElement.onreadystatechange = <any>null;
 			//if (domElement && scriptElement.parentNode) {
 			//	domElement.removeChild(scriptElement);
 			//}
@@ -76,12 +82,12 @@ export function onLoad(domElement: any, callback: any): void {
 example:
 var amdMain = getFirstAttribute("script","data-amd-main");
 */
-export function getDomAttribute(elementType: string, attribute: string, searchTopDown: boolean = false): string {
+export function getDomAttribute(elementType: string, attribute: string, searchTopDown: boolean = false): string|null {
 	if (typeof (document) === "undefined") {
 		return null;
 	}
 
-	var foundElement = getDomElement(elementType, attribute, null, searchTopDown);
+	var foundElement = getDomElement(elementType, attribute, undefined, searchTopDown);
 	if (foundElement == null) { return null; }
 
 	return foundElement.getAttribute(attribute);
@@ -89,7 +95,7 @@ export function getDomAttribute(elementType: string, attribute: string, searchTo
 /** get the first html element found and return it.  */
 export function getDomElement(elementType: string,
 	/** if not null, finds an element with this attribute */
-	attribute?: string, attributeValue?: string, searchTopDown = false): HTMLElement {
+	attribute?: string, attributeValue?: string, searchTopDown = false): HTMLElement |null {
 	if (typeof (document) === "undefined") {
 		return null;
 	}
@@ -196,12 +202,12 @@ export var getCookies = (() => {
 	return _getCookies;
 })();
 
-export function getCookie(key: string, valueIfNullOrEmpty?: string): string {
+export function getCookie(key: string, valueIfNullOrEmpty?: string|null): string|null {
 
 	var parsedCookies = getCookies();
 
 	var result = parsedCookies[key];
-	if (valueIfNullOrEmpty != null) {
+	if (valueIfNullOrEmpty !== undefined) {
 		if (result == null || result.length === 0) {
 			return valueIfNullOrEmpty;
 		}
@@ -250,12 +256,12 @@ export var getQuerystringVariables = (() => {
 	return _getQuerystringVariables;
 })();
 
-export function getQuerystringVariable(key: string, valueIfNullOrEmpty?: string): string {
+export function getQuerystringVariable(key: string, valueIfNullOrEmpty?: string|null): string|null {
 	//from: https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
 	var parsedQuerystrings : {[key:string]:string} = getQuerystringVariables() as any;
 
 	var result = parsedQuerystrings[key];
-	if (valueIfNullOrEmpty != null) {
+	if (valueIfNullOrEmpty !== undefined) {
 		if (result == null || result.length === 0) {
 			return valueIfNullOrEmpty;
 		}

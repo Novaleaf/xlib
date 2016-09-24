@@ -1,5 +1,6 @@
 "use strict";
 import ex = require("../exception");
+//import * as ex from "../exception";
 
 
 /** helpers for backend node.js stuff  NODE.JS ONLY!!! */
@@ -7,75 +8,75 @@ import ex = require("../exception");
 
 //declare var require: any;
 //declare var process: any;
-/** get a list of all ip addresses of this server.  after generating the ip's, will cache results for next time you call this method */
-export var getNetworkIPs = (function () {
-	if (typeof (require) === "undefined" || typeof (process) === "undefined") {
-		return function (callback: (error: any, ipV4Addresses: string[], ipV6Addresses: string[]) => void, bypassCache?: boolean) {
-			callback("network ip not supported on this platform", null, null);
-		}
-	}
-	var ignoreRE = /^(127\.0\.0\.1|::1|fe80(:1)?::1(%.*)?)$/i;
+///** get a list of all ip addresses of this server.  after generating the ip's, will cache results for next time you call this method */
+//export var getNetworkIPs = (function () {
+//	if (typeof (require) === "undefined" || typeof (process) === "undefined") {
+//        return function (callback: (error: any, ipV4Addresses: string[], ipV6Addresses: string[]) => void, bypassCache?: boolean) {            
+//			callback("network ip not supported on this platform", [], []);
+//		}
+//	}
+//	var ignoreRE = /^(127\.0\.0\.1|::1|fe80(:1)?::1(%.*)?)$/i;
 
-	var exec = require("child_process").exec;
-	var cachedV4: string[];
-	var cachedV6: string[];
-	var command: string;
-	var filter4RE: RegExp;
-	var filter6RE: RegExp;
+//	var exec = require("child_process").exec;
+//	var cachedV4: string[];
+//	var cachedV6: string[];
+//	var command: string;
+//	var filter4RE: RegExp;
+//	var filter6RE: RegExp;
 
-	switch (process.platform) {
-		case "win32":
-			//case 'win64': // TODO: test
-			command = "ipconfig";
-			filter4RE = /\bIPv[4][^:\r\n]+:\s*([^\s]+)/g;
-			filter6RE = /\bIPv[6][^:\r\n]+:\s*([^\s]+)/g;
-			break;
-		case "darwin":
-			command = "ipconfig";
-			filter4RE = /\binet\s+([^\s]+)/g;
-			filter6RE = /\binet6\s+([^\s]+)/g; // IPv6
-			break;
-		default:
-			command = "ipconfig";
-			filter4RE = /\binet\b[^:]+:\s*([^\s]+)/g;
-			filter6RE = /\binet6[^:]+:\s*([^\s]+)/g; // IPv6
-			break;
-	}
+//	switch (process.platform) {
+//		case "win32":
+//			//case 'win64': // TODO: test
+//			command = "ipconfig";
+//			filter4RE = /\bIPv[4][^:\r\n]+:\s*([^\s]+)/g;
+//			filter6RE = /\bIPv[6][^:\r\n]+:\s*([^\s]+)/g;
+//			break;
+//		case "darwin":
+//			command = "ipconfig";
+//			filter4RE = /\binet\s+([^\s]+)/g;
+//			filter6RE = /\binet6\s+([^\s]+)/g; // IPv6
+//			break;
+//		default:
+//			command = "ipconfig";
+//			filter4RE = /\binet\b[^:]+:\s*([^\s]+)/g;
+//			filter6RE = /\binet6[^:]+:\s*([^\s]+)/g; // IPv6
+//			break;
+//	}
 
-	return function (callback: (error: any, ipV4Addresses: string[], ipV6Addresses: string[]) => void, bypassCache?: boolean) {
-		if (cachedV4 && !bypassCache) {
-			callback(null, cachedV4, cachedV6);
-			return;
-		}
-		// system call
-		exec(command, function (error: any, stdout: any, sterr: any) {
-			cachedV4 = [];
-			cachedV6 = [];
-			var ip:string;
-			var i: number;
-			//if (!error) {
-			//ipv4
-			var matches4 = stdout.match(filter4RE) || [];
-			for (i = 0; i < matches4.length; i++) {
-				ip = matches4[i].replace(filter4RE, "$1");
-				if (!ignoreRE.test(ip)) {
-					cachedV4.push(ip);
-				}
-			}
+//	return function (callback: (error: any, ipV4Addresses: string[], ipV6Addresses: string[]) => void, bypassCache?: boolean) {
+//		if (cachedV4 && !bypassCache) {
+//			callback(null, cachedV4, cachedV6);
+//			return;
+//		}
+//		// system call
+//		exec(command, function (error: any, stdout: any, sterr: any) {
+//			cachedV4 = [];
+//			cachedV6 = [];
+//			var ip:string;
+//			var i: number;
+//			//if (!error) {
+//			//ipv4
+//			var matches4 = stdout.match(filter4RE) || [];
+//			for (i = 0; i < matches4.length; i++) {
+//				ip = matches4[i].replace(filter4RE, "$1");
+//				if (!ignoreRE.test(ip)) {
+//					cachedV4.push(ip);
+//				}
+//			}
 
-			//ipv6
-			var matches6 = stdout.match(filter6RE) || [];
-			for (i = 0; i < matches6.length; i++) {
-				ip = matches6[i].replace(filter6RE, "$1");
-				if (!ignoreRE.test(ip)) {
-					cachedV6.push(ip);
-				}
-			}
-			//}
-			callback(error, cachedV4, cachedV6);
-		});
-	};
-})();
+//			//ipv6
+//			var matches6 = stdout.match(filter6RE) || [];
+//			for (i = 0; i < matches6.length; i++) {
+//				ip = matches6[i].replace(filter6RE, "$1");
+//				if (!ignoreRE.test(ip)) {
+//					cachedV6.push(ip);
+//				}
+//			}
+//			//}
+//			callback(error, cachedV4, cachedV6);
+//		});
+//	};
+//})();
 
 //var cachedServerDomain: string;
 ///** if on windows, always returns "localhost".
@@ -152,12 +153,12 @@ export var getCommandlineArgs = (() => {
  * example:  "myKey=myValue" will return, but "someValue" will not.
  * if you need single value args, access process.argv directly.
  */
-export function getCommandlineArg(key: string, valueIfNullOrEmpty?: string): string {
+export function getCommandlineArg(key: string, valueIfNullOrEmpty?: string | null): string | null {
 
 	var parsedArgs = getCommandlineArgs();
 
 	var result = parsedArgs[key];
-	if (valueIfNullOrEmpty != null) {
+	if (valueIfNullOrEmpty !== undefined) {
 		if (result == null || result.length === 0) {
 			return valueIfNullOrEmpty;
 		}

@@ -1,225 +1,236 @@
-"use strict";
-var jsHelper = require("../jshelper");
-var ex = require("../exception");
-/** DEPRECATED:  use jsHelper.platformType instead.
-determine if running in a browser (if false, most likely running in node.js) */
-exports.isBrowser = typeof window !== "undefined" && typeof phantom === "undefined";
-/** detect ie version, or undefined if ie10+ or non ie browser.
-usage:  if(ieVersion<9){...}*/
-exports.ieVersion = (function () {
-    if (typeof (document) === "undefined") {
-        return null;
+(function (factory) {
+    if (typeof module === 'object' && typeof module.exports === 'object') {
+        var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
-    var undef, v = 3, div = document.createElement("div"), all = div.getElementsByTagName("i");
-    while (div.innerHTML = "<!--[if gt IE " + (++v) + "]><i></i><![endif]-->",
-        all[0]) {
+    else if (typeof define === 'function' && define.amd) {
+        define(["require", "exports", "../jshelper", "../exception"], factory);
     }
-    ;
-    return v > 4 ? v : undef;
-}());
-/** detects if we are running any ie, even 10  (looks for 'trident' in user agent) */
-exports.isIE = (function () {
-    if (typeof (navigator) === "undefined") {
+})(function (require, exports) {
+    "use strict";
+    //import * as jsHelper from "../jshelper";
+    //import * as ex from "../exception";
+    var jsHelper = require("../jshelper");
+    var ex = require("../exception");
+    /** DEPRECATED:  use jsHelper.platformType instead.
+    determine if running in a browser (if false, most likely running in node.js) */
+    exports.isBrowser = typeof window !== "undefined" && typeof phantom === "undefined";
+    /** detect ie version, or undefined if ie10+ or non ie browser.
+    usage:  if(ieVersion<9){...}*/
+    exports.ieVersion = (function () {
+        if (typeof (document) === "undefined") {
+            return null;
+        }
+        var undef, v = 3, div = document.createElement("div"), all = div.getElementsByTagName("i");
+        while (div.innerHTML = "<!--[if gt IE " + (++v) + "]><i></i><![endif]-->",
+            all[0]) {
+        }
+        ;
+        return v > 4 ? v : undef;
+    }());
+    /** detects if we are running any ie, even 10  (looks for 'trident' in user agent) */
+    exports.isIE = (function () {
+        if (typeof (navigator) === "undefined") {
+            return false;
+        }
+        if (exports.ieVersion || navigator.userAgent.toLowerCase().indexOf("trident") >= 0) {
+            return true;
+        }
         return false;
-    }
-    if (exports.ieVersion || navigator.userAgent.toLowerCase().indexOf("trident") >= 0) {
-        return true;
-    }
-    return false;
-}());
-/** provides onload() capabilities that work on old versions of IE too */
-function onLoad(domElement, callback) {
-    //throw new ex.CorelibException("depricated.  still used?");
-    //jquery handling of callbacks, taken from http://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
-    if (typeof domElement.onload === "undefined" && domElement.onreadystatechange !== "undefined") {
-        throw new ex.CorelibException("the element you wish to attach the callback does not have a .onload() method to attach to!");
-    }
-    var done = false;
-    domElement.onload = domElement.onreadystatechange = function (ev) {
-        if (!done && (!this.readyState ||
-            this.readyState === "loaded" || this.readyState === "complete")) {
-            done = true;
-            //jQuery.handleSuccess(s, xhr, status, data);
-            //jQuery.handleComplete(s, xhr, status, data);
-            callback(ev);
-            //if (!environment._DEBUG_MODE) {
-            // Handle memory leak in IE
-            domElement.onload = domElement.onreadystatechange = null;
+    }());
+    /** provides onload() capabilities that work on old versions of IE too */
+    function onLoad(domElement, callback) {
+        //throw new ex.CorelibException("depricated.  still used?");
+        //jquery handling of callbacks, taken from http://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
+        if (typeof domElement.onload === "undefined" && domElement.onreadystatechange !== "undefined") {
+            throw new ex.CorelibException("the element you wish to attach the callback does not have a .onload() method to attach to!");
         }
-    };
-}
-exports.onLoad = onLoad;
-/** get the first attribute and return it"s value from a dom element
-example:
-var amdMain = getFirstAttribute("script","data-amd-main");
-*/
-function getDomAttribute(elementType, attribute, searchTopDown) {
-    if (searchTopDown === void 0) { searchTopDown = false; }
-    if (typeof (document) === "undefined") {
-        return null;
+        var done = false;
+        domElement.onload = domElement.onreadystatechange = function (ev) {
+            if (!done && (!this.readyState ||
+                this.readyState === "loaded" || this.readyState === "complete")) {
+                done = true;
+                //jQuery.handleSuccess(s, xhr, status, data);
+                //jQuery.handleComplete(s, xhr, status, data);
+                callback(ev);
+                //if (!environment._DEBUG_MODE) {
+                // Handle memory leak in IE
+                domElement.onload = domElement.onreadystatechange = null;
+            }
+        };
     }
-    var foundElement = getDomElement(elementType, attribute, null, searchTopDown);
-    if (foundElement == null) {
-        return null;
-    }
-    return foundElement.getAttribute(attribute);
-}
-exports.getDomAttribute = getDomAttribute;
-/** get the first html element found and return it.  */
-function getDomElement(elementType, 
-    /** if not null, finds an element with this attribute */
-    attribute, attributeValue, searchTopDown) {
-    if (searchTopDown === void 0) { searchTopDown = false; }
-    if (typeof (document) === "undefined") {
-        return null;
-    }
-    var foundElement;
-    var elements;
-    elements = document.getElementsByTagName(elementType);
-    if (attribute == null) {
-        //return first element found
-        if (elements.length >= 1) {
-            foundElement = elements[0];
+    exports.onLoad = onLoad;
+    /** get the first attribute and return it"s value from a dom element
+    example:
+    var amdMain = getFirstAttribute("script","data-amd-main");
+    */
+    function getDomAttribute(elementType, attribute, searchTopDown) {
+        if (searchTopDown === void 0) { searchTopDown = false; }
+        if (typeof (document) === "undefined") {
+            return null;
         }
+        var foundElement = getDomElement(elementType, attribute, undefined, searchTopDown);
+        if (foundElement == null) {
+            return null;
+        }
+        return foundElement.getAttribute(attribute);
     }
-    else {
-        //search for attribute name
-        var searchPredicate = function (element) {
-            var foundAttributeValue = element.getAttribute(attribute);
-            if (foundAttributeValue) {
-                if (attributeValue == null) {
-                    //got it!   stop
-                    foundElement = element;
-                    return true;
-                }
-                else {
-                    //we need to match attribute"s value for success match
-                    if (attributeValue === foundAttributeValue) {
+    exports.getDomAttribute = getDomAttribute;
+    /** get the first html element found and return it.  */
+    function getDomElement(elementType, 
+        /** if not null, finds an element with this attribute */
+        attribute, attributeValue, searchTopDown) {
+        if (searchTopDown === void 0) { searchTopDown = false; }
+        if (typeof (document) === "undefined") {
+            return null;
+        }
+        var foundElement;
+        var elements;
+        elements = document.getElementsByTagName(elementType);
+        if (attribute == null) {
+            //return first element found
+            if (elements.length >= 1) {
+                foundElement = elements[0];
+            }
+        }
+        else {
+            //search for attribute name
+            var searchPredicate = function (element) {
+                var foundAttributeValue = element.getAttribute(attribute);
+                if (foundAttributeValue) {
+                    if (attributeValue == null) {
+                        //got it!   stop
                         foundElement = element;
                         return true;
                     }
+                    else {
+                        //we need to match attribute"s value for success match
+                        if (attributeValue === foundAttributeValue) {
+                            foundElement = element;
+                            return true;
+                        }
+                    }
                 }
-            }
-            return false;
-        };
-        if (searchTopDown) {
-            jsHelper.forEachArray(elements, searchPredicate);
-        }
-        else {
-            jsHelper.forEachArrayReverse(elements, searchPredicate);
-        }
-    }
-    return foundElement;
-}
-exports.getDomElement = getDomElement;
-/////** async load css
-////beware the styles may not be loaded before rendering occurs! */
-////export function loadCss(url) {
-////	var link = <HTMLLinkElement> document.createElement("link");
-////	link.type = "text/css";
-////	link.rel = "stylesheet";
-////	link.href = url;
-////	document.getElementsByTagName("head")[0].appendChild(link);
-////}
-/** obatin all cookies */
-exports.getCookies = (function () {
-    /** cached query so we only get cookies once per pageload*/
-    var parsedCookies;
-    function _getCookies() {
-        if (parsedCookies == null) {
-            if (typeof (document) === "undefined") {
-                throw new ex.CorelibException("document (base object) is missing.  this function is meant for browser use.  are you running serverside?");
+                return false;
+            };
+            if (searchTopDown) {
+                jsHelper.forEachArray(elements, searchPredicate);
             }
             else {
-                parsedCookies = {};
-                var rawCookies = document.cookie.split(";");
-                for (var i = 0; i < rawCookies.length; i++) {
-                    var keypair = rawCookies[i].trim();
-                    if (keypair.length === 0) {
-                        continue;
-                    }
-                    var cookie = rawCookies[i].split("=");
-                    if (cookie.length > 2) {
-                        throw new ex.CorelibException("invalid cookie format.  cookie= " + rawCookies[i]);
-                    }
-                    var key;
-                    var value;
-                    if (cookie.length == 1) {
-                        key = cookie[0];
-                        value = cookie[0];
-                    }
-                    else {
-                        key = cookie[0];
-                        value = cookie[1];
-                    }
-                    parsedCookies[key] = value;
-                }
+                jsHelper.forEachArrayReverse(elements, searchPredicate);
             }
         }
-        return parsedCookies;
+        return foundElement;
     }
-    return _getCookies;
-})();
-function getCookie(key, valueIfNullOrEmpty) {
-    var parsedCookies = exports.getCookies();
-    var result = parsedCookies[key];
-    if (valueIfNullOrEmpty != null) {
-        if (result == null || result.length === 0) {
-            return valueIfNullOrEmpty;
-        }
-    }
-    return result;
-}
-exports.getCookie = getCookie;
-exports.getQuerystringVariables = (function () {
-    /** cached query so we only get cookies once per pageload*/
-    var parsedQuerystrings;
-    function _getQuerystringVariables() {
-        if (parsedQuerystrings == null) {
-            if (typeof (window) === "undefined") {
-                throw new ex.CorelibException("window (base object) is missing.  this function is meant for browser use.  are you running serverside?");
-            }
-            else {
-                if (window.location.search.length === 0) {
-                    //no querystrings to parse
-                    return {};
+    exports.getDomElement = getDomElement;
+    /////** async load css
+    ////beware the styles may not be loaded before rendering occurs! */
+    ////export function loadCss(url) {
+    ////	var link = <HTMLLinkElement> document.createElement("link");
+    ////	link.type = "text/css";
+    ////	link.rel = "stylesheet";
+    ////	link.href = url;
+    ////	document.getElementsByTagName("head")[0].appendChild(link);
+    ////}
+    /** obatin all cookies */
+    exports.getCookies = (function () {
+        /** cached query so we only get cookies once per pageload*/
+        var parsedCookies;
+        function _getCookies() {
+            if (parsedCookies == null) {
+                if (typeof (document) === "undefined") {
+                    throw new ex.CorelibException("document (base object) is missing.  this function is meant for browser use.  are you running serverside?");
                 }
-                var rawVars = window.location.search.substring(1).split("&");
-                parsedQuerystrings = {};
-                for (var i = rawVars.length - 1; i >= 0; i--) {
-                    var pair = rawVars[i].split("=");
-                    var key;
-                    var value;
-                    if (pair.length == 1) {
-                        key = pair[0];
-                        value = key;
+                else {
+                    parsedCookies = {};
+                    var rawCookies = document.cookie.split(";");
+                    for (var i = 0; i < rawCookies.length; i++) {
+                        var keypair = rawCookies[i].trim();
+                        if (keypair.length === 0) {
+                            continue;
+                        }
+                        var cookie = rawCookies[i].split("=");
+                        if (cookie.length > 2) {
+                            throw new ex.CorelibException("invalid cookie format.  cookie= " + rawCookies[i]);
+                        }
+                        var key;
+                        var value;
+                        if (cookie.length == 1) {
+                            key = cookie[0];
+                            value = cookie[0];
+                        }
+                        else {
+                            key = cookie[0];
+                            value = cookie[1];
+                        }
+                        parsedCookies[key] = value;
                     }
-                    else if (pair.length == 2) {
-                        key = pair[0];
-                        value = pair[1];
-                    }
-                    else {
-                        key = pair[0];
-                        value = rawVars[i].substring(key.length);
-                    }
-                    parsedQuerystrings[key] = value;
                 }
             }
+            return parsedCookies;
         }
-        return parsedQuerystrings;
-    }
-    return _getQuerystringVariables;
-})();
-function getQuerystringVariable(key, valueIfNullOrEmpty) {
-    //from: https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-    var parsedQuerystrings = exports.getQuerystringVariables();
-    var result = parsedQuerystrings[key];
-    if (valueIfNullOrEmpty != null) {
-        if (result == null || result.length === 0) {
-            return valueIfNullOrEmpty;
+        return _getCookies;
+    })();
+    function getCookie(key, valueIfNullOrEmpty) {
+        var parsedCookies = exports.getCookies();
+        var result = parsedCookies[key];
+        if (valueIfNullOrEmpty !== undefined) {
+            if (result == null || result.length === 0) {
+                return valueIfNullOrEmpty;
+            }
         }
+        return result;
     }
-    return result;
-}
-exports.getQuerystringVariable = getQuerystringVariable;
+    exports.getCookie = getCookie;
+    exports.getQuerystringVariables = (function () {
+        /** cached query so we only get cookies once per pageload*/
+        var parsedQuerystrings;
+        function _getQuerystringVariables() {
+            if (parsedQuerystrings == null) {
+                if (typeof (window) === "undefined") {
+                    throw new ex.CorelibException("window (base object) is missing.  this function is meant for browser use.  are you running serverside?");
+                }
+                else {
+                    if (window.location.search.length === 0) {
+                        //no querystrings to parse
+                        return {};
+                    }
+                    var rawVars = window.location.search.substring(1).split("&");
+                    parsedQuerystrings = {};
+                    for (var i = rawVars.length - 1; i >= 0; i--) {
+                        var pair = rawVars[i].split("=");
+                        var key;
+                        var value;
+                        if (pair.length == 1) {
+                            key = pair[0];
+                            value = key;
+                        }
+                        else if (pair.length == 2) {
+                            key = pair[0];
+                            value = pair[1];
+                        }
+                        else {
+                            key = pair[0];
+                            value = rawVars[i].substring(key.length);
+                        }
+                        parsedQuerystrings[key] = value;
+                    }
+                }
+            }
+            return parsedQuerystrings;
+        }
+        return _getQuerystringVariables;
+    })();
+    function getQuerystringVariable(key, valueIfNullOrEmpty) {
+        //from: https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+        var parsedQuerystrings = exports.getQuerystringVariables();
+        var result = parsedQuerystrings[key];
+        if (valueIfNullOrEmpty !== undefined) {
+            if (result == null || result.length === 0) {
+                return valueIfNullOrEmpty;
+            }
+        }
+        return result;
+    }
+    exports.getQuerystringVariable = getQuerystringVariable;
+});
 //# sourceMappingURL=browserhelper.js.map

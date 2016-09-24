@@ -1,14 +1,13 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "module": "commonjs",
-    "noImplicitAny": true,
+    "module": "umd",
     "removeComments": false,
     "preserveConstEnums": true,
     "sourceMap": true,
     "inlineSources": false,
     "inlineSourceMap": false,
-    "declaration": false,
+    "declaration": true,
     "jsx": "react",
     "newLine": "LF",
     "pretty": true,
@@ -17,13 +16,20 @@
     "target": "es5",
     "watch": false,
     "moduleResolution": "node",
-    "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
 
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
 
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strictNullChecks": true
+    
   },
+
   "exclude": [
     "node_modules",
     "dist",

@@ -5,7 +5,8 @@ import _ = require("lodash");
 
 import ex = require("./exception");
 
-
+//import * as lodash from "lodash";
+//import * as exception from "./exception";
 
 
 /** low-level javascript helpers, to smooth over warts in the language */
@@ -185,34 +186,35 @@ export function forEachProperty<T>(
 	return true;
 }
 
-///** creates and returns a rate-limited facade over the input function.    
-// * this lets you invoke the facade and the underlying function will execute at maximum once per rateLimit period.  
-// * any additional calls are enqueued and triggered in a FIFO order.
-// * You can abort remaining */
-//export function rateLimitFacade<T>(
 
-/** simple ratelimiter, executes at most N times per second.  rate limit is shared by all calls to this method, even for dissimilar functions.*/
-export function rateLimit(perSecondLimit:number, fn:Function) {
-    var callsInLastSecond = 0;
-    var queue:any[] = [];
-    return function limited() {
-        if (callsInLastSecond >= perSecondLimit) {
-            queue.push([this, arguments]);
-            return;
-        }
+/////** creates and returns a rate-limited facade over the input function.    
+//// * this lets you invoke the facade and the underlying function will execute at maximum once per rateLimit period.  
+//// * any additional calls are enqueued and triggered in a FIFO order.
+//// * You can abort remaining */
+////export function rateLimitFacade<T>(
 
-        callsInLastSecond++;
-        setTimeout(function () {
-            callsInLastSecond--;
-            var parms: any;
-            if (parms = queue.shift()) {
-                limited.apply(parms[0], parms[1]);
-            }
-        }, 1010);
+///** simple ratelimiter, executes at most N times per second.  rate limit is shared by all calls to this method, even for dissimilar functions.*/
+//export function rateLimit(perSecondLimit:number, fn:Function) {
+//    var callsInLastSecond = 0;
+//    var queue:any[] = [];
+//    return function limited() {
+//        if (callsInLastSecond >= perSecondLimit) {
+//            queue.push([this, arguments]);
+//            return;
+//        }
 
-        fn.apply(this, arguments);
-    };
-}
+//        callsInLastSecond++;
+//        setTimeout(function () {
+//            callsInLastSecond--;
+//            var parms: any;
+//            if (parms = queue.shift()) {
+//                limited.apply(parms[0], parms[1]);
+//            }
+//        }, 1010);
+
+//        fn.apply(this, arguments);
+//    };
+//}
 
 /** call a constructor procedurally,
 from http://stackoverflow.com/questions/3362471/how-can-i-call-a-javascript-constructor-using-call-or-apply */

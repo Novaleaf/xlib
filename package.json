@@ -5,18 +5,19 @@
   "private": false,
   "author": "jason swearingen <jasons@novaleaf.com>",
   "dependencies": {
-    "@types/lodash": "^4.14.34",
-    "@types/node": "^6.0.38",
-    "lodash": "^4.15.0"
+    "@types/lodash": "^4.14.36",
+    "@types/node": "^6.0.41",
+    "lodash": "^4.16.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^3.0.2",
+    "source-map-loader": "^0.1.5"
+  },
   "scripts": {
     "test": "mocha"
-    "dev": "webpack --watch --progress --colors --config webpack.dev.config.js",
-    "build": "webpack && webpack --config webpack.dev.config.js",
   },
-  "main": "./dist/bundle.js",
-  "typings": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/Novaleaf/xlib"
