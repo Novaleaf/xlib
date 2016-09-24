@@ -5,7 +5,7 @@
 
 import jsHelper = require("../jshelper");
 import ex = require("../exception");
-
+import * as _ from "lodash";
 
 /** low-level javascript helpers for use in the browser. graceful fallbacks if not a browser*/
 
@@ -128,10 +128,13 @@ export function getDomElement(elementType: string,
 			return false;
 		};
 
-		if (searchTopDown) {
-			jsHelper.forEachArray(elements, searchPredicate);
-		} else {
-            jsHelper.forEachArrayReverse(elements, searchPredicate);
+        if (searchTopDown) {
+            _.forEach(elements, searchPredicate);
+			//jsHelper.forEachArray(elements, searchPredicate);
+        } else {
+
+            _.forEachRight(elements, searchPredicate);
+            //jsHelper.forEachArrayReverse(elements, searchPredicate);
 		}
 	}
 	return foundElement;

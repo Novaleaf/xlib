@@ -1,17 +1,8 @@
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "./jshelper", "./exception", "./environment", "lodash"], factory);
-    }
-})(function (require, exports) {
-    "use strict";
-    exports.jsHelper = require("./jshelper");
-    exports.exception = require("./exception");
-    exports.environment = require("./environment");
-    exports.lodash = require("lodash");
-});
+"use strict";
+exports.jsHelper = require("./jshelper");
+exports.exception = require("./exception");
+exports.environment = require("./environment");
+exports.lodash = require("lodash");
 //import * as jsHelper from "./jshelper";
 //export { jsHelper };
 //import * as exception from "./exception";
