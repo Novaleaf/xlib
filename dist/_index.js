@@ -15,16 +15,19 @@ mockMocha._initialize();
 //import * as ex from "./exception";
 //var jsShims = require("./jsshims");
 exports.lolo = require("./lolo");
-if (exports.lolo.isLogDebug === true) {
-    //try {
-    ///** https://www.npmjs.com/package/source-map-support
-    // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
-    //  */
-    console.log("loading sourcemap support");
-    var source_map_support = require("source-map-support");
-    //source_map_support.install({ handleUncaughtExceptions: false });
-    source_map_support.install();
-}
+//if (lolo.isLogDebug === true) {
+//	//try {
+//	///** https://www.npmjs.com/package/source-map-support
+//	// * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
+//	//  */
+//	console.log("loading sourcemap support");
+//    var source_map_support = require("source-map-support");
+//    //source_map_support.install({ handleUncaughtExceptions: false });
+//	source_map_support.install();
+//	//} catch (ex) {
+//	//	console.log("eating sourcemap support call");
+//	//}
+//}
 ///** low-level javascript helpers, to smooth over warts in the language */
 exports.jsHelper = require("./jshelper");
 exports.arrayHelper = require("./arrayhelper");
