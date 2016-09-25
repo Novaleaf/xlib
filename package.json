@@ -33,11 +33,11 @@
     "sanitize-html": "^1.13.0",
     "source-map-support": "^0.4.2",
     "sprintf-js": "^1.0.3",
-    "validator": "^5.7.0"
+    "validator": "^5.7.0",
+    "source-map-loader": "^0.1.5"
   },
   "devDependencies": {
-    "mocha": "^3.0.2",
-    "source-map-loader": "^0.1.5"
+    "mocha": "^3.0.2"
   },
   "scripts": {
     "test": "mocha"
