@@ -1,12 +1,18 @@
-# A Base Class Library for Typescript.  Cross Platform.
-*Kitchen sink included.*
+# A curated collection of 3rd party libraries and commonly useful functions.  Cross Platform.
+*Best used with Typescript 2.x*
 
 **```Xlib```** is Typescript's answer to .Net's Core Library.  It is not a translation of ```mscorlib```, but rather a collection of functions and features you'll use every day in your JavaScript code.
 
 --------
-# Status: BETA, Active Development (May 5, 2016)
+# 4.x Status: @NEXT Active Development.  not for use yet (Sept, 2016)
 
-**xlib** has been used as the BCL for high quality production systems, including [PhantomJs Cloud](https://PhantomJsCloud.com), so feel free to use it now!   However, some reorganizing is still occuring as I translate it from a private lib to a npm published one.  I recommend you do not take a hard dependency on it until v1.0.0 is released (a few days)
+
+
+**xlib** has been used as the BCL (base class libary) for high quality production systems
+including [PhantomJs Cloud](https://PhantomJsCloud.com).
+
+I am refactoring to support Typescript 2, especially publishing this for broad consumption via npm.  
+So this 4.x   Next branch is not for public use right now.
 
 
 ## Designed for
@@ -18,12 +24,8 @@
 
 To use xlib with typescript intellisence you will need to do the following:
 
-1. ```npm install typings --global```
-2. ```typings install --save --ambient async axios d3-dsv decimal.js json5 node sanitize-html sprintf-js```
-3. ```typings install --save bluebird chalk jsonwebtoken lodash validator```
-
-The above steps may change as we add or remove sub-modules.   Yes, it's a pain.  External module type definitions in Typescript is a complete mess.  Lets hope this gets fixed in Typescript 2.0
-
+1. *use Typescript 2.x*
+2. ```npm install xlib```
 
 ## Why
 
