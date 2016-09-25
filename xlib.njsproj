@@ -50,12 +50,23 @@
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\arrayhelper.ts" />
     <TypeScriptCompile Include="src\browser\browserhelper.ts" />
+    <TypeScriptCompile Include="src\cache.ts" />
+    <TypeScriptCompile Include="src\datetime.ts" />
     <TypeScriptCompile Include="src\environment.ts" />
     <TypeScriptCompile Include="src\exception.ts" />
     <TypeScriptCompile Include="src\jshelper.ts" />
+    <TypeScriptCompile Include="src\logging.ts" />
+    <TypeScriptCompile Include="src\lolo.ts" />
     <TypeScriptCompile Include="src\node\nodehelper.ts" />
     <TypeScriptCompile Include="src\index.ts" />
+    <TypeScriptCompile Include="src\numhelper.ts" />
+    <TypeScriptCompile Include="src\promise.ts" />
+    <TypeScriptCompile Include="src\reflection.ts" />
+    <TypeScriptCompile Include="src\serialization.ts" />
+    <TypeScriptCompile Include="src\stringhelper.ts" />
+    <TypeScriptCompile Include="src\validation.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

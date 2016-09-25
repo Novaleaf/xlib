@@ -1,3 +1,4 @@
+export import _ = require("lodash");
 /** low-level javascript helpers, to smooth over warts in the language */
 /**
  * if value is null, returns the default value
@@ -5,6 +6,46 @@
  * @param defaultValue
  */
 export declare function defaultIfNull<T>(value: T, defaultValue: T): T;
+/**
+* Helper function for iterating over values in the array. If the func returns
+* a false value, it will break out of the loop.
+* call will return true if enumerated everything, or false if terminated enumeration early.
+*/
+export declare function forEachArray<T>(
+    /** if a collection (an object with a .length property), will enumerate indicies */
+    collection: T[], func: (
+    /** null values are not discarded (unlike most foreach methods do!) */
+    value: T, index: number, collection: T[]) => boolean, 
+    /** if true, a copy of the collection is made and enumerated.
+this is useful if you wish to add/remove from the original collection while enumerating */
+    enumerateCopy?: boolean): boolean;
+export declare function forEachArray<T>(
+    /** if a collection (an object with a .length property), will enumerate indicies */
+    collection: T[], func: (
+    /** null values are not discarded (unlike most foreach methods do!) */
+    value: T, index: number, collection: T[]) => void, 
+    /** if true, a copy of the collection is made and enumerated.
+this is useful if you wish to add/remove from the original collection while enumerating */
+    enumerateCopy?: boolean): void;
+/**
+* Helper function for iterating over values in the object. If the func returns
+* a false value, it will break out of the loop.
+*/
+export declare function forEachArrayReverse<T>(
+    /** if a collection (an object with a .length property), will enumerate indicies */
+    collection: T[], func: (
+    /** null values are not discarded (unlike most foreach methods do!) */
+    value: T, index: number, collection: T[]) => boolean, 
+    /** if true, a copy of the collection is made and enumerated.
+this is useful if you wish to add/remove from the original collection while enumerating */
+    enumerateCopy?: boolean): boolean;
+export declare function forEachProperty<T>(
+    /** enumerate hasOwnProperties of this   */
+    object: any, func: (
+    /** null values are not discarded (unlike most foreach methods do!) */
+    value: T, key: string, collection: any) => void, recursive?: boolean): void;
+/** same as function.apply, but allows prepending arguments in front of an array of arguments */
+export declare function apply<TReturn>(targetFcn: (...args: any[]) => TReturn, thisObj: any, argArray: any[], argsToPrepend?: any[], argsToPostpend?: any[]): TReturn;
 /** replace a branch of your JSON object.  good for pruning nested hiearchies, for example when wanting to decrease verbosity sent to user (before doing a JSON.stringify() ) */
 export declare function replaceNodes(targetObject: any, 
     /** example:  'a.b.c.d' will remove the d node, replacing it (with null by default, effectively deleting)*/

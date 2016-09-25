@@ -1,7 +1,7 @@
 "use strict";
 
 
-import _ = require("lodash");
+export import _ = require("lodash");
 
 import ex = require("./exception");
 
@@ -39,152 +39,152 @@ export function defaultIfNull<T>(value: T, defaultValue: T): T {
 }
 
 
-///**
-//* Helper function for iterating over values in the array. If the func returns
-//* a false value, it will break out of the loop.
-//* call will return true if enumerated everything, or false if terminated enumeration early.
-//*/
-//export function forEachArray<T>
-//	(
-//	/** if a collection (an object with a .length property), will enumerate indicies */
-//	collection: T[]
-//	, func: (
-//		/** null values are not discarded (unlike most foreach methods do!) */
-//		value: T
-//	/** this is the index. */
-//		, index: number
-//		, collection: T[]
-//	) => boolean,
-//	/** if true, a copy of the collection is made and enumerated.
-//this is useful if you wish to add/remove from the original collection while enumerating */
-//	enumerateCopy?: boolean
-//	): boolean;
-//export function forEachArray<T>
-//	(
-//	/** if a collection (an object with a .length property), will enumerate indicies */
-//	collection: T[]
-//	, func: (
-//		/** null values are not discarded (unlike most foreach methods do!) */
-//		value: T
-//	/** this is the index. */
-//		, index: number
-//		, collection: T[]
-//	) => void,
-//	/** if true, a copy of the collection is made and enumerated.
-//this is useful if you wish to add/remove from the original collection while enumerating */
-//	enumerateCopy?: boolean
-//	): void;
-//export function forEachArray<T>
-//	(
-//	/** if a collection (an object with a .length property), will enumerate indicies */
-//	collection: T[]
-//	, func: (
-//		/** null values are not discarded (unlike most foreach methods do!) */
-//		value: T
-//	/** this is the index. */
-//		, index: number
-//		, collection: T[]
-//	) => boolean,
-//	/** if true, a copy of the collection is made and enumerated.
-//this is useful if you wish to add/remove from the original collection while enumerating */
-//	enumerateCopy = false
-//	): boolean {
-//	if (collection==null) { throw new Error("input collection is null/undefined") }
-//	if (collection["length"] == null) {
-//		throw new Error("should have length property");
-//	}
+/**
+* Helper function for iterating over values in the array. If the func returns
+* a false value, it will break out of the loop.
+* call will return true if enumerated everything, or false if terminated enumeration early.
+*/
+export function forEachArray<T>
+	(
+	/** if a collection (an object with a .length property), will enumerate indicies */
+	collection: T[]
+	, func: (
+		/** null values are not discarded (unlike most foreach methods do!) */
+		value: T
+	/** this is the index. */
+		, index: number
+		, collection: T[]
+	) => boolean,
+	/** if true, a copy of the collection is made and enumerated.
+this is useful if you wish to add/remove from the original collection while enumerating */
+	enumerateCopy?: boolean
+	): boolean;
+export function forEachArray<T>
+	(
+	/** if a collection (an object with a .length property), will enumerate indicies */
+	collection: T[]
+	, func: (
+		/** null values are not discarded (unlike most foreach methods do!) */
+		value: T
+	/** this is the index. */
+		, index: number
+		, collection: T[]
+	) => void,
+	/** if true, a copy of the collection is made and enumerated.
+this is useful if you wish to add/remove from the original collection while enumerating */
+	enumerateCopy?: boolean
+	): void;
+export function forEachArray<T>
+	(
+	/** if a collection (an object with a .length property), will enumerate indicies */
+	collection: T[]
+	, func: (
+		/** null values are not discarded (unlike most foreach methods do!) */
+		value: T
+	/** this is the index. */
+		, index: number
+		, collection: T[]
+	) => boolean,
+	/** if true, a copy of the collection is made and enumerated.
+this is useful if you wish to add/remove from the original collection while enumerating */
+	enumerateCopy = false
+	): boolean {
+	if (collection==null) { throw new Error("input collection is null/undefined") }
+	if (collection["length"] == null) {
+		throw new Error("should have length property");
+	}
 
-//	if (enumerateCopy) {
-//		collection = collection.slice(0);
-//	}
+	if (enumerateCopy) {
+		collection = collection.slice(0);
+	}
 
-//	for (var i = 0; i < collection.length; i++) {
-//		if (func(collection[i], i, collection) === false) {
-//			//yielded
-//			return false;
-//		}
-//	}
-//	//not yielded
-//	return true;
-//}
-///**
-//* Helper function for iterating over values in the object. If the func returns
-//* a false value, it will break out of the loop.
-//*/
-//export function forEachArrayReverse<T>
-//	(
-//	/** if a collection (an object with a .length property), will enumerate indicies */
-//	collection: T[]
-//	, func: (
-//		/** null values are not discarded (unlike most foreach methods do!) */
-//		value: T
-//	/** this is the index. */
-//		, index: number
-//		, collection: T[]
-//	) => boolean,
-//	/** if true, a copy of the collection is made and enumerated.
-//this is useful if you wish to add/remove from the original collection while enumerating */
-//	enumerateCopy = false
-//	): boolean {
-//	if (collection==null) { throw new Error("input collection is null/undefined") }
-//	if (!(length in collection)) {
-//		throw new Error("should have length property");
-//	}
+	for (var i = 0; i < collection.length; i++) {
+		if (func(collection[i], i, collection) === false) {
+			//yielded
+			return false;
+		}
+	}
+	//not yielded
+	return true;
+}
+/**
+* Helper function for iterating over values in the object. If the func returns
+* a false value, it will break out of the loop.
+*/
+export function forEachArrayReverse<T>
+	(
+	/** if a collection (an object with a .length property), will enumerate indicies */
+	collection: T[]
+	, func: (
+		/** null values are not discarded (unlike most foreach methods do!) */
+		value: T
+	/** this is the index. */
+		, index: number
+		, collection: T[]
+	) => boolean,
+	/** if true, a copy of the collection is made and enumerated.
+this is useful if you wish to add/remove from the original collection while enumerating */
+	enumerateCopy = false
+	): boolean {
+	if (collection==null) { throw new Error("input collection is null/undefined") }
+	if (!(length in collection)) {
+		throw new Error("should have length property");
+	}
 
-//	if (enumerateCopy) {
-//		collection = collection.slice(0);
-//	}
-//	for (var i = collection.length - 1; i >= 0; i--) {
-//		if (func(collection[i], i, collection) === false) {
-//			//yielded
-//			return false;
-//		}
-//	}
-//	//not yielded
-//	return true;
-//}
-//export function forEachProperty<T>(
-//	/** enumerate hasOwnProperties of this   */
-//	object:any
-//	, func: (
-//		/** null values are not discarded (unlike most foreach methods do!) */
-//		value: T
-//	/** the name of the property the value is assigned to */
-//		, key: string
-//		, collection: any
-//	) => void
-//	, recursive?: boolean): void;
-//export function forEachProperty<T>(
-//	/** enumerate hasOwnProperties of this   */
-//	object: any
-//	, func: (
-//		/** null values are not discarded (unlike most foreach methods do!) */
-//		value: T
-//	/** the name of the property the value is assigned to */
-//		, key: string
-//		, collection: any
-//	) => boolean
-//	, recursive = false): boolean {
-//	if (object == null) { throw new Error("input object is null/undefined") }
-//	for (var key in object) {
-//		if (object.hasOwnProperty(key)) {
-//			if (func(object[key], key, object) === false) {
-//				//yielded
-//				return false;
-//			}
-//			if (recursive === true && (typeof (object[key]) === "object")) {
-//				var result: boolean = <any>forEachProperty(object[key], func, recursive);
+	if (enumerateCopy) {
+		collection = collection.slice(0);
+	}
+	for (var i = collection.length - 1; i >= 0; i--) {
+		if (func(collection[i], i, collection) === false) {
+			//yielded
+			return false;
+		}
+	}
+	//not yielded
+	return true;
+}
+export function forEachProperty<T>(
+	/** enumerate hasOwnProperties of this   */
+	object:any
+	, func: (
+		/** null values are not discarded (unlike most foreach methods do!) */
+		value: T
+	/** the name of the property the value is assigned to */
+		, key: string
+		, collection: any
+	) => void
+	, recursive?: boolean): void;
+export function forEachProperty<T>(
+	/** enumerate hasOwnProperties of this   */
+	object: any
+	, func: (
+		/** null values are not discarded (unlike most foreach methods do!) */
+		value: T
+	/** the name of the property the value is assigned to */
+		, key: string
+		, collection: any
+	) => boolean
+	, recursive = false): boolean {
+	if (object == null) { throw new Error("input object is null/undefined") }
+	for (var key in object) {
+		if (object.hasOwnProperty(key)) {
+			if (func(object[key], key, object) === false) {
+				//yielded
+				return false;
+			}
+			if (recursive === true && (typeof (object[key]) === "object")) {
+				var result: boolean = <any>forEachProperty(object[key], func, recursive);
 
-//				if (result === false) {
-//					//if a recursive call returns TRUE, we abort all calls
-//					return false;
-//				}
-//			}
-//		}
-//	}
-//	//not yielded
-//	return true;
-//}
+				if (result === false) {
+					//if a recursive call returns TRUE, we abort all calls
+					return false;
+				}
+			}
+		}
+	}
+	//not yielded
+	return true;
+}
 
 
 ///////** creates and returns a rate-limited facade over the input function.    
@@ -244,30 +244,31 @@ export function defaultIfNull<T>(value: T, defaultValue: T): T {
 
 
 
-///** same as function.apply, but allows prepending arguments in front of an array of arguments */
-////export function apply<TReturn>(targetFcn: (arg1: any, ...anyArgs: any[]) => TReturn, thisObj: any, argArray: any[], ...argsToPrepend: any[]): TReturn
-//export function apply<TReturn>(targetFcn: (...args: any[]) => TReturn, thisObj: any, argArray: any[], argsToPrepend: any[] = [], argsToPostpend: any[] = []): TReturn {
-//	//in case this is IArguments or something of the sort, make a new array
-//	if (argArray.unshift == null) {
-//		var tmp:any[] = [];
-//		for (var i = 0; i < argArray.length; i++) {
-//			tmp.push(argArray[i]);
-//		}
-//		argArray = tmp;
-//	} else {
-//		//make a copy to not modify original args passed in
-//		argArray = argArray.slice();
-//	}
-//	argArray.unshift.apply(argArray, argsToPrepend);
-//	argArray = argArray.concat(argsToPostpend);
+/** same as function.apply, but allows prepending arguments in front of an array of arguments */
+//export function apply<TReturn>(targetFcn: (arg1: any, ...anyArgs: any[]) => TReturn, thisObj: any, argArray: any[], ...argsToPrepend: any[]): TReturn
+export function apply<TReturn>(targetFcn: (...args: any[]) => TReturn, thisObj: any, argArray: any[], argsToPrepend: any[] = [], argsToPostpend: any[] = []): TReturn {
+	//in case this is IArguments or something of the sort, make a new array
+	if (argArray.unshift == null) {
+		var tmp:any[] = [];
+		for (var i = 0; i < argArray.length; i++) {
+			tmp.push(argArray[i]);
+		}
+		argArray = tmp;
+	} else {
+		//make a copy to not modify original args passed in
+		argArray = argArray.slice();
+	}
+	argArray.unshift.apply(argArray, argsToPrepend);
+	argArray = argArray.concat(argsToPostpend);
 
-//	//for (var i = argsToPrepend.length-1; i >= 0; i--)
-//	//{
-//	//	argArray.unshift(argsToPrepend[i]);
-//	//}
+	//for (var i = argsToPrepend.length-1; i >= 0; i--)
+	//{
+	//	argArray.unshift(argsToPrepend[i]);
+	//}
 
-//	return targetFcn.apply(thisObj, argArray);
-//}
+	return targetFcn.apply(thisObj, argArray);
+}
+
 ///** if the targetFcn is null, silently ignore (no errors) */
 //export function applyOrNoop(targetFcn: Function, thisObj: any, argArray: any[], ...argsToPrepend: any[]): any {
 //	if (targetFcn == null) {
