@@ -43,8 +43,8 @@ function sha512(
     }
 }
 exports.sha512 = sha512;
-/** JSON Web Tokens.    https://jwt.io/ */
-exports.jwt = require("jsonwebtoken"); //good intro to JWT: https://stormpath.com/blog/token-auth-spa/
+///** JSON Web Tokens.    https://jwt.io/ */
+//export import jwt = require("jsonwebtoken");  //good intro to JWT: https://stormpath.com/blog/token-auth-spa/
 /**
  * returns a user-friendly alpha-numeric key.  By Default, constructs a cryptographically secure random one, or parses and normalizes one provided by userInput.
  * The key comprises the characters 0-9 and a-z, but not the characters o,i,l,u to avoid human transcription errors.
