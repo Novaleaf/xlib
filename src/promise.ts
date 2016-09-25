@@ -199,7 +199,7 @@ retry(myfunc).done(function(result) {
     console.log(result);
 });
  */
-export var retry: _BluebirdRetryInternals.IRetryStatic = require("bluebird-retry");
+export var retry: _BluebirdRetryInternals.IRetryStatic = require("./_internal/bluebird-retry");
 
 
 

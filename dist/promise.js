@@ -122,7 +122,7 @@ retry(myfunc).done(function(result) {
     console.log(result);
 });
  */
-exports.retry = require("bluebird-retry");
+exports.retry = require("./_internal/bluebird-retry");
 var _not_useful;
 (function (_not_useful) {
     /** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/
