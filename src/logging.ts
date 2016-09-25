@@ -10,11 +10,13 @@ import reflection = require("./reflection");
 import Stream = require("stream");
 //import PrettyStream = require("bunyan-prettystream");
 import _ = require("lodash");
+import __ = require("./lolo");
 import moment = require("moment");
 import assert = require("assert");
 import Exception = ex.Exception;
 import Promise = require("bluebird");
 class LoggerFatalException extends Exception { }
+
 
 /** coloring for node console */
 import Chalk = require("chalk");
@@ -389,6 +391,7 @@ export class Logger {
         args.unshift(false);
         this.assert.apply(this, args);
         args.shift();
+        
         throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args));
     }
 
@@ -442,7 +445,7 @@ export class Logger {
     }
     /** use to mark code that needs to be finished before it can be run.   asserts when hit. */
     todo(format = "TODO: not implemented", ...params: any[]) {
-        var msg = "TODO: " + stringHelper.format2(format, params);
+        var msg = "TODO: " + __.apply(stringHelper.format, null, params, [format]);//.apply(null,format, params);
         this.assert(false, msg);
     }
     deprecated(message?: string) {

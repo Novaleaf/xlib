@@ -92,10 +92,11 @@ export class Scrub<T>{
     private _appendErrorMessage(errorMessage: string, printInvalidValues: boolean, invalidValues?: {}): string {
         
 		if (printInvalidValues) {
-            errorMessage += stringHelper.format(
-                "  %i invalid/missing values. The following required keys+types were invalid: %s",
-                Object.keys(invalidValues).length,
-                serialization.JSONX.inspectStringify(invalidValues, -1, true, false, true, undefined, ""));
+            errorMessage += `  ${Object.keys(invalidValues).length} invalid/missing values. The following required keys+types were invalid: ${serialization.JSONX.inspectStringify(invalidValues, -1, true, false, true, undefined, "")}`;
+            //stringHelper.format(
+            //    "  %i invalid/missing values. The following required keys+types were invalid: %s",
+            //    Object.keys(invalidValues).length,
+            //    serialization.JSONX.inspectStringify(invalidValues, -1, true, false, true, undefined, ""));
 		}
 		this.errorMessages.push(errorMessage);
 		return errorMessage;

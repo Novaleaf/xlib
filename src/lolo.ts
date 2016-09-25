@@ -69,4 +69,9 @@ export var isLogDebug = environment.logLevel <= environment.LogLevel.DEBUG;
 // */
 //export var isProd = environment.envLevel === environment.EnvLevel.PROD;
 
-export var format = _numHelper.format;
+export var formatNum = _numHelper.format;
+
+//export var apply = _jsHelper.apply;
+
+export import apply = _jsHelper.apply;
+

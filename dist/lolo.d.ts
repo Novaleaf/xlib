@@ -35,4 +35,5 @@ export declare var isLogTrace: boolean;
  *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
  */
 export declare var isLogDebug: boolean;
-export declare var format: typeof _numHelper.format;
+export declare var formatNum: typeof _numHelper.format;
+export import apply = _jsHelper.apply;

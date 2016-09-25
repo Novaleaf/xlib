@@ -13,6 +13,7 @@ var serialization = require("./serialization");
 var reflection = require("./reflection");
 //import PrettyStream = require("bunyan-prettystream");
 var _ = require("lodash");
+var __ = require("./lolo");
 var moment = require("moment");
 var assert = require("assert");
 var Exception = ex.Exception;
@@ -432,7 +433,7 @@ var Logger = (function () {
         for (var _i = 1; _i < arguments.length; _i++) {
             params[_i - 1] = arguments[_i];
         }
-        var msg = "TODO: " + stringHelper.format2(format, params);
+        var msg = "TODO: " + __.apply(stringHelper.format, null, params, [format]); //.apply(null,format, params);
         this.assert(false, msg);
     };
     Logger.prototype.deprecated = function (message) {

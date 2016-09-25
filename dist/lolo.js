@@ -56,5 +56,7 @@ exports.isLogDebug = environment.logLevel <= environment.LogLevel.DEBUG;
 // *  current envLevel (real or fake data)  shortcut for ```environment.envLevel === environment.EnvLevel.PROD```
 // */
 //export var isProd = environment.envLevel === environment.EnvLevel.PROD;
-exports.format = _numHelper.format;
+exports.formatNum = _numHelper.format;
+//export var apply = _jsHelper.apply;
+exports.apply = _jsHelper.apply;
 //# sourceMappingURL=lolo.js.map
