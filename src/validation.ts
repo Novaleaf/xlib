@@ -360,6 +360,12 @@ export class Scrub<T>{
 	}
 }
 
+/**
+ *  allows scrubbing of user input.
+ * @param values
+ * @param clone
+ * @param deepClone
+ */
 export function scrub(values: _.Dictionary<any> | {}, clone = false, deepClone = false): Scrub<any> {
 	return new Scrub(<any>values, clone, deepClone);
 }

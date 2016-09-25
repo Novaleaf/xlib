@@ -177,41 +177,6 @@ export function randomizeArray(myArray: any[]):void {
     }
 }
 /**
- *  ex: randomString(20, 'ABCDEFG'); // Returns 'CCBAAGDGBBEGBDBECDCE' which is 20 characters length.
- * @param length
- * @param chars
- */
-export function randomStringCrypto(length:number, chars:string) {
-	if (!chars) {
-		throw new Error('Argument \'chars\' is undefined');
-	}
-
-	var charsLength = chars.length;
-	if (charsLength > 256) {
-		throw new Error('Argument \'chars\' should not have more than 256 characters'
-			+ ', otherwise unpredictability will be broken');
-	}
-
-	var randomBytes = crypto.randomBytes(length);
-	var result = new Array(length);
-
-	var cursor = 0;
-	for (var i = 0; i < length; i++) {
-		cursor += randomBytes[i];
-		result[i] = chars[cursor % charsLength];
-	}
-
-	return result.join('');
-}
-/**
- *  ex: randomAsciiString(20); // Returns 'rmRptK5niTSey7NlDk5y' which is 20 characters length.
- * @param length
- */
-export function randomAsciiStringCrypto(length:number) {
-	return randomStringCrypto(length,
-		'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-}
-/**
  *  create a random number output as a string, with the specified number of digits.  
  * @param minDigits
  * @param maxDigits set to minDigits if not specified
@@ -236,30 +201,6 @@ export function randomIntDigits(digits: number, radix = 10) {
 
     ////console.log("randomIntDigits", minValueInc, maxValueExc, randValue, toReturn);
     //return toReturn;
-}
-
-/**
- *  create a random number output as a string, with the specified number of digits.  
- *  uses crypto, so slower but secure.
- * @param minDigits
- * @param maxDigits set to minDigits if not specified
- * @param radix 
- */
-export function randomIntDigitsCrypto(digits: number, radix = 10) {
-
-    var output: string[] = [];
-
-    let hexBuffer = crypto.randomBytes(digits).toString("hex");
-
-    for (var i = 0; i < digits; i++) {
-        let hex = hexBuffer.substring(i * 2, (i + 1) * 2);
-        let byte = parseInt(hex, undefined, 16);
-        let num = byte % radix;
-
-        output.push(num.toString(radix));
-    }
-    var toReturn = output.join("");
-    return toReturn;
 }
 /**
  *  count number of digits in a number

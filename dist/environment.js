@@ -1,7 +1,7 @@
 "use strict";
 //"use strict";
-var nodeHelper = require("./node/nodehelper");
-var browserHelper = require("./browser/browserhelper");
+var nodeHelper = require("./_internal/nodehelper");
+var browserHelper = require("./_internal/browserhelper");
 var ex = require("./exception");
 //import * as nodeHelper from "./node/nodehelper";
 //import * as browserHelper from "./browser/browserhelper";

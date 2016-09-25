@@ -1,7 +1,6 @@
 "use strict";
 /* tslint:disable:no-bitwise */
 var ex = require("./exception");
-var crypto = require("crypto");
 exports.INT8_MAX = 127;
 exports.INT8_MIN = -128;
 exports.INT16_MAX = 32767;
@@ -176,38 +175,6 @@ function randomizeArray(myArray) {
 }
 exports.randomizeArray = randomizeArray;
 /**
- *  ex: randomString(20, 'ABCDEFG'); // Returns 'CCBAAGDGBBEGBDBECDCE' which is 20 characters length.
- * @param length
- * @param chars
- */
-function randomStringCrypto(length, chars) {
-    if (!chars) {
-        throw new Error('Argument \'chars\' is undefined');
-    }
-    var charsLength = chars.length;
-    if (charsLength > 256) {
-        throw new Error('Argument \'chars\' should not have more than 256 characters'
-            + ', otherwise unpredictability will be broken');
-    }
-    var randomBytes = crypto.randomBytes(length);
-    var result = new Array(length);
-    var cursor = 0;
-    for (var i = 0; i < length; i++) {
-        cursor += randomBytes[i];
-        result[i] = chars[cursor % charsLength];
-    }
-    return result.join('');
-}
-exports.randomStringCrypto = randomStringCrypto;
-/**
- *  ex: randomAsciiString(20); // Returns 'rmRptK5niTSey7NlDk5y' which is 20 characters length.
- * @param length
- */
-function randomAsciiStringCrypto(length) {
-    return randomStringCrypto(length, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-}
-exports.randomAsciiStringCrypto = randomAsciiStringCrypto;
-/**
  *  create a random number output as a string, with the specified number of digits.
  * @param minDigits
  * @param maxDigits set to minDigits if not specified
@@ -230,27 +197,6 @@ function randomIntDigits(digits, radix) {
     //return toReturn;
 }
 exports.randomIntDigits = randomIntDigits;
-/**
- *  create a random number output as a string, with the specified number of digits.
- *  uses crypto, so slower but secure.
- * @param minDigits
- * @param maxDigits set to minDigits if not specified
- * @param radix
- */
-function randomIntDigitsCrypto(digits, radix) {
-    if (radix === void 0) { radix = 10; }
-    var output = [];
-    var hexBuffer = crypto.randomBytes(digits).toString("hex");
-    for (var i = 0; i < digits; i++) {
-        var hex = hexBuffer.substring(i * 2, (i + 1) * 2);
-        var byte = parseInt(hex, undefined, 16);
-        var num = byte % radix;
-        output.push(num.toString(radix));
-    }
-    var toReturn = output.join("");
-    return toReturn;
-}
-exports.randomIntDigitsCrypto = randomIntDigitsCrypto;
 /**
  *  count number of digits in a number
  * @param value

@@ -1,6 +1,6 @@
 //"use strict";
-import nodeHelper = require("./node/nodehelper");
-import browserHelper = require("./browser/browserhelper");
+import nodeHelper = require("./_internal/nodehelper");
+import browserHelper = require("./_internal/browserhelper");
 import ex = require("./exception");
 
 

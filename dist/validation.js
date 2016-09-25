@@ -342,6 +342,12 @@ var Scrub = (function () {
     return Scrub;
 }());
 exports.Scrub = Scrub;
+/**
+ *  allows scrubbing of user input.
+ * @param values
+ * @param clone
+ * @param deepClone
+ */
 function scrub(values, clone, deepClone) {
     if (clone === void 0) { clone = false; }
     if (deepClone === void 0) { deepClone = false; }

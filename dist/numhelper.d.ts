@@ -35,31 +35,12 @@ export declare function round(value: number,
 /** randomize order of elements in this array */
 export declare function randomizeArray(myArray: any[]): void;
 /**
- *  ex: randomString(20, 'ABCDEFG'); // Returns 'CCBAAGDGBBEGBDBECDCE' which is 20 characters length.
- * @param length
- * @param chars
- */
-export declare function randomStringCrypto(length: number, chars: string): string;
-/**
- *  ex: randomAsciiString(20); // Returns 'rmRptK5niTSey7NlDk5y' which is 20 characters length.
- * @param length
- */
-export declare function randomAsciiStringCrypto(length: number): string;
-/**
  *  create a random number output as a string, with the specified number of digits.
  * @param minDigits
  * @param maxDigits set to minDigits if not specified
  * @param radix
  */
 export declare function randomIntDigits(digits: number, radix?: number): string;
-/**
- *  create a random number output as a string, with the specified number of digits.
- *  uses crypto, so slower but secure.
- * @param minDigits
- * @param maxDigits set to minDigits if not specified
- * @param radix
- */
-export declare function randomIntDigitsCrypto(digits: number, radix?: number): string;
 /**
  *  count number of digits in a number
  * @param value

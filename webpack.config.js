@@ -1,7 +1,13 @@
-﻿module.exports = {
-    entry: "./src/index.tsx",
+﻿//make a "webpak.dev.config.js" without uglifyJsPlugin minifier later
+
+module.exports = {
+    debug: true,
+    entry: "./src/_index.ts",
     output: {
         filename: "./dist/bundle.js",
+        //library: "xlib",
+        //libraryTarget: "umd",
+        //umdNamedDefine:true,
     },
     // Enable sourcemaps for debugging webpack's output.
     devtool: "source-map",
@@ -24,7 +30,18 @@
     // This is important because it allows us to avoid bundling all of our
     // dependencies, which allows browsers to cache those libraries between builds.
     externals: {
-        "react": "React",
-        "react-dom": "ReactDOM"
+        //"react": "React",
+        //"react-dom": "ReactDOM"
     },
+    ////enable these when we get webpack modules working properly
+    //plugins: [
+    //    new uglifyJsPlugin({
+    //        compress: {
+    //            warnings: false
+    //        }
+    //    })
+    //],
+    //eslint: {
+    //    configFile: '.eslintrc'
+    //},
 };

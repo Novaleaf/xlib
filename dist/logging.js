@@ -324,6 +324,7 @@ var Logger = (function () {
                 }
                 break;
         }
+        return finalArgs;
     };
     Logger.prototype.trace = function () {
         var args = [];
@@ -353,12 +354,23 @@ var Logger = (function () {
         }
         this._log(environment.LogLevel.WARN, args);
     };
+    /**
+     *  log as an error, and returns an exception you can throw.
+    ex:  throw log.error("something bad");
+     * @param args
+     */
     Logger.prototype.error = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i - 0] = arguments[_i];
         }
-        this._log(environment.LogLevel.ERROR, args);
+        var finalArgs = this._log(environment.LogLevel.ERROR, args);
+        if (finalArgs != null) {
+            return new ex.Exception(finalArgs.shift());
+        }
+        else {
+            return new ex.Exception("");
+        }
     };
     Logger.prototype.fatal = function () {
         var args = [];
@@ -433,29 +445,28 @@ var Logger = (function () {
     return Logger;
 }());
 exports.Logger = Logger;
-"use strict";
-//import logging = require("./logging");
-//import ex = require("../exception");
-/** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.
- * usage notes: as long as this module is loaded
- *		(which it is unless your minifer is expecting pure functions)
- *		then it's enabled automatically.  if your minifier truncates this, execute this function.
- * why use? otherwise your unit tests will throw type error when running mocha "describe" calls
- */
-function _initializeMockMocha() {
-    if (typeof (global["describe"]) === "undefined") {
-        //var log = new logging.Logger(__filename);
-        //log.trace("mocha not present.  nooping describe function");
-        /* tslint:disable */
-        var noop = function () { };
-        /* tslint:enable */
-        global["describe"] = noop;
-        if (typeof (global["describe"]) === "undefined") {
-            throw new ex.CorelibException("unable to sham describe.  files containing mocha unit tests will fail, thus we failfast here.");
-        }
-    }
-}
-exports._initializeMockMocha = _initializeMockMocha;
+//"use strict";
+////import logging = require("./logging");
+////import ex = require("../exception");
+///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present. 
+// * usage notes: as long as this module is loaded 
+// *		(which it is unless your minifer is expecting pure functions)
+// *		then it's enabled automatically.  if your minifier truncates this, execute this function.
+// * why use? otherwise your unit tests will throw type error when running mocha "describe" calls
+// */
+//export function _initializeMockMocha() {
+//    if (typeof ((global as any)["describe"]) === "undefined") {
+//        //var log = new logging.Logger(__filename);
+//        //log.trace("mocha not present.  nooping describe function");
+//        /* tslint:disable */
+//        var noop: any = () => { };
+//        /* tslint:enable */
+//        (global as any)["describe"] = noop;
+//        if (typeof ((global as any)["describe"]) === "undefined") {
+//            throw new ex.CorelibException("unable to sham describe.  files containing mocha unit tests will fail, thus we failfast here.");
+//        }
+//    }
+//}
 ///////** wrapper over bunyan logger, includes extra diagnostics helpers such as .assert(), and will pretty output to console if no listener is attached.*/
 //////export class _Logger {
 //////    /** target of this logger wrapper*/

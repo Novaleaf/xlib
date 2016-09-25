@@ -65,4 +65,10 @@ export declare class Scrub<T> {
     getValid(key: string): T | undefined;
     getValid<U>(key: string, valueIfUndefined: U): U;
 }
+/**
+ *  allows scrubbing of user input.
+ * @param values
+ * @param clone
+ * @param deepClone
+ */
 export declare function scrub(values: _.Dictionary<any> | {}, clone?: boolean, deepClone?: boolean): Scrub<any>;

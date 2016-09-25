@@ -178,7 +178,7 @@ function colorCodeToString(input: string, currentColor?: IAnsiColor): IAnsiColor
                     throw new LoggerFatalException("colorCodeToString() unknown color " + input);
                 }
             //no action (do not set anything)
-                
+
         }
     }
 
@@ -221,7 +221,7 @@ export class Logger {
 
             switch (type) {
                 case reflection.Type.Error:
-                    var objArg:any;
+                    var objArg: any;
                     try {
                         objArg = (serialization.JSONX.inspectStringify(arg, 3, false, true, undefined, undefined, "\t"));
                         //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
@@ -237,7 +237,7 @@ export class Logger {
                         objArg = (serialization.JSONX.inspectStringify(arg, 3, false, false, undefined, undefined, "\t"));
                         //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
                     } catch (ex) {
-                        objArg =("[Object???]");
+                        objArg = ("[Object???]");
 
                     }
                     finalArgs.push(Chalk.green.bold(objArg));
@@ -253,110 +253,111 @@ export class Logger {
         if (targetLogLevel < this.logLevel) {
             return;
         }
-        return this._doLog.apply(this,arguments);        
+        return this._doLog.apply(this, arguments);
 
     }
 
-    private _doLog(targetLogLevel:environment.LogLevel, args:any[]){
-        
-        let finalArgs:any[];
-        switch(environment.platformType){
-            case environment.PlatformType.Browser:                
+    private _doLog(targetLogLevel: environment.LogLevel, args: any[]) {
+
+        let finalArgs: any[];
+        switch (environment.platformType) {
+            case environment.PlatformType.Browser:
                 finalArgs = args;
                 break;
             case environment.PlatformType.NodeJs:
             default:
-                finalArgs = this._normalizeArgs( args);
+                finalArgs = this._normalizeArgs(args);
                 break;
-            }
+        }
 
         var logLevelColor = Chalk.bgBlack;
-        switch(targetLogLevel){
+        switch (targetLogLevel) {
             case environment.LogLevel.TRACE:
-                logLevelColor=Chalk.bgWhite;
+                logLevelColor = Chalk.bgWhite;
                 break;
             case environment.LogLevel.DEBUG:
-                logLevelColor=Chalk.bgGreen;
+                logLevelColor = Chalk.bgGreen;
                 break;
             case environment.LogLevel.INFO:
-                logLevelColor=Chalk.bgCyan;
+                logLevelColor = Chalk.bgCyan;
                 break;
             case environment.LogLevel.WARN:
-                logLevelColor=Chalk.bgYellow;
+                logLevelColor = Chalk.bgYellow;
                 break;
             case environment.LogLevel.ERROR:
-                logLevelColor=Chalk.bgMagenta;
+                logLevelColor = Chalk.bgMagenta;
                 break;
             case environment.LogLevel.FATAL:
-                logLevelColor=Chalk.bgRed;
+                logLevelColor = Chalk.bgRed;
                 break;
-            default: 
-                logLevelColor=Chalk.inverse.bold;
+            default:
+                logLevelColor = Chalk.inverse.bold;
                 throw new LoggerFatalException("unknown targetLogLevel");
-                //break;
-            }
+            //break;
+        }
         finalArgs.unshift(logLevelColor(environment.LogLevel[targetLogLevel]));
         finalArgs.unshift(Chalk.cyan(this.name));
         finalArgs.unshift(Chalk.gray(moment().toISOString()));
 
         //on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
-        switch(environment.platformType){
-                        case environment.PlatformType.Browser:                
-switch (targetLogLevel) {
-            case environment.LogLevel.TRACE:
-                console.trace.apply(console, finalArgs);
+        switch (environment.platformType) {
+            case environment.PlatformType.Browser:
+                switch (targetLogLevel) {
+                    case environment.LogLevel.TRACE:
+                        console.trace.apply(console, finalArgs);
+                        break;
+                    case environment.LogLevel.DEBUG:
+                        console.trace.apply(console, finalArgs);
+                        break;
+                    case environment.LogLevel.INFO:
+                        console.trace.apply(console, finalArgs);
+                        break;
+                    case environment.LogLevel.WARN:
+                        console.error.apply(console, finalArgs);
+                        break;
+                    case environment.LogLevel.ERROR:
+                        console.error.apply(console, finalArgs);
+                        break;
+                    case environment.LogLevel.FATAL:
+                        console.error.apply(console, finalArgs);
+                        break;
+                    default:
+                        throw new LoggerFatalException("unknown targetLogLevel");
+                    //break;
+                }
                 break;
-            case environment.LogLevel.DEBUG:
-                console.trace.apply(console, finalArgs);
-                break;
-            case environment.LogLevel.INFO:
-                console.trace.apply(console, finalArgs);
-                break;
-            case environment.LogLevel.WARN:
-                console.error.apply(console, finalArgs);
-                break;
-            case environment.LogLevel.ERROR:
-                console.error.apply(console, finalArgs);
-                break;
-            case environment.LogLevel.FATAL:
-                console.error.apply(console, finalArgs);
-                break;
-            default:
-                throw new LoggerFatalException("unknown targetLogLevel");
-                //break;
-        }
-                break;
-                //on node, we use only show stacktrace for explicit trace call or errors.
+            //on node, we use only show stacktrace for explicit trace call or errors.
             case environment.PlatformType.NodeJs:
             default:
                 switch (targetLogLevel) {
-            case environment.LogLevel.TRACE:
-                console.trace.apply(console, finalArgs);
+                    case environment.LogLevel.TRACE:
+                        console.trace.apply(console, finalArgs);
+                        break;
+                    case environment.LogLevel.DEBUG:
+                        console.log.apply(console, finalArgs);
+                        break;
+                    case environment.LogLevel.INFO:
+                        console.log.apply(console, finalArgs);
+                        break;
+                    case environment.LogLevel.WARN:
+                        console.warn.apply(console, finalArgs);
+                        break;
+                    case environment.LogLevel.ERROR:
+                        console.error.apply(console, finalArgs);
+                        break;
+                    case environment.LogLevel.FATAL:
+                        console.error.apply(console, finalArgs);
+                        break;
+                    default:
+                        throw new LoggerFatalException("unknown targetLogLevel");
+                    //break;
+                }
                 break;
-            case environment.LogLevel.DEBUG:
-                console.log.apply(console, finalArgs);
-                break;
-            case environment.LogLevel.INFO:
-                console.log.apply(console, finalArgs);
-                break;
-            case environment.LogLevel.WARN:
-                console.warn.apply(console, finalArgs);
-                break;
-            case environment.LogLevel.ERROR:
-                console.error.apply(console, finalArgs);
-                break;
-            case environment.LogLevel.FATAL:
-                console.error.apply(console, finalArgs);
-                break;
-            default:
-                throw new LoggerFatalException("unknown targetLogLevel");
-                //break;
         }
-                break;
-            }
-        
 
-        }
+
+        return finalArgs;
+    }
 
     public trace(...args: any[]) {
         this._log(environment.LogLevel.TRACE, args);
@@ -370,8 +371,19 @@ switch (targetLogLevel) {
     public warn(...args: any[]) {
         this._log(environment.LogLevel.WARN, args);
     }
+    /**
+     *  log as an error, and returns an exception you can throw.
+    ex:  throw log.error("something bad");
+     * @param args
+     */
     public error(...args: any[]) {
-        this._log(environment.LogLevel.ERROR, args);
+        let finalArgs = this._log(environment.LogLevel.ERROR, args);
+
+        if (finalArgs != null) {
+            return new ex.Exception(finalArgs.shift());
+        } else {
+            return new ex.Exception("");
+        }
     }
     public fatal(...args: any[]) {
         args.unshift(false);
@@ -398,8 +410,8 @@ switch (targetLogLevel) {
             default:
                 finalArgs = this._normalizeArgs(args);
                 break;
-		}
-		
+        }
+
 
         finalArgs.unshift(Chalk.bgYellow("ASSERT"));
         finalArgs.unshift(Chalk.cyan(this.name));
@@ -407,23 +419,23 @@ switch (targetLogLevel) {
         //finalArgs.unshift(false);
 
         //on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
-		switch (environment.platformType) {
+        switch (environment.platformType) {
             case environment.PlatformType.Browser:
-				finalArgs.unshift(false);
-				console.assert.apply(console, finalArgs);
-				//assert(false, finalArgs.join("\n"));
+                finalArgs.unshift(false);
+                console.assert.apply(console, finalArgs);
+                //assert(false, finalArgs.join("\n"));
                 break;
 
             case environment.PlatformType.NodeJs:
-				console.trace.apply(console, finalArgs);
-				assert(false, finalArgs.join("\n"));
-				break;
-            default:
-				finalArgs.unshift(false);
-				//console.warn.apply(console, finalArgs);
-				console.assert.apply(console, finalArgs);
+                console.trace.apply(console, finalArgs);
+                assert(false, finalArgs.join("\n"));
                 break;
-		}
+            default:
+                finalArgs.unshift(false);
+                //console.warn.apply(console, finalArgs);
+                console.assert.apply(console, finalArgs);
+                break;
+        }
 
 
 
@@ -442,29 +454,29 @@ switch (targetLogLevel) {
     }
 }
 
-"use strict";
-//import logging = require("./logging");
-//import ex = require("../exception");
+//"use strict";
+////import logging = require("./logging");
+////import ex = require("../exception");
 
-/** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present. 
- * usage notes: as long as this module is loaded 
- *		(which it is unless your minifer is expecting pure functions)
- *		then it's enabled automatically.  if your minifier truncates this, execute this function.
- * why use? otherwise your unit tests will throw type error when running mocha "describe" calls
- */
-export function _initializeMockMocha() {
-	if (typeof ((global as any)["describe"]) === "undefined") {
-		//var log = new logging.Logger(__filename);
-		//log.trace("mocha not present.  nooping describe function");
-		/* tslint:disable */
-		var noop: any = () => { };
-		/* tslint:enable */
-		(global as any)["describe"] = noop;
-		if (typeof ((global as any)["describe"]) === "undefined") {
-			throw new ex.CorelibException("unable to sham describe.  files containing mocha unit tests will fail, thus we failfast here.");
-		}
-	}
-}
+///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present. 
+// * usage notes: as long as this module is loaded 
+// *		(which it is unless your minifer is expecting pure functions)
+// *		then it's enabled automatically.  if your minifier truncates this, execute this function.
+// * why use? otherwise your unit tests will throw type error when running mocha "describe" calls
+// */
+//export function _initializeMockMocha() {
+//    if (typeof ((global as any)["describe"]) === "undefined") {
+//        //var log = new logging.Logger(__filename);
+//        //log.trace("mocha not present.  nooping describe function");
+//        /* tslint:disable */
+//        var noop: any = () => { };
+//        /* tslint:enable */
+//        (global as any)["describe"] = noop;
+//        if (typeof ((global as any)["describe"]) === "undefined") {
+//            throw new ex.CorelibException("unable to sham describe.  files containing mocha unit tests will fail, thus we failfast here.");
+//        }
+//    }
+//}
 
 
 
@@ -495,7 +507,7 @@ export function _initializeMockMocha() {
 
 //////        if (noPrettyPrint === false && this.options.stream == null && this.options.streams == null) {
 //////            //install prettyprint
-			
+
 
 //////            var prettyStream = new PrettyStream();
 
@@ -524,13 +536,13 @@ export function _initializeMockMocha() {
 //////                        //reaquire the start, to find closest "[" to the m, in case there are orphan "["'s laying around
 //////                        start = text.lastIndexOf("[", end);
 //////                        searchPosition = start + 1; //make sure our next loop doesn't include this
-                        
+
 //////                        var potentialMatch = text.substring(start, end);
 //////                        if (potentialMatch.length < 3 || potentialMatch.substring(1, potentialMatch.length - 1).match(/[a-z ]/i) != null) {
 //////                            //invalid characters voids this potential match
 //////                            continue;
 //////                        }
-                        
+
 //////                        //get colors
 //////                        currentColor = colorCodeToString(potentialMatch, currentColor);
 //////                        let replacement = <IReplacement>_.clone(currentColor);
@@ -560,7 +572,7 @@ export function _initializeMockMocha() {
 //////                    //set initial color
 //////                    text = "%c" + text;
 //////                    cssColors.unshift("color:grey;background:black;");
-					
+
 //////                    //apply to console
 //////                    var args = cssColors.slice();
 //////                    args.unshift(text);
@@ -577,7 +589,7 @@ export function _initializeMockMocha() {
 //////            }
 
 //////            this.options.stream = prettyStream;
-			
+
 
 //////            //this.prettyPrintStream = prettyStream;
 
