@@ -48,8 +48,8 @@ export function sha512(
     }
 }
 
-///** JSON Web Tokens.    https://jwt.io/ */
-//export import jwt = require("jsonwebtoken");  //good intro to JWT: https://stormpath.com/blog/token-auth-spa/
+/** JSON Web Tokens.    https://jwt.io/ */
+export import jwt = require("jsonwebtoken");  //good intro to JWT: https://stormpath.com/blog/token-auth-spa/
 
 
 /**
