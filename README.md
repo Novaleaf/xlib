@@ -4,19 +4,19 @@
 **```Xlib```** is Typescript's answer to .Net's Core Library.  It is not a translation of ```mscorlib```, but rather a collection of functions and features you'll use every day in your JavaScript code.
 
 --------
-# 4.x Status: @NEXT Active Development.  not for use yet (Sept, 2016)
+# 4.x Status: works!
 
 
 
 **xlib** has been used as the BCL (base class libary) for high quality production systems
 including [PhantomJs Cloud](https://PhantomJsCloud.com).
 
-I am refactoring to support Typescript 2, especially publishing this for broad consumption via npm.  
-So this 4.x   Next branch is not for public use right now.
+
+This 4.x release has been refactored for use with WebPack, and has been tested with it.
 
 
 ## Designed for
-- **Browser**: Chrome.  works in all browsers (IE9+) via Browserify/Webpack, but the ```logging``` output is most pretty in Chrome.
+- **Browser**: Chrome.  works in all browsers (IE9+) via Browserify/Webpack, but the ```logging``` output is most pretty in Chrome.  Tested with WebPack.
 - **Node**: Tested with 0.12 to 6.0.0
 - **Typescript**: xlib is written in Typescript, and designed with it in mind.
 
