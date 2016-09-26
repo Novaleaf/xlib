@@ -349,6 +349,7 @@ export function escapeRegExp(str: string): string {
 }
 
 
+
 /**
  *  Converting to, and from, base64url https://en.wikipedia.org/wiki/Base64#RFC_4648
 example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```

@@ -16,6 +16,7 @@
     "@types/json5": "0.0.29",
     "@types/lodash": "^4.14.36",
     "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.41",
     "@types/sanitize-html": "^1.13.31",
     "@types/sprintf-js": "0.0.27",
     "@types/validator": "^5.7.32",
@@ -37,7 +38,6 @@
     "validator": "^5.7.0"
   },
   "devDependencies": {
-    "@types/node": "^6.0.41",
     "mocha": "^3.0.2"
   },
   "scripts": {
