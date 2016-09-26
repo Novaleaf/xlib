@@ -1,6 +1,6 @@
 {
   "name": "xlib",
-  "version": "4.0.14",
+  "version": "4.0.15",
   "description": "A cross platform (nodejs/browser) common utilities library, written in Typescript",
   "private": false,
   "author": {
