@@ -75,3 +75,19 @@ export var formatNum = _numHelper.format;
 
 export import apply = _jsHelper.apply;
 
+export interface _ILodashCollectionEnumerator {
+    <TValue>(array: TValue[], enumerator: (value: TValue, index: number, collection: TValue[]) => false | void): TValue[];
+    <TValue>(collection: { [key: string]: TValue }, enumerator: (value: TValue, key: string, collection: { [key: string]: TValue }) => false | void): { [key: string]: TValue };
+    <TValue, TCollection>(collection: TCollection, enumerator: (value: TValue, key: string, collection: TCollection) => false | void): TCollection;
+}
+export interface _ILodashObjectEnumerator {
+    <TValue, TObject>(object: TObject, enumerator: (value: TValue, key: string, object: TObject) => false | void): TObject;
+}
+/** fixes lodash.d.ts type signature problems */
+export let forEach: _ILodashCollectionEnumerator = _.forEach;
+export let forEachRight: _ILodashCollectionEnumerator = _.forEachRight;
+export let forIn: _ILodashObjectEnumerator = _.forIn;
+export let forInRight: _ILodashObjectEnumerator = _.forInRight;
+export let forOwn: _ILodashObjectEnumerator = _.forOwn;
+export let forOwnRight: _ILodashObjectEnumerator = _.forOwnRight;
+

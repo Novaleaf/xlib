@@ -37,3 +37,24 @@ export declare var isLogTrace: boolean;
 export declare var isLogDebug: boolean;
 export declare var formatNum: typeof _numHelper.format;
 export import apply = _jsHelper.apply;
+export interface _ILodashCollectionEnumerator {
+    <TValue>(array: TValue[], enumerator: (value: TValue, index: number, collection: TValue[]) => false | void): TValue[];
+    <TValue>(collection: {
+        [key: string]: TValue;
+    }, enumerator: (value: TValue, key: string, collection: {
+        [key: string]: TValue;
+    }) => false | void): {
+        [key: string]: TValue;
+    };
+    <TValue, TCollection>(collection: TCollection, enumerator: (value: TValue, key: string, collection: TCollection) => false | void): TCollection;
+}
+export interface _ILodashObjectEnumerator {
+    <TValue, TObject>(object: TObject, enumerator: (value: TValue, key: string, object: TObject) => false | void): TObject;
+}
+/** fixes lodash.d.ts type signature problems */
+export declare let forEach: _ILodashCollectionEnumerator;
+export declare let forEachRight: _ILodashCollectionEnumerator;
+export declare let forIn: _ILodashObjectEnumerator;
+export declare let forInRight: _ILodashObjectEnumerator;
+export declare let forOwn: _ILodashObjectEnumerator;
+export declare let forOwnRight: _ILodashObjectEnumerator;

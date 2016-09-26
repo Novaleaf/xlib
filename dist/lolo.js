@@ -59,4 +59,11 @@ exports.isLogDebug = environment.logLevel <= environment.LogLevel.DEBUG;
 exports.formatNum = _numHelper.format;
 //export var apply = _jsHelper.apply;
 exports.apply = _jsHelper.apply;
+/** fixes lodash.d.ts type signature problems */
+exports.forEach = _.forEach;
+exports.forEachRight = _.forEachRight;
+exports.forIn = _.forIn;
+exports.forInRight = _.forInRight;
+exports.forOwn = _.forOwn;
+exports.forOwnRight = _.forOwnRight;
 //# sourceMappingURL=lolo.js.map
