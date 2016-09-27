@@ -14,7 +14,6 @@ mockMocha._initialize();
 //import * as browserHelper from "./browser/browserhelper";
 //import * as ex from "./exception";
 //var jsShims = require("./jsshims");
-exports.lolo = require("./lolo");
 //if (lolo.isLogDebug === true) {
 //	//try {
 //	///** https://www.npmjs.com/package/source-map-support
@@ -48,6 +47,11 @@ exports.serialization = require("./serialization");
 exports.compression = require("./compression");
 exports.threading = require("./threading");
 exports.lodash = require("lodash");
+//set lodash as a global if it's not.
+if (exports.environment.getGlobal()["_"] == null) {
+    exports.environment.getGlobal()["_"] = exports.lodash;
+}
+exports.lolo = require("./lolo");
 exports.promise = require("./promise");
 exports.net = require("./net");
 exports.cache = require("./cache");

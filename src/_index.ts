@@ -32,7 +32,6 @@ mockMocha._initialize();
 
 
 
-export import lolo = require("./lolo");
 //if (lolo.isLogDebug === true) {
 //	//try {
 //	///** https://www.npmjs.com/package/source-map-support
@@ -75,6 +74,12 @@ export import compression = require("./compression");
 export import threading = require("./threading");
 
 export import lodash = require("lodash");
+//set lodash as a global if it's not.
+if (environment.getGlobal()["_"] == null) {
+    environment.getGlobal()["_"] = lodash;
+}
+
+export import lolo = require("./lolo");
 
 export import promise = require("./promise");
 

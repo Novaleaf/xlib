@@ -1,4 +1,3 @@
-export import lolo = require("./lolo");
 export import jsHelper = require("./jshelper");
 export import arrayHelper = require("./arrayhelper");
 export import ClassBase = require("./classbase");
@@ -16,6 +15,7 @@ export import serialization = require("./serialization");
 export import compression = require("./compression");
 export import threading = require("./threading");
 export import lodash = require("lodash");
+export import lolo = require("./lolo");
 export import promise = require("./promise");
 export import net = require("./net");
 export import cache = require("./cache");
