@@ -12,8 +12,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>4d5b35d3-784f-40ff-a79a-b529eefc9296</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>
-    </StartupFile>
+    <StartupFile>src\_index.ts</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -51,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\arrayhelper.ts" />
+    <TypeScriptCompile Include="src\logtest.ts" />
     <TypeScriptCompile Include="src\_internal\base64url.ts" />
     <TypeScriptCompile Include="src\_internal\bluebird-retry.ts" />
     <TypeScriptCompile Include="src\_internal\browserhelper.ts" />

@@ -15,7 +15,6 @@ export import serialization = require("./serialization");
 export import compression = require("./compression");
 export import threading = require("./threading");
 export import lodash = require("lodash");
-export import lolo = require("./lolo");
 export import promise = require("./promise");
 export import net = require("./net");
 export import cache = require("./cache");
@@ -27,3 +26,4 @@ export import designPatterns = require("./design-patterns/_index");
 export import security = require("./security");
 /** custom type definitions */
 export import definitions = require("./definitions/_index");
+export import lolo = require("./lolo");

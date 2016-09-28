@@ -15,9 +15,8 @@ class ScrubFailureException extends ex.CorelibException {
 /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
 export import validator = require("validator");
 
-import logging = require("./logging")
-
-var log = new logging.Logger(__filename);
+import * as logging from "./logging";
+let log = new logging.Logger(__filename);
 
 
 

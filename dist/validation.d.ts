@@ -2,7 +2,7 @@
 import _ = require("lodash");
 /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
 export import validator = require("validator");
-import logging = require("./logging");
+import * as logging from "./logging";
 export declare class Scrub<T> {
     isValid: boolean;
     valid: {

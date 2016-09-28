@@ -1,4 +1,3 @@
-///// <reference path="../../../typings/all.d.ts" />
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -13,9 +12,10 @@ var serialization = require("./serialization");
 var reflection = require("./reflection");
 //import PrettyStream = require("bunyan-prettystream");
 var _ = require("lodash");
-var __ = require("./lolo");
+//import __ = require("./lolo");
 var moment = require("moment");
 var assert = require("assert");
+var jsHelper = require("./jshelper");
 var Exception = ex.Exception;
 var LoggerFatalException = (function (_super) {
     __extends(LoggerFatalException, _super);
@@ -24,6 +24,18 @@ var LoggerFatalException = (function (_super) {
     }
     return LoggerFatalException;
 }(Exception));
+//export class NewLogger {
+//    constructor(public name: string,
+//        public logLevel?: environment.LogLevel   //= environment.logLevel
+//    ) {
+//        if (logLevel == null) {
+//            logLevel = environment.logLevel;
+//        }
+//    }
+//    public echo(text: string) {
+//        console.log(this.name + text + "..." + text + "...");
+//    }
+//}
 /** coloring for node console */
 var Chalk = require("chalk");
 /**
@@ -178,15 +190,6 @@ function colorCodeToString(input, currentColor) {
     }
     return result;
 }
-//export class NewLogger {
-//    constructor(public name: string, public logLevel = environment.logLevel) {
-//    }
-//    private _log(targetLogLevel: environment.LogLevel, ...args: any[]) {
-//        if (targetLogLevel < this.logLevel) {
-//            return;
-//        }
-//    }
-//}
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
 var Logger = (function () {
     function Logger(name, logLevel) {
@@ -433,7 +436,7 @@ var Logger = (function () {
         for (var _i = 1; _i < arguments.length; _i++) {
             params[_i - 1] = arguments[_i];
         }
-        var msg = "TODO: " + __.apply(stringHelper.format, null, params, [format]); //.apply(null,format, params);
+        var msg = "TODO: " + jsHelper.apply(stringHelper.format, null, params, [format]); //.apply(null,format, params);
         this.assert(false, msg);
     };
     Logger.prototype.deprecated = function (message) {

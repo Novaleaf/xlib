@@ -1,6 +1,3 @@
-///// <reference path="../../../typings/all.d.ts" />
-"use strict";
-
 //export import bunyan = require("bunyan");
 import ex = require("./exception");
 import environment = require("./environment");
@@ -10,12 +7,28 @@ import reflection = require("./reflection");
 import Stream = require("stream");
 //import PrettyStream = require("bunyan-prettystream");
 import _ = require("lodash");
-import __ = require("./lolo");
+//import __ = require("./lolo");
 import moment = require("moment");
 import assert = require("assert");
-import Exception = ex.Exception;
 import Promise = require("bluebird");
+import jsHelper = require("./jshelper");
+
+import Exception = ex.Exception;
 class LoggerFatalException extends Exception { }
+
+//export class NewLogger {
+//    constructor(public name: string,
+//        public logLevel?: environment.LogLevel   //= environment.logLevel
+//    ) {
+//        if (logLevel == null) {
+//            logLevel = environment.logLevel;
+//        }
+//    }
+
+//    public echo(text: string) {
+//        console.log(this.name + text + "..." + text + "...");
+//    }
+//}
 
 
 /** coloring for node console */
@@ -193,20 +206,6 @@ interface IReplacement extends IAnsiColor {
 }
 
 
-
-
-//export class NewLogger {
-//    constructor(public name: string, public logLevel = environment.logLevel) {
-//    }
-
-
-//    private _log(targetLogLevel: environment.LogLevel, ...args: any[]) {
-//        if (targetLogLevel < this.logLevel) {
-//            return;
-//        }
-
-//    }
-//}
 
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
 export class Logger {
@@ -391,7 +390,7 @@ export class Logger {
         args.unshift(false);
         this.assert.apply(this, args);
         args.shift();
-        
+
         throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args));
     }
 
@@ -445,7 +444,7 @@ export class Logger {
     }
     /** use to mark code that needs to be finished before it can be run.   asserts when hit. */
     todo(format = "TODO: not implemented", ...params: any[]) {
-        var msg = "TODO: " + __.apply(stringHelper.format, null, params, [format]);//.apply(null,format, params);
+        var msg = "TODO: " + jsHelper.apply(stringHelper.format, null, params, [format]);//.apply(null,format, params);
         this.assert(false, msg);
     }
     deprecated(message?: string) {

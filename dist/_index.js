@@ -1,4 +1,6 @@
 "use strict";
+var source_map_support = require("source-map-support");
+source_map_support.install();
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 var mockMocha = require("./_internal/mockmocha");
 mockMocha._initialize();
@@ -14,7 +16,7 @@ mockMocha._initialize();
 //import * as browserHelper from "./browser/browserhelper";
 //import * as ex from "./exception";
 //var jsShims = require("./jsshims");
-//if (lolo.isLogDebug === true) {
+//if (lolo.isLogDebug === true) { 
 //	//try {
 //	///** https://www.npmjs.com/package/source-map-support
 //	// * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
@@ -51,7 +53,6 @@ exports.lodash = require("lodash");
 if (exports.environment.getGlobal()["_"] == null) {
     exports.environment.getGlobal()["_"] = exports.lodash;
 }
-exports.lolo = require("./lolo");
 exports.promise = require("./promise");
 exports.net = require("./net");
 exports.cache = require("./cache");
@@ -67,6 +68,7 @@ exports.definitions = require("./definitions/_index");
 //https://www.npmjs.com/package/decimal.js
 //*/
 //export import decimal = require("decimal.js");
+exports.lolo = require("./lolo");
 ///** cross-platform implementation of the nodejs module: http://nodejs.org/api/events.html
 // * -------------------
 // * Many objects in Node emit events: a net.Server emits an event each time a peer connects to it, 
