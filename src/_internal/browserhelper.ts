@@ -182,7 +182,9 @@ export var getCookies = (() => {
 						key = raw;
 						value = raw;
 					} else if (splitLocation === 0) {
-						throw new Error("invalid cookie format.  cookie= " + raw);
+						//throw new Error("invalid cookie format.  cookie= " + raw);
+						console.error("invalid cookie format.  cookie= " + raw);
+						continue;
 					} else {
 						key = raw.substring(0, splitLocation);
 						value = raw.substring(splitLocation + 1);
