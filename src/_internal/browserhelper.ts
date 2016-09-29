@@ -3,8 +3,8 @@
 //import * as jsHelper from "../jshelper";
 //import * as ex from "../exception";
 
-import jsHelper = require("../jshelper");
-import ex = require("../exception");
+//import jsHelper = require("../jshelper");
+//import ex = require("../exception");
 import * as _ from "lodash";
 
 /** low-level javascript helpers for use in the browser. graceful fallbacks if not a browser*/
@@ -49,10 +49,10 @@ export var isIE: boolean = (function () {
 
 /** provides onload() capabilities that work on old versions of IE too */
 export function onLoad(domElement: HTMLElement | any, callback: any): void {
-	//throw new ex.CorelibException("depricated.  still used?");
+	//throw new Error("depricated.  still used?");
 	//jquery handling of callbacks, taken from http://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
 	if (typeof domElement.onload === "undefined" && domElement.onreadystatechange !== "undefined") {
-		throw new ex.CorelibException("the element you wish to attach the callback does not have a .onload() method to attach to!");
+		throw new Error("the element you wish to attach the callback does not have a .onload() method to attach to!");
 	}
     var done = false;
     
@@ -161,7 +161,7 @@ export var getCookies = (() => {
 	function _getCookies() {
 		if (parsedCookies == null) {
 			if (typeof (document) === "undefined") { //for severside not using something like jsdom
-				throw new ex.CorelibException("document (base object) is missing.  this function is meant for browser use.  are you running serverside?");
+				throw new Error("document (base object) is missing.  this function is meant for browser use.  are you running serverside?");
 			} else {
 				parsedCookies = {};
 				var rawCookies = document.cookie.split(";");
@@ -171,26 +171,43 @@ export var getCookies = (() => {
 					if (keypair.length === 0) {
 						continue;
 					}
-					var cookie = rawCookies[i].split("=");
-					if (cookie.length > 2) {
-						throw new ex.CorelibException("invalid cookie format.  cookie= " + rawCookies[i]);
-					}
+
+					var raw = rawCookies[i];
+
 					var key: string;
 					var value: string;
-					if (cookie.length == 1) {
-						key = cookie[0];
-						value = cookie[0];
+
+					var splitLocation = raw.indexOf("=");
+					if (splitLocation === -1) {
+						key = raw;
+						value = raw;
+					} else if (splitLocation === 0) {
+						throw new Error("invalid cookie format.  cookie= " + raw);
 					} else {
-						key = cookie[0];
-						value = cookie[1];
+						key = raw.substring(0, splitLocation);
+						value = raw.substring(splitLocation + 1);
 					}
+
+					//var cookie = rawCookies[i].split("=");
+					//if (cookie.length > 2) {
+					//	throw new Error("invalid cookie format.  cookie= " + rawCookies[i]);
+					//}
+					//var key: string;
+					//var value: string;
+					//if (cookie.length == 1) {
+					//	key = cookie[0];
+					//	value = cookie[0];
+					//} else {
+					//	key = cookie[0];
+					//	value = cookie[1];
+					//}
 					parsedCookies[key] = value;
 				}
 
 				//for (var i = rawCookies.length - 1; i >= 0; i--) {
 				//	var cookie = rawCookies[i].split("=");
 				//	if (cookie.length !== 2) {
-				//		throw new ex.CorelibException("invalid cookie format.  cookie= " + rawCookies[i]);
+				//		throw new Error("invalid cookie format.  cookie= " + rawCookies[i]);
 				//	}
 
 				//	var key = cookie[0];
@@ -224,7 +241,7 @@ export var getQuerystringVariables = (() => {
 	function _getQuerystringVariables() {
 		if (parsedQuerystrings == null) {
 			if (typeof (window) === "undefined") { //for severside not using something like jsdom
-				throw new ex.CorelibException("window (base object) is missing.  this function is meant for browser use.  are you running serverside?");
+				throw new Error("window (base object) is missing.  this function is meant for browser use.  are you running serverside?");
             } else {
                 if (window.location.search.length === 0) {
                     //no querystrings to parse
@@ -247,7 +264,7 @@ export var getQuerystringVariables = (() => {
                     } else {
                         key = pair[0];
                         value = (<string>rawVars[i]).substring(key.length);
-                        //throw new ex.CorelibException("invalid querystring format.  var= " + rawVars[i]);
+                        //throw new Error("invalid querystring format.  var= " + rawVars[i]);
                     }
 					parsedQuerystrings[key] = value;
 				}

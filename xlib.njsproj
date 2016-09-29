@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\arrayhelper.ts" />
-    <TypeScriptCompile Include="src\logtest.ts" />
     <TypeScriptCompile Include="src\_internal\base64url.ts" />
     <TypeScriptCompile Include="src\_internal\bluebird-retry.ts" />
     <TypeScriptCompile Include="src\_internal\browserhelper.ts" />

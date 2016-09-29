@@ -1,5 +1,6 @@
 "use strict";
 exports._ = require("lodash");
+//import ex = require("./exception");
 //import * as lodash from "lodash";
 //import * as exception from "./exception";
 /** low-level javascript helpers, to smooth over warts in the language */

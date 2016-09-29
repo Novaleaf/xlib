@@ -92,7 +92,7 @@ export class BitFlags {
 	}
 
 	/** sets any flags that are set in the input */
-	public add(flags: BitFlags):void;
+	public add(flags: BitFlags): void;
 	public add(rawBuffer: number): void;
 	public add(bitFlagsOrRawBuffer: any): void {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
@@ -169,7 +169,7 @@ export class BitFlags {
 	}
 
 	/** returns true if all the set flags in the input are also set in this. */
-	public isAllOn(flags: BitFlags):boolean;
+	public isAllOn(flags: BitFlags): boolean;
 	public isAllOn(rawBuffer: number): boolean;
 	public isAllOn(bitFlagsOrRawBuffer: any): boolean {
 		if (typeof (bitFlagsOrRawBuffer) === "number") {
@@ -268,7 +268,7 @@ export class ExpiresDictionary<TValue> {
 
 	constructor(public autoTryCleanupInterval: moment.Duration, public defaultLifetime: moment.Duration) {
 		setInterval(() => {
-			this._tryCleanupOne(); 
+			this._tryCleanupOne();
 		}, this.autoTryCleanupInterval.asMilliseconds());
 	}
 
@@ -336,12 +336,13 @@ interface IExpiresDictionaryItem<TValue> {
 }
 
 /**
- *  enumerate over the key+items in a collection, removing each pair as they are enumerated.
- *  return a rejected promise from the callback to abort enumeration.  item is removed from collection immediatly prior to the callback being invoked, so if you wish it to remain in the collection you will need to manually re-add it.
- * @param collection
- * @param callback
+ *  enumerate over the key+items in a collection, removing each pair as they are enumerated. *  
  */
-export function ezForEachAndRemove<TItem>(collection: { [key: string]: TItem }, callback: (item: TItem, key: string) => Promise<any>): Promise<void> {
+export function ezForEachAndRemove<TItem>(
+	/** a javascript object with enumerable properties */
+	collection: { [key: string]: TItem },
+	/** return a rejected promise from the callback to abort enumeration.  item is removed from collection immediatly prior to the callback being invoked, so if you wish it to remain in the collection you will need to manually re-add it.*/
+	callback: (item: TItem, key: string) => Promise<any>): Promise<void> {
 
 	let keys = Object.keys(collection);
 	let nextIndex = 0;

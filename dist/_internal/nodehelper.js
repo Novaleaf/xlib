@@ -1,5 +1,5 @@
 "use strict";
-var ex = require("../exception");
+//import ex = require("../exception");
 //import * as ex from "../exception";
 /** helpers for backend node.js stuff  NODE.JS ONLY!!! */
 //declare var require: any;
@@ -112,7 +112,7 @@ exports.getCommandlineArgs = (function () {
     function _getCommandlineArgs() {
         if (parsedCommandlineArgs == null) {
             if (typeof (process) === "undefined") {
-                throw new ex.CorelibException("process (base object) is missing.  this function is meant for nodejs use.  are you running in a browser?");
+                throw new Error("process (base object) is missing.  this function is meant for nodejs use.  are you running in a browser?");
             }
             else {
                 //declare require: any;

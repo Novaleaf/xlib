@@ -276,12 +276,13 @@ var ExpiresDictionary = (function () {
 }());
 exports.ExpiresDictionary = ExpiresDictionary;
 /**
- *  enumerate over the key+items in a collection, removing each pair as they are enumerated.
- *  return a rejected promise from the callback to abort enumeration.  item is removed from collection immediatly prior to the callback being invoked, so if you wish it to remain in the collection you will need to manually re-add it.
- * @param collection
- * @param callback
+ *  enumerate over the key+items in a collection, removing each pair as they are enumerated. *
  */
-function ezForEachAndRemove(collection, callback) {
+function ezForEachAndRemove(
+    /** a javascript object with enumerable properties */
+    collection, 
+    /** return a rejected promise from the callback to abort enumeration.  item is removed from collection immediatly prior to the callback being invoked, so if you wish it to remain in the collection you will need to manually re-add it.*/
+    callback) {
     var keys = Object.keys(collection);
     var nextIndex = 0;
     var toReturn = new Promise(function (resolve, reject) {

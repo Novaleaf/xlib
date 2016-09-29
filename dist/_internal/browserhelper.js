@@ -1,5 +1,8 @@
 "use strict";
-var ex = require("../exception");
+//import * as jsHelper from "../jshelper";
+//import * as ex from "../exception";
+//import jsHelper = require("../jshelper");
+//import ex = require("../exception");
 var _ = require("lodash");
 /** DEPRECATED:  use jsHelper.platformType instead.
 determine if running in a browser (if false, most likely running in node.js) */
@@ -29,10 +32,10 @@ exports.isIE = (function () {
 }());
 /** provides onload() capabilities that work on old versions of IE too */
 function onLoad(domElement, callback) {
-    //throw new ex.CorelibException("depricated.  still used?");
+    //throw new Error("depricated.  still used?");
     //jquery handling of callbacks, taken from http://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
     if (typeof domElement.onload === "undefined" && domElement.onreadystatechange !== "undefined") {
-        throw new ex.CorelibException("the element you wish to attach the callback does not have a .onload() method to attach to!");
+        throw new Error("the element you wish to attach the callback does not have a .onload() method to attach to!");
     }
     var done = false;
     domElement.onload = domElement.onreadystatechange = function (ev) {
@@ -128,7 +131,7 @@ exports.getCookies = (function () {
     function _getCookies() {
         if (parsedCookies == null) {
             if (typeof (document) === "undefined") {
-                throw new ex.CorelibException("document (base object) is missing.  this function is meant for browser use.  are you running serverside?");
+                throw new Error("document (base object) is missing.  this function is meant for browser use.  are you running serverside?");
             }
             else {
                 parsedCookies = {};
@@ -138,20 +141,34 @@ exports.getCookies = (function () {
                     if (keypair.length === 0) {
                         continue;
                     }
-                    var cookie = rawCookies[i].split("=");
-                    if (cookie.length > 2) {
-                        throw new ex.CorelibException("invalid cookie format.  cookie= " + rawCookies[i]);
-                    }
+                    var raw = rawCookies[i];
                     var key;
                     var value;
-                    if (cookie.length == 1) {
-                        key = cookie[0];
-                        value = cookie[0];
+                    var splitLocation = raw.indexOf("=");
+                    if (splitLocation === -1) {
+                        key = raw;
+                        value = raw;
+                    }
+                    else if (splitLocation === 0) {
+                        throw new Error("invalid cookie format.  cookie= " + raw);
                     }
                     else {
-                        key = cookie[0];
-                        value = cookie[1];
+                        key = raw.substring(0, splitLocation);
+                        value = raw.substring(splitLocation + 1);
                     }
+                    //var cookie = rawCookies[i].split("=");
+                    //if (cookie.length > 2) {
+                    //	throw new Error("invalid cookie format.  cookie= " + rawCookies[i]);
+                    //}
+                    //var key: string;
+                    //var value: string;
+                    //if (cookie.length == 1) {
+                    //	key = cookie[0];
+                    //	value = cookie[0];
+                    //} else {
+                    //	key = cookie[0];
+                    //	value = cookie[1];
+                    //}
                     parsedCookies[key] = value;
                 }
             }
@@ -177,7 +194,7 @@ exports.getQuerystringVariables = (function () {
     function _getQuerystringVariables() {
         if (parsedQuerystrings == null) {
             if (typeof (window) === "undefined") {
-                throw new ex.CorelibException("window (base object) is missing.  this function is meant for browser use.  are you running serverside?");
+                throw new Error("window (base object) is missing.  this function is meant for browser use.  are you running serverside?");
             }
             else {
                 if (window.location.search.length === 0) {

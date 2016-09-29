@@ -2,7 +2,7 @@
 //"use strict";
 var nodeHelper = require("./_internal/nodehelper");
 var browserHelper = require("./_internal/browserhelper");
-var ex = require("./exception");
+//import ex = require("./exception");
 //import * as nodeHelper from "./node/nodehelper";
 //import * as browserHelper from "./browser/browserhelper";
 //import * as ex from "./exception";
@@ -260,7 +260,7 @@ function getEnvironmentVariable(key, valueIfNullOrEmpty) {
             }
             break;
         default:
-            throw new ex.CorelibException("unsupported plaform type: " + exports.platformType.toString());
+            throw new Error("unsupported plaform type: " + exports.platformType.toString());
     }
     //have our result (including if it's null/empty)
     if (valueIfNullOrEmpty === undefined) {

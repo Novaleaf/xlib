@@ -80,11 +80,12 @@ export declare class ExpiresDictionary<TValue> {
     delete(key: string): void;
 }
 /**
- *  enumerate over the key+items in a collection, removing each pair as they are enumerated.
- *  return a rejected promise from the callback to abort enumeration.  item is removed from collection immediatly prior to the callback being invoked, so if you wish it to remain in the collection you will need to manually re-add it.
- * @param collection
- * @param callback
+ *  enumerate over the key+items in a collection, removing each pair as they are enumerated. *
  */
-export declare function ezForEachAndRemove<TItem>(collection: {
+export declare function ezForEachAndRemove<TItem>(
+    /** a javascript object with enumerable properties */
+    collection: {
     [key: string]: TItem;
-}, callback: (item: TItem, key: string) => Promise<any>): Promise<void>;
+}, 
+    /** return a rejected promise from the callback to abort enumeration.  item is removed from collection immediatly prior to the callback being invoked, so if you wish it to remain in the collection you will need to manually re-add it.*/
+    callback: (item: TItem, key: string) => Promise<any>): Promise<void>;
