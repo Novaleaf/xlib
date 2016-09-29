@@ -6,8 +6,11 @@ from https://stackoverflow.com/questions/12915412/how-do-i-extend-a-host-object-
 export declare class Exception extends Error {
     message: string;
     innerException: Error | any;
+    stack: string;
     private static _getTypeNameOrFuncNameRegex;
-    constructor(message: string, innerException?: Error | any);
+    constructor(message: string, innerException?: Error | any, 
+        /** truncate extra stack frames from the stack that's attached to this, a good way to remove logging/util functions from the trace */
+        stackFramesToTruncate?: number);
     /** includes stack track in string*/
     toStringWithStack(): string;
     /** get a string representation of the exception, with full stack-track (if any exists) */

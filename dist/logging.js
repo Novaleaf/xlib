@@ -370,10 +370,17 @@ var Logger = (function () {
         }
         var finalArgs = this._log(environment.LogLevel.ERROR, args);
         if (finalArgs != null) {
-            return new ex.Exception(finalArgs.shift());
+            var message = void 0;
+            if (finalArgs.length > 2) {
+                message = finalArgs[3];
+            }
+            else {
+                message = finalArgs.join("\n");
+            }
+            return new ex.Exception(message, undefined, 1);
         }
         else {
-            return new ex.Exception("");
+            return new ex.Exception("Error", undefined, 1);
         }
     };
     Logger.prototype.fatal = function () {
@@ -384,7 +391,7 @@ var Logger = (function () {
         args.unshift(false);
         this.assert.apply(this, args);
         args.shift();
-        throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args));
+        throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args), undefined, 1);
     };
     Logger.prototype.assert = function (testCondition) {
         var args = [];
@@ -449,6 +456,16 @@ var Logger = (function () {
     return Logger;
 }());
 exports.Logger = Logger;
+//class TestError extends Error {
+//	constructor(message: string) {
+//		super(message);
+//		//this = new Error(message);
+//		//this._error = new Error(message);
+//		//this.stack = this._error.stack;
+//		//this.name = this._error.name;		
+//	}
+//	//private _error:Error;
+//}
 //"use strict";
 ////import logging = require("./logging");
 ////import ex = require("../exception");

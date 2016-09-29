@@ -254,7 +254,7 @@ export class Logger {
         if (targetLogLevel < this.logLevel) {
             return;
         }
-        return this._doLog.apply(this, arguments);
+        return this._doLog.apply(this, arguments) as string[];
 
     }
 
@@ -377,13 +377,19 @@ export class Logger {
     ex:  throw log.error("something bad");
      * @param args
      */
-    public error(...args: any[]) {
+    public error(...args: any[]):any {
         let finalArgs = this._log(environment.LogLevel.ERROR, args);
 
-        if (finalArgs != null) {
-            return new ex.Exception(finalArgs.shift());
+		if (finalArgs != null) {
+			let message: string;
+			if (finalArgs.length > 2) {
+				message = finalArgs[3]
+			} else {
+				message = finalArgs.join("\n");
+			}
+			return new ex.Exception(message,undefined,1);
         } else {
-            return new ex.Exception("");
+            return new ex.Exception("Error",undefined,1);
         }
     }
     public fatal(...args: any[]) {
@@ -391,7 +397,7 @@ export class Logger {
         this.assert.apply(this, args);
         args.shift();
 
-        throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args));
+        throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args),undefined,1);
     }
 
 
@@ -455,6 +461,18 @@ export class Logger {
         this.assert(false, "implement deprecated");
     }
 }
+
+//class TestError extends Error {
+//	constructor(message: string) {
+//		super(message);
+//		//this = new Error(message);
+//		//this._error = new Error(message);
+//		//this.stack = this._error.stack;
+//		//this.name = this._error.name;		
+//	}
+//	//private _error:Error;
+
+//}
 
 //"use strict";
 ////import logging = require("./logging");

@@ -16,12 +16,14 @@ from https://stackoverflow.com/questions/12915412/how-do-i-extend-a-host-object-
 */
 export class Exception extends Error {
 
-
+	public stack: string;
 	private static _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
-	constructor(public message: string, public innerException?: Error | any) {
+	constructor(public message: string, public innerException?: Error | any,
+		/** truncate extra stack frames from the stack that's attached to this, a good way to remove logging/util functions from the trace */
+		stackFramesToTruncate = 0) {
 
 		super(message);
-
+		
 		//if (environment.logLevel > environment.LogLevel.DEBUG) {
 		//	innerException = null;
 		//} else {
@@ -39,8 +41,34 @@ export class Exception extends Error {
 		var results = (Exception._getTypeNameOrFuncNameRegex).exec((this).constructor.toString());
 		this.name = (results && results.length > 1) ? results[1] : "";
 
+
+
 		//this.message = message;
 		//this.stack = (<any>new Error()).stack;		
+
+		let tempStack: string = new Error("boogah").stack as string;
+
+		//console.log("================START STACK================");
+		//console.log(tempStack);
+		//console.log("================END STACK================");
+		let _array = tempStack.split("\n");
+		if (_array.length > (2 + stackFramesToTruncate)) {
+			let line1 = _array.shift();
+			let line2 = _array.shift();
+
+			for (let i = 0; i < stackFramesToTruncate; i++) {
+				_array.shift();
+			}
+			_array.unshift(`${this.name}: ${this.message}` as string);
+		}
+		let finalStack = _array.join("\n");
+		this.stack = finalStack;
+
+
+
+
+
+		//console.log(typeof (this.stack));
 	}
 	/** includes stack track in string*/
 	toStringWithStack() {
@@ -52,10 +80,15 @@ export class Exception extends Error {
 		var msg = ex.name + ": " + ex.message;
 		var stack = (<any>ex).stack;
 		if (stack) {
-			if (stack.join !== "undefined") {			//if (__.arrayHelper.isArray(stack)) {
+			if (stack.join != undefined) {			//if (__.arrayHelper.isArray(stack)) {
 				stack = stack.join("\n");
 			}
-			msg += "\n" + stack;
+			if (environment.platformType === environment.PlatformType.NodeJs) {
+				//stack already includes message
+				msg = stack;
+			} else {
+				msg += "\n" + stack;
+			}
 		}
 		return msg;
 	}
