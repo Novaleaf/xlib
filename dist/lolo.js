@@ -1,84 +1,59 @@
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "./numhelper", "./jshelper", "./serialization", "./validation", "./exception", "moment", "./cache", "./environment"], factory);
-    }
-})(function (require, exports) {
-    "use strict";
-    var numHelper = require("./numhelper");
-    var _jsHelper = require("./jshelper");
-    var serialization = require("./serialization");
-    exports.JSONX = serialization.JSONX;
-    //export { serialization.JSONX as JSONX };
-    var validation = require("./validation");
-    exports.scrub = validation.scrub;
-    exports.defaultIfNull = _jsHelper.defaultIfNull;
-    //export { _jsHelper.defaultIfNull as defaultIfNull };
-    var _exception = require("./exception");
-    exports.Exception = _exception.Exception;
-    //export { _exception.Exception as Exception };
-    var moment = require("moment");
-    exports.moment = moment;
-    function utcNow() {
-        return moment.utc().toDate();
-    }
-    exports.utcNow = utcNow;
-    function utcNowMoment() {
-        return moment.utc();
-    }
-    exports.utcNowMoment = utcNowMoment;
-    function utcNowTimestamp() {
-        return moment.utc().toDate().getTime();
-    }
-    exports.utcNowTimestamp = utcNowTimestamp;
-    //import _cache = require("./cache");
-    var _cache = require("./cache");
-    /**
-     * read method from the defaultCache object (xlib.cache.defaultCache.read).
-     * for your own namespace, instantiate a new xlib.cache.Cache class instance instead.
-     */
-    exports.cache = _cache.defaultCache.read.bind(_cache.defaultCache);
-    //export { _cache.defaultCache.read.bind(_cache.defaultCache) as cache};
-    ///**
-    // * converts db escaped user input into html escaped user input (for ui presentation)
-    // */
-    //export var htmlEscape = _stringHelper.htmlEscapeEscapedUserInput;
-    ///**
-    // *  converts db escaped user input into sanitized html (includes whitelisted markeup) for ui formatting
-    // */
-    //export var htmlSanitize = _stringHelper.htmlSanitizeEscapedUserInput;
-    var environment = require("./environment");
-    /**
-     *   shortcut for ```environment.isDev```
-     */
-    exports.isDevCodeEnabled = environment.isDev;
-    /**
-     *  current testLevel (if tests are enabled or not) shortcut for ```environment.envLevel >= environment.EnvLevel.FULL```
-     */
-    exports.isTestCodeEnabled = environment.isTest;
-    /**
-     *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.TRACE```
-     */
-    exports.isLogTrace = environment.logLevel <= environment.LogLevel.TRACE;
-    /**
-     *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
-     */
-    exports.isLogDebug = environment.logLevel <= environment.LogLevel.DEBUG;
-    ///**
-    // *  current envLevel (real or fake data)  shortcut for ```environment.envLevel === environment.EnvLevel.PROD```
-    // */
-    //export var isProd = environment.envLevel === environment.EnvLevel.PROD;
-    exports.formatNum = numHelper.format;
-    //export var apply = _jsHelper.apply;
-    exports.apply = _jsHelper.apply;
-    /** fixes lodash.d.ts type signature problems */
-    exports.forEach = _.forEach;
-    exports.forEachRight = _.forEachRight;
-    exports.forIn = _.forIn;
-    exports.forInRight = _.forInRight;
-    exports.forOwn = _.forOwn;
-    exports.forOwnRight = _.forOwnRight;
-});
+"use strict";
+import * as numHelper from "./numhelper";
+import * as _jsHelper from "./jshelper";
+import * as serialization from "./serialization";
+export var JSONX = serialization.JSONX;
+import * as validation from "./validation";
+export var scrub = validation.scrub;
+export var defaultIfNull = _jsHelper.defaultIfNull;
+import * as _exception from "./exception";
+export var Exception = _exception.Exception;
+import * as moment from "moment";
+export { moment };
+export function utcNow() {
+    return moment.utc().toDate();
+}
+export function utcNowMoment() {
+    return moment.utc();
+}
+export function utcNowTimestamp() {
+    return moment.utc().toDate().getTime();
+}
+import * as _cache from "./cache";
+/**
+ * read method from the defaultCache object (xlib.cache.defaultCache.read).
+ * for your own namespace, instantiate a new xlib.cache.Cache class instance instead.
+ */
+export var cache = _cache.defaultCache.read.bind(_cache.defaultCache);
+import * as environment from "./environment";
+/**
+ *   shortcut for ```environment.isDev```
+ */
+export var isDevCodeEnabled = environment.isDev;
+/**
+ *  current testLevel (if tests are enabled or not) shortcut for ```environment.envLevel >= environment.EnvLevel.FULL```
+ */
+export var isTestCodeEnabled = environment.isTest;
+/**
+ *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.TRACE```
+ */
+export var isLogTrace = environment.logLevel <= environment.LogLevel.TRACE;
+/**
+ *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
+ */
+export var isLogDebug = environment.logLevel <= environment.LogLevel.DEBUG;
+///**
+// *  current envLevel (real or fake data)  shortcut for ```environment.envLevel === environment.EnvLevel.PROD```
+// */
+//export var isProd = environment.envLevel === environment.EnvLevel.PROD;
+export var formatNum = numHelper.format;
+//export var apply = _jsHelper.apply;
+export var apply = _jsHelper.apply;
+/** fixes lodash.d.ts type signature problems */
+export var forEach = _.forEach;
+export var forEachRight = _.forEachRight;
+export var forIn = _.forIn;
+export var forInRight = _.forInRight;
+export var forOwn = _.forOwn;
+export var forOwnRight = _.forOwnRight;
 //# sourceMappingURL=lolo.js.map

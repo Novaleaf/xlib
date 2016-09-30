@@ -1,7 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "module": "umd",
+    "module": "es2015",
     "removeComments": false,
     "preserveConstEnums": true,
     "sourceMap": true,
