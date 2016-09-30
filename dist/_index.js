@@ -1,6 +1,9 @@
 "use strict";
 var source_map_support = require("source-map-support");
-source_map_support.install();
+//can be removed by webpack
+if (source_map_support != null && source_map_support.install != null) {
+    source_map_support.install();
+}
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 var mockMocha = require("./_internal/mockmocha");
 mockMocha._initialize();
