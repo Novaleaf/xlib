@@ -4,13 +4,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-import * as stringHelper from "./stringhelper";
-import * as numHelper from "./numhelper";
-import * as jsHelper from "./jshelper";
-import * as ex from "./exception";
-import * as _ from "lodash";
-import * as serialization from "./serialization";
-import * as reflection from "./reflection";
+var stringHelper = require("./stringhelper");
+var numHelper = require("./numhelper");
+var jsHelper = require("./jshelper");
+var ex = require("./exception");
+var _ = require("lodash");
+var serialization = require("./serialization");
+var reflection = require("./reflection");
 var ScrubFailureException = (function (_super) {
     __extends(ScrubFailureException, _super);
     function ScrubFailureException() {
@@ -18,11 +18,12 @@ var ScrubFailureException = (function (_super) {
     }
     return ScrubFailureException;
 }(ex.CorelibException));
-import * as validator from "validator";
-export { validator };
-import * as logging from "./logging";
+/** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
+var validator = require("validator");
+exports.validator = validator;
+var logging = require("./logging");
 var log = new logging.Logger(__filename);
-export var Scrub = (function () {
+var Scrub = (function () {
     function Scrub(inputs, clone, deepClone, /** fail message if the inputs are not an object */ errorMessage, printInvalidValues) {
         if (clone === void 0) { clone = false; }
         if (deepClone === void 0) { deepClone = false; }
@@ -341,15 +342,17 @@ export var Scrub = (function () {
     };
     return Scrub;
 }());
+exports.Scrub = Scrub;
 /**
  *  allows scrubbing of user input.
  * @param values
  * @param clone
  * @param deepClone
  */
-export function scrub(values, clone, deepClone) {
+function scrub(values, clone, deepClone) {
     if (clone === void 0) { clone = false; }
     if (deepClone === void 0) { deepClone = false; }
     return new Scrub(values, clone, deepClone);
 }
+exports.scrub = scrub;
 //# sourceMappingURL=validation.js.map

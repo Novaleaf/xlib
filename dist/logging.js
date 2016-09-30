@@ -1,17 +1,21 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-import * as ex from "./exception";
-import * as environment from "./environment";
-import * as stringHelper from "./stringhelper";
-import * as serialization from "./serialization";
-import * as reflection from "./reflection";
-import * as _ from "lodash";
-import * as moment from "moment";
-import * as assert from "assert";
-import * as jsHelper from "./jshelper";
+var ex = require("./exception");
+var environment = require("./environment");
+var stringHelper = require("./stringhelper");
+var serialization = require("./serialization");
+var reflection = require("./reflection");
+//import Stream = require("stream");
+//import PrettyStream = require("bunyan-prettystream");
+var _ = require("lodash");
+//import * as __ from "./lolo";
+var moment = require("moment");
+var assert = require("assert");
+var jsHelper = require("./jshelper");
 var Exception = ex.Exception;
 var LoggerFatalException = (function (_super) {
     __extends(LoggerFatalException, _super);
@@ -20,7 +24,20 @@ var LoggerFatalException = (function (_super) {
     }
     return LoggerFatalException;
 }(Exception));
-import * as Chalk from "chalk";
+//export class NewLogger {
+//    constructor(public name: string,
+//        public logLevel?: environment.LogLevel   //= environment.logLevel
+//    ) {
+//        if (logLevel == null) {
+//            logLevel = environment.logLevel;
+//        }
+//    }
+//    public echo(text: string) {
+//        console.log(this.name + text + "..." + text + "...");
+//    }
+//}
+/** coloring for node console */
+var Chalk = require("chalk");
 /**
  * helper to convert ansi color codes to string representations.    conversions taken from https://en.wikipedia.org/wiki/ANSI_escape_code#graphics
  * @param input
@@ -174,7 +191,7 @@ function colorCodeToString(input, currentColor) {
     return result;
 }
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
-export var Logger = (function () {
+var Logger = (function () {
     function Logger(name, logLevel) {
         if (logLevel === void 0) { logLevel = environment.logLevel; }
         this.name = name;
@@ -438,6 +455,7 @@ export var Logger = (function () {
     };
     return Logger;
 }());
+exports.Logger = Logger;
 //class TestError extends Error {
 //	constructor(message: string) {
 //		super(message);

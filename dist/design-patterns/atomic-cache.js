@@ -1,9 +1,10 @@
-import * as moment from "moment";
-import * as Promise from "bluebird";
+"use strict";
+var moment = require("moment");
+var Promise = require("bluebird");
 /**
  * abstract class used for elements stored in the AtomicCache object
  */
-export var AtomicCacheItem = (function () {
+var AtomicCacheItem = (function () {
     function AtomicCacheItem(key, 
         /** max amount of time between uses of the cacheItem before we dispose it */
         _maxUnusedDuration, 
@@ -210,12 +211,13 @@ export var AtomicCacheItem = (function () {
     };
     return AtomicCacheItem;
 }());
+exports.AtomicCacheItem = AtomicCacheItem;
 /**
  *  allows for local caching of values, plus ability to atomically synchronize modifications with the master
  *  this pattern is known to work with google datastore (via transactions) so can probably be adapted to anything else too.
  * this is useful for data that is tollerant of eventual-consistency.  not so useful as-is for immediate/atomic consistency needs.
  */
-export var AtomicCache = (function () {
+var AtomicCache = (function () {
     function AtomicCache(_cacheItemCtor, _autoTryCleanupInterval) {
         var _this = this;
         this._cacheItemCtor = _cacheItemCtor;
@@ -306,4 +308,5 @@ export var AtomicCache = (function () {
     };
     return AtomicCache;
 }());
+exports.AtomicCache = AtomicCache;
 //# sourceMappingURL=atomic-cache.js.map

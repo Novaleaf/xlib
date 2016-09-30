@@ -1,6 +1,7 @@
 "use strict";
-import * as _ from "lodash";
-export { _ };
+//export import _ = require("lodash");
+var _ = require("lodash");
+exports._ = _;
 //import * as ex from "./exception";
 //import * as lodash from "lodash";
 //import * as exception from "./exception";
@@ -27,10 +28,11 @@ export { _ };
  * @param value
  * @param defaultValue
  */
-export function defaultIfNull(value, defaultValue) {
+function defaultIfNull(value, defaultValue) {
     return value == null ? defaultValue : value;
 }
-export function forEachArray(
+exports.defaultIfNull = defaultIfNull;
+function forEachArray(
     /** if a collection (an object with a .length property), will enumerate indicies */
     collection, func, 
     /** if true, a copy of the collection is made and enumerated.
@@ -55,11 +57,12 @@ this is useful if you wish to add/remove from the original collection while enum
     //not yielded
     return true;
 }
+exports.forEachArray = forEachArray;
 /**
 * Helper function for iterating over values in the object. If the func returns
 * a false value, it will break out of the loop.
 */
-export function forEachArrayReverse(
+function forEachArrayReverse(
     /** if a collection (an object with a .length property), will enumerate indicies */
     collection, func, 
     /** if true, a copy of the collection is made and enumerated.
@@ -84,7 +87,8 @@ this is useful if you wish to add/remove from the original collection while enum
     //not yielded
     return true;
 }
-export function forEachProperty(
+exports.forEachArrayReverse = forEachArrayReverse;
+function forEachProperty(
     /** enumerate hasOwnProperties of this   */
     object, func, recursive) {
     if (recursive === void 0) { recursive = false; }
@@ -109,6 +113,7 @@ export function forEachProperty(
     //not yielded
     return true;
 }
+exports.forEachProperty = forEachProperty;
 ///////** creates and returns a rate-limited facade over the input function.    
 ////// * this lets you invoke the facade and the underlying function will execute at maximum once per rateLimit period.  
 ////// * any additional calls are enqueued and triggered in a FIFO order.
@@ -156,7 +161,7 @@ export function forEachProperty(
 ////}
 /** same as function.apply, but allows prepending arguments in front of an array of arguments */
 //export function apply<TReturn>(targetFcn: (arg1: any, ...anyArgs: any[]) => TReturn, thisObj: any, argArray: any[], ...argsToPrepend: any[]): TReturn
-export function apply(targetFcn, thisObj, argArray, argsToPrepend, argsToPostpend) {
+function apply(targetFcn, thisObj, argArray, argsToPrepend, argsToPostpend) {
     if (argsToPrepend === void 0) { argsToPrepend = []; }
     if (argsToPostpend === void 0) { argsToPostpend = []; }
     //in case this is IArguments or something of the sort, make a new array
@@ -179,6 +184,7 @@ export function apply(targetFcn, thisObj, argArray, argsToPrepend, argsToPostpen
     //}
     return targetFcn.apply(thisObj, argArray);
 }
+exports.apply = apply;
 ///** if the targetFcn is null, silently ignore (no errors) */
 //export function applyOrNoop(targetFcn: Function, thisObj: any, argArray: any[], ...argsToPrepend: any[]): any {
 //	if (targetFcn == null) {
@@ -290,7 +296,7 @@ export function apply(targetFcn, thisObj, argArray, argsToPrepend, argsToPostpen
 ////	//return target;
 ////}
 /** replace a branch of your JSON object.  good for pruning nested hiearchies, for example when wanting to decrease verbosity sent to user (before doing a JSON.stringify() ) */
-export function replaceNodes(targetObject, 
+function replaceNodes(targetObject, 
     /** example:  'a.b.c.d' will remove the d node, replacing it (with null by default, effectively deleting)*/
     nodeHiearchyStrings, replaceWith, replaceEmptyLeafNodes) {
     if (replaceWith === void 0) { replaceWith = null; }
@@ -333,10 +339,11 @@ export function replaceNodes(targetObject,
         currentNodeProcessor(targetObject, hiearchy[0], 0, hiearchy);
     });
 }
+exports.replaceNodes = replaceNodes;
 /** allows chaining callbacks (sequentially)
 example usage:  object.callback = __.chainCallbacks(object.callback, myCallback, otherCallback, anotherAddedCallback);
 */
-export function chainCallbacks() {
+function chainCallbacks() {
     var callbacks = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         callbacks[_i - 0] = arguments[_i];
@@ -353,6 +360,7 @@ export function chainCallbacks() {
         }
     };
 }
+exports.chainCallbacks = chainCallbacks;
 /** create an instance of your class, and makes it callable
 example:
 //create instance of MyClass, passing args to the constructor
@@ -360,7 +368,7 @@ var myInstance = __.createCallableInstance(myMethod,MyClass,"ctorArg1",ctorArg2)
 //invoke myMethod on instance of myClass
 myInstance(myMethod1Arg);
 */
-export function createCallableInstance(
+function createCallableInstance(
     /* tslint:disable */
     /** method you want to be able to invoke
     example: var myMethod = (arg1)=>{};*/
@@ -399,9 +407,10 @@ export function createCallableInstance(
     return toReturn;
     /* tslint:enable */
 }
+exports.createCallableInstance = createCallableInstance;
 /** disallow enumeration of a property
 return true if succesfull false otherwise (such as if platform doesn't support it)*/
-export function disablePropertyEnumeration(obj, propertyName) {
+function disablePropertyEnumeration(obj, propertyName) {
     try {
         if (Object.defineProperty != null) {
             Object.defineProperty(obj, propertyName, { enumerable: false });
@@ -416,6 +425,7 @@ export function disablePropertyEnumeration(obj, propertyName) {
         return false;
     }
 }
+exports.disablePropertyEnumeration = disablePropertyEnumeration;
 //import * as util from "util";
 ///** inherit the prototype methods from one constructor into another. The prototype of constructor will be set to a new object created from superConstructor.
 //As an additional convenience, superConstructor will be accessible through the constructor.super_ property.

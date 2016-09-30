@@ -1,14 +1,15 @@
 ///// <reference path="../../../typings/all.d.ts" />
-import * as jsHelper from "./jshelper";
-import * as reflection from "./reflection";
-import * as ex from "./exception";
-import * as json5 from "json5";
-import * as stringHelper from "./stringhelper";
-import * as util from "util";
+"use strict";
+var jsHelper = require("./jshelper");
+var reflection = require("./reflection");
+var ex = require("./exception");
+var json5 = require("json5");
+var stringHelper = require("./stringhelper");
+var util = require("util");
 /** JSON5.parse (forgiving) coupled with JSON.stringify (standards compliant serialization), plus extra helpers
  *
  */
-export var JsonX = (function () {
+var JsonX = (function () {
     function JsonX() {
     }
     /**
@@ -292,7 +293,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                         try {
                             if (!nodeDepthSearchDisabled) {
                                 //check to see if we can stringify (no circular dependencies)
-                                JSONX.stringifyX(node, replacer);
+                                exports.JSONX.stringifyX(node, replacer);
                             }
                             //able to stringify (no exception thrown), so lets ignore depth searching for our children (avoid stringifying to gain perf)
                             return _nodePropertyRecurser(node, depth, typeName, true);
@@ -482,15 +483,16 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
     };
     return JsonX;
 }());
+exports.JsonX = JsonX;
 /** JSON5.parse (forgiving) coupled with JSON.stringify (standards compliant serialization), plus extra helpers
  */
-export var JSONX = new JsonX();
+exports.JSONX = new JsonX();
 //polyfill JSON if it doesn't exist (IE7)
 if (typeof (window) !== "undefined" && window.JSON == null) {
-    window.JSON = JSONX;
+    window.JSON = exports.JSONX;
 }
 /** A parser and formatter for DSV (CSV and TSV) files.
 Extracted from D3.
 https://www.npmjs.com/package/d3-dsv */
-export var dsv = require("d3-dsv");
+exports.dsv = require("d3-dsv");
 //# sourceMappingURL=serialization.js.map

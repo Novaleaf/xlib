@@ -1,15 +1,18 @@
 "use strict";
-import * as axios from "axios";
-export { axios };
-import * as promise from "./promise";
+//export import axios = require("axios");
+/** the axios httpClient library:  https://github.com/mzabriskie/axios */
+//export import axios = require("axios");
+var axios = require("axios");
+exports.axios = axios;
+var promise = require("./promise");
 var Promise = promise.bluebird;
-import * as _ from "lodash";
-import * as logging from "./logging";
+var _ = require("lodash");
+var logging = require("./logging");
 var log = new logging.Logger(__filename);
 /**
 *  a helper for constructing reusable endpoint functions
 */
-export var EzEndpointFunction = (function () {
+var EzEndpointFunction = (function () {
     function EzEndpointFunction(origin, path, 
         /** default is to retry for up to 10 seconds, (no retries after 10 seconds) */
         retryOptions, 
@@ -167,4 +170,5 @@ export var EzEndpointFunction = (function () {
     };
     return EzEndpointFunction;
 }());
+exports.EzEndpointFunction = EzEndpointFunction;
 //# sourceMappingURL=net.js.map

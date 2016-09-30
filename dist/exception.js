@@ -1,16 +1,24 @@
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-import * as environment from "./environment";
+//declare class Error {
+//	public name: string;
+//	public message: string;
+//	public stack: string;
+//	constructor(message?: string);
+//}
+//import * as environment from "./environment";
+var environment = require("./environment");
 //let err: Error;
 //err.
 /** class to allow extending of javascript errors (custom errors thrown by exceptions)
 usage example:  class MyException extends base.Exception{}  throw new MyException("boo");
 from https://stackoverflow.com/questions/12915412/how-do-i-extend-a-host-object-e-g-error-in-typescript
 */
-export var Exception = (function (_super) {
+var Exception = (function (_super) {
     __extends(Exception, _super);
     function Exception(message, innerException, 
         /** truncate extra stack frames from the stack that's attached to this, a good way to remove logging/util functions from the trace */
@@ -100,18 +108,20 @@ export var Exception = (function (_super) {
     Exception._getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
     return Exception;
 }(Error));
+exports.Exception = Exception;
 /** all errors thrown by corelib extend this error type */
-export var CorelibException = (function (_super) {
+var CorelibException = (function (_super) {
     __extends(CorelibException, _super);
     function CorelibException() {
         _super.apply(this, arguments);
     }
     return CorelibException;
 }(Exception));
+exports.CorelibException = CorelibException;
 /**
  * an exception that includes a statusCode for returning via http requests
  */
-export var HttpStatusCodeException = (function (_super) {
+var HttpStatusCodeException = (function (_super) {
     __extends(HttpStatusCodeException, _super);
     function HttpStatusCodeException(message, innerException, statusCode) {
         if (statusCode === void 0) { statusCode = 400; }
@@ -120,4 +130,5 @@ export var HttpStatusCodeException = (function (_super) {
     }
     return HttpStatusCodeException;
 }(Exception));
+exports.HttpStatusCodeException = HttpStatusCodeException;
 //# sourceMappingURL=exception.js.map

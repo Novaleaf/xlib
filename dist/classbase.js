@@ -1,5 +1,6 @@
 "use strict";
-import * as ex from "./exception";
+//import * as ex from "./exception";
+var ex = require("./exception");
 /** root class, includes the following functionality:
 typeName, toString, dispose, assertIsAlive, hashCode */
 var ClassBase = (function () {
@@ -68,6 +69,6 @@ returns:  true == we just disposed.   false==already disposed so we do nothing *
     ClassBase._hashId = 0;
     return ClassBase;
 }());
+exports.ClassBase = ClassBase;
 //export = ClassBase;
-export { ClassBase };
 //# sourceMappingURL=classbase.js.map

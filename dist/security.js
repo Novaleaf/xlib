@@ -1,15 +1,25 @@
 "use strict";
-import * as exception from "./exception";
-import * as stringHelper from "./stringhelper";
-import * as numHelper from "./numhelper";
-import * as _ from "lodash";
-import * as crypto from "crypto";
-export { crypto };
+//import * as exception from "./exception";
+//import * as stringHelper from "./stringhelper";
+//import * as numHelper from "./numhelper";
+//import _ = require("lodash");
+var exception = require("./exception");
+var stringHelper = require("./stringhelper");
+var numHelper = require("./numhelper");
+var _ = require("lodash");
+/** cross-platform implementation of the nodejs module: http://nodejs.org/api/crypto.html
+ * -------------------
+ * The crypto module offers a way of encapsulating secure credentials to be used as part of a secure HTTPS net or http connection.  It also offers a set of wrappers for OpenSSL's hash, hmac, cipher, decipher, sign and verify methods.
+ * When to use: if the other classes/functions in this ```security``` module do not meet your needs.
+ */
+//export import * as crypto from "crypto";
+var crypto = require("crypto");
+exports.crypto = crypto;
 /**
  * generate a sha512 hash of your inputs, and returns it as a base64 encoded string. (88 characters in length)
  * @param input
  */
-export function sha512(
+function sha512(
     /** if an array, generates a hash of all values */
     input) {
     /** set to true to use base64 output instead of base64Url*/
@@ -38,6 +48,7 @@ export function sha512(
         return stringHelper.base64Url.encode(buffer);
     }
 }
+exports.sha512 = sha512;
 ///** JSON Web Tokens.    https://jwt.io/ */
 //export import jwt = require("jsonwebtoken");  //good intro to JWT: https://stormpath.com/blog/token-auth-spa/
 /**
@@ -50,7 +61,7 @@ export function sha512(
  * @param groupingSeperator set the character used for sperating digit groups.  default is "-"
  * @param suppressThrowOnBadInput default false.  if true, returns empty string ("") when a blatently invalid key is detected.  when false, thrown an exception.
  */
-export function humanFriendlyKey(digits, digitGroupings, userInputToParse, groupingSeperator, suppressThrowOnBadInput) {
+function humanFriendlyKey(digits, digitGroupings, userInputToParse, groupingSeperator, suppressThrowOnBadInput) {
     if (suppressThrowOnBadInput === void 0) { suppressThrowOnBadInput = false; }
     var radix = 32; //target 0-9 and a-z, except for easily mixed up characters (see keyReplacements structure below)
     if (digits == null) {
@@ -139,12 +150,13 @@ export function humanFriendlyKey(digits, digitGroupings, userInputToParse, group
     //console.log("randomKey", minDigits, maxDigits, initialKey, toReturn);
     return toReturn;
 }
+exports.humanFriendlyKey = humanFriendlyKey;
 /**
  *  ex: randomString(20, 'ABCDEFG'); // Returns 'CCBAAGDGBBEGBDBECDCE' which is 20 characters length.
  * @param length
  * @param chars
  */
-export function randomStringCrypto(length, chars) {
+function randomStringCrypto(length, chars) {
     if (!chars) {
         throw new Error('Argument \'chars\' is undefined');
     }
@@ -162,13 +174,15 @@ export function randomStringCrypto(length, chars) {
     }
     return result.join('');
 }
+exports.randomStringCrypto = randomStringCrypto;
 /**
  *  ex: randomAsciiString(20); // Returns 'rmRptK5niTSey7NlDk5y' which is 20 characters length.
  * @param length
  */
-export function randomAsciiStringCrypto(length) {
+function randomAsciiStringCrypto(length) {
     return randomStringCrypto(length, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 }
+exports.randomAsciiStringCrypto = randomAsciiStringCrypto;
 /**
  *  create a random number output as a string, with the specified number of digits.
  *  uses crypto, so slower but secure.
@@ -176,7 +190,7 @@ export function randomAsciiStringCrypto(length) {
  * @param maxDigits set to minDigits if not specified
  * @param radix
  */
-export function randomIntDigitsCrypto(digits, radix) {
+function randomIntDigitsCrypto(digits, radix) {
     if (radix === void 0) { radix = 10; }
     var output = [];
     var hexBuffer = crypto.randomBytes(digits).toString("hex");
@@ -189,4 +203,5 @@ export function randomIntDigitsCrypto(digits, radix) {
     var toReturn = output.join("");
     return toReturn;
 }
+exports.randomIntDigitsCrypto = randomIntDigitsCrypto;
 //# sourceMappingURL=security.js.map

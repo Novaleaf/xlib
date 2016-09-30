@@ -1,4 +1,5 @@
-import * as Promise from "bluebird";
+"use strict";
+var Promise = require("bluebird");
 /**
  *  Stopping
 The library also supports stopping the retry loop before the timeout occurs by throwing a new instance of retry.StopError from within the called function.
@@ -147,5 +148,6 @@ function backoff(interval, options) {
     }
     return interval;
 }
-export default retry;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = retry;
 //# sourceMappingURL=bluebird-retry.js.map

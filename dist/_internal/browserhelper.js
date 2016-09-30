@@ -1,11 +1,15 @@
 "use strict";
-import * as _ from "lodash";
+//import * as jsHelper from "../jshelper";
+//import * as ex from "../exception";
+//import jsHelper = require("../jshelper");
+//import * as ex from "../exception";
+var _ = require("lodash");
 /** DEPRECATED:  use jsHelper.platformType instead.
 determine if running in a browser (if false, most likely running in node.js) */
-export var isBrowser = typeof window !== "undefined" && typeof phantom === "undefined";
+exports.isBrowser = typeof window !== "undefined" && typeof phantom === "undefined";
 /** detect ie version, or undefined if ie10+ or non ie browser.
 usage:  if(ieVersion<9){...}*/
-export var ieVersion = (function () {
+exports.ieVersion = (function () {
     if (typeof (document) === "undefined") {
         return null;
     }
@@ -17,17 +21,17 @@ export var ieVersion = (function () {
     return v > 4 ? v : undef;
 }());
 /** detects if we are running any ie, even 10  (looks for 'trident' in user agent) */
-export var isIE = (function () {
+exports.isIE = (function () {
     if (typeof (navigator) === "undefined") {
         return false;
     }
-    if (ieVersion || navigator.userAgent.toLowerCase().indexOf("trident") >= 0) {
+    if (exports.ieVersion || navigator.userAgent.toLowerCase().indexOf("trident") >= 0) {
         return true;
     }
     return false;
 }());
 /** provides onload() capabilities that work on old versions of IE too */
-export function onLoad(domElement, callback) {
+function onLoad(domElement, callback) {
     //throw new Error("depricated.  still used?");
     //jquery handling of callbacks, taken from http://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
     if (typeof domElement.onload === "undefined" && domElement.onreadystatechange !== "undefined") {
@@ -47,11 +51,12 @@ export function onLoad(domElement, callback) {
         }
     };
 }
+exports.onLoad = onLoad;
 /** get the first attribute and return it"s value from a dom element
 example:
 var amdMain = getFirstAttribute("script","data-amd-main");
 */
-export function getDomAttribute(elementType, attribute, searchTopDown) {
+function getDomAttribute(elementType, attribute, searchTopDown) {
     if (searchTopDown === void 0) { searchTopDown = false; }
     if (typeof (document) === "undefined") {
         return null;
@@ -62,8 +67,9 @@ export function getDomAttribute(elementType, attribute, searchTopDown) {
     }
     return foundElement.getAttribute(attribute);
 }
+exports.getDomAttribute = getDomAttribute;
 /** get the first html element found and return it.  */
-export function getDomElement(elementType, 
+function getDomElement(elementType, 
     /** if not null, finds an element with this attribute */
     attribute, attributeValue, searchTopDown) {
     if (searchTopDown === void 0) { searchTopDown = false; }
@@ -108,6 +114,7 @@ export function getDomElement(elementType,
     }
     return foundElement;
 }
+exports.getDomElement = getDomElement;
 /////** async load css
 ////beware the styles may not be loaded before rendering occurs! */
 ////export function loadCss(url) {
@@ -118,7 +125,7 @@ export function getDomElement(elementType,
 ////	document.getElementsByTagName("head")[0].appendChild(link);
 ////}
 /** obatin all cookies */
-export var getCookies = (function () {
+exports.getCookies = (function () {
     /** cached query so we only get cookies once per pageload*/
     var parsedCookies;
     function _getCookies() {
@@ -172,8 +179,8 @@ export var getCookies = (function () {
     }
     return _getCookies;
 })();
-export function getCookie(key, valueIfNullOrEmpty) {
-    var parsedCookies = getCookies();
+function getCookie(key, valueIfNullOrEmpty) {
+    var parsedCookies = exports.getCookies();
     var result = parsedCookies[key];
     if (valueIfNullOrEmpty !== undefined) {
         if (result == null || result.length === 0) {
@@ -182,7 +189,8 @@ export function getCookie(key, valueIfNullOrEmpty) {
     }
     return result;
 }
-export var getQuerystringVariables = (function () {
+exports.getCookie = getCookie;
+exports.getQuerystringVariables = (function () {
     /** cached query so we only get cookies once per pageload*/
     var parsedQuerystrings;
     function _getQuerystringVariables() {
@@ -221,9 +229,9 @@ export var getQuerystringVariables = (function () {
     }
     return _getQuerystringVariables;
 })();
-export function getQuerystringVariable(key, valueIfNullOrEmpty) {
+function getQuerystringVariable(key, valueIfNullOrEmpty) {
     //from: https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-    var parsedQuerystrings = getQuerystringVariables();
+    var parsedQuerystrings = exports.getQuerystringVariables();
     var result = parsedQuerystrings[key];
     if (valueIfNullOrEmpty !== undefined) {
         if (result == null || result.length === 0) {
@@ -232,4 +240,5 @@ export function getQuerystringVariable(key, valueIfNullOrEmpty) {
     }
     return result;
 }
+exports.getQuerystringVariable = getQuerystringVariable;
 //# sourceMappingURL=browserhelper.js.map

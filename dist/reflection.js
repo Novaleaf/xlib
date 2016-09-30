@@ -1,6 +1,9 @@
-import * as ex from "./exception";
+"use strict";
+//export import _common = require("./reflection/_common");
+//import stringHelper = require("../stringhelper");
+//import arrayHelper = require("../arrayhelper");
+var ex = require("./exception");
 /** primitive types as identified by javascript, plus well known object types */
-export var Type;
 (function (Type) {
     /** null is not undefined, unfortunately  */
     Type[Type["null"] = 0] = "null";
@@ -16,13 +19,14 @@ export var Type;
     Type[Type["Array"] = 8] = "Array";
     Type[Type["RegExp"] = 9] = "RegExp";
     Type[Type["Date"] = 10] = "Date";
-})(Type || (Type = {}));
+})(exports.Type || (exports.Type = {}));
+var Type = exports.Type;
 //OBSOLETE: just use getType() instead
 //export function isFunction(it) {
 //	return Object.prototype.toString.call(it) === "[object Function]";
 //}
 /** provides the primitive type of a variable. better than using 'typeof()' because this handles array and null. */
-export function getType(obj) {
+function getType(obj) {
     if (obj === null) {
         return Type.null;
     }
@@ -56,8 +60,9 @@ export function getType(obj) {
             throw new ex.CorelibException("getType(), unknown primitive type: " + String(type));
     }
 }
+exports.getType = getType;
 /** get the name of an object's type. better than using 'typeof()' because this handles array and null.*/
-export function getTypeName(obj) {
+function getTypeName(obj) {
     var type = getType(obj);
     switch (type) {
         case Type.object:
@@ -70,7 +75,8 @@ export function getTypeName(obj) {
             return str;
     }
 }
-export function getArgumentNames(argsOrFunction) {
+exports.getTypeName = getTypeName;
+function getArgumentNames(argsOrFunction) {
     var func;
     if (typeof (argsOrFunction) === "function") {
         func = argsOrFunction;
@@ -90,10 +96,11 @@ export function getArgumentNames(argsOrFunction) {
     }
     return paramNames;
 }
+exports.getArgumentNames = getArgumentNames;
 /** returns a key-value collection of argument names (keys) and their mapped input arg (values).
  * if no argumentNames are passed in, the current function's argument names are used.
  * useful for debugging/logging parameters */
-export function mapArgumentsValues(args, argumentNames) {
+function mapArgumentsValues(args, argumentNames) {
     if (argumentNames == null) {
         var caller = args.callee;
         argumentNames = getArgumentNames(caller);
@@ -104,6 +111,7 @@ export function mapArgumentsValues(args, argumentNames) {
     }
     return toReturn;
 }
+exports.mapArgumentsValues = mapArgumentsValues;
 //export function _nameArgs(argumentNames: string[], args: IArguments): any {
 //	var toReturn = {};
 //	for (var i = 0; i < args.length; i++) {

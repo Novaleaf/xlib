@@ -1,11 +1,16 @@
 "use strict";
-import * as stringHelper from "./stringhelper";
-import * as numHelper from "./numhelper";
-import * as ex from "./exception";
-import * as moment from "moment";
-import * as Promise from "bluebird";
+var stringHelper = require("./stringhelper");
+//import * as arrayHelper from "./arrayhelper";
+var numHelper = require("./numhelper");
+var ex = require("./exception");
+//import runtime = require("./runtime");
+//import diagnostics = require("./diagnostics");
+//import datetime = require("./datetime");
+var moment = require("moment");
+//import * as promise from "./promise";
+var Promise = require("bluebird");
 /** up to 32 true/false values stored in 32bits (a bitmask) */
-export var BitFlags = (function () {
+var BitFlags = (function () {
     function BitFlags(bitFlagsOrRawBuffer) {
         /** internal storage for our bitflags (just a number!) */
         this.rawBuffer = 0;
@@ -199,10 +204,11 @@ export var BitFlags = (function () {
     BitFlags.NONE = new BitFlags(0);
     return BitFlags;
 }());
+exports.BitFlags = BitFlags;
 /**
  *  a dictionary that deletes items when they expire
  */
-export var ExpiresDictionary = (function () {
+var ExpiresDictionary = (function () {
     function ExpiresDictionary(autoTryCleanupInterval, defaultLifetime) {
         var _this = this;
         this.autoTryCleanupInterval = autoTryCleanupInterval;
@@ -268,10 +274,11 @@ export var ExpiresDictionary = (function () {
     };
     return ExpiresDictionary;
 }());
+exports.ExpiresDictionary = ExpiresDictionary;
 /**
  *  enumerate over the key+items in a collection, removing each pair as they are enumerated. *
  */
-export function ezForEachAndRemove(
+function ezForEachAndRemove(
     /** a javascript object with enumerable properties */
     collection, 
     /** return a rejected promise from the callback to abort enumeration.  item is removed from collection immediatly prior to the callback being invoked, so if you wish it to remain in the collection you will need to manually re-add it.*/
@@ -301,6 +308,7 @@ export function ezForEachAndRemove(
     });
     return toReturn;
 }
+exports.ezForEachAndRemove = ezForEachAndRemove;
 ///** simple interface to allow casting of simple javascript object collection's values to specific types. 
 //== example usage ==
 //var myStuff:ICollection<number>={};

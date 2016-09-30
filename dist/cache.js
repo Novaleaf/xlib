@@ -1,15 +1,17 @@
 "use strict";
-import * as _ from "lodash";
-import * as moment from "moment";
-import * as exception from "./exception";
-import * as logging from "./logging";
-import * as Promise from "bluebird";
+var _ = require("lodash");
+var moment = require("moment");
+var exception = require("./exception");
+//import diagnostics = require("./diagnostics/_main")
+var logging = require("./logging");
+//import * as promise from "./promise";
+var Promise = require("bluebird");
 var log = new logging.Logger(__filename);
 /**
  * caches values in memory, mostly to help avoiding excessive db queries, but can be used for any similar reasons.
  * if you want your own namespace, construct your own instance of this class.   If you don't care, use the default ```defaultCache``` instance, or use the lolo shortcut: ```__.cache```
  */
-export var Cache = (function () {
+var Cache = (function () {
     function Cache() {
         this._storage = {};
         this._cleanupKeys = [];
@@ -157,8 +159,9 @@ export var Cache = (function () {
     };
     return Cache;
 }());
+exports.Cache = Cache;
 /**
  *  default cache
  */
-export var defaultCache = new Cache();
+exports.defaultCache = new Cache();
 //# sourceMappingURL=cache.js.map

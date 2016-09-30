@@ -1,13 +1,17 @@
 ///// <reference path="../../typings/all.d.ts" />
 "use strict";
-import * as moment from "moment";
-export { moment };
-export function getDateFromIsoString(isoDateTimeString) {
+///** a high-quality date-time library: http://momentjs.com/ Also includes the moment-timezone extension*/
+//export import moment = require("moment-timezone");
+/** a high-quality date-time library: http://momentjs.com/ */
+var moment = require("moment");
+exports.moment = moment;
+function getDateFromIsoString(isoDateTimeString) {
     if (isoDateTimeString == null) {
         return null;
     }
     return isoDateTimeString.substring(0, isoDateTimeString.lastIndexOf("T"));
 }
+exports.getDateFromIsoString = getDateFromIsoString;
 //export class DateTime {
 //	protected _instance: moment.Moment;
 //	/** To get the current date and time, just call moment() with no parameters.  This is essentially the same as calling moment(new Date()). */

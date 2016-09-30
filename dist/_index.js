@@ -1,3 +1,4 @@
+"use strict";
 /** https://www.npmjs.com/package/source-map-support
  * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
   */
@@ -7,58 +8,119 @@ var source_map_support = require("source-map-support");
 if (source_map_support != null && source_map_support.install != null) {
     source_map_support.install();
 }
-import * as mockMocha from "./_internal/mockmocha";
+///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
+//import mockMocha = require("./_internal/mockmocha");
+var mockMocha = require("./_internal/mockmocha");
 mockMocha._initialize();
-import * as jsHelper from "./jshelper";
-export { jsHelper };
-import * as arrayHelper from "./arrayhelper";
-export { arrayHelper };
-import { ClassBase } from "./classbase";
-export { ClassBase };
-import * as logging from "./logging";
-export { logging };
-import * as exception from "./exception";
-export { exception };
-import * as collections from "./collections";
-export { collections };
-import * as numHelper from "./numhelper";
-export { numHelper };
-import * as stringHelper from "./stringhelper";
-export { stringHelper };
-import * as reflection from "./reflection";
-export { reflection };
-import * as environment from "./environment";
-export { environment };
-import * as dateTime from "./datetime";
-export { dateTime };
-import * as validation from "./validation";
-export { validation };
-import * as serialization from "./serialization";
-export { serialization };
-import * as compression from "./compression";
-export { compression };
-import * as threading from "./threading";
-export { threading };
-import * as lodash from "lodash";
-export { lodash };
+//import * as jsHelper from "./jshelper";
+//export { jsHelper };
+//import * as exception from "./exception";
+//export { exception };
+//import * as environment from "./environment";
+//export { environment };
+//import * as lodash from "lodash";
+//export { lodash };
+//export import * as nodeHelper from "./node/nodehelper";
+//import * as browserHelper from "./browser/browserhelper";
+//import * as ex from "./exception";
+//var jsShims = require("./jsshims");
+//if (lolo.isLogDebug === true) { 
+//	//try {
+//	///** https://www.npmjs.com/package/source-map-support
+//	// * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
+//	//  */
+//	console.log("loading sourcemap support");
+//    var source_map_support = require("source-map-support");
+//    //source_map_support.install({ handleUncaughtExceptions: false });
+//	source_map_support.install();
+//	//} catch (ex) {
+//	//	console.log("eating sourcemap support call");
+//	//}
+//}
+///** low-level javascript helpers, to smooth over warts in the language */
+//export import * as jsHelper from "./jshelper";
+//export import * as arrayHelper from "./arrayhelper";
+//export import ClassBase = require("./classbase");
+//export import * as logging from "./logging";
+var jsHelper = require("./jshelper");
+exports.jsHelper = jsHelper;
+var arrayHelper = require("./arrayhelper");
+exports.arrayHelper = arrayHelper;
+var classbase_1 = require("./classbase");
+exports.ClassBase = classbase_1.ClassBase;
+var logging = require("./logging");
+exports.logging = logging;
+//export import * as exception from "./exception";
+//export import collections = require("./collections");
+var exception = require("./exception");
+exports.exception = exception;
+var collections = require("./collections");
+exports.collections = collections;
+/** various math and numerical conversion/manipulation related helper functions */
+//export import * as numHelper from "./numhelper";
+//export import * as stringHelper from "./stringhelper";
+//export import * as reflection from "./reflection";
+//export import * as environment from "./environment";
+//export import dateTime = require("./datetime");
+var numHelper = require("./numhelper");
+exports.numHelper = numHelper;
+var stringHelper = require("./stringhelper");
+exports.stringHelper = stringHelper;
+var reflection = require("./reflection");
+exports.reflection = reflection;
+var environment = require("./environment");
+exports.environment = environment;
+var dateTime = require("./datetime");
+exports.dateTime = dateTime;
+//export import * as validation from "./validation";
+//export import * as serialization from "./serialization";
+var validation = require("./validation");
+exports.validation = validation;
+var serialization = require("./serialization");
+exports.serialization = serialization;
+//export import compression = require("./compression");
+//export import threading = require("./threading");
+var compression = require("./compression");
+exports.compression = compression;
+var threading = require("./threading");
+exports.threading = threading;
+//export import lodash = require("lodash");
+var lodash = require("lodash");
+exports.lodash = lodash;
 //set lodash as a global if it's not.
 if (environment.getGlobal()["_"] == null) {
     environment.getGlobal()["_"] = lodash;
 }
-import * as promise from "./promise";
-export { promise };
-import * as net from "./net";
-export { net };
-import * as cache from "./cache";
-export { cache };
-import * as designPatterns from "./design-patterns/_index";
-export { designPatterns };
-import * as security from "./security";
-export { security };
-import * as definitions from "./definitions/_index";
-export { definitions };
-import * as lolo from "./lolo";
-export { lolo };
+//export import * as promise from "./promise";
+//export import net = require("./net");
+//export import cache = require("./cache");
+var promise = require("./promise");
+exports.promise = promise;
+var net = require("./net");
+exports.net = net;
+var cache = require("./cache");
+exports.cache = cache;
+/** templates for various design patterns */
+//export import designPatterns = require("./design-patterns/_index");
+var designPatterns = require("./design-patterns/_index");
+exports.designPatterns = designPatterns;
+/** security and cryptographic helpers.   (cross-platform)
+ *  note:  our ```KDF``` is nodejs only, and can be found in the ```nlib.security``` module.
+ * */
+//export import security = require("./security");
+var security = require("./security");
+exports.security = security;
+/** custom type definitions */
+//export import definitions = require("./definitions/_index");
+var definitions = require("./definitions/_index");
+exports.definitions = definitions;
+///** decimal.js: high precision numbers
+//https://www.npmjs.com/package/decimal.js
+//*/
+//export import decimal = require("decimal.js");
+//export import lolo = require("./lolo");
+var lolo = require("./lolo");
+exports.lolo = lolo;
 ///** cross-platform implementation of the nodejs module: http://nodejs.org/api/events.html
 // * -------------------
 // * Many objects in Node emit events: a net.Server emits an event each time a peer connects to it, 

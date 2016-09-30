@@ -1,7 +1,10 @@
 "use strict";
-import * as _ from "lodash";
-import * as sanitizeHtml from "sanitize-html";
-export { sanitizeHtml };
+var _ = require("lodash");
+/** Clean up user-submitted HTML, preserving whitelisted elements and whitelisted attributes on a per-element basis
+ https://www.npmjs.com/package/sanitize-html
+*/
+var sanitizeHtml = require("sanitize-html");
+exports.sanitizeHtml = sanitizeHtml;
 ///**
 // * takes our normal "escaped at rest" user input and unescapes it, then sanitizes
 // * @param html
@@ -44,14 +47,15 @@ export { sanitizeHtml };
  * may return false-positives, but never false-negatives.
  * @param value
  */
-export function isEncodedMaybe(value) {
+function isEncodedMaybe(value) {
     if (value.indexOf("%") < 0) {
         return false;
     }
     ;
     return true;
 }
-export function count(target, subStrToCount, ignoreCase, startingPosition, /**default false.  if true, we allow overlapping finds, such as "aa" in the string "aaa" would return 2*/ allowOverlaps) {
+exports.isEncodedMaybe = isEncodedMaybe;
+function count(target, subStrToCount, ignoreCase, startingPosition, /**default false.  if true, we allow overlapping finds, such as "aa" in the string "aaa" would return 2*/ allowOverlaps) {
     if (ignoreCase === void 0) { ignoreCase = false; }
     if (startingPosition === void 0) { startingPosition = 0; }
     if (allowOverlaps === void 0) { allowOverlaps = false; }
@@ -83,7 +87,8 @@ export function count(target, subStrToCount, ignoreCase, startingPosition, /**de
     }
     return counted;
 }
-export function indexOf(target, toFind, ignoreCase, startingPosition) {
+exports.count = count;
+function indexOf(target, toFind, ignoreCase, startingPosition) {
     if (ignoreCase === void 0) { ignoreCase = false; }
     if (startingPosition === void 0) { startingPosition = 0; }
     if (ignoreCase === true) {
@@ -92,10 +97,11 @@ export function indexOf(target, toFind, ignoreCase, startingPosition) {
     }
     return target.indexOf(toFind, startingPosition);
 }
+exports.indexOf = indexOf;
 /** if the target is encapsulated by prefix/suffix, returns the unencapsulated version
 otherwise, returns the target (non modified)
 */
-export function between(target, prefix, suffix, ignoreCase, trimFirst) {
+function between(target, prefix, suffix, ignoreCase, trimFirst) {
     if (ignoreCase === void 0) { ignoreCase = false; }
     if (trimFirst === void 0) { trimFirst = false; }
     if (trimFirst) {
@@ -115,8 +121,9 @@ export function between(target, prefix, suffix, ignoreCase, trimFirst) {
         return target;
     }
 }
+exports.between = between;
 /** if the string is longer than the maxLength, creates a summary (first + last) and returns it (ommiting the middle) */
-export function summarize(str, /** default = 100 */ maxLength) {
+function summarize(str, /** default = 100 */ maxLength) {
     if (maxLength === void 0) { maxLength = 100; }
     if (str == null) {
         return "NULL";
@@ -137,11 +144,12 @@ export function summarize(str, /** default = 100 */ maxLength) {
     var toReturn = str.substring(0, half) + "..." + str.substring(str.length - half);
     return toReturn;
 }
+exports.summarize = summarize;
 /** converts a string to something that can be used as a machine-readable id.
 input is converted to lowercase, alphanumeric with underscore (or your choosen 'whitespaceChar').
 example:  "  (hi)   world!" ==> "hi_world"
 the rules: maximum of 1 underscore at a time, and won't prefix/suffix with underscores (or your chosen 'whitespaceChar'*/
-export function toId(str, whitespaceChar) {
+function toId(str, whitespaceChar) {
     if (whitespaceChar === void 0) { whitespaceChar = "_"; }
     //strip out invalid characters (valid=alphanumeric) groups are replaced by a single whitespace (which will be replaced in a following line)
     var toReturn = str;
@@ -157,6 +165,7 @@ export function toId(str, whitespaceChar) {
     toReturn = toReturn.replace(/\s+/g, whitespaceChar);
     return toReturn;
 }
+exports.toId = toId;
 ///**
 // * creates a human-readable key.   similar to toId(), but also replaces underscores with "x" and "l" with "5".
 // * example: "  (hi)   world!" ==> "hixwor5d" 
@@ -171,7 +180,7 @@ export function toId(str, whitespaceChar) {
 //    //toReturn = replaceAll(toReturn,"_", "x");
 //    return toReturn;
 //}
-export function ipV4toInt(ip) {
+function ipV4toInt(ip) {
     var parts = ip.split(".");
     var res = 0;
     res += parseInt(parts[0], 10) << 24;
@@ -180,20 +189,24 @@ export function ipV4toInt(ip) {
     res += parseInt(parts[3], 10);
     return res;
 }
-export function intToIpV4(int) {
+exports.ipV4toInt = ipV4toInt;
+function intToIpV4(int) {
     var part1 = int & 255;
     var part2 = ((int >> 8) & 255);
     var part3 = ((int >> 16) & 255);
     var part4 = ((int >> 24) & 255);
     return part4 + "." + part3 + "." + part2 + "." + part1;
 }
-export function capitalize(str) {
+exports.intToIpV4 = intToIpV4;
+function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
-export function repeat(toRepeate, numberOfTimes) {
+exports.capitalize = capitalize;
+function repeat(toRepeate, numberOfTimes) {
     return Array(numberOfTimes + 1).join(toRepeate);
 }
-export function replaceAll(target, strToFind, replaceWith, ignoreCase) {
+exports.repeat = repeat;
+function replaceAll(target, strToFind, replaceWith, ignoreCase) {
     if (ignoreCase === void 0) { ignoreCase = false; }
     var flags = "g"; //global match
     if (ignoreCase === true) {
@@ -201,10 +214,12 @@ export function replaceAll(target, strToFind, replaceWith, ignoreCase) {
     }
     return target.replace(RegExp(escapeRegExp(strToFind), flags), replaceWith);
 }
-export function insertAt(target, toInsert, insertPosition) {
+exports.replaceAll = replaceAll;
+function insertAt(target, toInsert, insertPosition) {
     return [target.slice(0, insertPosition), toInsert, target.slice(insertPosition)].join("");
 }
-export function remove(target) {
+exports.insertAt = insertAt;
+function remove(target) {
     var textToRemove = [];
     for (var _i = 1; _i < arguments.length; _i++) {
         textToRemove[_i - 1] = arguments[_i];
@@ -230,7 +245,8 @@ export function remove(target) {
     } while (loop);
     return target;
 }
-export function removePrefix(target) {
+exports.remove = remove;
+function removePrefix(target) {
     var prefixToRemove = [];
     for (var _i = 1; _i < arguments.length; _i++) {
         prefixToRemove[_i - 1] = arguments[_i];
@@ -252,7 +268,8 @@ export function removePrefix(target) {
     } while (loop);
     return target;
 }
-export function removeSuffix(target) {
+exports.removePrefix = removePrefix;
+function removeSuffix(target) {
     var suffixToRemove = [];
     for (var _i = 1; _i < arguments.length; _i++) {
         suffixToRemove[_i - 1] = arguments[_i];
@@ -278,7 +295,8 @@ export function removeSuffix(target) {
     } while (loop);
     return target;
 }
-export function removeAfter(target, textToFind, keepFindText) {
+exports.removeSuffix = removeSuffix;
+function removeAfter(target, textToFind, keepFindText) {
     if (keepFindText === void 0) { keepFindText = false; }
     var index = target.indexOf(textToFind);
     if (index < 0) {
@@ -289,7 +307,8 @@ export function removeAfter(target, textToFind, keepFindText) {
     }
     return target.substring(0, index);
 }
-export function removeBefore(target, textToFind, keepFindText) {
+exports.removeAfter = removeAfter;
+function removeBefore(target, textToFind, keepFindText) {
     if (keepFindText === void 0) { keepFindText = false; }
     var index = target.indexOf(textToFind);
     if (index < 0) {
@@ -300,17 +319,20 @@ export function removeBefore(target, textToFind, keepFindText) {
     }
     return target.substring(index);
 }
-export function endsWith(target, toFind) {
+exports.removeBefore = removeBefore;
+function endsWith(target, toFind) {
     return target.lastIndexOf(toFind) === target.length - toFind.length;
 }
-export function isNullOrEmpty(str) {
+exports.endsWith = endsWith;
+function isNullOrEmpty(str) {
     if (str == null || str.length === 0) {
         return true;
     }
     return false;
 }
+exports.isNullOrEmpty = isNullOrEmpty;
 /** removes any leading bit-order-marker from utf8 strings */
-export function tryRemoveBom(str) {
+function tryRemoveBom(str) {
     if (str == null) {
         return str;
     }
@@ -332,18 +354,25 @@ export function tryRemoveBom(str) {
         return str;
     }
 }
+exports.tryRemoveBom = tryRemoveBom;
 /** escape a string for use as a literal match in a regex expression
 copied from http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
 */
-export function escapeRegExp(str) {
+function escapeRegExp(str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
-import * as base64Url from "./_internal/base64url";
-export { base64Url };
+exports.escapeRegExp = escapeRegExp;
+/**
+ *  Converting to, and from, base64url https://en.wikipedia.org/wiki/Base64#RFC_4648
+example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
+copied source code from the npm package: https://www.npmjs.com/package/base64url on 20160926.
+ */
+var base64Url = require("./_internal/base64url");
+exports.base64Url = base64Url;
 /**
  *  base64 encode and decode functions
  */
-export var base64;
+var base64;
 (function (base64) {
     function encode(input) {
         var isStr = _.isString(input);
@@ -371,7 +400,7 @@ export var base64;
         return new Buffer(base64Encoded, "base64");
     }
     base64.toBuffer = toBuffer;
-})(base64 || (base64 = {}));
+})(base64 = exports.base64 || (exports.base64 = {}));
 ///** common js method, missing from typescript d.ts */
 //declare function escape(input: string): string;
 ///** common js method, missing from typescript d.ts */
@@ -381,7 +410,7 @@ export var base64;
 //	return collections.hashHelper.createUniqueCodeInternal();
 //}
 /** returns a 32bit integer.  same algorithm as used with java, so output should match */
-export function hash(input) {
+function hash(input) {
     /* tslint:disable */
     var hash = 0, i, c, l;
     if (input.length == 0) {
@@ -395,9 +424,11 @@ export function hash(input) {
     /* tslint:enable */
     return hash;
 }
-import * as _sprintf from "sprintf-js";
-export var format = _sprintf.sprintf;
-export var format2 = _sprintf.vsprintf;
+exports.hash = hash;
+/**format strings */
+var _sprintf = require("sprintf-js");
+exports.format = _sprintf.sprintf;
+exports.format2 = _sprintf.vsprintf;
 ///** string.format, supports the following style:  formatAlt(" hello {0}!","world")
 //*/
 //export function formatAlt(toFormat: string, ...args: any[]): string {

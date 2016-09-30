@@ -106,7 +106,7 @@
  * example:  "myKey=myValue" will return, but "someValue" will not.
  * if you need single value args, access process.argv directly.
  */
-export var getCommandlineArgs = (function () {
+exports.getCommandlineArgs = (function () {
     /** cached query so we only get args once per js load*/
     var parsedCommandlineArgs;
     function _getCommandlineArgs() {
@@ -139,8 +139,8 @@ export var getCommandlineArgs = (function () {
  * example:  "myKey=myValue" will return, but "someValue" will not.
  * if you need single value args, access process.argv directly.
  */
-export function getCommandlineArg(key, valueIfNullOrEmpty) {
-    var parsedArgs = getCommandlineArgs();
+function getCommandlineArg(key, valueIfNullOrEmpty) {
+    var parsedArgs = exports.getCommandlineArgs();
     var result = parsedArgs[key];
     if (valueIfNullOrEmpty !== undefined) {
         if (result == null || result.length === 0) {
@@ -149,4 +149,5 @@ export function getCommandlineArg(key, valueIfNullOrEmpty) {
     }
     return result;
 }
+exports.getCommandlineArg = getCommandlineArg;
 //# sourceMappingURL=nodehelper.js.map

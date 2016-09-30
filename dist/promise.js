@@ -1,11 +1,14 @@
 "use strict";
-import * as arrayHelper from "./arrayhelper";
-import * as _ from "lodash";
-import * as __ from "./lolo";
-import * as logging from "./logging";
-import * as environment from "./environment";
-import * as bluebird from "bluebird";
-export { bluebird };
+var arrayHelper = require("./arrayhelper");
+var _ = require("lodash");
+var __ = require("./lolo");
+var logging = require("./logging");
+var environment = require("./environment");
+/** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance
+ * global.Promise is aliased to this.
+ */
+var bluebird = require("bluebird");
+exports.bluebird = bluebird;
 //bluebird.longStackTraces();
 if (__.isLogDebug == true) {
     //http://bluebirdjs.com/docs/api/promise.config.html
@@ -76,7 +79,7 @@ function logPromiseUnhandledRejections(logger) {
 logPromiseUnhandledRejections();
 /** constructs a unified promise for your returned (callback function) promises.  wraps a lodash foreach, just adds Promise.all() glue code.
 NOTE: executes all asynchronously.  if you need to only execute + complete one promise at a time, use Promise.each() instead. */
-export function forEach(array, callback) {
+function forEach(array, callback) {
     try {
         var results = [];
         _.forEach(array, function (value) {
@@ -89,9 +92,10 @@ export function forEach(array, callback) {
         return bluebird.reject(ex);
     }
 }
-export var _BluebirdRetryInternals;
+exports.forEach = forEach;
+var _BluebirdRetryInternals;
 (function (_BluebirdRetryInternals) {
-})(_BluebirdRetryInternals || (_BluebirdRetryInternals = {}));
+})(_BluebirdRetryInternals = exports._BluebirdRetryInternals || (exports._BluebirdRetryInternals = {}));
 /**
  *  The ```bluebird-retry``` module:  https://www.npmjs.com/package/bluebird-retry
 utility for retrying a bluebird promise until it succeeds
@@ -119,7 +123,7 @@ retry(myfunc).done(function(result) {
     console.log(result);
 });
  */
-export var retry = require("./_internal/bluebird-retry");
+exports.retry = require("./_internal/bluebird-retry");
 var _not_useful;
 (function (_not_useful) {
     /** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/
