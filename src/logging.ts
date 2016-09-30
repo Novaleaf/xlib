@@ -1,17 +1,17 @@
-//export import bunyan = require("bunyan");
-import ex = require("./exception");
-import environment = require("./environment");
-import stringHelper = require("./stringhelper");
-import serialization = require("./serialization");
-import reflection = require("./reflection");
-import Stream = require("stream");
+
+import * as ex from "./exception";
+import * as environment from "./environment";
+import * as stringHelper from "./stringhelper";
+import * as serialization from "./serialization";
+import * as reflection from "./reflection";
+//import Stream = require("stream");
 //import PrettyStream = require("bunyan-prettystream");
-import _ = require("lodash");
-//import __ = require("./lolo");
-import moment = require("moment");
-import assert = require("assert");
-import Promise = require("bluebird");
-import jsHelper = require("./jshelper");
+import * as _ from "lodash";
+//import * as __ from "./lolo";
+import * as moment from "moment";
+import * as assert from "assert";
+import * as Promise from "bluebird";
+import * as jsHelper from "./jshelper";
 
 import Exception = ex.Exception;
 class LoggerFatalException extends Exception { }
@@ -32,7 +32,7 @@ class LoggerFatalException extends Exception { }
 
 
 /** coloring for node console */
-import Chalk = require("chalk");
+import * as Chalk from "chalk";
 
 interface IAnsiColor {
     foreground: string;
@@ -475,8 +475,8 @@ export class Logger {
 //}
 
 //"use strict";
-////import logging = require("./logging");
-////import ex = require("../exception");
+////import * as logging from "./logging";
+////import * as ex from "../exception";
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present. 
 // * usage notes: as long as this module is loaded 

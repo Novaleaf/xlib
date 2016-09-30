@@ -1,13 +1,20 @@
 //copied source code from the npm package: https://www.npmjs.com/package/base64url on 20160926.
 //why:  because that npm package used the old "typings" system and it causes visual studio to error on virtual projects.
-"use strict";
-/**
- *  Converting to, and from, base64url https://en.wikipedia.org/wiki/Base64#RFC_4648
-example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
-uses the npm package: https://www.npmjs.com/package/base64url
- */
-var base64Url;
-(function (base64Url) {
+(function (factory) {
+    if (typeof module === 'object' && typeof module.exports === 'object') {
+        var v = factory(require, exports); if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === 'function' && define.amd) {
+        define(["require", "exports"], factory);
+    }
+})(function (require, exports) {
+    "use strict";
+    /**
+     *  Converting to, and from, base64url https://en.wikipedia.org/wiki/Base64#RFC_4648
+    example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
+    uses the npm package: https://www.npmjs.com/package/base64url
+     */
+    //module base64Url {
     function padString(input) {
         var segmentLength = 4;
         var stringLength = input.length;
@@ -39,7 +46,7 @@ var base64Url;
         }
         return fromBase64(new Buffer(input, encoding).toString("base64"));
     }
-    base64Url.encode = encode;
+    exports.encode = encode;
     ;
     /** Convert a base64url encoded string into a raw string. Encoding defaults to 'utf8'.
     ```
@@ -50,7 +57,7 @@ var base64Url;
         if (encoding === void 0) { encoding = "utf8"; }
         return new Buffer(toBase64(base64url), "base64").toString(encoding);
     }
-    base64Url.decode = decode;
+    exports.decode = decode;
     /** Convert a base64url encoded string to a base64 encoded string
     ```
 > base64url.toBase64('qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA')
@@ -65,7 +72,7 @@ var base64Url;
             .replace(/\-/g, "+")
             .replace(/_/g, "/");
     }
-    base64Url.toBase64 = toBase64;
+    exports.toBase64 = toBase64;
     /** Convert a base64 encoded string to a base64url encoded string
 
 Example
@@ -80,7 +87,7 @@ Example
             .replace(/\+/g, "-")
             .replace(/\//g, "_");
     }
-    base64Url.fromBase64 = fromBase64;
+    exports.fromBase64 = fromBase64;
     /**
     Convert a base64url encoded string to a Buffer
     ```
@@ -90,9 +97,10 @@ Example
     function toBuffer(base64url) {
         return new Buffer(toBase64(base64url), "base64");
     }
-    base64Url.toBuffer = toBuffer;
-})(base64Url || (base64Url = {}));
-module.exports = base64Url;
+    exports.toBuffer = toBuffer;
+});
+//}
+//export = base64Url;
 //export interface Base64Url {
 //    (input: string | Buffer, encoding?: string): string;
 //    encode(input: string | Buffer, encoding?: string): string;

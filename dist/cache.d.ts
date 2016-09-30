@@ -1,6 +1,6 @@
 /// <reference types="bluebird" />
-import moment = require("moment");
-import Promise = require("bluebird");
+import * as moment from "moment";
+import * as Promise from "bluebird";
 export interface ICacheItem<TValue> {
     /** if UNDEFINED the cache is invalid.   Important note:  NULL is a valid cached value.*/
     value: TValue;

@@ -1,13 +1,13 @@
 ///// <reference path="../../../typings/all.d.ts" />
 
-import jsHelper = require("./jshelper");
-import reflection = require("./reflection");
-import ex = require("./exception");
+import * as jsHelper from "./jshelper";
+import * as reflection from "./reflection";
+import * as ex from "./exception";
 
-import json5 = require("json5");
-import stringHelper = require("./stringhelper");
-import Promise = require("bluebird");
-import moment = require("moment");
+import * as json5 from "json5";
+import * as stringHelper from "./stringhelper";
+import * as Promise from "bluebird";
+import * as moment from "moment";
 
 
 /** An optional options object may be passed that alters certain aspects of the formatted string:
@@ -30,7 +30,7 @@ export interface InspectOptions {
     /** customInspect - if false, then custom inspect() functions defined on the objects being inspected won't be called. Defaults to true. */
     customInspect?: boolean;
 }
-import util = require("util");
+import * as util from "util";
 
 
 

@@ -5,7 +5,8 @@
 //export import moment = require("moment-timezone");
 
 /** a high-quality date-time library: http://momentjs.com/ */
-export import moment = require("moment");
+import * as moment from "moment";
+export { moment };
 
 export function getDateFromIsoString(isoDateTimeString: string) {
 	if (isoDateTimeString == null) {

@@ -1,4 +1,4 @@
-import environment = require("./environment");
+import * as environment from "./environment";
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
 export declare class Logger {
     name: string;

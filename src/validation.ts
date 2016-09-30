@@ -1,11 +1,11 @@
 "use strict";
-import stringHelper = require("./stringhelper");
-import numHelper = require("./numhelper");
-import jsHelper = require("./jshelper");
-import ex = require("./exception");
-import _ = require("lodash");
-import serialization = require("./serialization");
-import reflection = require("./reflection");
+import * as stringHelper from "./stringhelper";
+import * as numHelper from "./numhelper";
+import * as jsHelper from "./jshelper";
+import * as ex from "./exception";
+import * as _ from "lodash";
+import * as serialization from "./serialization";
+import * as reflection from "./reflection";
 
 class ScrubFailureException extends ex.CorelibException {
 
@@ -13,7 +13,8 @@ class ScrubFailureException extends ex.CorelibException {
 
 
 /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
-export import validator = require("validator");
+import * as validator from "validator";
+export { validator }
 
 import * as logging from "./logging";
 let log = new logging.Logger(__filename);

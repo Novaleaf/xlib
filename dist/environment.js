@@ -1,277 +1,286 @@
-"use strict";
 //"use strict";
-var nodeHelper = require("./_internal/nodehelper");
-var browserHelper = require("./_internal/browserhelper");
-//import ex = require("./exception");
-//import * as nodeHelper from "./node/nodehelper";
-//import * as browserHelper from "./browser/browserhelper";
+//import nodeHelper = require("./_internal/nodehelper");
+//import browserHelper = require("./_internal/browserhelper");
 //import * as ex from "./exception";
-(function (PlatformType) {
-    PlatformType[PlatformType["None"] = 0] = "None";
-    PlatformType[PlatformType["Browser"] = 1] = "Browser";
-    PlatformType[PlatformType["NodeJs"] = 2] = "NodeJs";
-    PlatformType[PlatformType["PhantomJs"] = 3] = "PhantomJs";
-    PlatformType[PlatformType["Unknown"] = 4] = "Unknown";
-})(exports.PlatformType || (exports.PlatformType = {}));
-var PlatformType = exports.PlatformType;
-////declare var module; //not defined when using the requirejs loader :(, so we have to look for GLOBAL only.
-///** global var if we are running under nodejs*/
-//declare var GLOBAL: any;
-/** info on the type of platform we are currently executing under */
-exports.platformType = function () {
-    if (typeof (phantom) !== "undefined") {
-        return PlatformType.PhantomJs;
+(function (factory) {
+    if (typeof module === 'object' && typeof module.exports === 'object') {
+        var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
-    if (typeof (window) !== "undefined") {
-        return PlatformType.Browser;
+    else if (typeof define === 'function' && define.amd) {
+        define(["require", "exports", "./_internal/nodehelper", "./_internal/browserhelper"], factory);
     }
-    if (typeof (global) !== "undefined" && typeof (process) !== "undefined") {
-        return PlatformType.NodeJs;
-    }
-    return PlatformType.Unknown;
-}();
-(function (OsName) {
-    OsName[OsName["unknown"] = 0] = "unknown";
-    /** mac */
-    OsName[OsName["darwin"] = 1] = "darwin";
-    OsName[OsName["freebsd"] = 2] = "freebsd";
-    OsName[OsName["linux"] = 3] = "linux";
-    OsName[OsName["sunos"] = 4] = "sunos";
-    /** windows (may be x64) */
-    OsName[OsName["win32"] = 5] = "win32";
-    OsName[OsName["unix"] = 6] = "unix";
-})(exports.OsName || (exports.OsName = {}));
-var OsName = exports.OsName;
-/** the name of the os we detect running.  uses user agent in browsers, process.platform in nodejs */
-exports.osName = (function () {
-    if (typeof (process) !== "undefined") {
-        return OsName[process.platform];
-    }
-    try {
-        if (navigator.appVersion.indexOf("Win") !== -1) {
-            return OsName.win32;
+})(function (require, exports) {
+    "use strict";
+    var nodeHelper = require("./_internal/nodehelper");
+    var browserHelper = require("./_internal/browserhelper");
+    //import * as ex from "./exception";
+    (function (PlatformType) {
+        PlatformType[PlatformType["None"] = 0] = "None";
+        PlatformType[PlatformType["Browser"] = 1] = "Browser";
+        PlatformType[PlatformType["NodeJs"] = 2] = "NodeJs";
+        PlatformType[PlatformType["PhantomJs"] = 3] = "PhantomJs";
+        PlatformType[PlatformType["Unknown"] = 4] = "Unknown";
+    })(exports.PlatformType || (exports.PlatformType = {}));
+    var PlatformType = exports.PlatformType;
+    ////declare var module; //not defined when using the requirejs loader :(, so we have to look for GLOBAL only.
+    ///** global var if we are running under nodejs*/
+    //declare var GLOBAL: any;
+    /** info on the type of platform we are currently executing under */
+    exports.platformType = function () {
+        if (typeof (phantom) !== "undefined") {
+            return PlatformType.PhantomJs;
         }
-        if (navigator.appVersion.indexOf("Mac") !== -1) {
-            return OsName.darwin;
+        if (typeof (window) !== "undefined") {
+            return PlatformType.Browser;
         }
-        if (navigator.appVersion.indexOf("X11") !== -1) {
-            return OsName.unix;
+        if (typeof (global) !== "undefined" && typeof (process) !== "undefined") {
+            return PlatformType.NodeJs;
         }
-        if (navigator.appVersion.indexOf("Linux") !== -1) {
-            return OsName.linux;
+        return PlatformType.Unknown;
+    }();
+    (function (OsName) {
+        OsName[OsName["unknown"] = 0] = "unknown";
+        /** mac */
+        OsName[OsName["darwin"] = 1] = "darwin";
+        OsName[OsName["freebsd"] = 2] = "freebsd";
+        OsName[OsName["linux"] = 3] = "linux";
+        OsName[OsName["sunos"] = 4] = "sunos";
+        /** windows (may be x64) */
+        OsName[OsName["win32"] = 5] = "win32";
+        OsName[OsName["unix"] = 6] = "unix";
+    })(exports.OsName || (exports.OsName = {}));
+    var OsName = exports.OsName;
+    /** the name of the os we detect running.  uses user agent in browsers, process.platform in nodejs */
+    exports.osName = (function () {
+        if (typeof (process) !== "undefined") {
+            return OsName[process.platform];
+        }
+        try {
+            if (navigator.appVersion.indexOf("Win") !== -1) {
+                return OsName.win32;
+            }
+            if (navigator.appVersion.indexOf("Mac") !== -1) {
+                return OsName.darwin;
+            }
+            if (navigator.appVersion.indexOf("X11") !== -1) {
+                return OsName.unix;
+            }
+            if (navigator.appVersion.indexOf("Linux") !== -1) {
+                return OsName.linux;
+            }
+        }
+        catch (ex) { }
+        return OsName.unknown;
+    })();
+    /** returns the current global object.
+            depending on platform, this is:
+            window (browser, phantomjs);
+            GLOBAL (nodejs) */
+    function getGlobal() {
+        switch (exports.platformType) {
+            case PlatformType.PhantomJs:
+            case PlatformType.Browser:
+                return window;
+            case PlatformType.NodeJs:
+                return global;
+            case PlatformType.None:
+                return null;
+            case PlatformType.Unknown:
+                throw new Error("Unknown platform.  do not know what object is global");
         }
     }
-    catch (ex) { }
-    return OsName.unknown;
-})();
-/** returns the current global object.
-        depending on platform, this is:
-        window (browser, phantomjs);
-        GLOBAL (nodejs) */
-function getGlobal() {
-    switch (exports.platformType) {
-        case PlatformType.PhantomJs:
-        case PlatformType.Browser:
-            return window;
-        case PlatformType.NodeJs:
-            return global;
-        case PlatformType.None:
-            return null;
-        case PlatformType.Unknown:
-            throw new Error("Unknown platform.  do not know what object is global");
-    }
-}
-exports.getGlobal = getGlobal;
-(function (LogLevel) {
-    LogLevel[LogLevel["TRACE"] = 10] = "TRACE";
-    LogLevel[LogLevel["DEBUG"] = 20] = "DEBUG";
-    LogLevel[LogLevel["INFO"] = 30] = "INFO";
-    LogLevel[LogLevel["WARN"] = 40] = "WARN";
-    LogLevel[LogLevel["ERROR"] = 50] = "ERROR";
-    LogLevel[LogLevel["FATAL"] = 60] = "FATAL";
-})(exports.LogLevel || (exports.LogLevel = {}));
-var LogLevel = exports.LogLevel;
-//var testThis = getEnvironmentVariable("logLevel", "TRACE");
-/** the logLevel of your environment.  used as the default when constructing a logging.Logger()
- * nodejs: set by running "node entrypoint.js logLevel=DEBUG" or by setting your systemenv var: logLevel=DEBUG
- * browser: set by adding "logLevel=DEBUG" in your querystring, add a cookie, or as a attribute of your html tag
-  */
-exports.logLevel = LogLevel[getEnvironmentVariable("logLevel", null)];
-if (exports.logLevel == null) {
-    exports.logLevel = LogLevel.TRACE;
-    console.info("logLevel varible is not set.  \n\tdefaulting to logLevel=TRACE.");
-    console.info("\tPossible values are TRACE, DEBUG, INFO, WARN, ERROR, FATAL.");
-    console.info("\tHow to modify: ");
-    console.info("\t\tnodejs: set by running 'node entrypoint.js logLevel=DEBUG' or by setting your systemenv var: logLevel=DEBUG");
-    console.info("\t\tbrowser: set by adding 'logLevel= DEBUG' in your querystring, add a cookie, or as a attribute of your html tag\n");
-}
-else {
-    console.info("logLevel=" + LogLevel[exports.logLevel]);
-}
-exports.isDebugBreakEnabled = (function () {
-    if (exports.logLevel <= LogLevel.DEBUG && global.v8debug != null) {
-        global.v8debug.Debug.setBreakOnException();
-        return true;
-    }
-    return false;
-})();
-/** the current environment.  prod or preprod.
-nodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD
-browser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag*/
-(function (EnvLevel) {
-    EnvLevel[EnvLevel["PREPROD"] = 10] = "PREPROD";
-    EnvLevel[EnvLevel["PROD"] = 40] = "PROD";
-})(exports.EnvLevel || (exports.EnvLevel = {}));
-var EnvLevel = exports.EnvLevel;
-/** the current environment.  prod or preprod.  use to determine what database, domain names used, etc.
-nodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD
-browser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag*/
-exports.envLevel = EnvLevel[getEnvironmentVariable("envLevel", null)];
-if (exports.envLevel == null) {
-    exports.envLevel = EnvLevel.PREPROD;
-    console.info("envLevel varible is not set.  \n\tdefaulting to envLevel=DEV.");
-    console.info("\tPossible values are PREPROD, PROD.");
-    console.info("\tHow to modify: ");
-    console.info("\t\tnodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD");
-    console.info("\t\tbrowser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag\n");
-}
-else {
-    console.info("envLevel=" + EnvLevel[exports.envLevel]);
-}
-var _isTest = getEnvironmentVariable("isTest", null);
-if (_isTest == null) {
-    _isTest = "FALSE";
-    console.info("isTest varible is not set.  \n\tdefaulting to isTest=FALSE.");
-    console.info("\tPossible values are TRUE, FALSE.");
-    console.info("\tHow to modify: ");
-    console.info("\t\tnodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE");
-    console.info("\t\tbrowser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
-}
-else {
-    console.info("isTest=" + _isTest);
-}
-/** if we are in test mode, meaning unit and scenario tests, etc.
-nodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE
-browser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag*/
-exports.isTest = _isTest.trim().toLowerCase() === "true";
-var _isDev = getEnvironmentVariable("isDev", null);
-if (_isDev == null) {
-    _isDev = "FALSE";
-    console.info("isDev varible is not set.  \n\tdefaulting to isDev=FALSE.");
-    console.info("\tPossible values are TRUE, FALSE.");
-    console.info("\tHow to modify: ");
-    console.info("\t\tnodejs: set by running 'node entrypoint.js isDev=TRUE' or by setting your systemenv var: isDev=TRUE");
-    console.info("\t\tbrowser: set by adding 'isDev=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
-}
-else {
-    console.info("isDev=" + _isDev);
-}
-/** if we are in dev mode, meaning high-frequency polling, extra state validation code, etc.
-nodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE
-browser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag*/
-exports.isDev = _isDev.trim().toLowerCase() === "true";
-//export enum TestLevel {
-//	NONE = 0,
-//	//TEST = 20,
-//	//PREPROD = 30,
-//	FULL = 40,
-//}
-//export var testLevel: TestLevel = (TestLevel as any)[getEnvironmentVariable("testLevel", null)];
-//if (testLevel == null) {
-//	testLevel = TestLevel.FULL;
-//	console.info("testLevel varible is not set.  \n\tdefaulting to testLevel=FULL.");
-//	console.info("\tPossible values are NONE, FULL.");
-//	console.info("\tHow to modify: ");
-//	console.info("\t\tnodejs: set by running 'node entrypoint.js testLevel=FULL' or by setting your systemenv var: testLevel=FULL");
-//	console.info("\t\tbrowser: set by adding 'testLevel=FULL' in your querystring, add a cookie, or as a attribute of your html tag");
-//} else {
-//	console.info("testLevel=" + TestLevel[testLevel]);
-//}
-///** if mocha tests are enabled.  this is set to true if the "describe" global object is found. */
-//export var isTest: boolean;
-//if (typeof (getGlobal()["describe"]) !== "undefined") {
-//	isTest = true;
-//} else {
-//	isTest = false;
-//}
-/** no op the input function if not running LogLevel <= DEBUG.
-  * for uglify / closure-compiler dead-code optimization (minification)
-  */
-function _ifDebug(fcn) {
-    if (exports.logLevel <= LogLevel.DEBUG) {
-        return fcn;
+    exports.getGlobal = getGlobal;
+    (function (LogLevel) {
+        LogLevel[LogLevel["TRACE"] = 10] = "TRACE";
+        LogLevel[LogLevel["DEBUG"] = 20] = "DEBUG";
+        LogLevel[LogLevel["INFO"] = 30] = "INFO";
+        LogLevel[LogLevel["WARN"] = 40] = "WARN";
+        LogLevel[LogLevel["ERROR"] = 50] = "ERROR";
+        LogLevel[LogLevel["FATAL"] = 60] = "FATAL";
+    })(exports.LogLevel || (exports.LogLevel = {}));
+    var LogLevel = exports.LogLevel;
+    //var testThis = getEnvironmentVariable("logLevel", "TRACE");
+    /** the logLevel of your environment.  used as the default when constructing a logging.Logger()
+     * nodejs: set by running "node entrypoint.js logLevel=DEBUG" or by setting your systemenv var: logLevel=DEBUG
+     * browser: set by adding "logLevel=DEBUG" in your querystring, add a cookie, or as a attribute of your html tag
+      */
+    exports.logLevel = LogLevel[getEnvironmentVariable("logLevel", null)];
+    if (exports.logLevel == null) {
+        exports.logLevel = LogLevel.TRACE;
+        console.info("logLevel varible is not set.  \n\tdefaulting to logLevel=TRACE.");
+        console.info("\tPossible values are TRACE, DEBUG, INFO, WARN, ERROR, FATAL.");
+        console.info("\tHow to modify: ");
+        console.info("\t\tnodejs: set by running 'node entrypoint.js logLevel=DEBUG' or by setting your systemenv var: logLevel=DEBUG");
+        console.info("\t\tbrowser: set by adding 'logLevel= DEBUG' in your querystring, add a cookie, or as a attribute of your html tag\n");
     }
     else {
-        //no op
-        /* tslint:disable */
-        return function () { };
+        console.info("logLevel=" + LogLevel[exports.logLevel]);
     }
-}
-exports._ifDebug = _ifDebug;
-/** no op the input function if not running in test mode.
-  * for uglify / closure-compiler dead-code optimization (minification)
-  */
-function _ifTest(fcn) {
-    if (exports.isTest === true) {
-        return fcn;
+    exports.isDebugBreakEnabled = (function () {
+        if (exports.logLevel <= LogLevel.DEBUG && global.v8debug != null) {
+            global.v8debug.Debug.setBreakOnException();
+            return true;
+        }
+        return false;
+    })();
+    /** the current environment.  prod or preprod.
+    nodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD
+    browser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag*/
+    (function (EnvLevel) {
+        EnvLevel[EnvLevel["PREPROD"] = 10] = "PREPROD";
+        EnvLevel[EnvLevel["PROD"] = 40] = "PROD";
+    })(exports.EnvLevel || (exports.EnvLevel = {}));
+    var EnvLevel = exports.EnvLevel;
+    /** the current environment.  prod or preprod.  use to determine what database, domain names used, etc.
+    nodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD
+    browser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag*/
+    exports.envLevel = EnvLevel[getEnvironmentVariable("envLevel", null)];
+    if (exports.envLevel == null) {
+        exports.envLevel = EnvLevel.PREPROD;
+        console.info("envLevel varible is not set.  \n\tdefaulting to envLevel=DEV.");
+        console.info("\tPossible values are PREPROD, PROD.");
+        console.info("\tHow to modify: ");
+        console.info("\t\tnodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD");
+        console.info("\t\tbrowser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag\n");
     }
     else {
-        //no op
-        /* tslint:disable */
-        return function () { };
+        console.info("envLevel=" + EnvLevel[exports.envLevel]);
     }
-}
-exports._ifTest = _ifTest;
-function getEnvironmentVariable(key, valueIfNullOrEmpty) {
-    var result;
-    switch (exports.platformType) {
-        case PlatformType.Browser:
-            //try to find in querystring
-            result = browserHelper.getQuerystringVariable(key, null);
-            if (result != null && result.length > 0) {
-                break;
-            }
-            //try to find in cookie
-            result = browserHelper.getCookie(key, null);
-            if (result != null && result.length > 0) {
-                break;
-            }
-            //try to find in html attribute
-            result = browserHelper.getDomAttribute("html", "data-" + key, true);
-            if (result != null && result.length > 0) {
-                break;
-            }
-            result = browserHelper.getDomAttribute("html", key, true);
-            if (result != null && result.length > 0) {
-                break;
-            }
-            break;
-        case PlatformType.NodeJs:
-        case PlatformType.PhantomJs:
-            //seach commandline
-            result = nodeHelper.getCommandlineArg(key, null);
-            if (result != null && result.length > 0) {
-                break;
-            }
-            //search system env vars
-            result = process.env[key];
-            if (result != null && result.length > 0) {
-                break;
-            }
-            break;
-        default:
-            throw new Error("unsupported plaform type: " + exports.platformType.toString());
+    var _isTest = getEnvironmentVariable("isTest", null);
+    if (_isTest == null) {
+        _isTest = "FALSE";
+        console.info("isTest varible is not set.  \n\tdefaulting to isTest=FALSE.");
+        console.info("\tPossible values are TRUE, FALSE.");
+        console.info("\tHow to modify: ");
+        console.info("\t\tnodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE");
+        console.info("\t\tbrowser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
     }
-    //have our result (including if it's null/empty)
-    if (valueIfNullOrEmpty === undefined) {
+    else {
+        console.info("isTest=" + _isTest);
+    }
+    /** if we are in test mode, meaning unit and scenario tests, etc.
+    nodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE
+    browser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag*/
+    exports.isTest = _isTest.trim().toLowerCase() === "true";
+    var _isDev = getEnvironmentVariable("isDev", null);
+    if (_isDev == null) {
+        _isDev = "FALSE";
+        console.info("isDev varible is not set.  \n\tdefaulting to isDev=FALSE.");
+        console.info("\tPossible values are TRUE, FALSE.");
+        console.info("\tHow to modify: ");
+        console.info("\t\tnodejs: set by running 'node entrypoint.js isDev=TRUE' or by setting your systemenv var: isDev=TRUE");
+        console.info("\t\tbrowser: set by adding 'isDev=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
+    }
+    else {
+        console.info("isDev=" + _isDev);
+    }
+    /** if we are in dev mode, meaning high-frequency polling, extra state validation code, etc.
+    nodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE
+    browser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag*/
+    exports.isDev = _isDev.trim().toLowerCase() === "true";
+    //export enum TestLevel {
+    //	NONE = 0,
+    //	//TEST = 20,
+    //	//PREPROD = 30,
+    //	FULL = 40,
+    //}
+    //export var testLevel: TestLevel = (TestLevel as any)[getEnvironmentVariable("testLevel", null)];
+    //if (testLevel == null) {
+    //	testLevel = TestLevel.FULL;
+    //	console.info("testLevel varible is not set.  \n\tdefaulting to testLevel=FULL.");
+    //	console.info("\tPossible values are NONE, FULL.");
+    //	console.info("\tHow to modify: ");
+    //	console.info("\t\tnodejs: set by running 'node entrypoint.js testLevel=FULL' or by setting your systemenv var: testLevel=FULL");
+    //	console.info("\t\tbrowser: set by adding 'testLevel=FULL' in your querystring, add a cookie, or as a attribute of your html tag");
+    //} else {
+    //	console.info("testLevel=" + TestLevel[testLevel]);
+    //}
+    ///** if mocha tests are enabled.  this is set to true if the "describe" global object is found. */
+    //export var isTest: boolean;
+    //if (typeof (getGlobal()["describe"]) !== "undefined") {
+    //	isTest = true;
+    //} else {
+    //	isTest = false;
+    //}
+    /** no op the input function if not running LogLevel <= DEBUG.
+      * for uglify / closure-compiler dead-code optimization (minification)
+      */
+    function _ifDebug(fcn) {
+        if (exports.logLevel <= LogLevel.DEBUG) {
+            return fcn;
+        }
+        else {
+            //no op
+            /* tslint:disable */
+            return function () { };
+        }
+    }
+    exports._ifDebug = _ifDebug;
+    /** no op the input function if not running in test mode.
+      * for uglify / closure-compiler dead-code optimization (minification)
+      */
+    function _ifTest(fcn) {
+        if (exports.isTest === true) {
+            return fcn;
+        }
+        else {
+            //no op
+            /* tslint:disable */
+            return function () { };
+        }
+    }
+    exports._ifTest = _ifTest;
+    function getEnvironmentVariable(key, valueIfNullOrEmpty) {
+        var result;
+        switch (exports.platformType) {
+            case PlatformType.Browser:
+                //try to find in querystring
+                result = browserHelper.getQuerystringVariable(key, null);
+                if (result != null && result.length > 0) {
+                    break;
+                }
+                //try to find in cookie
+                result = browserHelper.getCookie(key, null);
+                if (result != null && result.length > 0) {
+                    break;
+                }
+                //try to find in html attribute
+                result = browserHelper.getDomAttribute("html", "data-" + key, true);
+                if (result != null && result.length > 0) {
+                    break;
+                }
+                result = browserHelper.getDomAttribute("html", key, true);
+                if (result != null && result.length > 0) {
+                    break;
+                }
+                break;
+            case PlatformType.NodeJs:
+            case PlatformType.PhantomJs:
+                //seach commandline
+                result = nodeHelper.getCommandlineArg(key, null);
+                if (result != null && result.length > 0) {
+                    break;
+                }
+                //search system env vars
+                result = process.env[key];
+                if (result != null && result.length > 0) {
+                    break;
+                }
+                break;
+            default:
+                throw new Error("unsupported plaform type: " + exports.platformType.toString());
+        }
+        //have our result (including if it's null/empty)
+        if (valueIfNullOrEmpty === undefined) {
+            return result;
+        }
+        if (result == null || result.length === 0) {
+            return valueIfNullOrEmpty;
+        }
         return result;
     }
-    if (result == null || result.length === 0) {
-        return valueIfNullOrEmpty;
-    }
-    return result;
-}
-exports.getEnvironmentVariable = getEnvironmentVariable;
+    exports.getEnvironmentVariable = getEnvironmentVariable;
+});
 /* tslint:disable */
 ///** initialization events for environment variables */
 //module environmentInitialization {

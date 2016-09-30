@@ -3,7 +3,8 @@ export declare var webworker_threads: () => never;
  * Async utilities for node and the browser
  * Async provides around 20 functions that include the usual 'functional' suspects (map, reduce, filter, each…) as well as some common patterns for asynchronous control flow (parallel, series, waterfall…). All these functions assume you follow the Node.js convention of providing a single callback as the last argument of your async function.
  */
-export import async = require("async");
+import * as async from "async";
+export { async };
 /** From https://github.com/71104/rwlock    Asynchronous read/write lock implementation for Node.js.
 == Main rules: ==
 there may be zero or more readers at a time,

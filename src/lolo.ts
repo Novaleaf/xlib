@@ -1,24 +1,28 @@
 "use strict";
 
-import _stringHelper = require("./stringhelper");
-import _numHelper = require("./numhelper");
-import _arrayHelper = require("./arrayhelper");
-import _jsHelper = require("./jshelper");
+import * as stringHelper from "./stringhelper";
+import * as numHelper from "./numhelper";
+import * as arrayHelper from "./arrayhelper";
+import * as _jsHelper from "./jshelper";
 
-import serialization = require("./serialization");
+import * as serialization from "./serialization";
 export var JSONX = serialization.JSONX;
+//export { serialization.JSONX as JSONX };
 
-import validation = require("./validation");
+import * as validation from "./validation";
 export var scrub = validation.scrub;
 
-import Promise = require("bluebird");
+import * as Promise from "bluebird";
 
 export var defaultIfNull = _jsHelper.defaultIfNull;
+//export { _jsHelper.defaultIfNull as defaultIfNull };
 
-import _exception = require("./exception");
+import * as _exception from  "./exception";
 export var Exception = _exception.Exception;
+//export { _exception.Exception as Exception };
 
-export import moment = require("moment");
+import * as moment from "moment";
+export { moment };
 
 export function utcNow(): Date {
     return moment.utc().toDate();
@@ -30,13 +34,15 @@ export function utcNowMoment() {
 export function utcNowTimestamp(): number {
     return moment.utc().toDate().getTime();
 }
-import _cache = require("./cache");
+//import _cache = require("./cache");
+import * as _cache from "./cache";
+
 /**
  * read method from the defaultCache object (xlib.cache.defaultCache.read).
  * for your own namespace, instantiate a new xlib.cache.Cache class instance instead.
  */
 export var cache = _cache.defaultCache.read.bind(_cache.defaultCache) as typeof _cache.defaultCache.read;
-
+//export { _cache.defaultCache.read.bind(_cache.defaultCache) as cache};
 
 ///**
 // * converts db escaped user input into html escaped user input (for ui presentation)
@@ -47,7 +53,7 @@ export var cache = _cache.defaultCache.read.bind(_cache.defaultCache) as typeof 
 // */
 //export var htmlSanitize = _stringHelper.htmlSanitizeEscapedUserInput;
 
-import environment = require("./environment");
+import * as environment from "./environment";
 /**
  *   shortcut for ```environment.isDev```
  */
@@ -69,7 +75,7 @@ export var isLogDebug = environment.logLevel <= environment.LogLevel.DEBUG;
 // */
 //export var isProd = environment.envLevel === environment.EnvLevel.PROD;
 
-export var formatNum = _numHelper.format;
+export var formatNum = numHelper.format;
 
 //export var apply = _jsHelper.apply;
 

@@ -1,4 +1,4 @@
-﻿import Promise = require('bluebird');
+﻿import * as Promise from "bluebird";
 
 
 /**
@@ -166,4 +166,4 @@ function backoff(interval: number, options: any) {
 
 //module.exports = retry;
 /** hack copy of the bluebird-retry js code base.   use through the xlib "promise" module instead of via here. */
-export = retry;
+export default retry;// { retry as default };

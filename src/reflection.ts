@@ -2,7 +2,7 @@
 //export import _common = require("./reflection/_common");
 //import stringHelper = require("../stringhelper");
 //import arrayHelper = require("../arrayhelper");
-import ex = require("./exception");
+import * as ex from "./exception";
 
 
 

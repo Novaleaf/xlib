@@ -4,8 +4,8 @@
 //	public stack: string;
 //	constructor(message?: string);
 //}
-import environment = require("./environment");
 //import * as environment from "./environment";
+import * as environment from "./environment";
 
 //let err: Error;
 

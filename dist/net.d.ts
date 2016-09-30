@@ -1,8 +1,9 @@
 /// <reference types="axios" />
 /// <reference types="bluebird" />
 /** the axios httpClient library:  https://github.com/mzabriskie/axios */
-export import axios = require("axios");
-import promise = require("./promise");
+import * as axios from "axios";
+export { axios };
+import * as promise from "./promise";
 import Promise = promise.bluebird;
 /**
 *  a helper for constructing reusable endpoint functions

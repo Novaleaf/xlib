@@ -1,16 +1,16 @@
 "use strict";
 
-import stringHelper = require("./stringhelper");
-//import arrayHelper = require("./arrayhelper");
-import numHelper = require("./numhelper");
-import ex = require("./exception")
+import * as stringHelper from "./stringhelper";
+//import * as arrayHelper from "./arrayhelper";
+import * as numHelper from "./numhelper";
+import * as ex from "./exception";
 //import runtime = require("./runtime");
 //import diagnostics = require("./diagnostics");
 //import datetime = require("./datetime");
-import moment = require("moment");
+import * as moment from "moment";
 
-//import promise = require("./promise");
-import Promise = require("bluebird");
+//import * as promise from "./promise";
+import * as Promise from "bluebird";
 
 /** up to 32 true/false values stored in 32bits (a bitmask) */
 export class BitFlags {

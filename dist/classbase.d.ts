@@ -26,4 +26,4 @@ returns:  true == we just disposed.   false==already disposed so we do nothing *
     override to provide your own hashing function */
     getHashCode(): string;
 }
-export = ClassBase;
+export { ClassBase };

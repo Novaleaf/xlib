@@ -1,11 +1,12 @@
 "use strict";
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
 /** Clean up user-submitted HTML, preserving whitelisted elements and whitelisted attributes on a per-element basis
  https://www.npmjs.com/package/sanitize-html
 */
-export import sanitizeHtml = require("sanitize-html");
+import * as sanitizeHtml from "sanitize-html";
+export { sanitizeHtml };
 
 
 ///**
@@ -352,7 +353,8 @@ export function escapeRegExp(str: string): string {
 example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
 copied source code from the npm package: https://www.npmjs.com/package/base64url on 20160926.
  */
-export import base64Url = require("./_internal/base64url");
+import * as base64Url from "./_internal/base64url";
+export { base64Url };
 
 
 
@@ -414,7 +416,7 @@ export function hash(input: string): number {
 }
 
 /**format strings */
-import _sprintf = require("sprintf-js");
+import * as _sprintf from "sprintf-js";
 export var format = _sprintf.sprintf;
 export var format2 = _sprintf.vsprintf;
 

@@ -1,9 +1,11 @@
 "use strict";
 
 
-export import _ = require("lodash");
+//export import _ = require("lodash");
+import * as _ from "lodash";
+export { _ };
 
-//import ex = require("./exception");
+//import * as ex from "./exception";
 
 //import * as lodash from "lodash";
 //import * as exception from "./exception";
@@ -514,7 +516,7 @@ export function disablePropertyEnumeration(obj: any, propertyName: string): bool
 	}
 }
 
-//import util = require("util");
+//import * as util from "util";
 
 ///** inherit the prototype methods from one constructor into another. The prototype of constructor will be set to a new object created from superConstructor.
 

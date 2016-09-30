@@ -1,29 +1,52 @@
-export import jsHelper = require("./jshelper");
-export import arrayHelper = require("./arrayhelper");
-export import ClassBase = require("./classbase");
-export import logging = require("./logging");
-export import exception = require("./exception");
-export import collections = require("./collections");
+import * as jsHelper from "./jshelper";
+export { jsHelper };
+import * as arrayHelper from "./arrayhelper";
+export { arrayHelper };
+import { ClassBase } from "./classbase";
+export { ClassBase };
+import * as logging from "./logging";
+export { logging };
+import * as exception from "./exception";
+export { exception };
+import * as collections from "./collections";
+export { collections };
 /** various math and numerical conversion/manipulation related helper functions */
-export import numHelper = require("./numhelper");
-export import stringHelper = require("./stringhelper");
-export import reflection = require("./reflection");
-export import environment = require("./environment");
-export import dateTime = require("./datetime");
-export import validation = require("./validation");
-export import serialization = require("./serialization");
-export import compression = require("./compression");
-export import threading = require("./threading");
-export import lodash = require("lodash");
-export import promise = require("./promise");
-export import net = require("./net");
-export import cache = require("./cache");
+import * as numHelper from "./numhelper";
+export { numHelper };
+import * as stringHelper from "./stringhelper";
+export { stringHelper };
+import * as reflection from "./reflection";
+export { reflection };
+import * as environment from "./environment";
+export { environment };
+import * as dateTime from "./datetime";
+export { dateTime };
+import * as validation from "./validation";
+export { validation };
+import * as serialization from "./serialization";
+export { serialization };
+import * as compression from "./compression";
+export { compression };
+import * as threading from "./threading";
+export { threading };
+import * as lodash from "lodash";
+export { lodash };
+import * as promise from "./promise";
+export { promise };
+import * as net from "./net";
+export { net };
+import * as cache from "./cache";
+export { cache };
 /** templates for various design patterns */
-export import designPatterns = require("./design-patterns/_index");
+import * as designPatterns from "./design-patterns/_index";
+export { designPatterns };
 /** security and cryptographic helpers.   (cross-platform)
  *  note:  our ```KDF``` is nodejs only, and can be found in the ```nlib.security``` module.
  * */
-export import security = require("./security");
+import * as security from "./security";
+export { security };
 /** custom type definitions */
-export import definitions = require("./definitions/_index");
-export import lolo = require("./lolo");
+import * as definitions from "./definitions/_index";
+export { definitions };
+import * as lolo from "./lolo";
+export { lolo };

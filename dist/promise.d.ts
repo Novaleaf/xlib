@@ -3,8 +3,9 @@
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance
  * global.Promise is aliased to this.
  */
-export import bluebird = require("bluebird");
-import Promise = require("bluebird");
+import * as bluebird from "bluebird";
+export { bluebird };
+import * as Promise from "bluebird";
 /** constructs a unified promise for your returned (callback function) promises.  wraps a lodash foreach, just adds Promise.all() glue code.
 NOTE: executes all asynchronously.  if you need to only execute + complete one promise at a time, use Promise.each() instead. */
 export declare function forEach<TIn, TOut>(array: TIn[], callback: (value: TIn) => TOut | Promise<TOut>): Promise<TOut[]>;

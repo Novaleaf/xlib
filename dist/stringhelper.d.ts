@@ -3,7 +3,8 @@
 /** Clean up user-submitted HTML, preserving whitelisted elements and whitelisted attributes on a per-element basis
  https://www.npmjs.com/package/sanitize-html
 */
-export import sanitizeHtml = require("sanitize-html");
+import * as sanitizeHtml from "sanitize-html";
+export { sanitizeHtml };
 /**
  * basic, simple check if the string has been encoded via encodeURIComponent() or encodeURI()
  * may return false-positives, but never false-negatives.
@@ -47,7 +48,8 @@ export declare function escapeRegExp(str: string): string;
 example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
 copied source code from the npm package: https://www.npmjs.com/package/base64url on 20160926.
  */
-export import base64Url = require("./_internal/base64url");
+import * as base64Url from "./_internal/base64url";
+export { base64Url };
 /**
  *  base64 encode and decode functions
  */
@@ -59,6 +61,6 @@ export declare module base64 {
 /** returns a 32bit integer.  same algorithm as used with java, so output should match */
 export declare function hash(input: string): number;
 /**format strings */
-import _sprintf = require("sprintf-js");
+import * as _sprintf from "sprintf-js";
 export declare var format: typeof _sprintf.sprintf;
 export declare var format2: typeof _sprintf.vsprintf;

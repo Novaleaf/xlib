@@ -1,6 +1,6 @@
 "use strict";
-//import logging = require("./logging");
-import ex = require("../exception");
+//import * as logging from "./logging";
+import * as ex from "../exception";
 
 /** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present. 
  * usage notes: as long as this module is loaded 

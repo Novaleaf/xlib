@@ -1,5 +1,5 @@
 "use strict";
-//import ex = require("../exception");
+//import * as ex from "../exception";
 //import * as ex from "../exception";
 
 

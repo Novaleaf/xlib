@@ -7,8 +7,9 @@
 example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
 uses the npm package: https://www.npmjs.com/package/base64url
  */
-module base64Url {
+//module base64Url {
 
+	
     function padString(input: string): string {
         let segmentLength = 4;
         let stringLength = input.length;
@@ -94,10 +95,12 @@ Example
     ```*/
     export function toBuffer(base64url: string): Buffer {
         return new Buffer(toBase64(base64url), "base64");
-    }
-}
+	}
 
-export = base64Url;
+	
+//}
+
+//export = base64Url;
 
 
 //export interface Base64Url {

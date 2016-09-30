@@ -1,4 +1,5 @@
-export import _ = require("lodash");
+import * as _ from "lodash";
+export { _ };
 /** low-level javascript helpers, to smooth over warts in the language */
 /**
  * if value is null, returns the default value

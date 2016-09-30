@@ -1,6 +1,6 @@
 /// <reference types="bluebird" />
-import moment = require("moment");
-import Promise = require("bluebird");
+import * as moment from "moment";
+import * as Promise from "bluebird";
 /** up to 32 true/false values stored in 32bits (a bitmask) */
 export declare class BitFlags {
     /** how many bytes can be stored by instances of this */

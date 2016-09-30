@@ -1,6 +1,6 @@
 ﻿
-import moment = require("moment");
-import Promise = require("bluebird");
+import * as moment from "moment";
+import * as Promise from "bluebird";
 
 /**
  * abstract class used for elements stored in the AtomicCache object

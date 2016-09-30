@@ -1,6 +1,7 @@
 "use strict";
 
-import ex = require("./exception");
+//import * as ex from "./exception";
+import * as ex from "./exception";
 
 /** root class, includes the following functionality:
 typeName, toString, dispose, assertIsAlive, hashCode */
@@ -75,4 +76,5 @@ returns:  true == we just disposed.   false==already disposed so we do nothing *
 	}
 }
 
-export = ClassBase;
+//export = ClassBase;
+export { ClassBase };

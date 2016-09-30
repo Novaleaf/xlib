@@ -1,21 +1,21 @@
 ﻿"use strict";
 
-import stringHelper = require("./stringhelper");
+import * as stringHelper from "./stringhelper";
 
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import jsHelper = require("./jshelper");
+import * as jsHelper from "./jshelper";
 
-import moment = require("moment");
+import * as moment from "moment";
 
-import exception = require("./exception");
+import * as exception from "./exception";
 
-import reflection = require("./reflection");
+import * as reflection from "./reflection";
 
 //import diagnostics = require("./diagnostics/_main")
-import logging = require("./logging");
-//import promise = require("./promise");
-import Promise = require("bluebird");
+import * as logging from "./logging";
+//import * as promise from "./promise";
+import * as Promise from "bluebird";
 
 var log = new logging.Logger(__filename);
 

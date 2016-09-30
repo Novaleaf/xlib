@@ -1,17 +1,23 @@
 "use strict";
 
-import exception = require("./exception");
-import stringHelper = require("./stringhelper");
-import numHelper = require("./numhelper");
-import _ = require("lodash");
+//import * as exception from "./exception";
+//import * as stringHelper from "./stringhelper";
+//import * as numHelper from "./numhelper";
+//import _ = require("lodash");
+
+import * as exception from "./exception";
+import * as stringHelper from "./stringhelper";
+import * as numHelper from "./numhelper";
+import * as _ from "lodash";
 
 /** cross-platform implementation of the nodejs module: http://nodejs.org/api/crypto.html
  * -------------------
  * The crypto module offers a way of encapsulating secure credentials to be used as part of a secure HTTPS net or http connection.  It also offers a set of wrappers for OpenSSL's hash, hmac, cipher, decipher, sign and verify methods.
  * When to use: if the other classes/functions in this ```security``` module do not meet your needs.
  */
-export import crypto = require("crypto");
-
+//export import * as crypto from "crypto";
+import * as crypto from "crypto";
+export { crypto };
 /**
  * generate a sha512 hash of your inputs, and returns it as a base64 encoded string. (88 characters in length)
  * @param input

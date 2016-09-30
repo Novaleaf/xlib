@@ -1,19 +1,20 @@
 /// <reference types="bluebird" />
-import _numHelper = require("./numhelper");
-import _jsHelper = require("./jshelper");
-import serialization = require("./serialization");
+import * as numHelper from "./numhelper";
+import * as _jsHelper from "./jshelper";
+import * as serialization from "./serialization";
 export declare var JSONX: serialization.JsonX;
-import validation = require("./validation");
+import * as validation from "./validation";
 export declare var scrub: typeof validation.scrub;
-import Promise = require("bluebird");
+import * as Promise from "bluebird";
 export declare var defaultIfNull: typeof _jsHelper.defaultIfNull;
-import _exception = require("./exception");
+import * as _exception from "./exception";
 export declare var Exception: typeof _exception.Exception;
-export import moment = require("moment");
+import * as moment from "moment";
+export { moment };
 export declare function utcNow(): Date;
 export declare function utcNowMoment(): moment.Moment;
 export declare function utcNowTimestamp(): number;
-import _cache = require("./cache");
+import * as _cache from "./cache";
 /**
  * read method from the defaultCache object (xlib.cache.defaultCache.read).
  * for your own namespace, instantiate a new xlib.cache.Cache class instance instead.
@@ -35,7 +36,7 @@ export declare var isLogTrace: boolean;
  *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
  */
 export declare var isLogDebug: boolean;
-export declare var formatNum: typeof _numHelper.format;
+export declare var formatNum: typeof numHelper.format;
 export import apply = _jsHelper.apply;
 export interface _ILodashCollectionEnumerator {
     <TValue>(array: TValue[], enumerator: (value: TValue, index: number, collection: TValue[]) => false | void): TValue[];

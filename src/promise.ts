@@ -1,16 +1,17 @@
 ﻿"use strict";
 
-import arrayHelper = require("./arrayhelper");
-import _ = require("lodash");
-import __ = require("./lolo");
-import logging = require("./logging");
-import environment = require("./environment");
+import * as arrayHelper from "./arrayhelper";
+import * as _ from "lodash";
+import * as __ from "./lolo";
+import * as logging from "./logging";
+import * as environment from "./environment";
 
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance 
  * global.Promise is aliased to this.
  */
-export import bluebird = require("bluebird");
-import Promise = require("bluebird");
+import * as bluebird from "bluebird";
+export { bluebird };
+import * as Promise from "bluebird";
 //bluebird.longStackTraces();
 
 if (__.isLogDebug == true) {

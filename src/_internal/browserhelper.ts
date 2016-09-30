@@ -4,7 +4,7 @@
 //import * as ex from "../exception";
 
 //import jsHelper = require("../jshelper");
-//import ex = require("../exception");
+//import * as ex from "../exception";
 import * as _ from "lodash";
 
 /** low-level javascript helpers for use in the browser. graceful fallbacks if not a browser*/

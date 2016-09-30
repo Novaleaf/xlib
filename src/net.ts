@@ -4,19 +4,20 @@
 //export import axios = require("axios");
 
 /** the axios httpClient library:  https://github.com/mzabriskie/axios */
-export import axios = require("axios");
+//export import axios = require("axios");
+import * as axios from "axios";
+export { axios };
 
-
-import promise = require("./promise");
+import * as promise from "./promise";
 import Promise = promise.bluebird;
-import _ = require("lodash");
+import * as _ from "lodash";
 
-import logging = require("./logging");
+import * as logging from "./logging";
 let log = new logging.Logger(__filename);
 
-import serialization = require("./serialization");
-import exception = require("./exception");
-import stringHelper = require("./stringhelper");
+import * as serialization from "./serialization";
+import * as exception from "./exception";
+import * as stringHelper from "./stringhelper";
 
 
 /**

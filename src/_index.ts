@@ -1,12 +1,16 @@
-
+/** https://www.npmjs.com/package/source-map-support
+ * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
+  */
 var source_map_support = require("source-map-support");
+//import * as source_map_support from "source-map-support";
 //can be removed by webpack
-if (source_map_support != null && source_map_support.install !=null) {
+if (source_map_support != null && source_map_support.install != null) {
 	source_map_support.install();
 }
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
-import mockMocha = require("./_internal/mockmocha");
+//import mockMocha = require("./_internal/mockmocha");
+import * as mockMocha from "./_internal/mockmocha";
 mockMocha._initialize();
 
 
@@ -54,57 +58,97 @@ mockMocha._initialize();
 
 
 ///** low-level javascript helpers, to smooth over warts in the language */
-export import jsHelper = require("./jshelper");
-export import arrayHelper = require("./arrayhelper");
-export import ClassBase = require("./classbase");
-export import logging = require("./logging");
+//export import * as jsHelper from "./jshelper";
+//export import * as arrayHelper from "./arrayhelper";
+//export import ClassBase = require("./classbase");
+//export import * as logging from "./logging";
+import * as jsHelper from "./jshelper";
+export { jsHelper };
+import * as arrayHelper from "./arrayhelper";
+export { arrayHelper };
+import { ClassBase } from "./classbase";
+export { ClassBase };
+import * as logging from "./logging";
+export { logging };
 
 
-
-export import exception = require("./exception");
-export import collections = require("./collections");
+//export import * as exception from "./exception";
+//export import collections = require("./collections");
+import * as exception from "./exception";
+export { exception };
+import * as collections from "./collections";
+export { collections };
 
 /** various math and numerical conversion/manipulation related helper functions */
-export import numHelper = require("./numhelper");
-export import stringHelper = require("./stringhelper");
-export import reflection = require("./reflection");
-export import environment = require("./environment");
-export import dateTime = require("./datetime");
-////define momentStatic
-//environment.getGlobal()["moment"] = dateTime.moment; 
+//export import * as numHelper from "./numhelper";
+//export import * as stringHelper from "./stringhelper";
+//export import * as reflection from "./reflection";
+//export import * as environment from "./environment";
+//export import dateTime = require("./datetime");
+import * as numHelper from "./numhelper";
+export { numHelper };
+import * as stringHelper from "./stringhelper";
+export { stringHelper };
+import * as reflection from "./reflection";
+export { reflection };
+import * as environment from "./environment";
+export { environment };
+import * as dateTime from "./datetime";
+export { dateTime };
 
 
 
-export import validation = require("./validation");
-export import serialization = require("./serialization");
+//export import * as validation from "./validation";
+//export import * as serialization from "./serialization";
+import * as validation from "./validation";
+export { validation };
+import * as serialization from "./serialization";
+export { serialization };
 
-export import compression = require("./compression");
-export import threading = require("./threading");
+//export import compression = require("./compression");
+//export import threading = require("./threading");
+import * as compression from "./compression";
+export { compression };
+import * as threading from "./threading";
+export { threading };
 
-export import lodash = require("lodash");
+//export import lodash = require("lodash");
+import * as lodash from "lodash";
+export { lodash };
 //set lodash as a global if it's not.
 if (environment.getGlobal()["_"] == null) {
-    environment.getGlobal()["_"] = lodash;
+	environment.getGlobal()["_"] = lodash;
 }
 
-export import promise = require("./promise");
+//export import * as promise from "./promise";
+//export import net = require("./net");
+//export import cache = require("./cache");
+import * as promise from "./promise";
+export { promise };
+import * as net from "./net";
+export { net };
+import * as cache from "./cache";
+export { cache };
 
-export import net = require("./net");
-
-export import cache = require("./cache");
 
 /** templates for various design patterns */
-export import designPatterns = require("./design-patterns/_index");
+//export import designPatterns = require("./design-patterns/_index");
+import * as designPatterns from "./design-patterns/_index";
+export { designPatterns };
 
 /** security and cryptographic helpers.   (cross-platform)
  *  note:  our ```KDF``` is nodejs only, and can be found in the ```nlib.security``` module.
  * */
-export import security = require("./security");
+//export import security = require("./security");
+import * as security from "./security";
+export { security };
 
 
 
 /** custom type definitions */
-export import definitions = require("./definitions/_index");
+//export import definitions = require("./definitions/_index");
+import * as definitions from "./definitions/_index";
+export { definitions };
 
 ///** decimal.js: high precision numbers
 //https://www.npmjs.com/package/decimal.js
@@ -112,7 +156,9 @@ export import definitions = require("./definitions/_index");
 //export import decimal = require("decimal.js");
 
 
-export import lolo = require("./lolo");
+//export import lolo = require("./lolo");
+import * as lolo from "./lolo";
+export { lolo };
 
 
 ///** cross-platform implementation of the nodejs module: http://nodejs.org/api/events.html
