@@ -30,19 +30,19 @@ You can check out the [PhantomJsCloud](https://www.npmjs.com/package/phantomjscl
 
 Tested with WebPack, works down to IE9.  Designed for development using Chrome (logging and stack traces tested)
 
-Use ```WebPack``` or ```Browserify```.  ```xlib``` is tested and compatible with WebPack.  Here is [an example using ```xlib``` with WebPack and React]() that includes minification.
+Use ```WebPack``` or ```Browserify```.  ```xlib``` is tested and compatible with WebPack.  Here is [an example using ```xlib``` with WebPack and React](https://www.npmjs.com/package/xlib-webpack-react-test) that includes minification.
 
 --------
 # Usage
 
 ```xlib``` is transpiled to ```es5``` compatable javascript using ```commonjs``` module format.   Thus you can consume it as you would any other NPM module:
 
-```typescript
-//typescript 2.0 example:
+```javascript
+//typescript 2.0 /es6 example:
 
 import xlib = require("xlib");
 //or
-import * as xlib from "xlib"
+import * as xlib from "xlib";
 
 
 //log something
@@ -73,7 +73,7 @@ The main functional areas ```xlib``` covers
 
 #### Logging
 
-```typescript
+```javascript
 let log = new xlib.logging.Logger(__filename);
 log.info("hi",{some:"data"});
 ```
