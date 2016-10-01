@@ -1,6 +1,6 @@
 {
   "name": "xlib",
-  "version": "5.0.4",
+  "version": "5.0.5",
   "description": "A cross platform (nodejs/browser) common utilities library, written in Typescript",
   "private": false,
   "author": {
@@ -40,7 +40,7 @@
   },
   "scripts": {
     "test": "mocha",
-      "docs": "typedoc "
+    "docs": "typedoc "
   },
   "main": "./dist/_index.js",
   "types": "./dist/_index.d.ts",
