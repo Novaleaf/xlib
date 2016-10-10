@@ -1,10 +1,10 @@
 //"use strict";
-//import nodeHelper = require("./_internal/nodehelper");
-//import browserHelper = require("./_internal/browserhelper");
+//import nodeHelper = require("./internal/nodehelper");
+//import browserHelper = require("./internal/browserhelper");
 //import * as ex from "./exception";
 "use strict";
-var nodeHelper = require("./_internal/nodehelper");
-var browserHelper = require("./_internal/browserhelper");
+var nodeHelper = require("./internal/nodehelper");
+var browserHelper = require("./internal/browserhelper");
 //import * as ex from "./exception";
 (function (PlatformType) {
     PlatformType[PlatformType["None"] = 0] = "None";

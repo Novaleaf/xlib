@@ -367,7 +367,7 @@ exports.escapeRegExp = escapeRegExp;
 example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
 copied source code from the npm package: https://www.npmjs.com/package/base64url on 20160926.
  */
-var base64Url = require("./_internal/base64url");
+var base64Url = require("./internal/base64url");
 exports.base64Url = base64Url;
 /**
  *  base64 encode and decode functions

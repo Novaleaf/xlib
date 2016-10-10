@@ -34,6 +34,7 @@ if (global.Promise == null) {
 }
 
 
+
 ///** Reactive Extensions https://github.com/Reactive-Extensions/RxJS 
 //...is a set of libraries to compose asynchronous and event-based programs using observable collections and Array#extras style composition in JavaScript
 // * global.Rx is aliased to this.
@@ -41,6 +42,13 @@ if (global.Promise == null) {
 //export import rx = require("rx.all");
 //(global as any)["Rx"] = rx;
 //(rx as any).config.Promise = bluebird;
+
+/** Reactive Extensions v5 beta.  npm rxjs */
+//import * as Rx from "@reactivex/rxjs";
+//import Rx = require("rxjs");
+
+
+
 
 
 var __isUnhandledHooked = false;
@@ -200,7 +208,7 @@ retry(myfunc).done(function(result) {
     console.log(result);
 });
  */
-export var retry: _BluebirdRetryInternals.IRetryStatic = require("./_internal/bluebird-retry");
+export var retry: _BluebirdRetryInternals.IRetryStatic = require("./internal/bluebird-retry");
 
 
 

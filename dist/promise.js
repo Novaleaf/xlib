@@ -35,6 +35,9 @@ if (global.Promise == null) {
 //export import rx = require("rx.all");
 //(global as any)["Rx"] = rx;
 //(rx as any).config.Promise = bluebird;
+/** Reactive Extensions v5 beta.  npm rxjs */
+//import * as Rx from "@reactivex/rxjs";
+//import Rx = require("rxjs");
 var __isUnhandledHooked = false;
 var _unhandledDefaultLogger = new logging.Logger("promise.logPromiseUnhandledRejections");
 function logPromiseUnhandledRejections(logger) {
@@ -123,7 +126,7 @@ retry(myfunc).done(function(result) {
     console.log(result);
 });
  */
-exports.retry = require("./_internal/bluebird-retry");
+exports.retry = require("./internal/bluebird-retry");
 var _not_useful;
 (function (_not_useful) {
     /** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/

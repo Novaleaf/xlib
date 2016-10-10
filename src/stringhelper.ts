@@ -353,7 +353,7 @@ export function escapeRegExp(str: string): string {
 example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
 copied source code from the npm package: https://www.npmjs.com/package/base64url on 20160926.
  */
-import * as base64Url from "./_internal/base64url";
+import * as base64Url from "./internal/base64url";
 export { base64Url };
 
 

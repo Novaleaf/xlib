@@ -1,11 +1,11 @@
 //"use strict";
-//import nodeHelper = require("./_internal/nodehelper");
-//import browserHelper = require("./_internal/browserhelper");
+//import nodeHelper = require("./internal/nodehelper");
+//import browserHelper = require("./internal/browserhelper");
 //import * as ex from "./exception";
 
 
-import * as nodeHelper from "./_internal/nodehelper";
-import * as browserHelper from "./_internal/browserhelper";
+import * as nodeHelper from "./internal/nodehelper";
+import * as browserHelper from "./internal/browserhelper";
 //import * as ex from "./exception";
 
 export enum PlatformType {

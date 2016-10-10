@@ -1,4 +1,3 @@
-# A Cross-Platform, Core-Library for Professional Javascript Projects
 *Best used with Typescript 2.x*
 
 --------

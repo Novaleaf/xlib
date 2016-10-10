@@ -1,7 +1,7 @@
 {
   "name": "xlib",
   "version": "5.0.7",
-  "description": "A cross platform (nodejs/browser) common utilities library, written in Typescript",
+  "description": "A Cross-Platform, Core-Library for Professional TypeScript Projects",
   "private": false,
   "author": {
     "name": "Jason Swearingen",

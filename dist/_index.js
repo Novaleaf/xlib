@@ -9,8 +9,8 @@ if (source_map_support != null && source_map_support.install != null) {
     source_map_support.install();
 }
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
-//import mockMocha = require("./_internal/mockmocha");
-var mockMocha = require("./_internal/mockmocha");
+//import mockMocha = require("./internal/mockmocha");
+var mockMocha = require("./internal/mockmocha");
 mockMocha._initialize();
 //import * as jsHelper from "./jshelper";
 //export { jsHelper };
