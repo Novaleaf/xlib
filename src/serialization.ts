@@ -311,6 +311,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 						return dateDetails;
 
 					case TYPE.function:
+						try{
 						verboseObjectsOut.push(node);
 						var full: string = node.toString();
 						var fcnName = full.substring(full.indexOf(" "), full.indexOf("("));
@@ -323,6 +324,9 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 							delete fcnDetails.full;
 						}
 						return fcnDetails;
+						} catch (ex) {
+							return { "[*TYPE*]": typeName, value: "function-unknown" };
+						}
 					case TYPE.Error:
 						verboseObjectsOut.push(node);
 						var errDetails = { "[*TYPE*]": typeName, name: node.name, message: node.message, stack: node.stack == null ? null : node.stack.split("\n") };
@@ -360,15 +364,19 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 								}
 								return { "[*TYPE*]": typeName, value: promise.toString() };
 							case "Buffer":
-								var buffer = (node as Buffer);
-								var bufferDetails = { "[*TYPE*]": typeName, value: stringHelper.summarize(buffer.toString(), 200), length: buffer.length };
-								if (hideType) {
-									delete bufferDetails["[*TYPE*]"];
+								try {
+									var buffer = (node as Buffer);
+									var bufferDetails = { "[*TYPE*]": typeName, value: stringHelper.summarize(buffer.toString(), 200), length: buffer.length };
+									if (hideType) {
+										delete bufferDetails["[*TYPE*]"];
+									}
+									if (!showVerboseDetails) {
+										//return bufferDetails.value;
+									}
+									return bufferDetails;
+								} catch (ex) {
+									return { "[*TYPE*]": typeName, value: "buffer-unknown" };
 								}
-								if (!showVerboseDetails) {
-									//return bufferDetails.value;
-								}
-								return bufferDetails;
 							case "Stream":
 							case "ReadableStream":
 							case "WriteableStream":
@@ -412,8 +420,11 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 								return "[*MAX_DEPTH*]";
 							}
 							//can't stringify it, so...
-							if (ex.message.toLowerCase().indexOf("circular") < 0) {
+							if (ex.message.toLowerCase().indexOf("circular") < 0 && ex.message.toLowerCase().indexOf("TypeError") < 0) {
 								//exception isn't due to circular, so let's just stop
+								if (ex.toString == null) {
+									return "[*ERROR_ex=" + ex + "*]";
+								}
 								return "[*ERROR_" + ex.toString() + "*]";
 							}
 							if (!disableCircularDetection) {
@@ -430,7 +441,12 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 
 						}
 					default:
-						var unknownDetails = { "[*TYPE*]": typeName, status: "inspectJSONify does not know how to parse this", value: node.toString() };
+						var unknownDetails: any;
+						if (node.toString == null) {
+							unknownDetails = { "[*TYPE*]": typeName, status: "inspectJSONify does not know how to parse this", value: "some-node" };
+						} else {
+							unknownDetails = { "[*TYPE*]": typeName, status: "inspectJSONify does not know how to parse this", value: node.toString() };
+						}
 						if (hideType) {
 							delete unknownDetails["[*TYPE*]"];
 						}
