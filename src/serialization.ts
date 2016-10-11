@@ -398,6 +398,22 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 									return momentValue.toISOString();
 								}
 								return momentDetails;
+							case "IncommingMessage":
+								try {
+									let req = (node as any);
+									var msgDetails = { "[*TYPE*]": typeName, value: { headers: req.headers, method: req.method, statusCode: req.statusCode, httpVersion: req.httpVersion, statusMessage: req.statusMessage, url: req.url } };
+									if (hideType) {
+										delete msgDetails["[*TYPE*]"];
+									}
+									if (!showVerboseDetails) {
+										return msgDetails.value;
+									}
+									return msgDetails;
+								} catch (ex) {
+									//failure parsing as node http.IncommingMessage.  try as normal instead.
+									break;
+								}
+								
 							default:
 								//try to see if a .toJSON() method exists
 								if (typeof (node["toJSON"]) !== "undefined") {
@@ -420,8 +436,8 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 								return "[*MAX_DEPTH*]";
 							}
 							//can't stringify it, so...
-							if (ex.message.toLowerCase().indexOf("circular") < 0 && ex.message.toLowerCase().indexOf("TypeError") < 0) {
-								//exception isn't due to circular, so let's just stop
+							if (ex.message.toLowerCase().indexOf("circular") < 0 && ex.message.toLowerCase().indexOf("typeerror") < 0) {
+								//exception isn't due to circular or typeErrors, so let's just stop
 								if (ex.toString == null) {
 									return "[*ERROR_ex=" + ex + "*]";
 								}
