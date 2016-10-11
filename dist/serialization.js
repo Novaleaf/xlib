@@ -106,7 +106,13 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i - 0] = arguments[_i];
         }
-        return json5.stringify.apply(json5, arguments);
+        try {
+            return json5.stringify.apply(json5, arguments);
+        }
+        catch (ex) {
+            //if json5 fails, try normal json
+            return JSON.stringify.apply(JSON, arguments);
+        }
     };
     /** parses your object, then attempts to parse string values in your object.  failed parse() calls will return the original string for that variable */
     JsonX.prototype.parseRecursive = function (textOrObj, reviver, 
