@@ -447,11 +447,17 @@ var Logger = (function () {
         this.assert(false, msg);
     };
     Logger.prototype.deprecated = function (message) {
-        this.assert(false, "implement deprecated");
+        this.warn("log.deprecated(" + message + ")");
+        //this.assert(false, "implement deprecated");
     };
-    /** note to redo this before shipping (any time not in #DEBUG mode) */
+    /** note to redo this before shipping (any time not in envLevel===PROD mode).   when in prod mode, an error is thrown */
     Logger.prototype.refactor = function (message) {
-        this.assert(false, "implement deprecated");
+        if (environment.envLevel === environment.EnvLevel.PROD) {
+            throw this.error("log.refactor(" + message + ")");
+        }
+        else {
+            this.warn("log.refactor(" + message + ")");
+        }
     };
     return Logger;
 }());

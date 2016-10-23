@@ -23,6 +23,6 @@ export declare class Logger {
     /** use to mark code that needs to be finished before it can be run.   asserts when hit. */
     todo(format?: string, ...params: any[]): void;
     deprecated(message?: string): void;
-    /** note to redo this before shipping (any time not in #DEBUG mode) */
+    /** note to redo this before shipping (any time not in envLevel===PROD mode).   when in prod mode, an error is thrown */
     refactor(message?: string): void;
 }

@@ -225,18 +225,24 @@ export var retry: _BluebirdRetryInternals.IRetryStatic = require("./internal/blu
  * }
  * ```
  */
-export class InitializeHelper<TInitResult> {
+export class InitializeHelper<TInitResult, TOptions>  {
 
     constructor(private _log: logging.Logger,
         /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
-        private _initWork: () => Promise<TInitResult>) { }
+        private _initWork: (/** init options passed by the this.initalize() caller */ options: TOptions) => Promise<TInitResult>) {
+
+        if (_.isFunction(_initWork) !== true) {
+            throw _log.error("the _initWork parameter must be a function.  it is not");
+        }
+
+    }
 
     /** the promise containing the results of the initialization (status and resulting value, if any) */
-    public result: Promise<TInitResult> | null = null;
+    public result: Promise<TInitResult> | undefined;
     /**
      * perform the initialization work, or if it's already initialized, does nothing
      */
-    public initialize(): Promise<TInitResult> {
+    public initialize(/** init options passed to the this._initWork() worker (callee) */  options?: TOptions): Promise<TInitResult> {
 
         if (this.result != null) {
             //already called initialize, return it's promise
@@ -244,21 +250,31 @@ export class InitializeHelper<TInitResult> {
         }
 
         this.result = Promise.try<TInitResult>(() => {
-            return this._initWork();
+            try {
+                return this._initWork(options as any);
+            } catch (ex) {
+                if (this._log == null) {
+                    throw new Error(`Type error, most likely because you didn't call .bind() to your initialize function.  ex:  export let initialize: typeof _init.initialize = _init.initialize.bind(_init);  Error=${ex}`)
+                }
+                throw ex;
+            }
         });
         return this.result;
-
     }
     /**
      *  make sure this module's initialize method has been called and has finished successfully.
      * if not, will log and throw an error.
      */
-    public ensureFinished() : void {
+    public ensureFinished(/**optinoal. if fails, show your custom error message instead of the default */  errorMessage?:string) : void {
         if (this.result == null || this.result.isPending()) {
             throw this._log.error("initialization still pending");
         }
         if (this.result.isRejected()) {
-            throw this._log.error("init failed.  check result details:", { result: this.result.toJSON() });
+            if (errorMessage == null) {
+                throw this._log.error("init failed.  check result details:", { result: this.result.toJSON() });
+            } else {
+                throw this._log.error(errorMessage);
+            }
         }
     }
 }

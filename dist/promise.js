@@ -147,20 +147,29 @@ var InitializeHelper = (function () {
         _initWork) {
         this._log = _log;
         this._initWork = _initWork;
-        /** the promise containing the results of the initialization (status and resulting value, if any) */
-        this.result = null;
+        if (_.isFunction(_initWork) !== true) {
+            throw _log.error("the _initWork parameter must be a function.  it is not");
+        }
     }
     /**
      * perform the initialization work, or if it's already initialized, does nothing
      */
-    InitializeHelper.prototype.initialize = function () {
+    InitializeHelper.prototype.initialize = function (/** init options passed to the this._initWork() worker (callee) */ options) {
         var _this = this;
         if (this.result != null) {
             //already called initialize, return it's promise
             return this.result;
         }
         this.result = Promise.try(function () {
-            return _this._initWork();
+            try {
+                return _this._initWork(options);
+            }
+            catch (ex) {
+                if (_this._log == null) {
+                    throw new Error("Type error, most likely because you didn't call .bind() to your initialize function.  ex:  export let initialize: typeof _init.initialize = _init.initialize.bind(_init);  Error=" + ex);
+                }
+                throw ex;
+            }
         });
         return this.result;
     };
@@ -168,12 +177,17 @@ var InitializeHelper = (function () {
      *  make sure this module's initialize method has been called and has finished successfully.
      * if not, will log and throw an error.
      */
-    InitializeHelper.prototype.ensureFinished = function () {
+    InitializeHelper.prototype.ensureFinished = function (/**optinoal. if fails, show your custom error message instead of the default */ errorMessage) {
         if (this.result == null || this.result.isPending()) {
             throw this._log.error("initialization still pending");
         }
         if (this.result.isRejected()) {
-            throw this._log.error("init failed.  check result details:", { result: this.result.toJSON() });
+            if (errorMessage == null) {
+                throw this._log.error("init failed.  check result details:", { result: this.result.toJSON() });
+            }
+            else {
+                throw this._log.error(errorMessage);
+            }
         }
     };
     return InitializeHelper;

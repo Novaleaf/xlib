@@ -454,11 +454,17 @@ export class Logger {
         this.assert(false, msg);
     }
     deprecated(message?: string) {
-        this.assert(false, "implement deprecated");
+        this.warn(`log.deprecated(${message})`);
+        //this.assert(false, "implement deprecated");
     }
-    /** note to redo this before shipping (any time not in #DEBUG mode) */
+    /** note to redo this before shipping (any time not in envLevel===PROD mode).   when in prod mode, an error is thrown */
     refactor(message?: string) {
-        this.assert(false, "implement deprecated");
+        
+        if (environment.envLevel === environment.EnvLevel.PROD) {
+            throw this.error(`log.refactor(${message})`);
+        } else {
+            this.warn(`log.refactor(${message})`);
+        }
     }
 }
 
