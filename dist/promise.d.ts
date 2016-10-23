@@ -1,5 +1,5 @@
-/// <reference types="bluebird" />
 /// <reference types="node" />
+import * as logging from "./logging";
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance
  * global.Promise is aliased to this.
  */
@@ -94,3 +94,35 @@ retry(myfunc).done(function(result) {
 });
  */
 export declare var retry: _BluebirdRetryInternals.IRetryStatic;
+/**
+ *  helper class to handle async initialization logic.  for example, useful to make sure module initializations are performed before usage.
+ * can also be used as a kind of "make sure something is run exactly once" logic.
+ * example:
+ * ```javascript
+ * let log = new xlib.logging.Logger(__filename);
+ * let _init = new InitializeHelper(log,()=>{return Promise.resolve()});
+ * export let initialize = _init.initialize;
+ * export function doStuff(){
+ * _init.ensure(); //makes sure the initialization completed
+ * }
+ * ```
+ */
+export declare class InitializeHelper<TInitResult> {
+    private _log;
+    /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
+    private _initWorker;
+    constructor(_log: logging.Logger, 
+        /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
+        _initWorker: () => Promise<TInitResult>);
+    /** the promise containing the results of the initialization (status and resulting value, if any) */
+    result: Promise<TInitResult> | null;
+    /**
+     * initialize this module, or if it's already initialized, does nothing
+     */
+    initialize(): Promise<TInitResult>;
+    /**
+     *  make sure this module's initialize method has been called.
+     * if not, will log and throw an error.
+     */
+    ensure(): void;
+}

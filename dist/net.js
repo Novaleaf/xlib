@@ -1,9 +1,5 @@
 "use strict";
-//export import axios = require("axios");
-/** the axios httpClient library:  https://github.com/mzabriskie/axios */
-//export import axios = require("axios");
-var axios = require("axios");
-exports.axios = axios;
+exports.axios = require("axios");
 var promise = require("./promise");
 var Promise = promise.bluebird;
 var _ = require("lodash");
@@ -63,7 +59,7 @@ var EzEndpointFunction = (function () {
                 else {
                     finalRequestOptions = _.defaults({}, customRequestOptions, _this.requestOptions);
                 }
-                return axios.post(endpoint, submitPayload, finalRequestOptions)
+                return exports.axios.post(endpoint, submitPayload, finalRequestOptions)
                     .then(function (result) {
                     log.debug("EzEndpointFunction .post() got valid response");
                     return Promise.resolve(result);
@@ -130,7 +126,7 @@ var EzEndpointFunction = (function () {
             else {
                 finalRequestOptions = _.defaults({}, customRequestOptions, _this.requestOptions);
             }
-            return axios.get(endpoint, finalRequestOptions)
+            return exports.axios.get(endpoint, finalRequestOptions)
                 .then(function (result) {
                 return Promise.resolve(result);
             }, function (err) {

@@ -1,4 +1,3 @@
-/// <reference types="lodash" />
 import * as _ from "lodash";
 /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
 import * as validator from "validator";

@@ -1,4 +1,3 @@
-/// <reference types="bluebird" />
 import * as moment from "moment";
 import * as Promise from "bluebird";
 export interface ICacheItem<TValue> {

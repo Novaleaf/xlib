@@ -9,6 +9,7 @@ var environment = require("./environment");
  */
 var bluebird = require("bluebird");
 exports.bluebird = bluebird;
+var Promise = require("bluebird");
 //bluebird.longStackTraces();
 if (__.isLogDebug == true) {
     //http://bluebirdjs.com/docs/api/promise.config.html
@@ -127,6 +128,54 @@ retry(myfunc).done(function(result) {
 });
  */
 exports.retry = require("./internal/bluebird-retry");
+/**
+ *  helper class to handle async initialization logic.  for example, useful to make sure module initializations are performed before usage.
+ * can also be used as a kind of "make sure something is run exactly once" logic.
+ * example:
+ * ```javascript
+ * let log = new xlib.logging.Logger(__filename);
+ * let _init = new InitializeHelper(log,()=>{return Promise.resolve()});
+ * export let initialize = _init.initialize;
+ * export function doStuff(){
+ * _init.ensure(); //makes sure the initialization completed
+ * }
+ * ```
+ */
+var InitializeHelper = (function () {
+    function InitializeHelper(_log, 
+        /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
+        _initWorker) {
+        this._log = _log;
+        this._initWorker = _initWorker;
+        /** the promise containing the results of the initialization (status and resulting value, if any) */
+        this.result = null;
+    }
+    /**
+     * initialize this module, or if it's already initialized, does nothing
+     */
+    InitializeHelper.prototype.initialize = function () {
+        var _this = this;
+        if (this.result != null) {
+            //already called initialize, return it's promise
+            return this.result;
+        }
+        this.result = Promise.try(function () {
+            return _this._initWorker();
+        });
+        return this.result;
+    };
+    /**
+     *  make sure this module's initialize method has been called.
+     * if not, will log and throw an error.
+     */
+    InitializeHelper.prototype.ensure = function () {
+        if (this.result == null || this.result.isPending()) {
+            throw this._log.error("initialization still pending");
+        }
+    };
+    return InitializeHelper;
+}());
+exports.InitializeHelper = InitializeHelper;
 var _not_useful;
 (function (_not_useful) {
     /** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/

@@ -5,8 +5,11 @@
 
 /** the axios httpClient library:  https://github.com/mzabriskie/axios */
 //export import axios = require("axios");
-import * as axios from "axios";
-export { axios };
+//import * as axios from "axios";
+//export { axios };
+import _axiosCustomDefinitions = require("./internal/definitions/axios-d");
+export let axios: _axiosCustomDefinitions.AxiosStatic = require("axios");
+
 
 import * as promise from "./promise";
 import Promise = promise.bluebird;
@@ -18,6 +21,7 @@ let log = new logging.Logger(__filename);
 import * as serialization from "./serialization";
 import * as exception from "./exception";
 import * as stringHelper from "./stringhelper";
+
 
 
 /**

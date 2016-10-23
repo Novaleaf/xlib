@@ -212,6 +212,54 @@ export var retry: _BluebirdRetryInternals.IRetryStatic = require("./internal/blu
 
 
 
+/**
+ *  helper class to handle async initialization logic.  for example, useful to make sure module initializations are performed before usage.
+ * can also be used as a kind of "make sure something is run exactly once" logic.
+ * example:
+ * ```javascript
+ * let log = new xlib.logging.Logger(__filename);
+ * let _init = new InitializeHelper(log,()=>{return Promise.resolve()});
+ * export let initialize = _init.initialize;
+ * export function doStuff(){
+ * _init.ensure(); //makes sure the initialization completed
+ * }
+ * ```
+ */
+export class InitializeHelper<TInitResult> {
+
+    constructor(private _log: logging.Logger,
+        /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
+        private _initWorker: () => Promise<TInitResult>) { }
+
+    /** the promise containing the results of the initialization (status and resulting value, if any) */
+    public result: Promise<TInitResult> | null = null;
+    /**
+     * initialize this module, or if it's already initialized, does nothing
+     */
+    public initialize(): Promise<TInitResult> {
+
+        if (this.result != null) {
+            //already called initialize, return it's promise
+            return this.result;
+        }
+
+        this.result = Promise.try<TInitResult>(() => {
+            return this._initWorker();
+        });
+        return this.result;
+
+    }
+    /**
+     *  make sure this module's initialize method has been called.
+     * if not, will log and throw an error.
+     */
+    public ensure() {
+        if (this.result == null || this.result.isPending()) {
+            throw this._log.error("initialization still pending");
+        }
+    }
+}
+
 module _not_useful {
 	/** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/
 	export function CreateExposedPromise<T>(callback?: (resolve: (resultOrThenable: T | Promise<T>) => void, reject: (error: any) => void) => void): IExposedPromise<T> {

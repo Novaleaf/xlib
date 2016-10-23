@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\arrayhelper.ts" />
+    <TypeScriptCompile Include="src\internal\definitions\axios-d.ts" />
     <TypeScriptCompile Include="src\internal\base64url.ts" />
     <TypeScriptCompile Include="src\internal\bluebird-retry.ts" />
     <TypeScriptCompile Include="src\internal\browserhelper.ts" />
@@ -86,6 +87,7 @@
     <Folder Include="src\definitions\" />
     <Folder Include="src\design-patterns\" />
     <Folder Include="src\internal\" />
+    <Folder Include="src\internal\definitions\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />

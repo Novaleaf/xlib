@@ -1,7 +1,6 @@
-/// <reference types="bluebird" />
 /** the axios httpClient library:  https://github.com/mzabriskie/axios */
-import * as axios from "axios";
-export { axios };
+import _axiosCustomDefinitions = require("./internal/definitions/axios-d");
+export declare let axios: _axiosCustomDefinitions.AxiosStatic;
 import * as promise from "./promise";
 import Promise = promise.bluebird;
 /**
