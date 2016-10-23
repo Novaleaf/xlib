@@ -229,12 +229,12 @@ export class InitializeHelper<TInitResult> {
 
     constructor(private _log: logging.Logger,
         /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
-        private _initWorker: () => Promise<TInitResult>) { }
+        private _initWork: () => Promise<TInitResult>) { }
 
     /** the promise containing the results of the initialization (status and resulting value, if any) */
     public result: Promise<TInitResult> | null = null;
     /**
-     * initialize this module, or if it's already initialized, does nothing
+     * perform the initialization work, or if it's already initialized, does nothing
      */
     public initialize(): Promise<TInitResult> {
 
@@ -244,18 +244,21 @@ export class InitializeHelper<TInitResult> {
         }
 
         this.result = Promise.try<TInitResult>(() => {
-            return this._initWorker();
+            return this._initWork();
         });
         return this.result;
 
     }
     /**
-     *  make sure this module's initialize method has been called.
+     *  make sure this module's initialize method has been called and has finished successfully.
      * if not, will log and throw an error.
      */
-    public ensure() {
+    public ensureFinished() : void {
         if (this.result == null || this.result.isPending()) {
             throw this._log.error("initialization still pending");
+        }
+        if (this.result.isRejected()) {
+            throw this._log.error("init failed.  check result details:", { result: this.result.toJSON() });
         }
     }
 }

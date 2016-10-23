@@ -110,19 +110,19 @@ export declare var retry: _BluebirdRetryInternals.IRetryStatic;
 export declare class InitializeHelper<TInitResult> {
     private _log;
     /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
-    private _initWorker;
+    private _initWork;
     constructor(_log: logging.Logger, 
         /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
-        _initWorker: () => Promise<TInitResult>);
+        _initWork: () => Promise<TInitResult>);
     /** the promise containing the results of the initialization (status and resulting value, if any) */
     result: Promise<TInitResult> | null;
     /**
-     * initialize this module, or if it's already initialized, does nothing
+     * perform the initialization work, or if it's already initialized, does nothing
      */
     initialize(): Promise<TInitResult>;
     /**
-     *  make sure this module's initialize method has been called.
+     *  make sure this module's initialize method has been called and has finished successfully.
      * if not, will log and throw an error.
      */
-    ensure(): void;
+    ensureFinished(): void;
 }

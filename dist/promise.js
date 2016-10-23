@@ -144,14 +144,14 @@ exports.retry = require("./internal/bluebird-retry");
 var InitializeHelper = (function () {
     function InitializeHelper(_log, 
         /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
-        _initWorker) {
+        _initWork) {
         this._log = _log;
-        this._initWorker = _initWorker;
+        this._initWork = _initWork;
         /** the promise containing the results of the initialization (status and resulting value, if any) */
         this.result = null;
     }
     /**
-     * initialize this module, or if it's already initialized, does nothing
+     * perform the initialization work, or if it's already initialized, does nothing
      */
     InitializeHelper.prototype.initialize = function () {
         var _this = this;
@@ -160,17 +160,20 @@ var InitializeHelper = (function () {
             return this.result;
         }
         this.result = Promise.try(function () {
-            return _this._initWorker();
+            return _this._initWork();
         });
         return this.result;
     };
     /**
-     *  make sure this module's initialize method has been called.
+     *  make sure this module's initialize method has been called and has finished successfully.
      * if not, will log and throw an error.
      */
-    InitializeHelper.prototype.ensure = function () {
+    InitializeHelper.prototype.ensureFinished = function () {
         if (this.result == null || this.result.isPending()) {
             throw this._log.error("initialization still pending");
+        }
+        if (this.result.isRejected()) {
+            throw this._log.error("init failed.  check result details:", { result: this.result.toJSON() });
         }
     };
     return InitializeHelper;
