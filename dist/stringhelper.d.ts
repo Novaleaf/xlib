@@ -32,6 +32,12 @@ export declare function insertAt(target: string, toInsert: string, insertPositio
 export declare function remove(target: string, ...textToRemove: string[]): string;
 export declare function removePrefix(target: string, ...prefixToRemove: string[]): string;
 export declare function removeSuffix(target: string, ...suffixToRemove: string[]): string;
+/**
+ * removes the beginning of a string until the point where it no longer matches another.   good for removing prefixing paths
+ * @param target
+ * @param match
+ */
+export declare function removeMatchingPrefix(target: string, match: string): string;
 export declare function removeAfter(target: string, textToFind: string, keepFindText?: boolean): string;
 export declare function removeBefore(target: string, textToFind: string, keepFindText?: boolean): string;
 export declare function endsWith(target: string, toFind: string): boolean;

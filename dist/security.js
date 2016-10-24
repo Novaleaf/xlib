@@ -204,4 +204,30 @@ function randomIntDigitsCrypto(digits, radix) {
     return toReturn;
 }
 exports.randomIntDigitsCrypto = randomIntDigitsCrypto;
+var Promise = require("bluebird");
+/**
+ * helper that wraps a function into a promise that takes a minimum amount of time.  Useful for situations that may be susceptible to timing attacks.   Note: if you use our slib KDF class you don't need this.
+ * @param minimumDurrationMs
+ * @param logic
+ * @param randomPaddingMaxMs
+ */
+function mitigateTimingAttacks(minimumDurrationMs, logic, randomPaddingMaxMs) {
+    if (randomPaddingMaxMs === void 0) { randomPaddingMaxMs = 250; }
+    var startTime = Date.now();
+    var toReturnPromise = new Promise(function (resolve, reject) {
+        logic(resolve, reject);
+    }).then(function (result) { return result; }, function (error) {
+        //error, ensure we are exceeding our minimum times
+        var endTime = Date.now();
+        var elapsed = endTime - startTime;
+        var targetDurration = minimumDurrationMs + numHelper.randomInt(0, randomPaddingMaxMs);
+        var remaining = targetDurration - elapsed;
+        //mitigate timing attacks: if our business logic took longer than minimumDurration and still failed, obfuscate the time taken by waiting an additional "randomPadding" amount.
+        if (remaining < 0) {
+            remaining = numHelper.randomInt(0, randomPaddingMaxMs);
+        }
+        return Promise.delay(remaining, Promise.reject(error)); //return our failure after a delay
+    });
+    return toReturnPromise;
+}
 //# sourceMappingURL=security.js.map

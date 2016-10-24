@@ -291,6 +291,29 @@ export function removeSuffix(target: string, ...suffixToRemove: string[]): strin
 
     return target;
 }
+/**
+ * removes the beginning of a string until the point where it no longer matches another.   good for removing prefixing paths
+ * @param target
+ * @param match
+ */
+export function removeMatchingPrefix(target: string, match: string): string {
+    let targetLen = target.length;
+    let finalPos = -1;
+    for (let i = 0; i < match.length; i++) {
+        if (targetLen < i) {
+            return "";
+        }
+        if (target[i] === match[i]) {
+            finalPos++;
+            continue;
+        } else {
+            break;
+        }
+    }
+
+    return target.substring(finalPos + 1);
+
+}
 
 export function removeAfter(target: string, textToFind: string, keepFindText: boolean = false) {
     var index = target.indexOf(textToFind);

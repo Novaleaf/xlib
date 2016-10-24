@@ -1,4 +1,6 @@
+/// <reference types="node" />
 import * as _ from "lodash";
+import * as serialization from "./serialization";
 /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
 import * as validator from "validator";
 export { validator };
@@ -72,3 +74,9 @@ export declare class Scrub<T> {
  * @param deepClone
  */
 export declare function scrub(values: _.Dictionary<any> | {}, clone?: boolean, deepClone?: boolean): Scrub<any>;
+import Promise = require("bluebird");
+export declare function isTemplatePopulated<TTemplate>(input: {}, /** required values that must exist in the input, and of the right type */ template: {}): {
+    valid: boolean;
+    invalidMessage?: string;
+};
+export declare function scrubUserInput<TOutput extends {}, TRequiredValues extends {}, TDefaultValues extends {}>(untrustedUserInput: string | Buffer | Promise<string | Buffer> | {}, requiredValues: TRequiredValues, defaultValues?: TDefaultValues, options?: serialization.ITemplateParseOptions): TRequiredValues & TDefaultValues;

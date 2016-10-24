@@ -89,7 +89,7 @@ export interface _ILodashCollectionEnumerator {
 export interface _ILodashObjectEnumerator {
     <TValue, TObject>(object: TObject, enumerator: (value: TValue, key: string, object: TObject) => false | void): TObject;
 }
-/** fixes lodash.d.ts type signature problems */
+/** same as lodash, we just fix lodash.d.ts type signature problems */
 export let forEach: _ILodashCollectionEnumerator = _.forEach;
 export let forEachRight: _ILodashCollectionEnumerator = _.forEachRight;
 export let forIn: _ILodashObjectEnumerator = _.forIn;
@@ -97,3 +97,4 @@ export let forInRight: _ILodashObjectEnumerator = _.forInRight;
 export let forOwn: _ILodashObjectEnumerator = _.forOwn;
 export let forOwnRight: _ILodashObjectEnumerator = _.forOwnRight;
 
+//export let defaults:<T>()=>T = _.def

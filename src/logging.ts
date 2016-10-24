@@ -207,9 +207,16 @@ interface IReplacement extends IAnsiColor {
 
 
 
+import path = require("path");
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
 export class Logger {
-    constructor(public name: string, public logLevel = environment.logLevel) {
+    constructor(public name: string, public logLevel = environment.logLevel, options: { doNotTrimName?: boolean } = {}) {
+
+        if (options.doNotTrimName !== true) {
+            this.name = stringHelper.removeMatchingPrefix(name, __dirname);
+        }
+
+
     }
     /** converts objects to strings, leaves primitive types intact */
     private _normalizeArgs(args: any[]) {
@@ -359,7 +366,10 @@ export class Logger {
 
         return finalArgs;
     }
-
+    /**
+     *  highest verbosity
+     * @param args
+     */
     public trace(...args: any[]) {
         this._log(environment.LogLevel.TRACE, args);
     }
@@ -377,19 +387,19 @@ export class Logger {
     ex:  throw log.error("something bad");
      * @param args
      */
-    public error(...args: any[]):any {
+    public error(...args: any[]): any {
         let finalArgs = this._log(environment.LogLevel.ERROR, args);
 
-		if (finalArgs != null) {
-			let message: string;
-			if (finalArgs.length > 2) {
-				message = finalArgs[3]
-			} else {
-				message = finalArgs.join("\n");
-			}
-			return new ex.Exception(message,undefined,1);
+        if (finalArgs != null) {
+            let message: string;
+            if (finalArgs.length > 2) {
+                message = finalArgs[3]
+            } else {
+                message = finalArgs.join("\n");
+            }
+            return new ex.Exception(message, undefined, 1);
         } else {
-            return new ex.Exception("Error",undefined,1);
+            return new ex.Exception("Error", undefined, 1);
         }
     }
     public fatal(...args: any[]) {
@@ -397,7 +407,7 @@ export class Logger {
         this.assert.apply(this, args);
         args.shift();
 
-        throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args),undefined,1);
+        throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args), undefined, 1);
     }
 
 
@@ -459,7 +469,7 @@ export class Logger {
     }
     /** note to redo this before shipping (any time not in envLevel===PROD mode).   when in prod mode, an error is thrown */
     refactor(message?: string) {
-        
+
         if (environment.envLevel === environment.EnvLevel.PROD) {
             throw this.error(`log.refactor(${message})`);
         } else {

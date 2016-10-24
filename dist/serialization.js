@@ -414,7 +414,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
      * DOES NOT fail if user input doesn't include fields in the template.  they just won't exist in the output.  to specify "default values" for these missing fields, use runtime.jsHelper.mixin()
     */
     JsonX.prototype.parseUsingTemplate = function (templateObj, 
-        /** you can pass a string (to parse to an object) or an existing object */
+        /** you can pass a string or Buffer (to parse to an object) or an existing object */
         input, options) {
         var _this = this;
         if (options == null) {

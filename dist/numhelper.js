@@ -404,15 +404,14 @@ function parseBoolean(toParse, invalidResult, throwOnInvalid) {
     return invalidResult;
 }
 exports.parseBoolean = parseBoolean;
-var tests;
-(function (tests) {
-    "use strict";
-    describe("abc", function () {
-        describe("second level", function () {
-            it("should fail", function () {
-                throw new Error("boom!");
-            });
-        });
-    });
-})(tests || (tests = {}));
+//module tests {
+//	"use strict";
+//	describe("abc", () => {
+//		describe("second level", () => {
+//			it("should fail", () => {
+//				throw new Error("boom!");
+//			});
+//		});
+//	});
+//} 
 //# sourceMappingURL=numhelper.js.map

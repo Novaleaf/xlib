@@ -192,10 +192,14 @@ function colorCodeToString(input, currentColor) {
 }
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
 var Logger = (function () {
-    function Logger(name, logLevel) {
+    function Logger(name, logLevel, options) {
         if (logLevel === void 0) { logLevel = environment.logLevel; }
+        if (options === void 0) { options = {}; }
         this.name = name;
         this.logLevel = logLevel;
+        if (options.doNotTrimName !== true) {
+            this.name = stringHelper.removeMatchingPrefix(name, __dirname);
+        }
     }
     /** converts objects to strings, leaves primitive types intact */
     Logger.prototype._normalizeArgs = function (args) {
@@ -330,6 +334,10 @@ var Logger = (function () {
         }
         return finalArgs;
     };
+    /**
+     *  highest verbosity
+     * @param args
+     */
     Logger.prototype.trace = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {

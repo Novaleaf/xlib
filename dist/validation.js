@@ -355,4 +355,154 @@ function scrub(values, clone, deepClone) {
     return new Scrub(values, clone, deepClone);
 }
 exports.scrub = scrub;
+function isTemplatePopulated(input, /** required values that must exist in the input, and of the right type */ template) {
+    function nodeLoop(inputTargetNode, templateTargetNode, key, nodeChain) {
+        //log.debug({ inputTargetNode, templateTargetNode, key, nodeChain});
+        if (templateTargetNode == null) {
+            return { valid: true };
+        }
+        nodeChain = nodeChain + "." + key;
+        if (inputTargetNode == null) {
+            return { valid: false, invalidMessage: "input is missing the required node: " + nodeChain };
+        }
+        //make sure the types of the nodes match
+        var templateNodeType = reflection.getType(templateTargetNode);
+        var inputNodeType = reflection.getType(inputTargetNode);
+        if (templateNodeType !== inputNodeType) {
+            return { valid: false, invalidMessage: "input node is of the wrong type.  Got " + reflection.Type[inputNodeType] + " but expected " + reflection.Type[templateNodeType] + " at node: " + nodeChain };
+        }
+        //if the template node isn't an object, stop becasue we are at a leaf
+        if (templateNodeType !== reflection.Type.object) {
+            return { valid: true };
+        }
+        //template node has children
+        var tempNodeResult = null;
+        _.forEach(templateTargetNode, function (nextValue, nextKey) {
+            tempNodeResult = nodeLoop(inputTargetNode[nextKey], templateTargetNode[nextKey], nextKey, nodeChain);
+            if (tempNodeResult.valid === false) {
+                return false;
+            }
+            return true;
+        });
+        if (tempNodeResult == null) {
+            //no children to loop
+            tempNodeResult = { valid: true };
+        }
+        return tempNodeResult;
+    }
+    var finalResult = nodeLoop(input, template, "value", "");
+    return finalResult;
+}
+exports.isTemplatePopulated = isTemplatePopulated;
+function scrubUserInput(untrustedUserInput, requiredValues, defaultValues, options) {
+    if (defaultValues === void 0) { defaultValues = {}; }
+    if (options === void 0) { options = {}; }
+    var targetTemplate = _.merge({}, requiredValues, defaultValues);
+    var parsedInput = serialization.JSONX.parseUsingTemplate(targetTemplate, untrustedUserInput, options);
+    var templateResult = isTemplatePopulated(parsedInput, targetTemplate);
+    if (templateResult.valid !== true) {
+        throw new Error("scrubUserInput failed, error while validating the template.  error= " + templateResult.invalidMessage);
+    }
+    _.defaults(parsedInput, defaultValues);
+    return parsedInput;
+}
+exports.scrubUserInput = scrubUserInput;
+var _tests;
+(function (_tests) {
+    //"use strict";
+    describe(__filename, function () {
+        describe("isTemplatePopulated()", function () {
+            var simple1 = { hi: "there", nested: { bye: 2 } };
+            //let simple1 = { hi: "there" };
+            var simple2 = { hi: "there", nested: { bye: 2 }, another: 3 };
+            var simple3 = { hi: "there", nested: { bye: 2, anotherNested: 4 }, another: 3 };
+            var simple1_wrongType = { hi: "there", nested: { bye: "two not 2" } };
+            //let simple1_wrongType = { hi: 1 };
+            var simple3_wrongType = { hi: "there", nested: { bye: 2, anotherNested: "four not 4" }, another: 3 };
+            it("parse identical template", function () {
+                var input = simple1;
+                var template = simple1;
+                var result = isTemplatePopulated(input, template);
+                log.assert(result.valid === true);
+            });
+            it("parse input has more values", function () {
+                var input = simple3;
+                var template = simple1;
+                var result = isTemplatePopulated(input, template);
+                log.assert(result.valid === true);
+            });
+            it("fail template, missing node", function () {
+                var input = simple1;
+                var template = simple2;
+                var result = isTemplatePopulated(input, template);
+                log.assert(result.valid === false, { result: result });
+            });
+            it("fail template, type mismatch", function () {
+                var input = simple1_wrongType;
+                var template = simple1;
+                var result = isTemplatePopulated(input, template);
+                log.assert(result.valid === false, { result: result });
+            });
+            it("fail template, missing child node", function () {
+                var input = simple2;
+                var template = simple3;
+                var result = isTemplatePopulated(input, template);
+                log.assert(result.valid === false, { result: result });
+            });
+            it("fail template, type mismatch on nested node", function () {
+                var input = simple3_wrongType;
+                var template = simple3;
+                var result = isTemplatePopulated(input, template);
+                log.assert(result.valid === false, { result: result });
+            });
+        });
+    });
+})(_tests || (_tests = {}));
+///**
+// * allows describing user input as a Class instead of a POJO, and enforces conformance of the class via templates.
+// */
+//export abstract class PayloadTemplate<TThis>{
+//    constructor(jsonPayload?: string | Buffer, templateObj?: TThis,
+//		/** defaults: {parseOrphans:false,pruneOrphans:true,sanitizeStrings:true,maxInputLength:5000} 
+//		set to FALSE to not parse
+//		*/
+//        templateParseOptions?: {
+//            /** JSON reviver, allows passing a function to transform a node (key+value) into a value of a different type.  for example, translate a date string into a moment object. */
+//            reviver?: (key: any, value: any) => any;
+//            /** if true, an object can be passed in, not just a string or Buffer */
+//            allowObjectInput?: boolean;
+//            /** if true, attempts to parse any additional strings found in the input (and does this recursively) */
+//            parseOrphans?: boolean;
+//            /** if true, deletes any orphans found.  default = TRUE */
+//            pruneOrphans?: boolean;
+//            /** if true, will escape strings to prevent injection attacks.  default false.   to ignore pruning of a node's children, set that node to null.  ex: ```myTemplate.userTags=null``` */
+//            escapeStrings?: boolean,
+//            /** if set, throws an exception if the input is too long.  default=5000 */
+//            maxInputLength?: number;
+//            /** true to not validate that all template fields are present.  default=false*/
+//            skipValidation?: boolean;
+//        }
+//    ) {
+//        if (jsonPayload == null) {
+//            return;
+//        }
+//        if (templateParseOptions == null) {
+//            templateParseOptions = {}
+//        }
+//        _.defaults(templateParseOptions, { parseOrphans: false, pruneOrphans: true, escapeStrings: false, maxInputLength: 5000, skipValidation: false, });
+//        let parsedObj: any;
+//        if (templateObj != null) {
+//            parsedObj = serialization.JSONX.parseUsingTemplate(templateObj, jsonPayload, templateParseOptions);
+//        } else {
+//            parsedObj = serialization.JSONX.parse(jsonPayload);
+//        }
+//        _.assign(this, parsedObj);
+//        if (templateParseOptions.skipValidation !== true) {
+//            if (templateObj == null) {
+//                throw new Error("Payload validation failed.  no template was passed");
+//            }
+//            scrub(this).isTemplatePopulated(templateObj).failThrow();
+//        }
+//    }
+//}
 //# sourceMappingURL=validation.js.map

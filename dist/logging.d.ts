@@ -3,11 +3,17 @@ import * as environment from "./environment";
 export declare class Logger {
     name: string;
     logLevel: environment.LogLevel;
-    constructor(name: string, logLevel?: environment.LogLevel);
+    constructor(name: string, logLevel?: environment.LogLevel, options?: {
+        doNotTrimName?: boolean;
+    });
     /** converts objects to strings, leaves primitive types intact */
     private _normalizeArgs(args);
     private _log(targetLogLevel, args);
     private _doLog(targetLogLevel, args);
+    /**
+     *  highest verbosity
+     * @param args
+     */
     trace(...args: any[]): void;
     debug(...args: any[]): void;
     info(...args: any[]): void;

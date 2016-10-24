@@ -296,6 +296,29 @@ function removeSuffix(target) {
     return target;
 }
 exports.removeSuffix = removeSuffix;
+/**
+ * removes the beginning of a string until the point where it no longer matches another.   good for removing prefixing paths
+ * @param target
+ * @param match
+ */
+function removeMatchingPrefix(target, match) {
+    var targetLen = target.length;
+    var finalPos = -1;
+    for (var i = 0; i < match.length; i++) {
+        if (targetLen < i) {
+            return "";
+        }
+        if (target[i] === match[i]) {
+            finalPos++;
+            continue;
+        }
+        else {
+            break;
+        }
+    }
+    return target.substring(finalPos + 1);
+}
+exports.removeMatchingPrefix = removeMatchingPrefix;
 function removeAfter(target, textToFind, keepFindText) {
     if (keepFindText === void 0) { keepFindText = false; }
     var index = target.indexOf(textToFind);

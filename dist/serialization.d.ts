@@ -19,6 +19,20 @@ export interface InspectOptions {
     /** customInspect - if false, then custom inspect() functions defined on the objects being inspected won't be called. Defaults to true. */
     customInspect?: boolean;
 }
+export interface ITemplateParseOptions {
+    /** used by the JSON object, transforms a node from one type to another.  for example, useful for turning a string to Date or Moment object */
+    reviver?: (key: any, value: any) => any;
+    /** if true, an object can be passed in, not just a string or Buffer */
+    allowObjectInput?: boolean;
+    /** if true, attempts to parse any additional strings found in the input (and does this recursively) */
+    parseOrphans?: boolean;
+    /** if true, deletes any orphans found.   to ignore pruning of a node's children, set that node to null.  ex: ```myTemplate.userTags=null``` */
+    pruneOrphans?: boolean;
+    /** if true, will sanitize strings to prevent injection attacks.  default false. */
+    escapeStrings?: boolean;
+    /** if set, throws an exception if the input is too long */
+    maxInputLength?: number;
+}
 /** JSON5.parse (forgiving) coupled with JSON.stringify (standards compliant serialization), plus extra helpers
  *
  */
@@ -155,20 +169,8 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
      * DOES NOT fail if user input doesn't include fields in the template.  they just won't exist in the output.  to specify "default values" for these missing fields, use runtime.jsHelper.mixin()
     */
     parseUsingTemplate<T>(templateObj: T, 
-        /** you can pass a string (to parse to an object) or an existing object */
-        input: string | Buffer | any, options: {
-        reviver?: (key: any, value: any) => any;
-        /** if true, an object can be passed in, not just a string or Buffer */
-        allowObjectInput?: boolean;
-        /** if true, attempts to parse any additional strings found in the input (and does this recursively) */
-        parseOrphans?: boolean;
-        /** if true, deletes any orphans found.   to ignore pruning of a node's children, set that node to null.  ex: ```myTemplate.userTags=null``` */
-        pruneOrphans?: boolean;
-        /** if true, will sanitize strings to prevent injection attacks.  default false. */
-        escapeStrings?: boolean;
-        /** if set, throws an exception if the input is too long */
-        maxInputLength?: number;
-    }): T;
+        /** you can pass a string or Buffer (to parse to an object) or an existing object */
+        input: string | Buffer | any, options: ITemplateParseOptions): T;
     /** == wrapper over nodejs.util.inspect().  the output is *NOT* JSON compatable! ==
     ----------------
     Return a string representation of object, which is useful for debugging.

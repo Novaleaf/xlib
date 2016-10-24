@@ -391,13 +391,13 @@ export function parseBoolean(toParse: string | number, invalidResult = false, th
     return invalidResult;
 }
 
-module tests {
-	"use strict";
-	describe("abc", () => {
-		describe("second level", () => {
-			it("should fail", () => {
-				throw new Error("boom!");
-			});
-		});
-	});
-}
+//module tests {
+//	"use strict";
+//	describe("abc", () => {
+//		describe("second level", () => {
+//			it("should fail", () => {
+//				throw new Error("boom!");
+//			});
+//		});
+//	});
+//}
