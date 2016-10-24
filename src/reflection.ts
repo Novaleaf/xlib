@@ -70,11 +70,18 @@ export function getTypeName(obj:any): string {
 	var type = getType(obj);
 	switch (type) {
 		case Type.object:
-		case Type.Error:
-			var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
-			var results = (_getTypeNameOrFuncNameRegex).exec((obj).constructor.toString());
-			return (results && results.length > 1) ? results[1] : "";
-
+        case Type.Error:
+            try {
+                var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
+                var results = (_getTypeNameOrFuncNameRegex).exec((obj).constructor.toString());
+                return (results && results.length > 1) ? results[1] : "";
+            } catch (ex) {
+                try {
+                    return typeof (obj);
+                } catch (ex) {
+                    return "UnknownType";
+                }
+            }
         default:
             var str = Type[type]; //type.toString();
             return str;

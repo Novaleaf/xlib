@@ -67,9 +67,19 @@ function getTypeName(obj) {
     switch (type) {
         case Type.object:
         case Type.Error:
-            var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
-            var results = (_getTypeNameOrFuncNameRegex).exec((obj).constructor.toString());
-            return (results && results.length > 1) ? results[1] : "";
+            try {
+                var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
+                var results = (_getTypeNameOrFuncNameRegex).exec((obj).constructor.toString());
+                return (results && results.length > 1) ? results[1] : "";
+            }
+            catch (ex) {
+                try {
+                    return typeof (obj);
+                }
+                catch (ex) {
+                    return "UnknownType";
+                }
+            }
         default:
             var str = Type[type]; //type.toString();
             return str;

@@ -59,7 +59,12 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
         }
         var typeName = reflection.getTypeName(text);
         if (typeName === "Buffer") {
-            text = text.toString();
+            if (text.toString == null) {
+                text = "ERROR_Buffer_no_toString_method";
+            }
+            else {
+                text = text.toString();
+            }
             typeName = typeof (text);
         }
         if (typeName !== "string") {
@@ -212,7 +217,13 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                     case TYPE.function:
                         try {
                             verboseObjectsOut.push(node);
-                            var full = node.toString();
+                            var full;
+                            if (node.toString == null) {
+                                full = "ERROR_node_no_toString_method";
+                            }
+                            else {
+                                full = node.toString();
+                            }
                             var fcnName = full.substring(full.indexOf(" "), full.indexOf("("));
                             var fcnParams = full.substring(full.indexOf("("), full.indexOf("{") - 1);
                             var fcnDetails = { "[*TYPE*]": typeName, signature: fcnName + fcnParams, full: full };
@@ -261,11 +272,23 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                                     promiseDetails["[*TYPE*]"] = typeName;
                                     return promiseDetails;
                                 }
-                                return { "[*TYPE*]": typeName, value: promise.toString() };
+                                if (promise.toString == null) {
+                                    return { "[*TYPE*]": typeName, value: "ERROR_promise_no_toString_method" };
+                                }
+                                else {
+                                    return { "[*TYPE*]": typeName, value: promise.toString() };
+                                }
                             case "Buffer":
                                 try {
                                     var buffer = node;
-                                    var bufferDetails = { "[*TYPE*]": typeName, value: stringHelper.summarize(buffer.toString(), 200), length: buffer.length };
+                                    var strOutput = void 0;
+                                    if (buffer.toString == null) {
+                                        strOutput = "ERROR_buffer2_no_toString_method";
+                                    }
+                                    else {
+                                        strOutput = buffer.toString();
+                                    }
+                                    var bufferDetails = { "[*TYPE*]": typeName, value: stringHelper.summarize(strOutput, 200), length: buffer.length };
                                     if (hideType) {
                                         delete bufferDetails["[*TYPE*]"];
                                     }
@@ -339,7 +362,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                             if (ex.message.toLowerCase().indexOf("circular") < 0 && ex.message.toLowerCase().indexOf("typeerror") < 0) {
                                 //exception isn't due to circular or typeErrors, so let's just stop
                                 if (ex.toString == null) {
-                                    return "[*ERROR_ex=" + ex + "*]";
+                                    return "[*ERROR_ex_no_toString=" + ex + "*]";
                                 }
                                 return "[*ERROR_" + ex.toString() + "*]";
                             }
@@ -358,7 +381,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                     default:
                         var unknownDetails;
                         if (node.toString == null) {
-                            unknownDetails = { "[*TYPE*]": typeName, status: "inspectJSONify does not know how to parse this", value: "some-node" };
+                            unknownDetails = { "[*TYPE*]": typeName, status: "inspectJSONify does not know how to parse this", value: "some-node_no_toString" };
                         }
                         else {
                             unknownDetails = { "[*TYPE*]": typeName, status: "inspectJSONify does not know how to parse this", value: node.toString() };
@@ -431,7 +454,14 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                     throw new ex.CorelibException("JsonX.parseUsingTemplate() failed.  input lenght of " + input.length + " exceeds max of " + options.maxInputLength + ".");
                 }
             }
-            input = input.toString();
+            var strOutput = void 0;
+            if (input.toString == null) {
+                strOutput = "ERROR_input_no_toString_method";
+            }
+            else {
+                strOutput = input.toString();
+            }
+            input = strOutput;
             inputType = reflection.getTypeName(input);
         }
         if (inputType === "string") {
@@ -536,4 +566,29 @@ if (typeof (window) !== "undefined" && window.JSON == null) {
 Extracted from D3.
 https://www.npmjs.com/package/d3-dsv */
 exports.dsv = require("d3-dsv");
+//module _tests {
+//    describe(__filename, () => {
+//        //let testLog = new logging.Logger(__filename);
+//        describe("JSONX", () => {
+//            describe("success cases", () => {
+//                let sample1 = {
+//                    nested: {
+//                        isNull: null,isEmptyObj: {}, isEmptyArray: [], isEmptyStr: ""
+//                    }
+//                };
+//                let sample2 = { outer: { sparseArrayOfSample1: [sample1, null ] } };
+//                it("should roundtrip serialize", () => {
+//                    let serialized = JSONX.stringify(sample2,undefined as any,"\t");
+//                    let deserialized = JSONX.parse(serialized);
+//                    let matchResult = _.matches(sample1)(deserialized);
+//                    console.log(serialized, deserialized, sample1, matchResult);
+//                    if (matchResult !== true) {
+//                        throw new Error("does not match");
+//                    }
+//                });
+//            });
+//            describe("fail cases", () => { });
+//        });
+//    });
+//} 
 //# sourceMappingURL=serialization.js.map
