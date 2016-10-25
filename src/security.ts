@@ -56,6 +56,12 @@ export function sha512(
 
 ///** JSON Web Tokens.    https://jwt.io/ */
 //export import jwt = require("jsonwebtoken");  //good intro to JWT: https://stormpath.com/blog/token-auth-spa/
+/** JSON Web Tokens.  https://www.npmjs.com/package/jwt-simple 
+
+ good intro to JWT: https://stormpath.com/blog/token-auth-spa/
+*/
+export import jwt = require("jwt-simple");
+
 
 
 /**
