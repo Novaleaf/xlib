@@ -208,15 +208,26 @@ interface IReplacement extends IAnsiColor {
 
 
 import path = require("path");
-/** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
+/** console logger logs to screen as simple text.*/
 export class Logger {
-    constructor(public name: string, public logLevel = environment.logLevel, options: { doNotTrimName?: boolean } = {}) {
+    //INTERNAL NOTE:  This is a replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) 
+    //works well, but it would be better with a pluggable global listener, to log to various other locations (email)
+
+
+    constructor(
+        /** IMPORTANT: almost always, you should pass ```__filename``` as the name.    \n\n Effective naming is important. it is used as a Key to selectively enable/disable/adjust the log levels via the logging.Logger.adjustLogLevels() static method */
+        public name: string,
+        /** (optional) the verbosity of this log object.   defaults to the environment.logLevel */
+        public logLevel = environment.logLevel,
+        /** (optional) additional options */
+        options: {
+            /** if false (the default), will trim off the prefix of the name that matches the logging.js director location.  (useful to reduce verbosity, as usually your name will be ```__filename```) */
+            doNotTrimName?: boolean
+        } = {}) {
 
         if (options.doNotTrimName !== true) {
             this.name = stringHelper.removeMatchingPrefix(name, __dirname);
         }
-
-
     }
     /** converts objects to strings, leaves primitive types intact */
     private _normalizeArgs(args: any[]) {

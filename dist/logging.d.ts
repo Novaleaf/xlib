@@ -1,9 +1,18 @@
 import * as environment from "./environment";
-/** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
+/** console logger logs to screen as simple text.*/
 export declare class Logger {
+    /** IMPORTANT: almost always, you should pass ```__filename``` as the name.    \n\n Effective naming is important. it is used as a Key to selectively enable/disable/adjust the log levels via the logging.Logger.adjustLogLevels() static method */
     name: string;
+    /** (optional) the verbosity of this log object.   defaults to the environment.logLevel */
     logLevel: environment.LogLevel;
-    constructor(name: string, logLevel?: environment.LogLevel, options?: {
+    constructor(
+        /** IMPORTANT: almost always, you should pass ```__filename``` as the name.    \n\n Effective naming is important. it is used as a Key to selectively enable/disable/adjust the log levels via the logging.Logger.adjustLogLevels() static method */
+        name: string, 
+        /** (optional) the verbosity of this log object.   defaults to the environment.logLevel */
+        logLevel?: environment.LogLevel, 
+        /** (optional) additional options */
+        options?: {
+        /** if false (the default), will trim off the prefix of the name that matches the logging.js director location.  (useful to reduce verbosity, as usually your name will be ```__filename```) */
         doNotTrimName?: boolean;
     });
     /** converts objects to strings, leaves primitive types intact */

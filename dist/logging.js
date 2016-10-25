@@ -190,9 +190,17 @@ function colorCodeToString(input, currentColor) {
     }
     return result;
 }
-/** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
+/** console logger logs to screen as simple text.*/
 var Logger = (function () {
-    function Logger(name, logLevel, options) {
+    //INTERNAL NOTE:  This is a replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) 
+    //works well, but it would be better with a pluggable global listener, to log to various other locations (email)
+    function Logger(
+        /** IMPORTANT: almost always, you should pass ```__filename``` as the name.    \n\n Effective naming is important. it is used as a Key to selectively enable/disable/adjust the log levels via the logging.Logger.adjustLogLevels() static method */
+        name, 
+        /** (optional) the verbosity of this log object.   defaults to the environment.logLevel */
+        logLevel, 
+        /** (optional) additional options */
+        options) {
         if (logLevel === void 0) { logLevel = environment.logLevel; }
         if (options === void 0) { options = {}; }
         this.name = name;
