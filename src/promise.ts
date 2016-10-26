@@ -279,7 +279,7 @@ export class InitializeHelper<TInitResult, TOptions>  {
     }
 }
 
-module _not_useful {
+export module _deprecated {
 	/** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/
 	export function CreateExposedPromise<T>(callback?: (resolve: (resultOrThenable: T | Promise<T>) => void, reject: (error: any) => void) => void): IExposedPromise<T> {
 

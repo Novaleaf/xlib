@@ -193,8 +193,8 @@ var InitializeHelper = (function () {
     return InitializeHelper;
 }());
 exports.InitializeHelper = InitializeHelper;
-var _not_useful;
-(function (_not_useful) {
+var _deprecated;
+(function (_deprecated) {
     /** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/
     function CreateExposedPromise(callback) {
         var resolver;
@@ -210,7 +210,7 @@ var _not_useful;
         });
         return toReturn;
     }
-    _not_useful.CreateExposedPromise = CreateExposedPromise;
+    _deprecated.CreateExposedPromise = CreateExposedPromise;
     /** for a given function signature which returns a promise, construct a facade that will fulfill once all outstanding calls finish, and each call will be executed sequentially (not in parallel!)*/
     function sequentializePromisedFunction(__this, func) {
         //todo: error handling.
@@ -255,6 +255,6 @@ var _not_useful;
         }
         return __toReturn;
     }
-    _not_useful.sequentializePromisedFunction = sequentializePromisedFunction;
-})(_not_useful || (_not_useful = {}));
+    _deprecated.sequentializePromisedFunction = sequentializePromisedFunction;
+})(_deprecated = exports._deprecated || (exports._deprecated = {}));
 //# sourceMappingURL=promise.js.map

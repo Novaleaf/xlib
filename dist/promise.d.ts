@@ -126,3 +126,13 @@ export declare class InitializeHelper<TInitResult, TOptions> {
      */
     ensureFinished(/**optinoal. if fails, show your custom error message instead of the default */ errorMessage?: string): void;
 }
+export declare module _deprecated {
+    /** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/
+    function CreateExposedPromise<T>(callback?: (resolve: (resultOrThenable: T | Promise<T>) => void, reject: (error: any) => void) => void): IExposedPromise<T>;
+    interface IExposedPromise<R> extends Promise<R> {
+        resolve: (resultOrThenable: R | Promise<R>) => void;
+        reject: (error: any) => void;
+    }
+    /** for a given function signature which returns a promise, construct a facade that will fulfill once all outstanding calls finish, and each call will be executed sequentially (not in parallel!)*/
+    function sequentializePromisedFunction<T>(__this: any, func: (...args: any[]) => Promise<T>): (...args: any[]) => Promise<T[]>;
+}
