@@ -134,30 +134,38 @@ export interface AxiosXHRConfig<T> extends AxiosXHRConfigBase<T> {
  * <U> - request body data type
  */
 export interface AxiosXHR<T> {
-	/**
-	 * Response that was provided by the server
-	 */
-	data: T;
-
-	/**
-	 * HTTP status code from the server response
-	 */
-	status: number;
-
-	/**
-	 * HTTP status message from the server response
-	 */
-	statusText: string;
-
-	/**
-	 * headers that the server responded with
-	 */
-	headers: Object;
 
 	/**
 	 * config that was provided to `axios` for the request
 	 */
-	config: AxiosXHRConfig<T>;
+    config: AxiosXHRConfig<T>;
+	/**
+	 * Response that was provided by the server
+	 */
+    response: {
+        /** payload that came with the response */
+        data: T;
+
+        /**
+         * HTTP status code from the server response
+         */
+        status: number;
+
+        /**
+         * HTTP status message from the server response
+         */
+        statusText: string;
+
+        /**
+         * headers that the server responded with
+         */
+        headers: Object;
+
+        /**
+         * config that was provided to `axios` for the request
+         */
+        config: AxiosXHRConfig<T>;
+    }
 }
 /**
 *  a helper for constructing reusable endpoint functions

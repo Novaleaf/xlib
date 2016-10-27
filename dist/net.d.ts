@@ -101,19 +101,15 @@ export interface AxiosXHRConfig<T> extends AxiosXHRConfigBase<T> {
  */
 export interface AxiosXHR<T> {
     /**
+     * config that was provided to `axios` for the request
+     */
+    config: AxiosXHRConfig<T>;
+    /**
      * Response that was provided by the server
      */
     response: {
-        /**
-         * config that was provided to `axios` for the request
-         */
-        config: AxiosXHRConfig<T>;
-
+        /** payload that came with the response */
         data: T;
-        /**
-         * headers that the server responded with
-         */
-        headers: Object;
         /**
          * HTTP status code from the server response
          */
@@ -122,14 +118,15 @@ export interface AxiosXHR<T> {
          * HTTP status message from the server response
          */
         statusText: string;
-
-        request: XMLHttpRequest;
-    
-    }
-    /**
-     * config that was provided to `axios` for the request
-     */
-    config: AxiosXHRConfig<T>;
+        /**
+         * headers that the server responded with
+         */
+        headers: Object;
+        /**
+         * config that was provided to `axios` for the request
+         */
+        config: AxiosXHRConfig<T>;
+    };
 }
 /**
 *  a helper for constructing reusable endpoint functions

@@ -79,7 +79,7 @@ function logPromiseUnhandledRejections(logger = _unhandledDefaultLogger) {
             break;
     }
 }
-//logPromiseUnhandledRejections();
+logPromiseUnhandledRejections();
 /** constructs a unified promise for your returned (callback function) promises.  wraps a lodash foreach, just adds Promise.all() glue code.
 NOTE: executes all asynchronously.  if you need to only execute + complete one promise at a time, use Promise.each() instead. */
 function forEach(array, callback) {
