@@ -3,17 +3,17 @@
 //import * as stringHelper from "./stringhelper";
 //import * as numHelper from "./numhelper";
 //import _ = require("lodash");
-var exception = require("./exception");
-var stringHelper = require("./stringhelper");
-var numHelper = require("./numhelper");
-var _ = require("lodash");
+const exception = require("./exception");
+const stringHelper = require("./stringhelper");
+const numHelper = require("./numhelper");
+const _ = require("lodash");
 /** cross-platform implementation of the nodejs module: http://nodejs.org/api/crypto.html
  * -------------------
  * The crypto module offers a way of encapsulating secure credentials to be used as part of a secure HTTPS net or http connection.  It also offers a set of wrappers for OpenSSL's hash, hmac, cipher, decipher, sign and verify methods.
  * When to use: if the other classes/functions in this ```security``` module do not meet your needs.
  */
 //export import * as crypto from "crypto";
-var crypto = require("crypto");
+const crypto = require("crypto");
 exports.crypto = crypto;
 /**
  * generate a sha512 hash of your inputs, and returns it as a base64 encoded string. (88 characters in length)
@@ -23,14 +23,14 @@ function sha512(
     /** if an array, generates a hash of all values */
     input) {
     /** set to true to use base64 output instead of base64Url*/
-    var useNormalBase64Encode = true;
+    let useNormalBase64Encode = true;
     //if (_.isArray(input) !== true) {
     //    input = [input] as any[];
     //}
     var hashFunction = crypto.createHash("sha512");
     if (_.isArray(input)) {
         for (var i = 0; i < input.length; i++) {
-            var currentInput = input[i];
+            let currentInput = input[i];
             if (currentInput == null) {
                 continue;
             }
@@ -40,7 +40,7 @@ function sha512(
     else {
         hashFunction.update(input);
     }
-    var buffer = hashFunction.digest();
+    let buffer = hashFunction.digest();
     if (useNormalBase64Encode === true) {
         return buffer.toString("base64");
     }
@@ -66,8 +66,7 @@ exports.jwt = require("jwt-simple");
  * @param groupingSeperator set the character used for sperating digit groups.  default is "-"
  * @param suppressThrowOnBadInput default false.  if true, returns empty string ("") when a blatently invalid key is detected.  when false, thrown an exception.
  */
-function humanFriendlyKey(digits, digitGroupings, userInputToParse, groupingSeperator, suppressThrowOnBadInput) {
-    if (suppressThrowOnBadInput === void 0) { suppressThrowOnBadInput = false; }
+function humanFriendlyKey(digits, digitGroupings, userInputToParse, groupingSeperator, suppressThrowOnBadInput = false) {
     var radix = 32; //target 0-9 and a-z, except for easily mixed up characters (see keyReplacements structure below)
     if (digits == null) {
         digits = 25;
@@ -110,7 +109,7 @@ function humanFriendlyKey(digits, digitGroupings, userInputToParse, groupingSepe
     /**
      *  don't use easily confused characters in key
      */
-    var keyReplacements = {
+    let keyReplacements = {
         "o": "z",
         "i": "y",
         "l": "x",
@@ -142,7 +141,7 @@ function humanFriendlyKey(digits, digitGroupings, userInputToParse, groupingSepe
         }
         else {
             //the initialKey is formed from randomDigits.  map potential wrong characters (o,i,l,u) to (z,y,x,w)
-            var replacement = keyReplacements[char];
+            let replacement = keyReplacements[char];
             if (replacement != null) {
                 char = replacement;
             }
@@ -195,33 +194,31 @@ exports.randomAsciiStringCrypto = randomAsciiStringCrypto;
  * @param maxDigits set to minDigits if not specified
  * @param radix
  */
-function randomIntDigitsCrypto(digits, radix) {
-    if (radix === void 0) { radix = 10; }
+function randomIntDigitsCrypto(digits, radix = 10) {
     var output = [];
-    var hexBuffer = crypto.randomBytes(digits).toString("hex");
+    let hexBuffer = crypto.randomBytes(digits).toString("hex");
     for (var i = 0; i < digits; i++) {
-        var hex = hexBuffer.substring(i * 2, (i + 1) * 2);
-        var byte = numHelper.parseInt(hex, undefined, 16);
-        var num = byte % radix;
+        let hex = hexBuffer.substring(i * 2, (i + 1) * 2);
+        let byte = numHelper.parseInt(hex, undefined, 16);
+        let num = byte % radix;
         output.push(num.toString(radix));
     }
     var toReturn = output.join("");
     return toReturn;
 }
 exports.randomIntDigitsCrypto = randomIntDigitsCrypto;
-var Promise = require("bluebird");
+const Promise = require("bluebird");
 /**
  * helper that wraps a function into a promise that takes a minimum amount of time.  Useful for situations that may be susceptible to timing attacks.   Note: if you use our slib KDF class you don't need this.
  * @param minimumDurrationMs
  * @param logic
  * @param randomPaddingMaxMs
  */
-function mitigateTimingAttacks(minimumDurrationMs, logic, randomPaddingMaxMs) {
-    if (randomPaddingMaxMs === void 0) { randomPaddingMaxMs = 250; }
+function mitigateTimingAttacks(minimumDurrationMs, logic, randomPaddingMaxMs = 250) {
     var startTime = Date.now();
-    var toReturnPromise = new Promise(function (resolve, reject) {
+    var toReturnPromise = new Promise((resolve, reject) => {
         logic(resolve, reject);
-    }).then(function (result) { return result; }, function (error) {
+    }).then((result) => { return result; }, (error) => {
         //error, ensure we are exceeding our minimum times
         var endTime = Date.now();
         var elapsed = endTime - startTime;

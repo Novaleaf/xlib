@@ -103,7 +103,7 @@ function logPromiseUnhandledRejections(logger = _unhandledDefaultLogger) {
 
 
 }
-logPromiseUnhandledRejections();
+//logPromiseUnhandledRejections();
 
 
 /** constructs a unified promise for your returned (callback function) promises.  wraps a lodash foreach, just adds Promise.all() glue code.
@@ -283,21 +283,23 @@ export module _deprecated {
 	/** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/
 	export function CreateExposedPromise<T>(callback?: (resolve: (resultOrThenable: T | Promise<T>) => void, reject: (error: any) => void) => void): IExposedPromise<T> {
 
-		var resolver: (resultOrThenable: T | Promise<T>) => void;
-		var rejector: (error: any) => void;
+        var resolver: ( (resultOrThenable: T | Promise<T>) => void) | null = null;
+        var rejector: ( (error: any) => void)|null= null;
 
-		var toReturn: IExposedPromise<T> = <any>new bluebird<T>(function (resolve, reject) {
+
+        
+        //create a new instance of a bluebird promise
+        var toReturn: IExposedPromise<T> = <any>new bluebird<T>(function (this: IExposedPromise<T>, resolve:any, reject:any) {
 			resolver = resolve;
             rejector = reject;
-
-
-            toReturn.resolve = resolver;
-            toReturn.reject = rejector;
-
 			if (callback != null) {
 				callback.apply(toReturn, arguments);
 			}
-		});
+        });
+        //assign our resolver/rejectors to our promise object
+        //the above closure executes during the bluebird ctor method, so the values are always properly populated.
+        toReturn.resolve = resolver as any;
+        toReturn.reject = rejector as any;
 
 
 		return toReturn;

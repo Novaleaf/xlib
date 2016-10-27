@@ -13,7 +13,7 @@
     "pretty": true,
     "stripInternal": true,
     "diagnostics": true,
-    "target": "es5",
+    "target": "es2015",
     "watch": false,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
@@ -37,6 +37,8 @@
 
   "exclude": [
     "node_modules",
+    "node_modules/**/*",
+    "**/node_modules",
     "dist",
     "src/graveyard",
     "typings"

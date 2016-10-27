@@ -3,7 +3,7 @@
 ///** a high-quality date-time library: http://momentjs.com/ Also includes the moment-timezone extension*/
 //export import moment = require("moment-timezone");
 /** a high-quality date-time library: http://momentjs.com/ */
-var moment = require("moment");
+const moment = require("moment");
 exports.moment = moment;
 function getDateFromIsoString(isoDateTimeString) {
     if (isoDateTimeString == null) {

@@ -3,8 +3,8 @@
 //import browserHelper = require("./internal/browserhelper");
 //import * as ex from "./exception";
 "use strict";
-var nodeHelper = require("./internal/nodehelper");
-var browserHelper = require("./internal/browserhelper");
+const nodeHelper = require("./internal/nodehelper");
+const browserHelper = require("./internal/browserhelper");
 //import * as ex from "./exception";
 (function (PlatformType) {
     PlatformType[PlatformType["None"] = 0] = "None";
@@ -43,7 +43,7 @@ exports.platformType = function () {
 })(exports.OsName || (exports.OsName = {}));
 var OsName = exports.OsName;
 /** the name of the os we detect running.  uses user agent in browsers, process.platform in nodejs */
-exports.osName = (function () {
+exports.osName = (() => {
     if (typeof (process) !== "undefined") {
         return OsName[process.platform];
     }
@@ -108,7 +108,7 @@ if (exports.logLevel == null) {
 else {
     console.info("logLevel=" + LogLevel[exports.logLevel]);
 }
-exports.isDebugBreakEnabled = (function () {
+exports.isDebugBreakEnabled = (() => {
     if (exports.logLevel <= LogLevel.DEBUG && global.v8debug != null) {
         global.v8debug.Debug.setBreakOnException();
         return true;
@@ -138,7 +138,7 @@ if (exports.envLevel == null) {
 else {
     console.info("envLevel=" + EnvLevel[exports.envLevel]);
 }
-var _isTest = getEnvironmentVariable("isTest", null);
+let _isTest = getEnvironmentVariable("isTest", null);
 if (_isTest == null) {
     _isTest = "FALSE";
     console.info("isTest varible is not set.  \n\tdefaulting to isTest=FALSE.");
@@ -154,7 +154,7 @@ else {
 nodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE
 browser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag*/
 exports.isTest = _isTest.trim().toLowerCase() === "true";
-var _isDev = getEnvironmentVariable("isDev", null);
+let _isDev = getEnvironmentVariable("isDev", null);
 if (_isDev == null) {
     _isDev = "FALSE";
     console.info("isDev varible is not set.  \n\tdefaulting to isDev=FALSE.");
@@ -204,7 +204,7 @@ function _ifDebug(fcn) {
     else {
         //no op
         /* tslint:disable */
-        return function () { };
+        return () => { };
     }
 }
 exports._ifDebug = _ifDebug;
@@ -218,7 +218,7 @@ function _ifTest(fcn) {
     else {
         //no op
         /* tslint:disable */
-        return function () { };
+        return () => { };
     }
 }
 exports._ifTest = _ifTest;

@@ -1,6 +1,5 @@
 "use strict";
-function copy(array, startIndex, endIndex) {
-    if (startIndex === void 0) { startIndex = 0; }
+function copy(array, startIndex = 0, endIndex) {
     return Array.prototype.slice.call(array, startIndex, endIndex);
 }
 exports.copy = copy;
@@ -40,8 +39,7 @@ function contains(array, toFind) {
 }
 exports.contains = contains;
 /** returns an array containing the removed elements */
-function removeAt(array, index, count) {
-    if (count === void 0) { count = 1; }
+function removeAt(array, index, count = 1) {
     return array.splice(index, count);
 }
 exports.removeAt = removeAt;
@@ -56,7 +54,7 @@ exports.removeAfter = removeAfter;
  * @param maxChunkSize
  */
 function chunk(array, maxChunkSize) {
-    var toReturn = [];
+    let toReturn = [];
     for (var i = 0; i < array.length; i += maxChunkSize) {
         toReturn.push(array.slice(i, i + maxChunkSize));
     }

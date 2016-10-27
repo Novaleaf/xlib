@@ -5,7 +5,15 @@ var source_map_support = require("source-map-support");
 //import * as source_map_support from "source-map-support";
 //can be removed by webpack
 if (source_map_support != null && source_map_support.install != null) {
-	source_map_support.install();
+	//console.info("source map support installing");
+    source_map_support.install();
+    console.info("source map support installed.");
+} else if (source_map_support != null && source_map_support.sourceMapSupport != null) {
+	//console.warn("source map support installing 2");
+	source_map_support.sourceMapSupport.install();
+} else {
+    console.warn("NO source map support installed.  could not find the module.  (is it no-oped?)");
+    console.log(JSON.stringify(source_map_support, undefined, "\t"));
 }
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */

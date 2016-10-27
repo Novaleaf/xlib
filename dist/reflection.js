@@ -2,7 +2,7 @@
 //export import _common = require("./reflection/_common");
 //import stringHelper = require("../stringhelper");
 //import arrayHelper = require("../arrayhelper");
-var ex = require("./exception");
+const ex = require("./exception");
 /** primitive types as identified by javascript, plus well known object types */
 (function (Type) {
     /** null is not undefined, unfortunately  */

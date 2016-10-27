@@ -8,12 +8,12 @@
 // */
 //export import Parallel = require("paralleljs");
 //also try adding https://www.npmjs.com/package/webworker-threads sometime
-exports.webworker_threads = function () { throw new Error("to implement"); };
+exports.webworker_threads = () => { throw new Error("to implement"); };
 /** https://github.com/caolan/async
  * Async utilities for node and the browser
  * Async provides around 20 functions that include the usual 'functional' suspects (map, reduce, filter, each…) as well as some common patterns for asynchronous control flow (parallel, series, waterfall…). All these functions assume you follow the Node.js convention of providing a single callback as the last argument of your async function.
  */
-var async = require("async");
+const async = require("async");
 exports.async = async;
 /** From https://github.com/71104/rwlock    Asynchronous read/write lock implementation for Node.js.
 == Main rules: ==

@@ -1,17 +1,17 @@
 "use strict";
-var numHelper = require("./numhelper");
-var _jsHelper = require("./jshelper");
-var serialization = require("./serialization");
+const numHelper = require("./numhelper");
+const _jsHelper = require("./jshelper");
+const serialization = require("./serialization");
 exports.JSONX = serialization.JSONX;
 //export { serialization.JSONX as JSONX };
-var validation = require("./validation");
+const validation = require("./validation");
 exports.scrub = validation.scrub;
 exports.defaultIfNull = _jsHelper.defaultIfNull;
 //export { _jsHelper.defaultIfNull as defaultIfNull };
-var _exception = require("./exception");
+const _exception = require("./exception");
 exports.Exception = _exception.Exception;
 //export { _exception.Exception as Exception };
-var moment = require("moment");
+const moment = require("moment");
 exports.moment = moment;
 function utcNow() {
     return moment.utc().toDate();
@@ -26,7 +26,7 @@ function utcNowTimestamp() {
 }
 exports.utcNowTimestamp = utcNowTimestamp;
 //import _cache = require("./cache");
-var _cache = require("./cache");
+const _cache = require("./cache");
 /**
  * read method from the defaultCache object (xlib.cache.defaultCache.read).
  * for your own namespace, instantiate a new xlib.cache.Cache class instance instead.
@@ -41,7 +41,7 @@ exports.cache = _cache.defaultCache.read.bind(_cache.defaultCache);
 // *  converts db escaped user input into sanitized html (includes whitelisted markeup) for ui formatting
 // */
 //export var htmlSanitize = _stringHelper.htmlSanitizeEscapedUserInput;
-var environment = require("./environment");
+const environment = require("./environment");
 /**
  *   shortcut for ```environment.isDev```
  */

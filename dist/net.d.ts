@@ -103,19 +103,29 @@ export interface AxiosXHR<T> {
     /**
      * Response that was provided by the server
      */
-    data: T;
-    /**
-     * HTTP status code from the server response
-     */
-    status: number;
-    /**
-     * HTTP status message from the server response
-     */
-    statusText: string;
-    /**
-     * headers that the server responded with
-     */
-    headers: Object;
+    response: {
+        /**
+         * config that was provided to `axios` for the request
+         */
+        config: AxiosXHRConfig<T>;
+
+        data: T;
+        /**
+         * headers that the server responded with
+         */
+        headers: Object;
+        /**
+         * HTTP status code from the server response
+         */
+        status: number;
+        /**
+         * HTTP status message from the server response
+         */
+        statusText: string;
+
+        request: XMLHttpRequest;
+    
+    }
     /**
      * config that was provided to `axios` for the request
      */

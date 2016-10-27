@@ -6,11 +6,21 @@ var source_map_support = require("source-map-support");
 //import * as source_map_support from "source-map-support";
 //can be removed by webpack
 if (source_map_support != null && source_map_support.install != null) {
+    //console.info("source map support installing");
     source_map_support.install();
+    console.info("source map support installed.");
+}
+else if (source_map_support != null && source_map_support.sourceMapSupport != null) {
+    //console.warn("source map support installing 2");
+    source_map_support.sourceMapSupport.install();
+}
+else {
+    console.warn("NO source map support installed.  could not find the module.  (is it no-oped?)");
+    console.log(JSON.stringify(source_map_support, undefined, "\t"));
 }
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 //import mockMocha = require("./internal/mockmocha");
-var mockMocha = require("./internal/mockmocha");
+const mockMocha = require("./internal/mockmocha");
 mockMocha._initialize();
 //import * as jsHelper from "./jshelper";
 //export { jsHelper };
@@ -42,19 +52,19 @@ mockMocha._initialize();
 //export import * as arrayHelper from "./arrayhelper";
 //export import ClassBase = require("./classbase");
 //export import * as logging from "./logging";
-var jsHelper = require("./jshelper");
+const jsHelper = require("./jshelper");
 exports.jsHelper = jsHelper;
-var arrayHelper = require("./arrayhelper");
+const arrayHelper = require("./arrayhelper");
 exports.arrayHelper = arrayHelper;
-var classbase_1 = require("./classbase");
+const classbase_1 = require("./classbase");
 exports.ClassBase = classbase_1.ClassBase;
-var logging = require("./logging");
+const logging = require("./logging");
 exports.logging = logging;
 //export import * as exception from "./exception";
 //export import collections = require("./collections");
-var exception = require("./exception");
+const exception = require("./exception");
 exports.exception = exception;
-var collections = require("./collections");
+const collections = require("./collections");
 exports.collections = collections;
 /** various math and numerical conversion/manipulation related helper functions */
 //export import * as numHelper from "./numhelper";
@@ -62,30 +72,30 @@ exports.collections = collections;
 //export import * as reflection from "./reflection";
 //export import * as environment from "./environment";
 //export import dateTime = require("./datetime");
-var numHelper = require("./numhelper");
+const numHelper = require("./numhelper");
 exports.numHelper = numHelper;
-var stringHelper = require("./stringhelper");
+const stringHelper = require("./stringhelper");
 exports.stringHelper = stringHelper;
-var reflection = require("./reflection");
+const reflection = require("./reflection");
 exports.reflection = reflection;
-var environment = require("./environment");
+const environment = require("./environment");
 exports.environment = environment;
-var dateTime = require("./datetime");
+const dateTime = require("./datetime");
 exports.dateTime = dateTime;
 //export import * as validation from "./validation";
 //export import * as serialization from "./serialization";
-var validation = require("./validation");
+const validation = require("./validation");
 exports.validation = validation;
-var serialization = require("./serialization");
+const serialization = require("./serialization");
 exports.serialization = serialization;
 //export import compression = require("./compression");
 //export import threading = require("./threading");
-var compression = require("./compression");
+const compression = require("./compression");
 exports.compression = compression;
-var threading = require("./threading");
+const threading = require("./threading");
 exports.threading = threading;
 //export import lodash = require("lodash");
-var lodash = require("lodash");
+const lodash = require("lodash");
 exports.lodash = lodash;
 //set lodash as a global if it's not.
 if (environment.getGlobal()["_"] == null) {
@@ -94,32 +104,32 @@ if (environment.getGlobal()["_"] == null) {
 //export import * as promise from "./promise";
 //export import net = require("./net");
 //export import cache = require("./cache");
-var promise = require("./promise");
+const promise = require("./promise");
 exports.promise = promise;
-var net = require("./net");
+const net = require("./net");
 exports.net = net;
-var cache = require("./cache");
+const cache = require("./cache");
 exports.cache = cache;
 /** templates for various design patterns */
 //export import designPatterns = require("./design-patterns/_index");
-var designPatterns = require("./design-patterns/_index");
+const designPatterns = require("./design-patterns/_index");
 exports.designPatterns = designPatterns;
 /** security and cryptographic helpers.   (cross-platform)
  *  note:  our ```KDF``` is nodejs only, and can be found in the ```nlib.security``` module.
  * */
 //export import security = require("./security");
-var security = require("./security");
+const security = require("./security");
 exports.security = security;
 /** custom type definitions */
 //export import definitions = require("./definitions/_index");
-var definitions = require("./definitions/_index");
+const definitions = require("./definitions/_index");
 exports.definitions = definitions;
 ///** decimal.js: high precision numbers
 //https://www.npmjs.com/package/decimal.js
 //*/
 //export import decimal = require("decimal.js");
 //export import lolo = require("./lolo");
-var lolo = require("./lolo");
+const lolo = require("./lolo");
 exports.lolo = lolo;
 ///** cross-platform implementation of the nodejs module: http://nodejs.org/api/events.html
 // * -------------------

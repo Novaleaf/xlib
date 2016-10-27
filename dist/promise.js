@@ -1,15 +1,15 @@
 "use strict";
-var arrayHelper = require("./arrayhelper");
-var _ = require("lodash");
-var __ = require("./lolo");
-var logging = require("./logging");
-var environment = require("./environment");
+const arrayHelper = require("./arrayhelper");
+const _ = require("lodash");
+const __ = require("./lolo");
+const logging = require("./logging");
+const environment = require("./environment");
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance
  * global.Promise is aliased to this.
  */
-var bluebird = require("bluebird");
+const bluebird = require("bluebird");
 exports.bluebird = bluebird;
-var Promise = require("bluebird");
+const Promise = require("bluebird");
 //bluebird.longStackTraces();
 if (__.isLogDebug == true) {
     //http://bluebirdjs.com/docs/api/promise.config.html
@@ -40,9 +40,8 @@ if (global.Promise == null) {
 //import * as Rx from "@reactivex/rxjs";
 //import Rx = require("rxjs");
 var __isUnhandledHooked = false;
-var _unhandledDefaultLogger = new logging.Logger("promise.logPromiseUnhandledRejections");
-function logPromiseUnhandledRejections(logger) {
-    if (logger === void 0) { logger = _unhandledDefaultLogger; }
+let _unhandledDefaultLogger = new logging.Logger("promise.logPromiseUnhandledRejections");
+function logPromiseUnhandledRejections(logger = _unhandledDefaultLogger) {
     if (__isUnhandledHooked === true) {
         return;
     }
@@ -50,7 +49,7 @@ function logPromiseUnhandledRejections(logger) {
     logger.debug("exec xlib.diagnostics.logger.logPromiseUnhandledRejections()");
     switch (environment.platformType) {
         case environment.PlatformType.Browser:
-            window.addEventListener("unhandledrejection", function (e) {
+            window.addEventListener("unhandledrejection", (e) => {
                 var reason = e.detail.reason;
                 var promise = e.detail.promise;
                 logger.error(reason, promise);
@@ -80,13 +79,13 @@ function logPromiseUnhandledRejections(logger) {
             break;
     }
 }
-logPromiseUnhandledRejections();
+//logPromiseUnhandledRejections();
 /** constructs a unified promise for your returned (callback function) promises.  wraps a lodash foreach, just adds Promise.all() glue code.
 NOTE: executes all asynchronously.  if you need to only execute + complete one promise at a time, use Promise.each() instead. */
 function forEach(array, callback) {
     try {
         var results = [];
-        _.forEach(array, function (value) {
+        _.forEach(array, (value) => {
             var resultPromise = callback(value);
             results.push(resultPromise);
         });
@@ -141,8 +140,8 @@ exports.retry = require("./internal/bluebird-retry");
  * }
  * ```
  */
-var InitializeHelper = (function () {
-    function InitializeHelper(_log, 
+class InitializeHelper {
+    constructor(_log, 
         /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
         _initWork) {
         this._log = _log;
@@ -154,30 +153,29 @@ var InitializeHelper = (function () {
     /**
      * perform the initialization work, or if it's already initialized, does nothing
      */
-    InitializeHelper.prototype.initialize = function (/** init options passed to the this._initWork() worker (callee) */ options) {
-        var _this = this;
+    initialize(/** init options passed to the this._initWork() worker (callee) */ options) {
         if (this.result != null) {
             //already called initialize, return it's promise
             return this.result;
         }
-        this.result = Promise.try(function () {
+        this.result = Promise.try(() => {
             try {
-                return _this._initWork(options);
+                return this._initWork(options);
             }
             catch (ex) {
-                if (_this._log == null) {
-                    throw new Error("Type error, most likely because you didn't call .bind() to your initialize function.  ex:  export let initialize: typeof _init.initialize = _init.initialize.bind(_init);  Error=" + ex);
+                if (this._log == null) {
+                    throw new Error(`Type error, most likely because you didn't call .bind() to your initialize function.  ex:  export let initialize: typeof _init.initialize = _init.initialize.bind(_init);  Error=${ex}`);
                 }
                 throw ex;
             }
         });
         return this.result;
-    };
+    }
     /**
      *  make sure this module's initialize method has been called and has finished successfully.
      * if not, will log and throw an error.
      */
-    InitializeHelper.prototype.ensureFinished = function (/**optinoal. if fails, show your custom error message instead of the default */ errorMessage) {
+    ensureFinished(/**optinoal. if fails, show your custom error message instead of the default */ errorMessage) {
         if (this.result == null || this.result.isPending()) {
             throw this._log.error("initialization still pending");
         }
@@ -189,25 +187,27 @@ var InitializeHelper = (function () {
                 throw this._log.error(errorMessage);
             }
         }
-    };
-    return InitializeHelper;
-}());
+    }
+}
 exports.InitializeHelper = InitializeHelper;
 var _deprecated;
 (function (_deprecated) {
     /** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/
     function CreateExposedPromise(callback) {
-        var resolver;
-        var rejector;
+        var resolver = null;
+        var rejector = null;
+        //create a new instance of a bluebird promise
         var toReturn = new bluebird(function (resolve, reject) {
             resolver = resolve;
             rejector = reject;
-            toReturn.resolve = resolver;
-            toReturn.reject = rejector;
             if (callback != null) {
                 callback.apply(toReturn, arguments);
             }
         });
+        //assign our resolver/rejectors to our promise object
+        //the above closure executes during the bluebird ctor method, so the values are always properly populated.
+        toReturn.resolve = resolver;
+        toReturn.reject = rejector;
         return toReturn;
     }
     _deprecated.CreateExposedPromise = CreateExposedPromise;
@@ -234,10 +234,10 @@ var _deprecated;
             //get the next call to process
             var args = __enqueuedCallArguments.shift();
             var currentPromise = func.apply(__this, args);
-            currentPromise.then(function (currentValue) {
+            currentPromise.then((currentValue) => {
                 __batchResults.push(currentValue);
                 __doNext();
-            }, function (error) {
+            }, (error) => {
                 var tempPromise = __batchPromise;
                 __resetVariables();
                 tempPromise.reject(error);

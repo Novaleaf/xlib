@@ -1,6 +1,6 @@
 "use strict";
 //import * as logging from "./logging";
-var ex = require("../exception");
+const ex = require("../exception");
 /** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.
  * usage notes: as long as this module is loaded
  *		(which it is unless your minifer is expecting pure functions)
@@ -12,7 +12,7 @@ function _initialize() {
         //var log = new logging.Logger(__filename);
         //log.trace("mocha not present.  nooping describe function");
         /* tslint:disable */
-        var noop = function () { };
+        var noop = () => { };
         /* tslint:enable */
         global["describe"] = noop;
         if (typeof (global["describe"]) === "undefined") {

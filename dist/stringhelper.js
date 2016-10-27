@@ -1,9 +1,9 @@
 "use strict";
-var _ = require("lodash");
+const _ = require("lodash");
 /** Clean up user-submitted HTML, preserving whitelisted elements and whitelisted attributes on a per-element basis
  https://www.npmjs.com/package/sanitize-html
 */
-var sanitizeHtml = require("sanitize-html");
+const sanitizeHtml = require("sanitize-html");
 exports.sanitizeHtml = sanitizeHtml;
 ///**
 // * takes our normal "escaped at rest" user input and unescapes it, then sanitizes
@@ -55,10 +55,7 @@ function isEncodedMaybe(value) {
     return true;
 }
 exports.isEncodedMaybe = isEncodedMaybe;
-function count(target, subStrToCount, ignoreCase, startingPosition, /**default false.  if true, we allow overlapping finds, such as "aa" in the string "aaa" would return 2*/ allowOverlaps) {
-    if (ignoreCase === void 0) { ignoreCase = false; }
-    if (startingPosition === void 0) { startingPosition = 0; }
-    if (allowOverlaps === void 0) { allowOverlaps = false; }
+function count(target, subStrToCount, ignoreCase = false, startingPosition = 0, /**default false.  if true, we allow overlapping finds, such as "aa" in the string "aaa" would return 2*/ allowOverlaps = false) {
     if (target == null) {
         return 0;
     }
@@ -66,12 +63,12 @@ function count(target, subStrToCount, ignoreCase, startingPosition, /**default f
         target = target.toLowerCase();
         subStrToCount = subStrToCount.toLowerCase();
     }
-    var counted = 0;
+    let counted = 0;
     if (subStrToCount == null || subStrToCount.length === 0) {
         throw new Error("subStrToCount length is zero");
     }
     while (true) {
-        var index = target.indexOf(subStrToCount, startingPosition);
+        let index = target.indexOf(subStrToCount, startingPosition);
         if (index >= 0) {
             counted++;
             if (allowOverlaps === true) {
@@ -88,9 +85,7 @@ function count(target, subStrToCount, ignoreCase, startingPosition, /**default f
     return counted;
 }
 exports.count = count;
-function indexOf(target, toFind, ignoreCase, startingPosition) {
-    if (ignoreCase === void 0) { ignoreCase = false; }
-    if (startingPosition === void 0) { startingPosition = 0; }
+function indexOf(target, toFind, ignoreCase = false, startingPosition = 0) {
     if (ignoreCase === true) {
         target = target.toLowerCase();
         toFind = toFind.toLowerCase();
@@ -101,9 +96,7 @@ exports.indexOf = indexOf;
 /** if the target is encapsulated by prefix/suffix, returns the unencapsulated version
 otherwise, returns the target (non modified)
 */
-function between(target, prefix, suffix, ignoreCase, trimFirst) {
-    if (ignoreCase === void 0) { ignoreCase = false; }
-    if (trimFirst === void 0) { trimFirst = false; }
+function between(target, prefix, suffix, ignoreCase = false, trimFirst = false) {
     if (trimFirst) {
         target = target.trim();
     }
@@ -123,8 +116,7 @@ function between(target, prefix, suffix, ignoreCase, trimFirst) {
 }
 exports.between = between;
 /** if the string is longer than the maxLength, creates a summary (first + last) and returns it (ommiting the middle) */
-function summarize(str, /** default = 100 */ maxLength) {
-    if (maxLength === void 0) { maxLength = 100; }
+function summarize(str, /** default = 100 */ maxLength = 100) {
     if (str == null) {
         return "NULL";
     }
@@ -149,8 +141,7 @@ exports.summarize = summarize;
 input is converted to lowercase, alphanumeric with underscore (or your choosen 'whitespaceChar').
 example:  "  (hi)   world!" ==> "hi_world"
 the rules: maximum of 1 underscore at a time, and won't prefix/suffix with underscores (or your chosen 'whitespaceChar'*/
-function toId(str, whitespaceChar) {
-    if (whitespaceChar === void 0) { whitespaceChar = "_"; }
+function toId(str, whitespaceChar = "_") {
     //strip out invalid characters (valid=alphanumeric) groups are replaced by a single whitespace (which will be replaced in a following line)
     var toReturn = str;
     //lowercase
@@ -206,8 +197,7 @@ function repeat(toRepeate, numberOfTimes) {
     return Array(numberOfTimes + 1).join(toRepeate);
 }
 exports.repeat = repeat;
-function replaceAll(target, strToFind, replaceWith, ignoreCase) {
-    if (ignoreCase === void 0) { ignoreCase = false; }
+function replaceAll(target, strToFind, replaceWith, ignoreCase = false) {
     var flags = "g"; //global match
     if (ignoreCase === true) {
         flags += "i";
@@ -219,11 +209,7 @@ function insertAt(target, toInsert, insertPosition) {
     return [target.slice(0, insertPosition), toInsert, target.slice(insertPosition)].join("");
 }
 exports.insertAt = insertAt;
-function remove(target) {
-    var textToRemove = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        textToRemove[_i - 1] = arguments[_i];
-    }
+function remove(target, ...textToRemove) {
     if (target == null) {
         return target;
     }
@@ -246,11 +232,7 @@ function remove(target) {
     return target;
 }
 exports.remove = remove;
-function removePrefix(target) {
-    var prefixToRemove = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        prefixToRemove[_i - 1] = arguments[_i];
-    }
+function removePrefix(target, ...prefixToRemove) {
     if (target == null) {
         return target;
     }
@@ -269,11 +251,7 @@ function removePrefix(target) {
     return target;
 }
 exports.removePrefix = removePrefix;
-function removeSuffix(target) {
-    var suffixToRemove = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        suffixToRemove[_i - 1] = arguments[_i];
-    }
+function removeSuffix(target, ...suffixToRemove) {
     if (target == null) {
         return target;
     }
@@ -302,9 +280,9 @@ exports.removeSuffix = removeSuffix;
  * @param match
  */
 function removeMatchingPrefix(target, match) {
-    var targetLen = target.length;
-    var finalPos = -1;
-    for (var i = 0; i < match.length; i++) {
+    let targetLen = target.length;
+    let finalPos = -1;
+    for (let i = 0; i < match.length; i++) {
         if (targetLen < i) {
             return "";
         }
@@ -319,8 +297,7 @@ function removeMatchingPrefix(target, match) {
     return target.substring(finalPos + 1);
 }
 exports.removeMatchingPrefix = removeMatchingPrefix;
-function removeAfter(target, textToFind, keepFindText) {
-    if (keepFindText === void 0) { keepFindText = false; }
+function removeAfter(target, textToFind, keepFindText = false) {
     var index = target.indexOf(textToFind);
     if (index < 0) {
         return target; //trim not found, so return original
@@ -331,8 +308,7 @@ function removeAfter(target, textToFind, keepFindText) {
     return target.substring(0, index);
 }
 exports.removeAfter = removeAfter;
-function removeBefore(target, textToFind, keepFindText) {
-    if (keepFindText === void 0) { keepFindText = false; }
+function removeBefore(target, textToFind, keepFindText = false) {
     var index = target.indexOf(textToFind);
     if (index < 0) {
         return target; //trim not found, so return original
@@ -390,7 +366,7 @@ exports.escapeRegExp = escapeRegExp;
 example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
 copied source code from the npm package: https://www.npmjs.com/package/base64url on 20160926.
  */
-var base64Url = require("./internal/base64url");
+const base64Url = require("./internal/base64url");
 exports.base64Url = base64Url;
 /**
  *  base64 encode and decode functions
@@ -449,7 +425,7 @@ function hash(input) {
 }
 exports.hash = hash;
 /**format strings */
-var _sprintf = require("sprintf-js");
+const _sprintf = require("sprintf-js");
 exports.format = _sprintf.sprintf;
 exports.format2 = _sprintf.vsprintf;
 ///** string.format, supports the following style:  formatAlt(" hello {0}!","world")

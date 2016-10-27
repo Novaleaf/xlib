@@ -1,18 +1,18 @@
 "use strict";
-var _ = require("lodash");
-var moment = require("moment");
-var exception = require("./exception");
+const _ = require("lodash");
+const moment = require("moment");
+const exception = require("./exception");
 //import diagnostics = require("./diagnostics/_main")
-var logging = require("./logging");
+const logging = require("./logging");
 //import * as promise from "./promise";
-var Promise = require("bluebird");
+const Promise = require("bluebird");
 var log = new logging.Logger(__filename);
 /**
  * caches values in memory, mostly to help avoiding excessive db queries, but can be used for any similar reasons.
  * if you want your own namespace, construct your own instance of this class.   If you don't care, use the default ```defaultCache``` instance, or use the lolo shortcut: ```__.cache```
  */
-var Cache = (function () {
-    function Cache() {
+class Cache {
+    constructor() {
         this._storage = {};
         this._cleanupKeys = [];
         this._cleanupNextPosition = 0;
@@ -25,12 +25,11 @@ var Cache = (function () {
      * @param key
      * @param fetchFunction
      */
-    Cache.prototype.read = function (key, fetchFunction, options) {
-        var _this = this;
+    read(key, fetchFunction, options) {
         if (options == null) {
             options = {};
         }
-        var _options = options;
+        let _options = options;
         if (options.fetchExpiresAmount == null) {
             options.fetchExpiresAmount = 10;
         }
@@ -40,9 +39,9 @@ var Cache = (function () {
         if (options.gcAfterMultipler == null) {
             options.gcAfterMultipler = 3;
         }
-        var fetchExpiresDuration = moment.duration(options.fetchExpiresAmount, options.fetchExpiresUnits);
+        let fetchExpiresDuration = moment.duration(options.fetchExpiresAmount, options.fetchExpiresUnits);
         function _returnOrClone(potentialValue) {
-            var toReturn;
+            let toReturn;
             if (_options.noClone) {
                 //use newValue directly
                 toReturn = potentialValue;
@@ -55,13 +54,13 @@ var Cache = (function () {
             }
             return toReturn;
         }
-        var now = moment();
+        let now = moment();
         if (options.fetchExpiresAmount <= 0) {
             throw new exception.CorelibException("Cache: item to insert is alreadey expired (fetchExpiresAmount less than or equal to zero)");
         }
         // do a garbage collection pass (one item checked per read call) 
         this._tryGCOne(now);
-        var cacheItem = this._storage[key];
+        let cacheItem = this._storage[key];
         if (cacheItem == null) {
             cacheItem = {
                 value: undefined,
@@ -92,9 +91,9 @@ var Cache = (function () {
         //need to fetch a new value, so start refetching new
         cacheItem.currentFetch = fetchFunction();
         //ASYNC:  after the fetch completes, update our cacheItem
-        cacheItem.currentFetch.then(function (newValue) {
-            var now = moment();
-            _this._storage[key] = cacheItem; //in case gc deleted it
+        cacheItem.currentFetch.then((newValue) => {
+            let now = moment();
+            this._storage[key] = cacheItem; //in case gc deleted it
             cacheItem.value = newValue;
             cacheItem.expires = now.clone().add(fetchExpiresDuration);
             cacheItem.gcAfter = cacheItem.expires.clone().add(fetchExpiresDuration.asSeconds() * _options.gcAfterMultipler, "seconds");
@@ -115,25 +114,25 @@ var Cache = (function () {
         }
         //ok with the stale value
         return Promise.resolve(_returnOrClone(cacheItem.value));
-    };
+    }
     /**
      *  force update/insert the cache.   to delete, set newCacheItem to null
      * @param key
      * @param newCacheItem
      */
-    Cache.prototype.write = function (key, newCacheItem) {
+    write(key, newCacheItem) {
         if (newCacheItem == null) {
             delete this._storage[key];
         }
         else {
             this._storage[key] = newCacheItem;
         }
-    };
+    }
     /**
      *  lazy "garbage collector", every .get() call we will walk one item in our cache to see if it's expired.   if so, we remove it.
      * @param now
      */
-    Cache.prototype._tryGCOne = function (now) {
+    _tryGCOne(now) {
         if (this._cleanupNextPosition >= this._cleanupKeys.length) {
             this._cleanupKeys = Object.keys(this._storage);
             this._cleanupNextPosition = 0;
@@ -142,9 +141,9 @@ var Cache = (function () {
             //nothing to try cleaning up
             return;
         }
-        var key = this._cleanupKeys[this._cleanupNextPosition];
+        let key = this._cleanupKeys[this._cleanupNextPosition];
         this._cleanupNextPosition++;
-        var tryCleanup = this._storage[key];
+        let tryCleanup = this._storage[key];
         if (tryCleanup == null) {
             delete this._storage[key];
             return;
@@ -156,9 +155,8 @@ var Cache = (function () {
         //no early exit clauses triggered, so cleanup
         delete this._storage[key];
         return;
-    };
-    return Cache;
-}());
+    }
+}
 exports.Cache = Cache;
 /**
  *  default cache

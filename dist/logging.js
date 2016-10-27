@@ -1,29 +1,19 @@
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var ex = require("./exception");
-var environment = require("./environment");
-var stringHelper = require("./stringhelper");
-var serialization = require("./serialization");
-var reflection = require("./reflection");
+const ex = require("./exception");
+const environment = require("./environment");
+const stringHelper = require("./stringhelper");
+const serialization = require("./serialization");
+const reflection = require("./reflection");
 //import Stream = require("stream");
 //import PrettyStream = require("bunyan-prettystream");
-var _ = require("lodash");
+const _ = require("lodash");
 //import * as __ from "./lolo";
-var moment = require("moment");
-var assert = require("assert");
-var jsHelper = require("./jshelper");
+const moment = require("moment");
+const assert = require("assert");
+const jsHelper = require("./jshelper");
 var Exception = ex.Exception;
-var LoggerFatalException = (function (_super) {
-    __extends(LoggerFatalException, _super);
-    function LoggerFatalException() {
-        _super.apply(this, arguments);
-    }
-    return LoggerFatalException;
-}(Exception));
+class LoggerFatalException extends Exception {
+}
 //export class NewLogger {
 //    constructor(public name: string,
 //        public logLevel?: environment.LogLevel   //= environment.logLevel
@@ -37,7 +27,7 @@ var LoggerFatalException = (function (_super) {
 //    }
 //}
 /** coloring for node console */
-var Chalk = require("chalk");
+const Chalk = require("chalk");
 /**
  * helper to convert ansi color codes to string representations.    conversions taken from https://en.wikipedia.org/wiki/ANSI_escape_code#graphics
  * @param input
@@ -56,7 +46,7 @@ function colorCodeToString(input, currentColor) {
         input = input.substring(0, input.length - 1);
     }
     var sections = input.split(";");
-    for (var i = 0; i < sections.length; i++) {
+    for (let i = 0; i < sections.length; i++) {
         var num = parseInt(sections[i]);
         //color names from http://www.w3schools.com/cssref/css_colornames.asp
         switch (num) {
@@ -191,18 +181,16 @@ function colorCodeToString(input, currentColor) {
     return result;
 }
 /** console logger logs to screen as simple text.*/
-var Logger = (function () {
+class Logger {
     //INTERNAL NOTE:  This is a replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) 
     //works well, but it would be better with a pluggable global listener, to log to various other locations (email)
-    function Logger(
+    constructor(
         /** IMPORTANT: almost always, you should pass ```__filename``` as the name.    \n\n Effective naming is important. it is used as a Key to selectively enable/disable/adjust the log levels via the logging.Logger.adjustLogLevels() static method */
         name, 
         /** (optional) the verbosity of this log object.   defaults to the environment.logLevel */
-        logLevel, 
+        logLevel = environment.logLevel, 
         /** (optional) additional options */
-        options) {
-        if (logLevel === void 0) { logLevel = environment.logLevel; }
-        if (options === void 0) { options = {}; }
+        options = {}) {
         this.name = name;
         this.logLevel = logLevel;
         if (options.doNotTrimName !== true) {
@@ -210,10 +198,10 @@ var Logger = (function () {
         }
     }
     /** converts objects to strings, leaves primitive types intact */
-    Logger.prototype._normalizeArgs = function (args) {
+    _normalizeArgs(args) {
         //generate log string
         var finalArgs = [];
-        _.forEach(args, function (arg) {
+        _.forEach(args, (arg) => {
             var typeName = reflection.getTypeName(arg);
             var type = reflection.getType(arg);
             switch (type) {
@@ -242,15 +230,15 @@ var Logger = (function () {
             }
         });
         return finalArgs;
-    };
-    Logger.prototype._log = function (targetLogLevel, args) {
+    }
+    _log(targetLogLevel, args) {
         if (targetLogLevel < this.logLevel) {
             return;
         }
         return this._doLog.apply(this, arguments);
-    };
-    Logger.prototype._doLog = function (targetLogLevel, args) {
-        var finalArgs;
+    }
+    _doLog(targetLogLevel, args) {
+        let finalArgs;
         switch (environment.platformType) {
             case environment.PlatformType.Browser:
                 finalArgs = args;
@@ -341,52 +329,32 @@ var Logger = (function () {
                 break;
         }
         return finalArgs;
-    };
+    }
     /**
      *  highest verbosity
      * @param args
      */
-    Logger.prototype.trace = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
+    trace(...args) {
         this._log(environment.LogLevel.TRACE, args);
-    };
-    Logger.prototype.debug = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
+    }
+    debug(...args) {
         this._log(environment.LogLevel.DEBUG, args);
-    };
-    Logger.prototype.info = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
+    }
+    info(...args) {
         this._log(environment.LogLevel.INFO, args);
-    };
-    Logger.prototype.warn = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
+    }
+    warn(...args) {
         this._log(environment.LogLevel.WARN, args);
-    };
+    }
     /**
      *  log as an error, and returns an exception you can throw.
     ex:  throw log.error("something bad");
      * @param args
      */
-    Logger.prototype.error = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
-        var finalArgs = this._log(environment.LogLevel.ERROR, args);
+    error(...args) {
+        let finalArgs = this._log(environment.LogLevel.ERROR, args);
         if (finalArgs != null) {
-            var message = void 0;
+            let message;
             if (finalArgs.length > 2) {
                 message = finalArgs[3];
             }
@@ -398,29 +366,21 @@ var Logger = (function () {
         else {
             return new ex.Exception("Error", undefined, 1);
         }
-    };
-    Logger.prototype.fatal = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
+    }
+    fatal(...args) {
         args.unshift(false);
         this.assert.apply(this, args);
         args.shift();
         throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args), undefined, 1);
-    };
-    Logger.prototype.assert = function (testCondition) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
+    }
+    assert(testCondition, ...args) {
         if (testCondition === true) {
             return;
         }
         if (testCondition !== false) {
             throw new ex.CorelibException("first parameter to assert must evaluate to true or false");
         }
-        var finalArgs;
+        let finalArgs;
         switch (environment.platformType) {
             case environment.PlatformType.Browser:
                 finalArgs = args;
@@ -451,32 +411,26 @@ var Logger = (function () {
                 console.assert.apply(console, finalArgs);
                 break;
         }
-    };
+    }
     /** use to mark code that needs to be finished before it can be run.   asserts when hit. */
-    Logger.prototype.todo = function (format) {
-        if (format === void 0) { format = "TODO: not implemented"; }
-        var params = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            params[_i - 1] = arguments[_i];
-        }
+    todo(format = "TODO: not implemented", ...params) {
         var msg = "TODO: " + jsHelper.apply(stringHelper.format, null, params, [format]); //.apply(null,format, params);
         this.assert(false, msg);
-    };
-    Logger.prototype.deprecated = function (message) {
-        this.warn("log.deprecated(" + message + ")");
+    }
+    deprecated(message) {
+        this.warn(`log.deprecated(${message})`);
         //this.assert(false, "implement deprecated");
-    };
+    }
     /** note to redo this before shipping (any time not in envLevel===PROD mode).   when in prod mode, an error is thrown */
-    Logger.prototype.refactor = function (message) {
+    refactor(message) {
         if (environment.envLevel === environment.EnvLevel.PROD) {
-            throw this.error("log.refactor(" + message + ")");
+            throw this.error(`log.refactor(${message})`);
         }
         else {
-            this.warn("log.refactor(" + message + ")");
+            this.warn(`log.refactor(${message})`);
         }
-    };
-    return Logger;
-}());
+    }
+}
 exports.Logger = Logger;
 //class TestError extends Error {
 //	constructor(message: string) {
