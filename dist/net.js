@@ -20,7 +20,7 @@ class EzEndpointFunction {
         NOTE:   error's of statusCode 545 are request timeouts
         DEFAULT:  by default we will retry error 500 and above. */
         preRetryErrorIntercept = (err) => {
-            if (err.status <= 499) {
+            if (err.response.status <= 499) {
                 //console.assert(false, "err");					
                 return Promise.reject(err);
             }
@@ -60,11 +60,11 @@ class EzEndpointFunction {
                 }, (err) => {
                     log.debug("EzEndpointFunction .post() got err");
                     //log.info(err);
-                    if (err.status === 0 && err.statusText === "" && err.data === "") {
+                    if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "") {
                         //log.debug("EzEndpointFunction axios.post timeout.", { endpoint });
-                        err.status = 524;
-                        err.statusText = "A Timeout Occurred";
-                        err.data = "Axios->EzEndpointFunction timeout.";
+                        err.response.status = 524;
+                        err.response.statusText = "A Timeout Occurred";
+                        err.response.data = "Axios->EzEndpointFunction timeout.";
                     }
                     if (this.preRetryErrorIntercept != null) {
                         let interceptedErrorResult = this.preRetryErrorIntercept(err);
@@ -122,11 +122,11 @@ class EzEndpointFunction {
                 return Promise.resolve(result);
             }, (err) => {
                 //log.info(err);
-                if (err.status === 0 && err.statusText === "" && err.data === "") {
+                if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "") {
                     //log.debug("EzEndpointFunction axios.get timeout.", { endpoint });
-                    err.status = 524;
-                    err.statusText = "A Timeout Occurred";
-                    err.data = "Axios->EzEndpointFunction timeout.";
+                    err.response.status = 524;
+                    err.response.statusText = "A Timeout Occurred";
+                    err.response.data = "Axios->EzEndpointFunction timeout.";
                 }
                 if (this.preRetryErrorIntercept != null) {
                     let interceptedErrorResult = this.preRetryErrorIntercept(err);

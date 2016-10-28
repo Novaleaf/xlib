@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{4D5B35D3-784F-40FF-A79A-B529EEFC9296}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="src\arrayhelper.ts" />
+    <TypeScriptCompile Include="src\cache.ts" />
+    <TypeScriptCompile Include="src\classbase.ts" />
+    <TypeScriptCompile Include="src\collections.ts" />
+    <TypeScriptCompile Include="src\compression.ts" />
+    <TypeScriptCompile Include="src\datetime.ts" />
+    <TypeScriptCompile Include="src\definitions\stripe-d.ts" />
+    <TypeScriptCompile Include="src\definitions\_index.ts" />
+    <TypeScriptCompile Include="src\design-patterns\atomic-cache.ts" />
+    <TypeScriptCompile Include="src\design-patterns\_index.ts" />
+    <TypeScriptCompile Include="src\environment.ts" />
+    <TypeScriptCompile Include="src\exception.ts" />
+    <TypeScriptCompile Include="src\internal\base64url.ts" />
+    <TypeScriptCompile Include="src\internal\bluebird-retry.ts" />
+    <TypeScriptCompile Include="src\internal\browserhelper.ts" />
+    <TypeScriptCompile Include="src\internal\definitions\axios-d.ts" />
+    <TypeScriptCompile Include="src\internal\mockmocha.ts" />
+    <TypeScriptCompile Include="src\internal\nodehelper.ts" />
+    <TypeScriptCompile Include="src\jshelper.ts" />
+    <TypeScriptCompile Include="src\jsshims.ts" />
+    <TypeScriptCompile Include="src\logging.ts" />
+    <TypeScriptCompile Include="src\lolo.ts" />
+    <TypeScriptCompile Include="src\net.ts" />
+    <TypeScriptCompile Include="src\numhelper.ts" />
+    <TypeScriptCompile Include="src\promise.ts" />
+    <TypeScriptCompile Include="src\reflection.ts" />
+    <TypeScriptCompile Include="src\security.ts" />
+    <TypeScriptCompile Include="src\serialization.ts" />
+    <TypeScriptCompile Include="src\stringhelper.ts" />
+    <TypeScriptCompile Include="src\threading.ts" />
+    <TypeScriptCompile Include="src\validation.ts" />
+    <TypeScriptCompile Include="src\_index.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="tsconfig.json" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>xlib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets')" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>1505</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:1505/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+</Project>
