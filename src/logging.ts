@@ -314,25 +314,60 @@ export class Logger {
                 throw new LoggerFatalException("unknown targetLogLevel");
             //break;
         }
-        finalArgs.unshift(logLevelColor(environment.LogLevel[targetLogLevel]));
-        finalArgs.unshift(Chalk.cyan(this.name));
-        finalArgs.unshift(Chalk.gray(moment().toISOString()));
-
+        //format
+        switch (environment.platformType) {
+            // *****************************************************************
+            // *****************************************************************
+            // *****************************************************************
+            // ****************   TODO: pretty coloring for chrome, as started below.
+            //case environment.PlatformType.Browser:
+            //    {
+            //        //format for chrome color output:   https://developers.google.com/web/tools/chrome-devtools/console/console-write
+            //        finalArgs.unshift(`%c${environment.LogLevel[targetLogLevel]}`);
+            //        finalArgs.push("color: blue; font-size: x-large");
+            //        finalArgs.unshift(Chalk.cyan(this.name));
+            //        finalArgs.unshift(Chalk.gray(moment().toISOString()));
+            //    }
+            //    break;
+            default:
+                {
+                    //terminal output
+                    finalArgs.unshift(logLevelColor(environment.LogLevel[targetLogLevel]));
+                    finalArgs.unshift(Chalk.cyan(this.name));
+                    finalArgs.unshift(Chalk.gray(moment().toISOString()));
+                }
+                break;
+        }
         //on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
         switch (environment.platformType) {
             case environment.PlatformType.Browser:
+
+
                 switch (targetLogLevel) {
                     case environment.LogLevel.TRACE:
                         console.trace.apply(console, finalArgs);
                         break;
                     case environment.LogLevel.DEBUG:
-                        console.trace.apply(console, finalArgs);
+                        if (console.groupCollapsed != null) {
+                            console.groupCollapsed.apply(console, finalArgs);//("...trace...");
+                            console.trace("...trace...");
+                            console.groupEnd();
+                        } else {
+                            console.debug.apply(console, finalArgs);
+                        }
                         break;
                     case environment.LogLevel.INFO:
-                        console.trace.apply(console, finalArgs);
+                        //console.info.apply(console, finalArgs);
+                        if (console.groupCollapsed != null) {
+                            console.groupCollapsed.apply(console, finalArgs);//("...trace...");
+                            console.trace("...trace...");
+                            console.groupEnd();
+                        } else {
+                            console.info.apply(console, finalArgs);
+                        }
                         break;
                     case environment.LogLevel.WARN:
-                        console.error.apply(console, finalArgs);
+                        console.warn.apply(console, finalArgs);
                         break;
                     case environment.LogLevel.ERROR:
                         console.error.apply(console, finalArgs);
