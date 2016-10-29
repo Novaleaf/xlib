@@ -14,6 +14,8 @@ export interface IPromise<R> extends IThenable<R> {
     catch<U>(onRejected?: (error: any) => U | IThenable<U>): IPromise<U>;
 }
 
+//export interface IP<TResult> extends PromiseLike<TResult> { }
+
 /**
  * HTTP Basic auth details
  */
