@@ -139,30 +139,40 @@ export interface AxiosXHRConfigDefaults<T> extends AxiosXHRConfigBase<T> {
  * <U> - request body data type
  */
 export interface AxiosXHR<T> {
-    /**
-     * Response that was provided by the server
-     */
-    data: T;
+		/** payload that came with the response */
+		data: T;
 
-    /**
-     * HTTP status code from the server response
-     */
-    status: number;
+        /**
+         * HTTP status code from the server response
+         */
+		status: number;
 
-    /**
-     * HTTP status message from the server response
-     */
-    statusText: string;
+        /**
+         * HTTP status message from the server response
+         */
+		statusText: string;
 
-    /**
-     * headers that the server responded with
-     */
-    headers: Object;
+        /**
+         * headers that the server responded with
+         */
+		headers: Object;
 
-    /**
-     * config that was provided to `axios` for the request
-     */
-    config: AxiosXHRConfig<T>;
+        /**
+         * config that was provided to `axios` for the request
+         */
+		config: AxiosXHRConfig<T>;
+	
+}
+
+/** the response from an error */
+export interface AxiosErrorResponse<T> extends Error {
+
+	/**
+	 * config that was provided to `axios` for the request
+	 */
+	config: AxiosXHRConfig<T>;
+
+	response: AxiosXHR<T>;
 }
 
 export interface Interceptor {

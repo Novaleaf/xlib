@@ -141,7 +141,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
     * note once we find an an object is stringifiable (no circular references), maxSearchDepth is ignored for that object and it's children.
     * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.*/
     inspectJSONify(value, maxSearchDepth = 2, hideType = false, showVerboseDetails = false, disableCircularDetection = false, replacer, verboseObjectsOut = []) {
-        var _superStringifyTokenId = "$$___corelib.serialization.superStringify.tokenId";
+        var _superStringifyTokenId = "___JSONX.inspectJSONify.depthTrackingToken_ignoreThis_";
         /** tracks objects that are flagged as circular references (we remove our tracking tag at the end) */
         var _processedNodes = [];
         /** recurses through a node's key/value pairs (all properties) */
@@ -172,211 +172,245 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
             if (typeName === "Object") {
                 typeName = "[*POJO*]";
             }
-            try {
-                switch (type) {
-                    case TYPE.boolean:
-                    case TYPE.number:
-                    case TYPE.string:
-                        return node;
-                    case TYPE.Date:
-                        var date = node;
-                        var dateDetails = {
-                            "[*TYPE*]": typeName,
-                            //epochMs: date.getTime(),
-                            value: date.toISOString()
-                        };
-                        if (hideType) {
-                            delete dateDetails["[*TYPE*]"];
-                        }
-                        if (!showVerboseDetails) {
-                            return dateDetails.value; // delete dateDetails.epochMs;
-                        }
-                        return dateDetails;
-                    case TYPE.function:
-                        try {
-                            verboseObjectsOut.push(node);
-                            var full;
-                            if (node.toString == null) {
-                                full = "ERROR_node_no_toString_method";
-                            }
-                            else {
-                                full = node.toString();
-                            }
-                            var fcnName = full.substring(full.indexOf(" "), full.indexOf("("));
-                            var fcnParams = full.substring(full.indexOf("("), full.indexOf("{") - 1);
-                            var fcnDetails = { "[*TYPE*]": typeName, signature: fcnName + fcnParams, full: full };
+            /**
+             *  do the real processing work, bu abstracted as a helper so we can reprocess any missing nodes (see logic under the call to this)
+             */
+            function __processNode() {
+                try {
+                    switch (type) {
+                        case TYPE.boolean:
+                        case TYPE.number:
+                        case TYPE.string:
+                            return node;
+                        case TYPE.Date:
+                            var date = node;
+                            var dateDetails = {
+                                "[*TYPE*]": typeName,
+                                //epochMs: date.getTime(),
+                                value: date.toISOString()
+                            };
                             if (hideType) {
-                                delete fcnDetails["[*TYPE*]"];
+                                delete dateDetails["[*TYPE*]"];
                             }
                             if (!showVerboseDetails) {
-                                delete fcnDetails.full;
+                                return dateDetails.value; // delete dateDetails.epochMs;
                             }
-                            return fcnDetails;
-                        }
-                        catch (ex) {
-                            return { "[*TYPE*]": typeName, value: "function-unknown" };
-                        }
-                    case TYPE.Error:
-                        verboseObjectsOut.push(node);
-                        var errDetails = { "[*TYPE*]": typeName, name: node.name, message: node.message, stack: node.stack == null ? null : node.stack.split("\n") };
-                        if (hideType) {
-                            delete errDetails["[*TYPE*]"];
-                        }
-                        if (!showVerboseDetails) {
-                            delete errDetails.stack;
-                        }
-                        return errDetails;
-                    case TYPE.null:
-                        return null; // "[*NULL*]";
-                    case TYPE.undefined:
-                        return "[*UNDEFINED*]";
-                    case TYPE.RegExp:
-                    //var regexp = (node as RegExp);
-                    //var regexpDetails = { "[*TYPE*]": typeName, source: regexp.source, details: regexp.g };
-                    //if (hideType) {
-                    //    delete regexpDetails["[*TYPE*]"];
-                    //}
-                    //if (!showVerboseDetails) {
-                    //    delete regexpDetails.source;
-                    //}
-                    //return regexpDetails;
-                    case TYPE.Array:
-                    case TYPE.object:
-                        switch (typeName) {
-                            case "Promise":
-                                var promise = node;
-                                if (promise["toJSON"] != null) {
-                                    var promiseDetails = promise.toJSON();
-                                    promiseDetails["[*TYPE*]"] = typeName;
-                                    return promiseDetails;
-                                }
-                                if (promise.toString == null) {
-                                    return { "[*TYPE*]": typeName, value: "ERROR_promise_no_toString_method" };
+                            return dateDetails;
+                        case TYPE.function:
+                            try {
+                                verboseObjectsOut.push(node);
+                                var full;
+                                if (node.toString == null) {
+                                    full = "ERROR_node_no_toString_method";
                                 }
                                 else {
-                                    return { "[*TYPE*]": typeName, value: promise.toString() };
+                                    full = node.toString();
                                 }
-                            case "Buffer":
-                                try {
-                                    var buffer = node;
-                                    let strOutput;
-                                    if (buffer.toString == null) {
-                                        strOutput = "ERROR_buffer2_no_toString_method";
+                                var fcnName = full.substring(full.indexOf(" "), full.indexOf("("));
+                                var fcnParams = full.substring(full.indexOf("("), full.indexOf("{") - 1);
+                                var fcnDetails = { "[*TYPE*]": typeName, signature: fcnName + fcnParams, full: full };
+                                if (hideType) {
+                                    delete fcnDetails["[*TYPE*]"];
+                                }
+                                if (!showVerboseDetails) {
+                                    delete fcnDetails.full;
+                                }
+                                return fcnDetails;
+                            }
+                            catch (ex) {
+                                return { "[*TYPE*]": typeName, value: "function-unknown" };
+                            }
+                        case TYPE.Error:
+                            verboseObjectsOut.push(node);
+                            var errDetails = { "[*TYPE*]": typeName, name: node.name, message: node.message, stack: node.stack == null ? null : node.stack.split("\n") };
+                            if (hideType) {
+                                delete errDetails["[*TYPE*]"];
+                            }
+                            if (!showVerboseDetails) {
+                                delete errDetails.stack;
+                            }
+                            return errDetails;
+                        case TYPE.null:
+                            return null; // "[*NULL*]";
+                        case TYPE.undefined:
+                            return "[*UNDEFINED*]";
+                        case TYPE.RegExp:
+                        //var regexp = (node as RegExp);
+                        //var regexpDetails = { "[*TYPE*]": typeName, source: regexp.source, details: regexp.g };
+                        //if (hideType) {
+                        //    delete regexpDetails["[*TYPE*]"];
+                        //}
+                        //if (!showVerboseDetails) {
+                        //    delete regexpDetails.source;
+                        //}
+                        //return regexpDetails;
+                        case TYPE.Array:
+                        case TYPE.object:
+                            switch (typeName) {
+                                case "Promise":
+                                    var promise = node;
+                                    if (promise["toJSON"] != null) {
+                                        var promiseDetails = promise.toJSON();
+                                        promiseDetails["[*TYPE*]"] = typeName;
+                                        return promiseDetails;
+                                    }
+                                    if (promise.toString == null) {
+                                        return { "[*TYPE*]": typeName, value: "ERROR_promise_no_toString_method" };
                                     }
                                     else {
-                                        strOutput = buffer.toString();
+                                        return { "[*TYPE*]": typeName, value: promise.toString() };
                                     }
-                                    var bufferDetails = { "[*TYPE*]": typeName, value: stringHelper.summarize(strOutput, 200), length: buffer.length };
+                                case "Buffer":
+                                    try {
+                                        var buffer = node;
+                                        let strOutput;
+                                        if (buffer.toString == null) {
+                                            strOutput = "ERROR_buffer2_no_toString_method";
+                                        }
+                                        else {
+                                            strOutput = buffer.toString();
+                                        }
+                                        var bufferDetails = { "[*TYPE*]": typeName, value: stringHelper.summarize(strOutput, 200), length: buffer.length };
+                                        if (hideType) {
+                                            delete bufferDetails["[*TYPE*]"];
+                                        }
+                                        if (!showVerboseDetails) {
+                                        }
+                                        return bufferDetails;
+                                    }
+                                    catch (ex) {
+                                        return { "[*TYPE*]": typeName, value: "buffer-unknown" };
+                                    }
+                                case "Stream":
+                                case "ReadableStream":
+                                case "WriteableStream":
+                                    var streamDetails = { "[*TYPE*]": typeName, value: "[*STREAM*]" };
                                     if (hideType) {
-                                        delete bufferDetails["[*TYPE*]"];
+                                        delete streamDetails["[*TYPE*]"];
                                     }
                                     if (!showVerboseDetails) {
+                                        return streamDetails.value;
                                     }
-                                    return bufferDetails;
-                                }
-                                catch (ex) {
-                                    return { "[*TYPE*]": typeName, value: "buffer-unknown" };
-                                }
-                            case "Stream":
-                            case "ReadableStream":
-                            case "WriteableStream":
-                                var streamDetails = { "[*TYPE*]": typeName, value: "[*STREAM*]" };
-                                if (hideType) {
-                                    delete streamDetails["[*TYPE*]"];
-                                }
-                                if (!showVerboseDetails) {
-                                    return streamDetails.value;
-                                }
-                                return streamDetails;
-                            case "Moment":
-                                let momentValue = node;
-                                var momentDetails = { "[*TYPE*]": typeName, value: momentValue.toJSON() };
-                                if (hideType) {
-                                    delete momentDetails["[*TYPE*]"];
-                                }
-                                if (!showVerboseDetails) {
-                                    return momentValue.toISOString();
-                                }
-                                return momentDetails;
-                            case "IncommingMessage":
-                                try {
-                                    let req = node;
-                                    var msgDetails = { "[*TYPE*]": typeName, value: { headers: req.headers, method: req.method, statusCode: req.statusCode, httpVersion: req.httpVersion, statusMessage: req.statusMessage, url: req.url } };
+                                    return streamDetails;
+                                case "Moment":
+                                    let momentValue = node;
+                                    var momentDetails = { "[*TYPE*]": typeName, value: momentValue.toJSON() };
                                     if (hideType) {
-                                        delete msgDetails["[*TYPE*]"];
+                                        delete momentDetails["[*TYPE*]"];
                                     }
                                     if (!showVerboseDetails) {
-                                        return msgDetails.value;
+                                        return momentValue.toISOString();
                                     }
-                                    return msgDetails;
-                                }
-                                catch (ex) {
-                                    //failure parsing as node http.IncommingMessage.  try as normal instead.
+                                    return momentDetails;
+                                case "IncommingMessage":
+                                    try {
+                                        let req = node;
+                                        var msgDetails = { "[*TYPE*]": typeName, value: { headers: req.headers, method: req.method, statusCode: req.statusCode, httpVersion: req.httpVersion, statusMessage: req.statusMessage, url: req.url } };
+                                        if (hideType) {
+                                            delete msgDetails["[*TYPE*]"];
+                                        }
+                                        if (!showVerboseDetails) {
+                                            return msgDetails.value;
+                                        }
+                                        return msgDetails;
+                                    }
+                                    catch (ex) {
+                                        //failure parsing as node http.IncommingMessage.  try as normal instead.
+                                        break;
+                                    }
+                                default:
+                                    //try to see if a .toJSON() method exists
+                                    if (typeof (node["toJSON"]) !== "undefined") {
+                                        var toJsonDetails = node.toJSON();
+                                        toJsonDetails["[*TYPE*]"] = typeName;
+                                        return toJsonDetails;
+                                    }
                                     break;
-                                }
-                            default:
-                                //try to see if a .toJSON() method exists
-                                if (typeof (node["toJSON"]) !== "undefined") {
-                                    var toJsonDetails = node.toJSON();
-                                    toJsonDetails["[*TYPE*]"] = typeName;
-                                    return toJsonDetails;
-                                }
-                                break;
-                        }
-                        try {
-                            if (!nodeDepthSearchDisabled) {
-                                //check to see if we can stringify (no circular dependencies)
-                                exports.JSONX.stringifyX(node, replacer);
                             }
-                            //able to stringify (no exception thrown), so lets ignore depth searching for our children (avoid stringifying to gain perf)
-                            return _nodePropertyRecurser(node, depth, typeName, true);
-                        }
-                        catch (ex) {
-                            //couldn't stringify
-                            if (depth >= maxSearchDepth) {
-                                return "[*MAX_DEPTH*]";
-                            }
-                            //can't stringify it, so...
-                            if (ex.message.toLowerCase().indexOf("circular") < 0 && ex.message.toLowerCase().indexOf("typeerror") < 0) {
-                                //exception isn't due to circular or typeErrors, so let's just stop
-                                if (ex.toString == null) {
-                                    return "[*ERROR_ex_no_toString=" + ex + "*]";
+                            try {
+                                if (!nodeDepthSearchDisabled) {
+                                    //check to see if we can stringify (no circular dependencies)
+                                    exports.JSONX.stringifyX(node, replacer);
                                 }
-                                return "[*ERROR_" + ex.toString() + "*]";
+                                //able to stringify (no exception thrown), so lets ignore depth searching for our children (avoid stringifying to gain perf)
+                                return _nodePropertyRecurser(node, depth, typeName, true);
                             }
-                            if (!disableCircularDetection) {
-                                //circular, lets try to recursively work through this
-                                if (node[_superStringifyTokenId] !== undefined) {
-                                    //circular found, so stop
-                                    return "[*CIRCULAR_REFERENCE*]";
+                            catch (ex) {
+                                //couldn't stringify
+                                if (depth >= maxSearchDepth) {
+                                    return "[*MAX_DEPTH*]";
                                 }
-                                //mark this as processed
-                                node[_superStringifyTokenId] = null;
-                                _processedNodes.push(node);
+                                //can't stringify it, so...
+                                if (ex.message.toLowerCase().indexOf("circular") < 0 && ex.message.toLowerCase().indexOf("typeerror") < 0) {
+                                    //exception isn't due to circular or typeErrors, so let's just stop
+                                    if (ex.toString == null) {
+                                        return "[*ERROR_ex_no_toString=" + ex + "*]";
+                                    }
+                                    return "[*ERROR_" + ex.toString() + "*]";
+                                }
+                                if (!disableCircularDetection) {
+                                    //circular, lets try to recursively work through this
+                                    if (node[_superStringifyTokenId] !== undefined) {
+                                        //circular found, so stop
+                                        return "[*CIRCULAR_REFERENCE*]";
+                                    }
+                                    //mark this as processed
+                                    node[_superStringifyTokenId] = null;
+                                    _processedNodes.push(node);
+                                }
+                                return _nodePropertyRecurser(node, depth, typeName);
                             }
-                            return _nodePropertyRecurser(node, depth, typeName);
-                        }
-                    default:
-                        var unknownDetails;
-                        if (node.toString == null) {
-                            unknownDetails = { "[*TYPE*]": typeName, status: "inspectJSONify does not know how to parse this", value: "some-node_no_toString" };
-                        }
-                        else {
-                            unknownDetails = { "[*TYPE*]": typeName, status: "inspectJSONify does not know how to parse this", value: node.toString() };
-                        }
-                        if (hideType) {
-                            delete unknownDetails["[*TYPE*]"];
-                        }
-                        if (!showVerboseDetails) {
-                            return "[*???*] " + unknownDetails.value;
-                        }
-                        return unknownDetails;
+                        default:
+                            var unknownDetails;
+                            if (node.toString == null) {
+                                unknownDetails = { "[*TYPE*]": typeName, status: "inspectJSONify does not know how to parse this", value: "some-node_no_toString" };
+                            }
+                            else {
+                                unknownDetails = { "[*TYPE*]": typeName, status: "inspectJSONify does not know how to parse this", value: node.toString() };
+                            }
+                            if (hideType) {
+                                delete unknownDetails["[*TYPE*]"];
+                            }
+                            if (!showVerboseDetails) {
+                                return "[*???*] " + unknownDetails.value;
+                            }
+                            return unknownDetails;
+                    }
+                }
+                catch (ex) {
+                    //logger.assert(ex);
+                    return "error:  {0}" + String(ex);
                 }
             }
-            catch (ex) {
-                //logger.assert(ex);
-                return "error:  {0}" + String(ex);
+            let toReturn = __processNode();
+            if (_.isObject(toReturn)) {
+                //also process any other nodes that may have been missed, for example if we have a custom Parser for Error objects, but the user injects other custom properties onto it too
+                if (_.isString(toReturn)) {
+                    throw new Error("error, string being returned and our reprocess logic didn't recognize it");
+                }
+                try {
+                    let otherParams = {};
+                    _.forEach(node, (value, key) => {
+                        try {
+                            if (toReturn[key] != null) {
+                                //key already set, so skip
+                                return;
+                            }
+                            otherParams[key] = _JSONifyWorker(value, depth + 1, nodeDepthSearchDisabled);
+                        }
+                        catch (ex) {
+                            otherParams[key] = `[*ERROR*] can not Jsonify: ${ex.toString()}`;
+                        }
+                        //as we were able to convert to a JSON POJO, remove our recursive tracking token
+                        delete otherParams[key][_superStringifyTokenId];
+                    });
+                    //delete otherParams[_superStringifyTokenId];
+                    //combine the missing nodes back to the return value
+                    _.defaults(toReturn, otherParams);
+                }
+                catch (ex) { }
             }
+            return toReturn;
         }
         try {
             var normalizedResult = _JSONifyWorker(value, 0);

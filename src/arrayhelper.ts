@@ -16,10 +16,10 @@ export function removeFirst(array: any[], toRemove: any) :boolean {
 	var index = array.indexOf(toRemove);
 	if (index < 0) {
 		//throw new ex.CorelibException("not found to remove");
-        return false;
+		return false;
 	}
-    array.splice(index, 1);
-    return true;
+	array.splice(index, 1);
+	return true;
 }
 
 /** if exist, remove first occurance,  returns true if successful. */

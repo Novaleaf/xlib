@@ -1,3 +1,4 @@
+/// <reference types="node" />
 export interface IThenable<R> {
     then<U>(onFulfilled?: (value: R) => U | IThenable<U>, onRejected?: (error: any) => U | IThenable<U>): IThenable<U>;
     then<U>(onFulfilled?: (value: R) => U | IThenable<U>, onRejected?: (error: any) => void): IThenable<U>;
@@ -123,9 +124,7 @@ export interface AxiosXHRConfigDefaults<T> extends AxiosXHRConfigBase<T> {
  * <U> - request body data type
  */
 export interface AxiosXHR<T> {
-    /**
-     * Response that was provided by the server
-     */
+    /** payload that came with the response */
     data: T;
     /**
      * HTTP status code from the server response
@@ -143,6 +142,14 @@ export interface AxiosXHR<T> {
      * config that was provided to `axios` for the request
      */
     config: AxiosXHRConfig<T>;
+}
+/** the response from an error */
+export interface AxiosErrorResponse<T> extends Error {
+    /**
+     * config that was provided to `axios` for the request
+     */
+    config: AxiosXHRConfig<T>;
+    response: AxiosXHR<T>;
 }
 export interface Interceptor {
     /**
