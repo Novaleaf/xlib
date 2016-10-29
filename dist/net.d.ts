@@ -1,13 +1,20 @@
 /** the axios httpClient library:  https://github.com/mzabriskie/axios */
 /** definition of axios */
 export import _axiosDTs = require("./internal/definitions/axios-d");
+/**
+ * a low-level, but promise based http(s) library.
+ *
+ * **IMPORTANT**: recomend you DO NOT use this directly, as it does not provide retry logic.
+ * instead, use the ``EzEndpoint`` we offer instead
+ */
 export declare let axios: _axiosDTs.AxiosStatic;
 import * as promise from "./promise";
 import Promise = promise.bluebird;
 /**
 *  a helper for constructing reusable endpoint functions
+* includes retry logic and exponential backoff.
 */
-export declare class EzEndpointFunction<TSubmitPayload, TRecievePayload> {
+export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
     origin: string;
     path: string;
     /** default is to retry for up to 10 seconds, (no retries after 10 seconds) */

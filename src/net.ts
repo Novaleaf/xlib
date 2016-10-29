@@ -10,6 +10,13 @@
 
 /** definition of axios */
 export import _axiosDTs = require("./internal/definitions/axios-d");
+
+/**
+ * a low-level, but promise based http(s) library.
+ *
+ * **IMPORTANT**: recomend you DO NOT use this directly, as it does not provide retry logic.
+ * instead, use the ``EzEndpoint`` we offer instead
+ */
 export let axios: _axiosDTs.AxiosStatic = require("axios");
 
 
@@ -171,8 +178,9 @@ import * as stringHelper from "./stringhelper";
 //}
 /**
 *  a helper for constructing reusable endpoint functions
+* includes retry logic and exponential backoff.
 */
-export class EzEndpointFunction<TSubmitPayload, TRecievePayload>{
+export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 
 	constructor(
 		public origin?: string,
@@ -187,7 +195,7 @@ export class EzEndpointFunction<TSubmitPayload, TRecievePayload>{
 		NOTE:   error's of statusCode 545 are request timeouts
 		DEFAULT:  by default we will retry error 500 and above. */
 		public preRetryErrorIntercept: (err: _axiosDTs.AxiosErrorResponse<TRecievePayload>) => Promise<void> = (err) => {
-			if (err.response.status <= 499) {
+			if (err.response!=null && err.response.status <= 499) {
 				//console.assert(false, "err");					
 				return Promise.reject(err);
 			} else {
@@ -234,11 +242,13 @@ export class EzEndpointFunction<TSubmitPayload, TRecievePayload>{
 					}, (err: _axiosDTs.AxiosErrorResponse<TRecievePayload>) => {
 						log.debug("EzEndpointFunction .post() got err");
 						//log.info(err);
-						if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "" as any) {
-							//log.debug("EzEndpointFunction axios.post timeout.", { endpoint });
-							err.response.status = 524;
-							err.response.statusText = "A Timeout Occurred";
-							err.response.data = "Axios->EzEndpointFunction timeout." as any;
+						if (err.response != null) {
+							if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "" as any) {
+								//log.debug("EzEndpointFunction axios.post timeout.", { endpoint });
+								err.response.status = 524;
+								err.response.statusText = "A Timeout Occurred";
+								err.response.data = "Axios->EzEndpointFunction timeout." as any;
+							}
 						}
 						if (this.preRetryErrorIntercept != null) {
 							let interceptedErrorResult = this.preRetryErrorIntercept(err);
@@ -302,11 +312,13 @@ export class EzEndpointFunction<TSubmitPayload, TRecievePayload>{
 					return Promise.resolve(result);
 				}, (err: _axiosDTs.AxiosErrorResponse<TRecievePayload>) => {
 					//log.info(err);
-					if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "" as any) {
-						//log.debug("EzEndpointFunction axios.get timeout.", { endpoint });
-						err.response.status = 524;
-						err.response.statusText = "A Timeout Occurred";
-						err.response.data = "Axios->EzEndpointFunction timeout." as any;
+					if (err.response != null) {
+						if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "" as any) {
+							//log.debug("EzEndpointFunction axios.get timeout.", { endpoint });
+							err.response.status = 524;
+							err.response.statusText = "A Timeout Occurred";
+							err.response.data = "Axios->EzEndpointFunction timeout." as any;
+						}
 					}
 					if (this.preRetryErrorIntercept != null) {
 						let interceptedErrorResult = this.preRetryErrorIntercept(err);
@@ -375,14 +387,14 @@ module _test {
 
 				const badUrl = "https://moo";
 
-				let test: any = it("basic e2e", () => {
+				let test: any = it("invlid url", () => {
 					return axios.post(badUrl, samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
 						.then((axiosResponse) => {
 							throw log.error("should have failed with invalid url", { badUrl, axiosResponse });
 						})
 						.catch((err: _axiosDTs.AxiosErrorResponse<any>) => {
 
-							log.info("got error as expected", { err });
+							//log.info("got error as expected", { err });
 
 							return Promise.resolve();
 
@@ -399,7 +411,7 @@ module _test {
 						})
 						.catch((err: _axiosDTs.AxiosErrorResponse<any>) => {
 
-							log.info("got error as expected", { err });
+							//log.info("got error as expected", { err });
 
 							return Promise.resolve();
 

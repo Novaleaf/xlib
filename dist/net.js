@@ -6,6 +6,12 @@
 //export { axios };
 /** definition of axios */
 exports._axiosDTs = require("./internal/definitions/axios-d");
+/**
+ * a low-level, but promise based http(s) library.
+ *
+ * **IMPORTANT**: recomend you DO NOT use this directly, as it does not provide retry logic.
+ * instead, use the ``EzEndpoint`` we offer instead
+ */
 exports.axios = require("axios");
 const promise = require("./promise");
 var Promise = promise.bluebird;
@@ -139,8 +145,9 @@ let log = new logging.Logger(__filename);
 //}
 /**
 *  a helper for constructing reusable endpoint functions
+* includes retry logic and exponential backoff.
 */
-class EzEndpointFunction {
+class EzEndpoint {
     constructor(origin, path, 
         /** default is to retry for up to 10 seconds, (no retries after 10 seconds) */
         retryOptions = { timeout: 60000, interval: 100, backoff: 2, max_interval: 5000 }, 
@@ -152,7 +159,7 @@ class EzEndpointFunction {
         NOTE:   error's of statusCode 545 are request timeouts
         DEFAULT:  by default we will retry error 500 and above. */
         preRetryErrorIntercept = (err) => {
-            if (err.response.status <= 499) {
+            if (err.response != null && err.response.status <= 499) {
                 //console.assert(false, "err");					
                 return Promise.reject(err);
             }
@@ -192,11 +199,13 @@ class EzEndpointFunction {
                 }, (err) => {
                     log.debug("EzEndpointFunction .post() got err");
                     //log.info(err);
-                    if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "") {
-                        //log.debug("EzEndpointFunction axios.post timeout.", { endpoint });
-                        err.response.status = 524;
-                        err.response.statusText = "A Timeout Occurred";
-                        err.response.data = "Axios->EzEndpointFunction timeout.";
+                    if (err.response != null) {
+                        if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "") {
+                            //log.debug("EzEndpointFunction axios.post timeout.", { endpoint });
+                            err.response.status = 524;
+                            err.response.statusText = "A Timeout Occurred";
+                            err.response.data = "Axios->EzEndpointFunction timeout.";
+                        }
                     }
                     if (this.preRetryErrorIntercept != null) {
                         let interceptedErrorResult = this.preRetryErrorIntercept(err);
@@ -254,11 +263,13 @@ class EzEndpointFunction {
                 return Promise.resolve(result);
             }, (err) => {
                 //log.info(err);
-                if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "") {
-                    //log.debug("EzEndpointFunction axios.get timeout.", { endpoint });
-                    err.response.status = 524;
-                    err.response.statusText = "A Timeout Occurred";
-                    err.response.data = "Axios->EzEndpointFunction timeout.";
+                if (err.response != null) {
+                    if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "") {
+                        //log.debug("EzEndpointFunction axios.get timeout.", { endpoint });
+                        err.response.status = 524;
+                        err.response.statusText = "A Timeout Occurred";
+                        err.response.data = "Axios->EzEndpointFunction timeout.";
+                    }
                 }
                 if (this.preRetryErrorIntercept != null) {
                     let interceptedErrorResult = this.preRetryErrorIntercept(err);
@@ -288,7 +299,7 @@ class EzEndpointFunction {
         });
     }
 }
-exports.EzEndpointFunction = EzEndpointFunction;
+exports.EzEndpoint = EzEndpoint;
 var _test;
 (function (_test) {
     describe(__filename, () => {
@@ -313,13 +324,13 @@ var _test;
             });
             describe("fail", () => {
                 const badUrl = "https://moo";
-                let test = it("basic e2e", () => {
+                let test = it("invlid url", () => {
                     return exports.axios.post(badUrl, samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
                         .then((axiosResponse) => {
                         throw log.error("should have failed with invalid url", { badUrl, axiosResponse });
                     })
                         .catch((err) => {
-                        log.info("got error as expected", { err });
+                        //log.info("got error as expected", { err });
                         return Promise.resolve();
                     });
                 });
@@ -331,7 +342,7 @@ var _test;
                         throw log.error("should have failed with 401 error", { badUrl, axiosResponse });
                     })
                         .catch((err) => {
-                        log.info("got error as expected", { err });
+                        //log.info("got error as expected", { err });
                         return Promise.resolve();
                     });
                 });

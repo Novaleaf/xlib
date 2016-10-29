@@ -1,4 +1,3 @@
-/// <reference types="node" />
 export interface IThenable<R> {
     then<U>(onFulfilled?: (value: R) => U | IThenable<U>, onRejected?: (error: any) => U | IThenable<U>): IThenable<U>;
     then<U>(onFulfilled?: (value: R) => U | IThenable<U>, onRejected?: (error: any) => void): IThenable<U>;
@@ -16,7 +15,7 @@ export interface AxiosHttpBasicAuth {
     password: string;
 }
 /**
- * Common axios XHR config interface
+ * Common axios XHR config interface.
  * <T> - request body data type
  */
 export interface AxiosXHRConfigBase<T> {
@@ -143,13 +142,30 @@ export interface AxiosXHR<T> {
      */
     config: AxiosXHRConfig<T>;
 }
-/** the response from an error */
-export interface AxiosErrorResponse<T> extends Error {
+/** the response from an error.  this inherits from the Error object */
+export interface AxiosErrorResponse<T> {
+    /** inherited from the Error object*/
+    name: "Error";
+    /**human readable error message, such as ```getaddrinfo ENOTFOUND moo moo:443``` or ```Request failed with status code 401``` */
+    message: string;
     /**
      * config that was provided to `axios` for the request
      */
     config: AxiosXHRConfig<T>;
-    response: AxiosXHR<T>;
+    /** The server response.  ```undefined``` if no response from server (such as invalid url or network timeout */
+    response?: AxiosXHR<T>;
+    /** example ```ENOTFOUND```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+    code?: string;
+    /** example ```ENOTFOUND```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+    errno?: string;
+    /** example ```getaddrinfo```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+    syscall?: string;
+    /** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+    hostname?: string;
+    /** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+    host?: string;
+    /** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+    port?: number;
 }
 export interface Interceptor {
     /**
