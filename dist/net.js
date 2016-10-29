@@ -208,21 +208,17 @@ class EzEndpoint {
                         }
                     }
                     if (this.preRetryErrorIntercept != null) {
-                        let interceptedErrorResult = this.preRetryErrorIntercept(err);
-                        if (interceptedErrorResult == null || interceptedErrorResult.isRejected == null) {
-                            throw log.error("EzEndpointFunction POST interceptResult() did not return a promise", { submitPayload, interceptedErrorResult });
-                        }
-                        if (interceptedErrorResult.isFulfilled() === false) {
-                            throw log.error("EzEndpointFunction POST interceptResult() promise is not fulfilled", { submitPayload, interceptedErrorResult });
-                        }
-                        if (interceptedErrorResult.isRejected()) {
+                        return this.preRetryErrorIntercept(err)
+                            .then(() => {
+                            //do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
+                            lastErrorResult = err;
+                            return Promise.reject(err);
+                        }, (rejectedErr) => {
                             //rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
                             let stopError = new promise.retry.StopError("preRetryIntercept abort");
-                            stopError["interceptResult"] = interceptedErrorResult;
+                            stopError["interceptResult"] = Promise.reject(rejectedErr);
                             return Promise.reject(stopError);
-                        }
-                        else {
-                        }
+                        });
                     }
                     lastErrorResult = err;
                     return Promise.reject(err);
@@ -247,6 +243,7 @@ class EzEndpoint {
     get(
         /**setting a key overrides the key put in ctor.requestOptions. */ customRequestOptions, customOrigin = this.origin, customPath = this.path) {
         log.debug("EzEndpointFunction .get() called");
+        let lastErrorResult = null;
         return promise.retry(() => {
             let endpoint = customOrigin + customPath;
             //log.debug("EzEndpointFunction axios.get", { endpoint });
@@ -272,21 +269,17 @@ class EzEndpoint {
                     }
                 }
                 if (this.preRetryErrorIntercept != null) {
-                    let interceptedErrorResult = this.preRetryErrorIntercept(err);
-                    if (interceptedErrorResult == null || interceptedErrorResult.isRejected == null) {
-                        throw log.error("EzEndpointFunction GET interceptResult() did not return a promise", { interceptedErrorResult });
-                    }
-                    if (interceptedErrorResult.isFulfilled() === false) {
-                        throw log.error("EzEndpointFunction GET interceptResult() promise is not fulfilled", { interceptedErrorResult });
-                    }
-                    if (interceptedErrorResult.isRejected()) {
+                    return this.preRetryErrorIntercept(err)
+                        .then(() => {
+                        //do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
+                        lastErrorResult = err;
+                        return Promise.reject(err);
+                    }, (rejectedErr) => {
                         //rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
                         let stopError = new promise.retry.StopError("preRetryIntercept abort");
-                        stopError["interceptResult"] = interceptedErrorResult;
+                        stopError["interceptResult"] = Promise.reject(rejectedErr);
                         return Promise.reject(stopError);
-                    }
-                    else {
-                    }
+                    });
                 }
                 return Promise.reject(err);
             });
@@ -307,7 +300,7 @@ var _test;
             const targetUrl = "https://phantomjscloud.com/examples/helpers/requestdata";
             const samplePostPayload1 = { hi: 1, bye: "two", inner: { three: 4 } };
             const sampleHeader1 = { head1: "val1" };
-            describe("success", () => {
+            describe("success cases", () => {
                 it("basic e2e", () => {
                     return exports.axios.post(targetUrl, samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
                         .then((axiosResponse) => {
@@ -322,7 +315,7 @@ var _test;
                     });
                 });
             });
-            describe("fail", () => {
+            describe("fail cases", () => {
                 const badUrl = "https://moo";
                 let test = it("invlid url", () => {
                     return exports.axios.post(badUrl, samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
@@ -342,7 +335,23 @@ var _test;
                         throw log.error("should have failed with 401 error", { badUrl, axiosResponse });
                     })
                         .catch((err) => {
-                        //log.info("got error as expected", { err });
+                        if (err.response == null) {
+                            throw log.error("response should be defined", { err });
+                        }
+                        log.assert(err.response.status === 401, "wrong status code.", { err });
+                        return Promise.resolve();
+                    });
+                });
+                it("status 500 response", () => {
+                    return exports.axios.post("https://phantomjscloud.com/examples/helpers/statusCode/500", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+                        .then((axiosResponse) => {
+                        throw log.error("should have failed with 500 error", { badUrl, axiosResponse });
+                    })
+                        .catch((err) => {
+                        if (err.response == null) {
+                            throw log.error("response should be defined", { err });
+                        }
+                        log.assert(err.response.status === 500, "wrong status code.", { err });
                         return Promise.resolve();
                     });
                 });

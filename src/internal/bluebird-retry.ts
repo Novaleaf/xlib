@@ -166,4 +166,5 @@ function backoff(interval: number, options: any) {
 
 //module.exports = retry;
 /** hack copy of the bluebird-retry js code base.   use through the xlib "promise" module instead of via here. */
-export default retry;// { retry as default };
+//export default retry;// { retry as default };
+export = retry;

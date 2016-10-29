@@ -148,6 +148,5 @@ function backoff(interval, options) {
     }
     return interval;
 }
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = retry;
+module.exports = retry;
 //# sourceMappingURL=bluebird-retry.js.map

@@ -251,21 +251,37 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 							}
 						}
 						if (this.preRetryErrorIntercept != null) {
-							let interceptedErrorResult = this.preRetryErrorIntercept(err);
-							if (interceptedErrorResult == null || interceptedErrorResult.isRejected == null) {
-								throw log.error("EzEndpointFunction POST interceptResult() did not return a promise", { submitPayload, interceptedErrorResult });
-							}
-							if (interceptedErrorResult.isFulfilled() === false) {
-								throw log.error("EzEndpointFunction POST interceptResult() promise is not fulfilled", { submitPayload, interceptedErrorResult });
-							}
-							if (interceptedErrorResult.isRejected()) {
-								//rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
-								let stopError = new promise.retry.StopError("preRetryIntercept abort");
-								(stopError as any)["interceptResult"] = interceptedErrorResult;
-								return Promise.reject(stopError);
-							} else {
-								//do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
-							}
+
+							return this.preRetryErrorIntercept(err)
+								.then(() => {
+									//do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
+									lastErrorResult = err;
+									return Promise.reject(err);
+
+								}, (rejectedErr) => {
+									//rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
+									let stopError = new promise.retry.StopError("preRetryIntercept abort");
+									(stopError as any)["interceptResult"] = Promise.reject(rejectedErr);
+									return Promise.reject(stopError);
+								});
+
+
+							//let interceptedErrorResult = this.preRetryErrorIntercept(err);
+							
+							//if (interceptedErrorResult == null || interceptedErrorResult.isRejected == null) {
+							//	throw log.error("EzEndpointFunction POST interceptResult() did not return a promise", { submitPayload, interceptedErrorResult });
+							//}
+							//if (interceptedErrorResult.isResolved() === false) {
+							//	throw log.error("EzEndpointFunction POST interceptResult() promise is not resolved (fulfilled or rejected)", { submitPayload, interceptedErrorResult });
+							//}
+							//if (interceptedErrorResult.isRejected()) {
+							//	//rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
+							//	let stopError = new promise.retry.StopError("preRetryIntercept abort");
+							//	(stopError as any)["interceptResult"] = interceptedErrorResult;
+							//	return Promise.reject(stopError);
+							//} else {
+							//	//do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
+							//}
 						}
 						lastErrorResult = err;
 						return Promise.reject(err);
@@ -295,6 +311,8 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 		customPath: string | undefined = this.path
 	): Promise<_axiosDTs.AxiosXHR<TRecievePayload>> {
 		log.debug("EzEndpointFunction .get() called");
+		let lastErrorResult: any = null;
+
 		return promise.retry<_axiosDTs.AxiosXHR<TRecievePayload>>(() => {
 			let endpoint = customOrigin + customPath;
 			//log.debug("EzEndpointFunction axios.get", { endpoint });
@@ -321,21 +339,36 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 						}
 					}
 					if (this.preRetryErrorIntercept != null) {
-						let interceptedErrorResult = this.preRetryErrorIntercept(err);
-						if (interceptedErrorResult == null || interceptedErrorResult.isRejected == null) {
-							throw log.error("EzEndpointFunction GET interceptResult() did not return a promise", { interceptedErrorResult });
-						}
-						if (interceptedErrorResult.isFulfilled() === false) {
-							throw log.error("EzEndpointFunction GET interceptResult() promise is not fulfilled", { interceptedErrorResult });
-						}
-						if (interceptedErrorResult.isRejected()) {
-							//rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
-							let stopError = new promise.retry.StopError("preRetryIntercept abort");
-							(stopError as any)["interceptResult"] = interceptedErrorResult;
-							return Promise.reject(stopError);
-						} else {
-							//do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
-						}
+						return this.preRetryErrorIntercept(err)
+							.then(() => {
+								//do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
+								lastErrorResult = err;
+								return Promise.reject(err);
+
+							}, (rejectedErr) => {
+								//rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
+								let stopError = new promise.retry.StopError("preRetryIntercept abort");
+								(stopError as any)["interceptResult"] = Promise.reject(rejectedErr);
+								return Promise.reject(stopError);
+							});
+
+
+							//let interceptedErrorResult = this.preRetryErrorIntercept(err);
+
+							//if (interceptedErrorResult == null || interceptedErrorResult.isRejected == null) {
+							//	throw log.error("EzEndpointFunction POST interceptResult() did not return a promise", { submitPayload, interceptedErrorResult });
+							//}
+							//if (interceptedErrorResult.isResolved() === false) {
+							//	throw log.error("EzEndpointFunction POST interceptResult() promise is not resolved (fulfilled or rejected)", { submitPayload, interceptedErrorResult });
+							//}
+							//if (interceptedErrorResult.isRejected()) {
+							//	//rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
+							//	let stopError = new promise.retry.StopError("preRetryIntercept abort");
+							//	(stopError as any)["interceptResult"] = interceptedErrorResult;
+							//	return Promise.reject(stopError);
+							//} else {
+							//	//do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
+							//}
 					}
 					return Promise.reject(err);
 				});
@@ -360,7 +393,7 @@ module _test {
 			const targetUrl = "https://phantomjscloud.com/examples/helpers/requestdata";
 			const samplePostPayload1 = { hi: 1, bye: "two", inner: { three: 4 } };
 			const sampleHeader1 = { head1: "val1" };
-			describe("success", () => {
+			describe("success cases", () => {
 
 				it("basic e2e", () => {
 
@@ -381,7 +414,7 @@ module _test {
 				});
 			});
 
-			describe("fail", () => {
+			describe("fail cases", () => {
 
 				
 
@@ -411,7 +444,27 @@ module _test {
 						})
 						.catch((err: _axiosDTs.AxiosErrorResponse<any>) => {
 
-							//log.info("got error as expected", { err });
+							if (err.response == null) {
+								throw log.error("response should be defined", { err });
+							}
+							log.assert(err.response.status === 401, "wrong status code.", { err });
+
+							return Promise.resolve();
+
+						});
+				});
+
+				it("status 500 response", () => {
+					return axios.post("https://phantomjscloud.com/examples/helpers/statusCode/500", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+						.then((axiosResponse) => {
+							throw log.error("should have failed with 500 error", { badUrl, axiosResponse });
+						})
+						.catch((err: _axiosDTs.AxiosErrorResponse<any>) => {
+
+							if (err.response == null) {
+								throw log.error("response should be defined", { err });
+							}
+							log.assert(err.response.status === 500, "wrong status code.", { err });
 
 							return Promise.resolve();
 
