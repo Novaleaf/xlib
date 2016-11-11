@@ -1,5 +1,6 @@
+import * as ex from "./exception";
 import * as environment from "./environment";
-/** console logger logs to screen as simple text.*/
+/** console logger logs to screen as simple text...*/
 export declare class Logger {
     /** IMPORTANT: almost always, you should pass ```__filename``` as the name.    \n\n Effective naming is important. it is used as a Key to selectively enable/disable/adjust the log levels via the logging.Logger.adjustLogLevels() static method */
     name: string;
@@ -32,8 +33,19 @@ export declare class Logger {
     ex:  throw log.error("something bad");
      * @param args
      */
-    error(...args: any[]): any;
+    error(...args: any[]): ex.Exception;
+    /**
+     * useful for doing simple checks at production time.  if the condition fails, will log the error and then throw.
+     * @param testCondition
+     * @param args
+     */
+    errorAndThrowIf(testCondition: boolean, ...args: any[]): void;
     fatal(...args: any[]): void;
+    /**
+     *  for dev-time and testing,   not for catching production issues as this can be no-opted during minification.  if you want to test in a production environment, use .errorAndThrowIf()
+     * @param testCondition
+     * @param args
+     */
     assert(testCondition: boolean, ...args: any[]): void;
     /** use to mark code that needs to be finished before it can be run.   asserts when hit. */
     todo(format?: string, ...params: any[]): void;

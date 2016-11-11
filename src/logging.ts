@@ -35,493 +35,512 @@ class LoggerFatalException extends Exception { }
 import * as Chalk from "chalk";
 
 interface IAnsiColor {
-    foreground: string;
-    background: string;
-    highIntensity: boolean;
-    bold: boolean;
+	foreground: string;
+	background: string;
+	highIntensity: boolean;
+	bold: boolean;
 }
 /**
  * helper to convert ansi color codes to string representations.    conversions taken from https://en.wikipedia.org/wiki/ANSI_escape_code#graphics
  * @param input
  */
 function colorCodeToString(input: string, currentColor?: IAnsiColor): IAnsiColor {
-    var defaultColor: IAnsiColor = { foreground: "grey", background: "black", bold: false, highIntensity: false, };
+	var defaultColor: IAnsiColor = { foreground: "grey", background: "black", bold: false, highIntensity: false, };
 
-    var result = _.clone(defaultColor);
+	var result = _.clone(defaultColor);
 
-    if (currentColor != null) {
-        result = _.clone(currentColor);
-    }
-    input = input.trim();
-    if (input.indexOf("[") === 0) {
-        input = input.substring(1);
-    }
+	if (currentColor != null) {
+		result = _.clone(currentColor);
+	}
+	input = input.trim();
+	if (input.indexOf("[") === 0) {
+		input = input.substring(1);
+	}
 
-    if (input.indexOf("m") > 0) {
-        input = input.substring(0, input.length - 1);
-    }
+	if (input.indexOf("m") > 0) {
+		input = input.substring(0, input.length - 1);
+	}
 
-    var sections = input.split(";");
-    for (let i = 0; i < sections.length; i++) {
-        var num = parseInt(sections[i]);
-        //color names from http://www.w3schools.com/cssref/css_colornames.asp
-        switch (num) {
-            case 0: //reset
-            case 27: //positive
-                result = _.clone(defaultColor);
-                break;
-            case 1:
-                //bold
-                result.bold = true;
-                break;
-            case 2: //faint
-            case 21: //bold off
-            case 22: //normal intensity
-                result.bold = false;
-                break;
-            case 7: //swap
-                var tmp = result.foreground;
-                result.foreground = result.background;
-                result.background = tmp;
-            case 30:
-                result.foreground = "black";
-                break;
-            case 31:
-                result.foreground = "red";
-                break;
-            case 32:
-                result.foreground = "green";
-                break;
-            case 33:
-                result.foreground = "darkyellow";
-                break;
-            case 34:
-                result.foreground = "darkblue";
-                break;
-            case 35:
-                result.foreground = "magenta";
-                break;
-            case 36:
-                result.foreground = "darkturquoise"; //darkcyan
-                break;
-            case 37:
-                result.foreground = "lightgrey";
-                break;
-            case 39:
-                result.foreground = defaultColor.foreground;
-                break;
-            case 40:
-                result.background = "black";
-                break;
-            case 40:
-                result.background = "black";
-                break;
-            case 41:
-                result.background = "darkred";
-                break;
-            case 42:
-                result.background = "green";
-                break;
-            case 43:
-                result.background = "yellow";
-                break;
-            case 44:
-                result.background = "blue";
-                break;
-            case 45:
-                result.background = "magenta";
-                break;
-            case 46:
-                result.background = "cyan";
-                break;
-            case 47:
-                result.background = "white";
-                break;
-            case 49:
-                result.background = defaultColor.background;
-                break;
-            case 90:
-                result.foreground = "lightgrey";
-                break;
-            case 91:
-                result.foreground = "hotpink";
-                break;
-            case 92:
-                result.foreground = "lightgreen";
-                break;
-            case 93:
-                result.foreground = "yellow";
-                break;
-            case 94:
-                result.foreground = "blue";
-                break;
-            case 95:
-                result.foreground = "fuchsia";
-                break;
-            case 96:
-                result.foreground = "cyan";
-                break;
-            case 97:
-                result.foreground = "white";
-                break;
-            case 100:
-                result.background = "lightgrey";
-                break;
-            case 101:
-                result.background = "hotpink";
-                break;
-            case 102:
-                result.background = "lightgreen";
-                break;
-            case 103:
-                result.background = "yellow";
-                break;
-            case 104:
-                result.background = "blue";
-                break;
-            case 105:
-                result.background = "fuchsia";
-                break;
-            case 106:
-                result.background = "cyan";
-                break;
-            case 107:
-                result.background = "white";
-                break;
-            default:
-                if (environment.logLevel <= environment.LogLevel.DEBUG) {
-                    throw new LoggerFatalException("colorCodeToString() unknown color " + input);
-                }
-            //no action (do not set anything)
+	var sections = input.split(";");
+	for (let i = 0; i < sections.length; i++) {
+		var num = parseInt(sections[i]);
+		//color names from http://www.w3schools.com/cssref/css_colornames.asp
+		switch (num) {
+			case 0: //reset
+			case 27: //positive
+				result = _.clone(defaultColor);
+				break;
+			case 1:
+				//bold
+				result.bold = true;
+				break;
+			case 2: //faint
+			case 21: //bold off
+			case 22: //normal intensity
+				result.bold = false;
+				break;
+			case 7: //swap
+				var tmp = result.foreground;
+				result.foreground = result.background;
+				result.background = tmp;
+			case 30:
+				result.foreground = "black";
+				break;
+			case 31:
+				result.foreground = "red";
+				break;
+			case 32:
+				result.foreground = "green";
+				break;
+			case 33:
+				result.foreground = "darkyellow";
+				break;
+			case 34:
+				result.foreground = "darkblue";
+				break;
+			case 35:
+				result.foreground = "magenta";
+				break;
+			case 36:
+				result.foreground = "darkturquoise"; //darkcyan
+				break;
+			case 37:
+				result.foreground = "lightgrey";
+				break;
+			case 39:
+				result.foreground = defaultColor.foreground;
+				break;
+			case 40:
+				result.background = "black";
+				break;
+			case 40:
+				result.background = "black";
+				break;
+			case 41:
+				result.background = "darkred";
+				break;
+			case 42:
+				result.background = "green";
+				break;
+			case 43:
+				result.background = "yellow";
+				break;
+			case 44:
+				result.background = "blue";
+				break;
+			case 45:
+				result.background = "magenta";
+				break;
+			case 46:
+				result.background = "cyan";
+				break;
+			case 47:
+				result.background = "white";
+				break;
+			case 49:
+				result.background = defaultColor.background;
+				break;
+			case 90:
+				result.foreground = "lightgrey";
+				break;
+			case 91:
+				result.foreground = "hotpink";
+				break;
+			case 92:
+				result.foreground = "lightgreen";
+				break;
+			case 93:
+				result.foreground = "yellow";
+				break;
+			case 94:
+				result.foreground = "blue";
+				break;
+			case 95:
+				result.foreground = "fuchsia";
+				break;
+			case 96:
+				result.foreground = "cyan";
+				break;
+			case 97:
+				result.foreground = "white";
+				break;
+			case 100:
+				result.background = "lightgrey";
+				break;
+			case 101:
+				result.background = "hotpink";
+				break;
+			case 102:
+				result.background = "lightgreen";
+				break;
+			case 103:
+				result.background = "yellow";
+				break;
+			case 104:
+				result.background = "blue";
+				break;
+			case 105:
+				result.background = "fuchsia";
+				break;
+			case 106:
+				result.background = "cyan";
+				break;
+			case 107:
+				result.background = "white";
+				break;
+			default:
+				if (environment.logLevel <= environment.LogLevel.DEBUG) {
+					throw new LoggerFatalException("colorCodeToString() unknown color " + input);
+				}
+			//no action (do not set anything)
 
-        }
-    }
+		}
+	}
 
-    return result;
+	return result;
 }
 
 
 interface IReplacement extends IAnsiColor {
-    start: number; end: number; matchText: string;
+	start: number; end: number; matchText: string;
 }
 
 
 
 import path = require("path");
-/** console logger logs to screen as simple text.*/
+/** console logger logs to screen as simple text...*/
 export class Logger {
-    //INTERNAL NOTE:  This is a replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) 
-    //works well, but it would be better with a pluggable global listener, to log to various other locations (email)
+	//INTERNAL NOTE:  This is a replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) 
+	//works well, but it would be better with a pluggable global listener, to log to various other locations (email)
 
 
-    constructor(
-        /** IMPORTANT: almost always, you should pass ```__filename``` as the name.    \n\n Effective naming is important. it is used as a Key to selectively enable/disable/adjust the log levels via the logging.Logger.adjustLogLevels() static method */
-        public name: string,
-        /** (optional) the verbosity of this log object.   defaults to the environment.logLevel */
-        public logLevel = environment.logLevel,
-        /** (optional) additional options */
-        options: {
-            /** if false (the default), will trim off the prefix of the name that matches the logging.js director location.  (useful to reduce verbosity, as usually your name will be ```__filename```) */
-            doNotTrimName?: boolean
-        } = {}) {
+	constructor(
+		/** IMPORTANT: almost always, you should pass ```__filename``` as the name.    \n\n Effective naming is important. it is used as a Key to selectively enable/disable/adjust the log levels via the logging.Logger.adjustLogLevels() static method */
+		public name: string,
+		/** (optional) the verbosity of this log object.   defaults to the environment.logLevel */
+		public logLevel = environment.logLevel,
+		/** (optional) additional options */
+		options: {
+			/** if false (the default), will trim off the prefix of the name that matches the logging.js director location.  (useful to reduce verbosity, as usually your name will be ```__filename```) */
+			doNotTrimName?: boolean
+		} = {}) {
 
-        if (options.doNotTrimName !== true) {
-            this.name = stringHelper.removeMatchingPrefix(name, __dirname);
-        }
-    }
-    /** converts objects to strings, leaves primitive types intact */
-    private _normalizeArgs(args: any[]) {
-        //generate log string
-        var finalArgs: any[] = [];
+		if (options.doNotTrimName !== true) {
+			this.name = stringHelper.removeMatchingPrefix(name, __dirname);
+		}
+	}
+	/** converts objects to strings, leaves primitive types intact */
+	private _normalizeArgs(args: any[]) {
+		//generate log string
+		var finalArgs: any[] = [];
 
-        _.forEach(args, (arg) => {
-            var typeName = reflection.getTypeName(arg);
-            var type = reflection.getType(arg);
+		_.forEach(args, (arg) => {
+			var typeName = reflection.getTypeName(arg);
+			var type = reflection.getType(arg);
 
-            switch (type) {
-                case reflection.Type.Error:
-                    var objArg: any;
-                    try {
-                        objArg = (serialization.JSONX.inspectStringify(arg, 3, false, true, undefined, undefined, "\t"));
-                        //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
-                    } catch (ex) {
-                        objArg = ("[Object???]");
+			switch (type) {
+				case reflection.Type.Error:
+					var objArg: any;
+					try {
+						objArg = (serialization.JSONX.inspectStringify(arg, 3, false, true, undefined, undefined, "\t"));
+						//finalArgs.push(JSON.stringify(arg,undefined,"\t"));
+					} catch (ex) {
+						objArg = ("[Object???]");
 
-                    }
-                    finalArgs.push(Chalk.red.bold(objArg));
-                    break;
-                case reflection.Type.object:
-                    var objArg: any;
-                    try {
-                        objArg = (serialization.JSONX.inspectStringify(arg, 3, false, false, undefined, undefined, "\t"));
-                        //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
-                    } catch (ex) {
-                        objArg = ("[Object???]");
+					}
+					finalArgs.push(Chalk.red.bold(objArg));
+					break;
+				case reflection.Type.object:
+					var objArg: any;
+					try {
+						objArg = (serialization.JSONX.inspectStringify(arg, 3, false, false, undefined, undefined, "\t"));
+						//finalArgs.push(JSON.stringify(arg,undefined,"\t"));
+					} catch (ex) {
+						objArg = ("[Object???]");
 
-                    }
-                    finalArgs.push(Chalk.green.bold(objArg));
-                    break;
-                default:
-                    finalArgs.push(arg);
-            }
-        });
-        return finalArgs;
-    }
+					}
+					finalArgs.push(Chalk.green.bold(objArg));
+					break;
+				default:
+					finalArgs.push(arg);
+			}
+		});
+		return finalArgs;
+	}
 
-    private _log(targetLogLevel: environment.LogLevel, args: any[]) {
-        if (targetLogLevel < this.logLevel) {
-            return;
-        }
-        return this._doLog.apply(this, arguments) as string[];
+	private _log(targetLogLevel: environment.LogLevel, args: any[]) {
+		if (targetLogLevel < this.logLevel) {
+			return;
+		}
+		return this._doLog.apply(this, arguments) as string[];
 
-    }
+	}
 
-    private _doLog(targetLogLevel: environment.LogLevel, args: any[]) {
+	private _doLog(targetLogLevel: environment.LogLevel, args: any[]) {
 
-        let finalArgs: any[];
-        switch (environment.platformType) {
-            case environment.PlatformType.Browser:
-                finalArgs = args;
-                break;
-            case environment.PlatformType.NodeJs:
-            default:
-                finalArgs = this._normalizeArgs(args);
-                break;
-        }
+		let finalArgs: any[];
+		switch (environment.platformType) {
+			case environment.PlatformType.Browser:
+				finalArgs = args;
+				break;
+			case environment.PlatformType.NodeJs:
+			default:
+				finalArgs = this._normalizeArgs(args);
+				break;
+		}
 
-        var logLevelColor = Chalk.bgBlack;
-        switch (targetLogLevel) {
-            case environment.LogLevel.TRACE:
-                logLevelColor = Chalk.bgWhite;
-                break;
-            case environment.LogLevel.DEBUG:
-                logLevelColor = Chalk.bgGreen;
-                break;
-            case environment.LogLevel.INFO:
-                logLevelColor = Chalk.bgCyan;
-                break;
-            case environment.LogLevel.WARN:
-                logLevelColor = Chalk.bgYellow;
-                break;
-            case environment.LogLevel.ERROR:
-                logLevelColor = Chalk.bgMagenta;
-                break;
-            case environment.LogLevel.FATAL:
-                logLevelColor = Chalk.bgRed;
-                break;
-            default:
-                logLevelColor = Chalk.inverse.bold;
-                throw new LoggerFatalException("unknown targetLogLevel");
-            //break;
-        }
-        //format
-        switch (environment.platformType) {
-            // *****************************************************************
-            // *****************************************************************
-            // *****************************************************************
-            // ****************   TODO: pretty coloring for chrome, as started below.
-            //case environment.PlatformType.Browser:
-            //    {
-            //        //format for chrome color output:   https://developers.google.com/web/tools/chrome-devtools/console/console-write
-            //        finalArgs.unshift(`%c${environment.LogLevel[targetLogLevel]}`);
-            //        finalArgs.push("color: blue; font-size: x-large");
-            //        finalArgs.unshift(Chalk.cyan(this.name));
-            //        finalArgs.unshift(Chalk.gray(moment().toISOString()));
-            //    }
-            //    break;
-            default:
-                {
-                    //terminal output
-                    finalArgs.unshift(logLevelColor(environment.LogLevel[targetLogLevel]));
-                    finalArgs.unshift(Chalk.cyan(this.name));
-                    finalArgs.unshift(Chalk.gray(moment().toISOString()));
-                }
-                break;
-        }
-        //on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
-        switch (environment.platformType) {
-            case environment.PlatformType.Browser:
-
-
-                switch (targetLogLevel) {
-                    case environment.LogLevel.TRACE:
-                        console.trace.apply(console, finalArgs);
-                        break;
-                    case environment.LogLevel.DEBUG:
-                        if (console.groupCollapsed != null) {
-                            console.groupCollapsed.apply(console, finalArgs);//("...trace...");
-                            console.trace("...trace...");
-                            console.groupEnd();
-                        } else {
-                            console.debug.apply(console, finalArgs);
-                        }
-                        break;
-                    case environment.LogLevel.INFO:
-                        //console.info.apply(console, finalArgs);
-                        if (console.groupCollapsed != null) {
-                            console.groupCollapsed.apply(console, finalArgs);//("...trace...");
-                            console.trace("...trace...");
-                            console.groupEnd();
-                        } else {
-                            console.info.apply(console, finalArgs);
-                        }
-                        break;
-                    case environment.LogLevel.WARN:
-                        console.warn.apply(console, finalArgs);
-                        break;
-                    case environment.LogLevel.ERROR:
-                        console.error.apply(console, finalArgs);
-                        break;
-                    case environment.LogLevel.FATAL:
-                        console.error.apply(console, finalArgs);
-                        break;
-                    default:
-                        throw new LoggerFatalException("unknown targetLogLevel");
-                    //break;
-                }
-                break;
-            //on node, we use only show stacktrace for explicit trace call or errors.
-            case environment.PlatformType.NodeJs:
-            default:
-                switch (targetLogLevel) {
-                    case environment.LogLevel.TRACE:
-                        console.trace.apply(console, finalArgs);
-                        break;
-                    case environment.LogLevel.DEBUG:
-                        console.log.apply(console, finalArgs);
-                        break;
-                    case environment.LogLevel.INFO:
-                        console.log.apply(console, finalArgs);
-                        break;
-                    case environment.LogLevel.WARN:
-                        console.warn.apply(console, finalArgs);
-                        break;
-                    case environment.LogLevel.ERROR:
-                        console.error.apply(console, finalArgs);
-                        break;
-                    case environment.LogLevel.FATAL:
-                        console.error.apply(console, finalArgs);
-                        break;
-                    default:
-                        throw new LoggerFatalException("unknown targetLogLevel");
-                    //break;
-                }
-                break;
-        }
+		var logLevelColor = Chalk.bgBlack;
+		switch (targetLogLevel) {
+			case environment.LogLevel.TRACE:
+				logLevelColor = Chalk.bgWhite;
+				break;
+			case environment.LogLevel.DEBUG:
+				logLevelColor = Chalk.bgGreen;
+				break;
+			case environment.LogLevel.INFO:
+				logLevelColor = Chalk.bgCyan;
+				break;
+			case environment.LogLevel.WARN:
+				logLevelColor = Chalk.bgYellow;
+				break;
+			case environment.LogLevel.ERROR:
+				logLevelColor = Chalk.bgMagenta;
+				break;
+			case environment.LogLevel.FATAL:
+				logLevelColor = Chalk.bgRed;
+				break;
+			default:
+				logLevelColor = Chalk.inverse.bold;
+				throw new LoggerFatalException("unknown targetLogLevel");
+			//break;
+		}
+		//format
+		switch (environment.platformType) {
+			// *****************************************************************
+			// *****************************************************************
+			// *****************************************************************
+			// ****************   TODO: pretty coloring for chrome, as started below.
+			//case environment.PlatformType.Browser:
+			//    {
+			//        //format for chrome color output:   https://developers.google.com/web/tools/chrome-devtools/console/console-write
+			//        finalArgs.unshift(`%c${environment.LogLevel[targetLogLevel]}`);
+			//        finalArgs.push("color: blue; font-size: x-large");
+			//        finalArgs.unshift(Chalk.cyan(this.name));
+			//        finalArgs.unshift(Chalk.gray(moment().toISOString()));
+			//    }
+			//    break;
+			default:
+				{
+					//terminal output
+					finalArgs.unshift(logLevelColor(environment.LogLevel[targetLogLevel]));
+					finalArgs.unshift(Chalk.cyan(this.name));
+					finalArgs.unshift(Chalk.gray(moment().toISOString()));
+				}
+				break;
+		}
+		//on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
+		switch (environment.platformType) {
+			case environment.PlatformType.Browser:
 
 
-        return finalArgs;
-    }
-    /**
-     *  highest verbosity
-     * @param args
-     */
-    public trace(...args: any[]) {
-        this._log(environment.LogLevel.TRACE, args);
-    }
-    public debug(...args: any[]) {
-        this._log(environment.LogLevel.DEBUG, args);
-    }
-    public info(...args: any[]) {
-        this._log(environment.LogLevel.INFO, args);
-    }
-    public warn(...args: any[]) {
-        this._log(environment.LogLevel.WARN, args);
-    }
-    /**
-     *  log as an error, and returns an exception you can throw.
-    ex:  throw log.error("something bad");
-     * @param args
-     */
-    public error(...args: any[]): any {
-        let finalArgs = this._log(environment.LogLevel.ERROR, args);
-
-        if (finalArgs != null) {
-            let message: string;
-            if (finalArgs.length > 2) {
-                message = finalArgs[3]
-            } else {
-                message = finalArgs.join("\n");
-            }
-            return new ex.Exception(message, undefined, 1);
-        } else {
-            return new ex.Exception("Error", undefined, 1);
-        }
-    }
-    public fatal(...args: any[]) {
-        args.unshift(false);
-        this.assert.apply(this, args);
-        args.shift();
-
-        throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args), undefined, 1);
-    }
-
-
-    assert(testCondition: boolean, ...args: any[]): void {
-        if (testCondition === true) {
-            return;
-        }
-        if (testCondition !== false) {
-            throw new ex.CorelibException("first parameter to assert must evaluate to true or false");
-        }
-
-        let finalArgs: any[];
-        switch (environment.platformType) {
-            case environment.PlatformType.Browser:
-                finalArgs = args;
-                break;
-            case environment.PlatformType.NodeJs:
-            default:
-                finalArgs = this._normalizeArgs(args);
-                break;
-        }
-
-
-        finalArgs.unshift(Chalk.bgYellow("ASSERT"));
-        finalArgs.unshift(Chalk.cyan(this.name));
-        finalArgs.unshift(Chalk.gray(moment().toISOString()));
-        //finalArgs.unshift(false);
-
-        //on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
-        switch (environment.platformType) {
-            case environment.PlatformType.Browser:
-                finalArgs.unshift(false);
-                console.assert.apply(console, finalArgs);
-                //assert(false, finalArgs.join("\n"));
-                break;
-
-            case environment.PlatformType.NodeJs:
-                console.trace.apply(console, finalArgs);
-                assert(false, finalArgs.join("\n"));
-                break;
-            default:
-                finalArgs.unshift(false);
-                //console.warn.apply(console, finalArgs);
-                console.assert.apply(console, finalArgs);
-                break;
-        }
+				switch (targetLogLevel) {
+					case environment.LogLevel.TRACE:
+						console.trace.apply(console, finalArgs);
+						break;
+					case environment.LogLevel.DEBUG:
+						if (console.groupCollapsed != null) {
+							console.groupCollapsed.apply(console, finalArgs);//("...trace...");
+							console.trace("...trace...");
+							console.groupEnd();
+						} else {
+							console.debug.apply(console, finalArgs);
+						}
+						break;
+					case environment.LogLevel.INFO:
+						//console.info.apply(console, finalArgs);
+						if (console.groupCollapsed != null) {
+							console.groupCollapsed.apply(console, finalArgs);//("...trace...");
+							console.trace("...trace...");
+							console.groupEnd();
+						} else {
+							console.info.apply(console, finalArgs);
+						}
+						break;
+					case environment.LogLevel.WARN:
+						console.warn.apply(console, finalArgs);
+						break;
+					case environment.LogLevel.ERROR:
+						console.error.apply(console, finalArgs);
+						break;
+					case environment.LogLevel.FATAL:
+						console.error.apply(console, finalArgs);
+						break;
+					default:
+						throw new LoggerFatalException("unknown targetLogLevel");
+					//break;
+				}
+				break;
+			//on node, we use only show stacktrace for explicit trace call or errors.
+			case environment.PlatformType.NodeJs:
+			default:
+				switch (targetLogLevel) {
+					case environment.LogLevel.TRACE:
+						console.trace.apply(console, finalArgs);
+						break;
+					case environment.LogLevel.DEBUG:
+						console.log.apply(console, finalArgs);
+						break;
+					case environment.LogLevel.INFO:
+						console.log.apply(console, finalArgs);
+						break;
+					case environment.LogLevel.WARN:
+						console.warn.apply(console, finalArgs);
+						break;
+					case environment.LogLevel.ERROR:
+						console.error.apply(console, finalArgs);
+						break;
+					case environment.LogLevel.FATAL:
+						console.error.apply(console, finalArgs);
+						break;
+					default:
+						throw new LoggerFatalException("unknown targetLogLevel");
+					//break;
+				}
+				break;
+		}
 
 
+		return finalArgs;
+	}
+	/**
+	 *  highest verbosity
+	 * @param args
+	 */
+	public trace(...args: any[]) {
+		this._log(environment.LogLevel.TRACE, args);
+	}
+	public debug(...args: any[]) {
+		this._log(environment.LogLevel.DEBUG, args);
+	}
+	public info(...args: any[]) {
+		this._log(environment.LogLevel.INFO, args);
+	}
+	public warn(...args: any[]) {
+		this._log(environment.LogLevel.WARN, args);
+	}
+	/**
+	 *  log as an error, and returns an exception you can throw.
+	ex:  throw log.error("something bad");
+	 * @param args
+	 */
+	public error(...args: any[]): ex.Exception {
+		let finalArgs = this._log(environment.LogLevel.ERROR, args);
 
-    }
-    /** use to mark code that needs to be finished before it can be run.   asserts when hit. */
-    todo(format = "TODO: not implemented", ...params: any[]) {
-        var msg = "TODO: " + jsHelper.apply(stringHelper.format, null, params, [format]);//.apply(null,format, params);
-        this.assert(false, msg);
-    }
-    deprecated(message?: string) {
-        this.warn(`log.deprecated(${message})`);
-        //this.assert(false, "implement deprecated");
-    }
-    /** note to redo this before shipping (any time not in envLevel===PROD mode).   when in prod mode, an error is thrown */
-    refactor(message?: string) {
+		if (finalArgs != null) {
+			let message: string;
+			if (finalArgs.length > 2) {
+				message = finalArgs[3]
+			} else {
+				message = finalArgs.join("\n");
+			}
+			return new ex.Exception(message, undefined, 1);
+		} else {
+			return new ex.Exception("Error", undefined, 1);
+		}
+	}
+	/**
+	 * useful for doing simple checks at production time.  if the condition fails, will log the error and then throw.
+	 * @param testCondition
+	 * @param args
+	 */
+	public errorAndThrowIf(testCondition: boolean, ...args: any[]): void {
+		if (testCondition === true) {
+			return;
+		}
+		if (testCondition !== false) {
+			throw new ex.CorelibException("first parameter to assert must evaluate to true or false");
+		}
+		throw this.error.apply(this, args);
+	}
 
-        if (environment.envLevel === environment.EnvLevel.PROD) {
-            throw this.error(`log.refactor(${message})`);
-        } else {
-            this.warn(`log.refactor(${message})`);
-        }
-    }
+	public fatal(...args: any[]) {
+		args.unshift(false);
+		this.assert.apply(this, args);
+		args.shift();
+
+		throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args), undefined, 1);
+	}
+
+	/**
+	 *  for dev-time and testing,   not for catching production issues as this can be no-opted during minification.  if you want to test in a production environment, use .errorAndThrowIf()
+	 * @param testCondition
+	 * @param args
+	 */
+	assert(testCondition: boolean, ...args: any[]): void {
+		if (testCondition === true) {
+			return;
+		}
+		if (testCondition !== false) {
+			throw new ex.CorelibException("first parameter to assert must evaluate to true or false");
+		}
+
+		let finalArgs: any[];
+		switch (environment.platformType) {
+			case environment.PlatformType.Browser:
+				finalArgs = args;
+				break;
+			case environment.PlatformType.NodeJs:
+			default:
+				finalArgs = this._normalizeArgs(args);
+				break;
+		}
+
+
+		finalArgs.unshift(Chalk.bgYellow("ASSERT"));
+		finalArgs.unshift(Chalk.cyan(this.name));
+		finalArgs.unshift(Chalk.gray(moment().toISOString()));
+		//finalArgs.unshift(false);
+
+		//on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
+		switch (environment.platformType) {
+			case environment.PlatformType.Browser:
+				finalArgs.unshift(false);
+				console.assert.apply(console, finalArgs);
+				//assert(false, finalArgs.join("\n"));
+				break;
+
+			case environment.PlatformType.NodeJs:
+				console.trace.apply(console, finalArgs);
+				assert(false, finalArgs.join("\n"));
+				break;
+			default:
+				finalArgs.unshift(false);
+				//console.warn.apply(console, finalArgs);
+				console.assert.apply(console, finalArgs);
+				break;
+		}
+
+
+
+	}
+	/** use to mark code that needs to be finished before it can be run.   asserts when hit. */
+	todo(format = "TODO: not implemented", ...params: any[]) {
+		var msg = "TODO: " + jsHelper.apply(stringHelper.format, null, params, [format]);//.apply(null,format, params);
+		this.assert(false, msg);
+	}
+	deprecated(message?: string) {
+		this.warn(`log.deprecated(${message})`);
+		//this.assert(false, "implement deprecated");
+	}
+	/** note to redo this before shipping (any time not in envLevel===PROD mode).   when in prod mode, an error is thrown */
+	refactor(message?: string) {
+
+		if (environment.envLevel === environment.EnvLevel.PROD) {
+			throw this.error(`log.refactor(${message})`);
+		} else {
+			this.warn(`log.refactor(${message})`);
+		}
+	}
 }
 
 //class TestError extends Error {

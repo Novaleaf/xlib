@@ -1,4 +1,9 @@
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 //declare class Error {
 //	public name: string;
 //	public message: string;
@@ -6,20 +11,23 @@
 //	constructor(message?: string);
 //}
 //import * as environment from "./environment";
-const environment = require("./environment");
+var environment = require("./environment");
 //let err: Error;
 //err.
 /** class to allow extending of javascript errors (custom errors thrown by exceptions)
 usage example:  class MyException extends base.Exception{}  throw new MyException("boo");
 from https://stackoverflow.com/questions/12915412/how-do-i-extend-a-host-object-e-g-error-in-typescript
 */
-class Exception extends Error {
-    constructor(message, innerException, 
+var Exception = (function (_super) {
+    __extends(Exception, _super);
+    function Exception(message, innerException, 
         /** truncate extra stack frames from the stack that's attached to this, a good way to remove logging/util functions from the trace */
-        stackFramesToTruncate = 0) {
-        super(message);
-        this.message = message;
-        this.innerException = innerException;
+        stackFramesToTruncate) {
+        /** truncate extra stack frames from the stack that's attached to this, a good way to remove logging/util functions from the trace */
+        if (stackFramesToTruncate === void 0) { stackFramesToTruncate = 0; }
+        var _this = _super.call(this, message) || this;
+        _this.message = message;
+        _this.innerException = innerException;
         //if (environment.logLevel > environment.LogLevel.DEBUG) {
         //	innerException = null;
         //} else {
@@ -28,37 +36,38 @@ class Exception extends Error {
         //	}
         //}
         if (innerException != null) {
-            this.message = message + " +details: " + innerException.message;
+            _this.message = message + " +details: " + innerException.message;
         }
         //get name based on type.  snippet taken from ./runtime/reflection.ts code
         //this.name = "Exception";
-        var results = (Exception._getTypeNameOrFuncNameRegex).exec((this).constructor.toString());
-        this.name = (results && results.length > 1) ? results[1] : "";
+        var results = (Exception._getTypeNameOrFuncNameRegex).exec((_this).constructor.toString());
+        _this.name = (results && results.length > 1) ? results[1] : "";
         //this.message = message;
         //this.stack = (<any>new Error()).stack;		
-        let tempStack = new Error("boogah").stack;
+        var tempStack = new Error("boogah").stack;
         //console.log("================START STACK================");
         //console.log(tempStack);
         //console.log("================END STACK================");
-        let _array = tempStack.split("\n");
+        var _array = tempStack.split("\n");
         if (_array.length > (2 + stackFramesToTruncate)) {
-            let line1 = _array.shift();
-            let line2 = _array.shift();
-            for (let i = 0; i < stackFramesToTruncate; i++) {
+            var line1 = _array.shift();
+            var line2 = _array.shift();
+            for (var i = 0; i < stackFramesToTruncate; i++) {
                 _array.shift();
             }
-            _array.unshift(`${this.name}: ${this.message}`);
+            _array.unshift(_this.name + ": " + _this.message);
         }
-        let finalStack = _array.join("\n");
-        this.stack = finalStack;
+        var finalStack = _array.join("\n");
+        _this.stack = finalStack;
+        return _this;
         //console.log(typeof (this.stack));
     }
     /** includes stack track in string*/
-    toStringWithStack() {
+    Exception.prototype.toStringWithStack = function () {
         return Exception.exceptionToString(this);
-    }
+    };
     /** get a string representation of the exception, with full stack-track (if any exists) */
-    static exceptionToString(ex) {
+    Exception.exceptionToString = function (ex) {
         var msg = ex.name + ": " + ex.message;
         var stack = ex.stack;
         if (stack) {
@@ -74,8 +83,8 @@ class Exception extends Error {
             }
         }
         return msg;
-    }
-    toString() {
+    };
+    Exception.prototype.toString = function () {
         if (environment.logLevel > environment.LogLevel.DEBUG) {
             if (this.innerException == null) {
                 return this.message;
@@ -97,22 +106,31 @@ class Exception extends Error {
         //} else {
         //	return super.toString() + "\n\t innerException: " + this.innerException.toString();
         //}
-    }
-}
+    };
+    return Exception;
+}(Error));
 exports.Exception = Exception;
 Exception._getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
 /** all errors thrown by corelib extend this error type */
-class CorelibException extends Exception {
-}
+var CorelibException = (function (_super) {
+    __extends(CorelibException, _super);
+    function CorelibException() {
+        return _super.apply(this, arguments) || this;
+    }
+    return CorelibException;
+}(Exception));
 exports.CorelibException = CorelibException;
 /**
  * an exception that includes a statusCode for returning via http requests
  */
-class HttpStatusCodeException extends Exception {
-    constructor(message, innerException, statusCode = 400) {
-        super(message, innerException);
-        this.statusCode = statusCode;
+var HttpStatusCodeException = (function (_super) {
+    __extends(HttpStatusCodeException, _super);
+    function HttpStatusCodeException(message, innerException, statusCode) {
+        if (statusCode === void 0) { statusCode = 400; }
+        var _this = _super.call(this, message, innerException) || this;
+        _this.statusCode = statusCode;
+        return _this;
     }
-}
+    return HttpStatusCodeException;
+}(Exception));
 exports.HttpStatusCodeException = HttpStatusCodeException;
-//# sourceMappingURL=exception.js.map

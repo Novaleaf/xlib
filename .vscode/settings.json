@@ -1,0 +1,55 @@
+// Place your settings in this file to overwrite the default settings
+{
+	"workbench.statusBar.visible": true,
+	// Editor
+	// Insert spaces when pressing Tab. This setting is overriden based on the file contents when `editor.detectIndentation` is on.
+	"editor.insertSpaces": false,
+	// Typescript
+	// Defines space handling after opening and before closing non empty parenthesis.
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,
+	// Defines space handling after opening and before closing non empty brackets.
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
+	// Defines space handling after opening and before closing template string braces. Requires TypeScript >= 2.0.6.
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
+	// Defines space handling after opening and before closing JSX expression braces. Requires TypeScript >= 2.0.6.
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": true,
+	"tslint.enable": true,
+	"tslint.run": "onType",
+	"tslint.autoFixOnSave": true,
+	/** use version of typescript saved to the npm globals folder */
+	"typescript.tsdk": "C:/Users/jason/AppData/Roaming/npm/node_modules/typescript/lib",
+	//"typescript.tsdk": "%USERPROFILE%/AppData/Roaming/npm/node_modules/typescript/lib",
+	/** hide files/folders from the vscode explorer */
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/.DS_Store": true,
+		"**/node_modules": true,
+		"**/bin": true,
+		"**/obj": true,
+		"**/*.csproj": true,
+		"**/*.csproj.user": true,
+		"**/*.njsproj": true,
+		"**/*.sln": true,
+		"**/*.suo": true,
+		"**/.vs": true,
+		"**/*.cmd": true,
+		"**/.gitignore": true,
+		"**/.obj": true
+	},
+	/** color picker extension */
+	"colorHelper.resident": true,
+	// "emeraldwalk.runonsave": {
+	// 	"commands": [
+	// 		{
+	// 			"match": ".*ts(x?)$",
+	// 			"isAsync": false,
+	// 			"cmd": "tsc -p ${workspaceRoot}" //${file}
+	// 		}
+	// 	]
+	// },
+	
+	// json padding
+	"eof": true
+}

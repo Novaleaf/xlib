@@ -108,7 +108,7 @@ export class Scrub<T>{
         if (this.isValid === true) {
             return;
         }
-        var didAFix = false;
+        var didAFix:boolean = false;
         _.forEach(this.invalid, (value: T, key: string) => {
             var fixedValue = func(value, key, this);
             if (fixedValue !== undefined) {
@@ -117,7 +117,7 @@ export class Scrub<T>{
             }
         });
         //fixup state after modifications
-        if (didAFix === true) {
+        if (didAFix === true as any) {
             this._maintainValidState();
         }
     }
