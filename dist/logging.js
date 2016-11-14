@@ -408,7 +408,7 @@ class Logger {
      * @param testCondition
      * @param args
      */
-    errorAndThrowIf(testCondition, ...args) {
+    errorAndThrowIfFalse(testCondition, ...args) {
         if (testCondition === true) {
             return;
         }
@@ -471,6 +471,7 @@ class Logger {
     todo(format = "TODO: not implemented", ...params) {
         var msg = "TODO: " + jsHelper.apply(stringHelper.format, null, params, [format]); //.apply(null,format, params);
         this.assert(false, msg);
+        throw this.error(msg);
     }
     deprecated(message) {
         this.warn(`log.deprecated(${message})`);

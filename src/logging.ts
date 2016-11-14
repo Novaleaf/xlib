@@ -453,7 +453,7 @@ export class Logger {
 	 * @param testCondition
 	 * @param args
 	 */
-	public errorAndThrowIf(testCondition: boolean, ...args: any[]): void {
+	public errorAndThrowIfFalse(testCondition: boolean, ...args: any[]): void {
 		if (testCondition === true) {
 			return;
 		}
@@ -524,9 +524,10 @@ export class Logger {
 
 	}
 	/** use to mark code that needs to be finished before it can be run.   asserts when hit. */
-	todo(format = "TODO: not implemented", ...params: any[]) {
+	todo(format = "TODO: not implemented", ...params: any[]): never {
 		var msg = "TODO: " + jsHelper.apply(stringHelper.format, null, params, [format]);//.apply(null,format, params);
 		this.assert(false, msg);
+		throw this.error(msg);
 	}
 	deprecated(message?: string) {
 		this.warn(`log.deprecated(${message})`);
