@@ -27,9 +27,8 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "strictNullChecks": true,
-    "types": ["node", "mocha"],
-    "typeRoots": []
-    
+    "types": [ "node", "mocha" ]
+
   },
   "include": [
     "src/**/*"

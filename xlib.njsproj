@@ -55,6 +55,9 @@
     <TypeScriptCompile Include="src\definitions\stripe-d.ts" />
     <TypeScriptCompile Include="src\definitions\_index.ts" />
     <TypeScriptCompile Include="src\design-patterns\atomic-cache.ts" />
+    <TypeScriptCompile Include="src\design-patterns\data-schema.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\design-patterns\_index.ts" />
     <TypeScriptCompile Include="src\environment.ts" />
     <TypeScriptCompile Include="src\exception.ts" />
