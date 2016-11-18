@@ -397,10 +397,10 @@ class Logger {
             else {
                 message = finalArgs.join("\n");
             }
-            return new ex.Exception(message, undefined, 1);
+            return new ex.Exception(message, { stackFramesToTruncate: 1 });
         }
         else {
-            return new ex.Exception("Error", undefined, 1);
+            return new ex.Exception("Error", { stackFramesToTruncate: 1 });
         }
     }
     /**
@@ -413,7 +413,7 @@ class Logger {
             return;
         }
         if (testCondition !== false) {
-            throw new ex.CorelibException("first parameter to assert must evaluate to true or false");
+            throw new ex.Exception("first parameter to assert must evaluate to true or false");
         }
         throw this.error.apply(this, args);
     }
@@ -421,7 +421,7 @@ class Logger {
         args.unshift(false);
         this.assert.apply(this, args);
         args.shift();
-        throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args), undefined, 1);
+        throw new ex.Exception(stringHelper.format.apply(stringHelper, args), { stackFramesToTruncate: 1 });
     }
     /**
      *  for dev-time and testing,   not for catching production issues as this can be no-opted during minification.  if you want to test in a production environment, use .errorAndThrowIf()

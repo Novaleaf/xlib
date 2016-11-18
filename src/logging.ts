@@ -443,9 +443,9 @@ export class Logger {
 			} else {
 				message = finalArgs.join("\n");
 			}
-			return new ex.Exception(message, undefined, 1);
+			return new ex.Exception(message, {stackFramesToTruncate:1});
 		} else {
-			return new ex.Exception("Error", undefined, 1);
+			return new ex.Exception("Error", { stackFramesToTruncate: 1 });
 		}
 	}
 	/**
@@ -458,7 +458,7 @@ export class Logger {
 			return;
 		}
 		if (testCondition !== false) {
-			throw new ex.CorelibException("first parameter to assert must evaluate to true or false");
+			throw new ex.Exception("first parameter to assert must evaluate to true or false");
 		}
 		throw this.error.apply(this, args);
 	}
@@ -468,7 +468,7 @@ export class Logger {
 		this.assert.apply(this, args);
 		args.shift();
 
-		throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args), undefined, 1);
+		throw new ex.Exception(stringHelper.format.apply(stringHelper, args), { stackFramesToTruncate: 1 });
 	}
 
 	/**

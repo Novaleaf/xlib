@@ -14,12 +14,16 @@ usage example:  class MyException extends base.Exception{}  throw new MyExceptio
 from https://stackoverflow.com/questions/12915412/how-do-i-extend-a-host-object-e-g-error-in-typescript
 */
 class Exception extends Error {
-    constructor(message, innerException, 
-        /** truncate extra stack frames from the stack that's attached to this, a good way to remove logging/util functions from the trace */
-        stackFramesToTruncate = 0) {
+    constructor(message, options) {
         super(message);
         this.message = message;
-        this.innerException = innerException;
+        if (options == null) {
+            options = {};
+        }
+        if (options.stackFramesToTruncate == null) {
+            options.stackFramesToTruncate = 0;
+        }
+        this.options = options;
         //if (environment.logLevel > environment.LogLevel.DEBUG) {
         //	innerException = null;
         //} else {
@@ -27,8 +31,8 @@ class Exception extends Error {
         //		this.message = message + ": " + innerException.message;
         //	}
         //}
-        if (innerException != null) {
-            this.message = message + " +details: " + innerException.message;
+        if (options.innerException != null) {
+            this.message = message + " +details: " + options.innerException.message;
         }
         //get name based on type.  snippet taken from ./runtime/reflection.ts code
         //this.name = "Exception";
@@ -36,17 +40,26 @@ class Exception extends Error {
         this.name = (results && results.length > 1) ? results[1] : "";
         //this.message = message;
         //this.stack = (<any>new Error()).stack;		
-        let tempStack = new Error("boogah").stack;
-        //console.log("================START STACK================");
-        //console.log(tempStack);
-        //console.log("================END STACK================");
+        //remove our Error ctor from the stack (reduce unneeded verbosity of stack trace)
+        let defaultFramesToRemove = 1;
+        let tempStack;
+        if (this.stack == null) {
+            tempStack = new Error("Error Shim").stack;
+            //remove our extra errorShim ctor off the stack trace
+            defaultFramesToRemove = 2;
+        }
+        else {
+            tempStack = this.stack;
+        }
+        //truncate the stack if set by options
         let _array = tempStack.split("\n");
-        if (_array.length > (2 + stackFramesToTruncate)) {
+        if (_array.length > (defaultFramesToRemove + options.stackFramesToTruncate)) {
             let line1 = _array.shift();
             let line2 = _array.shift();
-            for (let i = 0; i < stackFramesToTruncate; i++) {
+            for (let i = 0; i < options.stackFramesToTruncate; i++) {
                 _array.shift();
             }
+            //put the message as the first item in the stack (as what normally is seen)
             _array.unshift(`${this.name}: ${this.message}`);
         }
         let finalStack = _array.join("\n");
@@ -77,19 +90,19 @@ class Exception extends Error {
     }
     toString() {
         if (environment.logLevel > environment.LogLevel.DEBUG) {
-            if (this.innerException == null) {
+            if (this.options.innerException == null) {
                 return this.message;
             }
             else {
-                return this.message + "\n\t innerException: " + this.innerException.message;
+                return this.message + "\n\t innerException: " + this.options.innerException.message;
             }
         }
         else {
-            if (this.innerException == null) {
+            if (this.options.innerException == null) {
                 return this.toStringWithStack();
             }
             else {
-                return Exception.exceptionToString(this) + "\n\t innerException: " + this.innerException.toString();
+                return Exception.exceptionToString(this) + "\n\t innerException: " + this.options.innerException.toString();
             }
         }
         //if (this.innerException == null) {
