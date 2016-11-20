@@ -17,6 +17,8 @@ export interface IPropertySchema<TValue> {
     if left undefined, user input will be as default which should usually be "string"
     review inputText types found at https://www.npmjs.com/package/react-jsonschema-form for choices
      */
+    inputType?: string;
+    /** sets the type of bootstrap widget used */
     inputWidget?: string;
     /** optional, used for Jsf input */
     inputFormat?: string;
@@ -29,6 +31,7 @@ export interface IPropertySchema<TValue> {
     dbReadTransform?: <TDbType>(/**value read from the db that needs to be transformed*/ dbValue?: TDbType) => TValue;
 }
 export interface IStringProperty extends IPropertySchema<string> {
+    inputType?: "string";
     inputWidget?: "textarea" | "password" | "color" | "string";
     inputFormat?: "email" | "uri" | "data-url" | "date" | "date-time";
     dbType: "string" | "none";
@@ -40,12 +43,14 @@ export interface IStringProperty extends IPropertySchema<string> {
     toLowercaseTrim?: boolean;
 }
 export interface IDateProperty extends IPropertySchema<Date> {
+    inputType?: "string";
     inputWidget?: "string";
     inputFormat: "date" | "date-time";
     dbType: "date" | "none";
 }
 export interface INumberProperty extends IPropertySchema<number> {
     dbType: "double" | "integer" | "none";
+    inputType?: "number" | "integer";
     inputWidget?: "updown" | "range" | "string";
     minimum?: number;
     maximum?: number;

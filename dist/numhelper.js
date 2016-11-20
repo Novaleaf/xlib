@@ -203,6 +203,7 @@ function countDigits(value, /** default false, count only the whole digits */ co
 }
 exports.countDigits = countDigits;
 /** how the clamp function should process the input (what kind of result should be returned) */
+var ClampType;
 (function (ClampType) {
     /** value not set, an error */
     ClampType[ClampType["none"] = 0] = "none";
@@ -215,8 +216,7 @@ exports.countDigits = countDigits;
     /** return the remainder (amount value lies beyond min/max range), not the clamped value.
     if inside clamp range, returns zero.  if below min, returns negative.  if above range, returns positive. */
     ClampType[ClampType["remainder"] = 4] = "remainder";
-})(exports.ClampType || (exports.ClampType = {}));
-var ClampType = exports.ClampType;
+})(ClampType = exports.ClampType || (exports.ClampType = {}));
 /**
  *  clamp a number to be within the range specified
  */

@@ -772,5 +772,5 @@ exports.Logger = Logger;
 //////////		}
 //////////		log.trace("corelib.Logger", " ======== NO TRACE FILTERS HAVE BEEN SPECIFIED!  ALL TRACES ENABLED!  =================  \n{0}\n-------------------------------------", msg);
 //////////	}
-//////////} 
+//////////}
 //# sourceMappingURL=logging.js.map

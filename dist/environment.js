@@ -6,14 +6,14 @@
 const nodeHelper = require("./internal/nodehelper");
 const browserHelper = require("./internal/browserhelper");
 //import * as ex from "./exception";
+var PlatformType;
 (function (PlatformType) {
     PlatformType[PlatformType["None"] = 0] = "None";
     PlatformType[PlatformType["Browser"] = 1] = "Browser";
     PlatformType[PlatformType["NodeJs"] = 2] = "NodeJs";
     PlatformType[PlatformType["PhantomJs"] = 3] = "PhantomJs";
     PlatformType[PlatformType["Unknown"] = 4] = "Unknown";
-})(exports.PlatformType || (exports.PlatformType = {}));
-var PlatformType = exports.PlatformType;
+})(PlatformType = exports.PlatformType || (exports.PlatformType = {}));
 ////declare var module; //not defined when using the requirejs loader :(, so we have to look for GLOBAL only.
 ///** global var if we are running under nodejs*/
 //declare var GLOBAL: any;
@@ -30,6 +30,7 @@ exports.platformType = function () {
     }
     return PlatformType.Unknown;
 }();
+var OsName;
 (function (OsName) {
     OsName[OsName["unknown"] = 0] = "unknown";
     /** mac */
@@ -40,8 +41,7 @@ exports.platformType = function () {
     /** windows (may be x64) */
     OsName[OsName["win32"] = 5] = "win32";
     OsName[OsName["unix"] = 6] = "unix";
-})(exports.OsName || (exports.OsName = {}));
-var OsName = exports.OsName;
+})(OsName = exports.OsName || (exports.OsName = {}));
 /** the name of the os we detect running.  uses user agent in browsers, process.platform in nodejs */
 exports.osName = (() => {
     if (typeof (process) !== "undefined") {
@@ -82,6 +82,7 @@ function getGlobal() {
     }
 }
 exports.getGlobal = getGlobal;
+var LogLevel;
 (function (LogLevel) {
     LogLevel[LogLevel["TRACE"] = 10] = "TRACE";
     LogLevel[LogLevel["DEBUG"] = 20] = "DEBUG";
@@ -89,8 +90,7 @@ exports.getGlobal = getGlobal;
     LogLevel[LogLevel["WARN"] = 40] = "WARN";
     LogLevel[LogLevel["ERROR"] = 50] = "ERROR";
     LogLevel[LogLevel["FATAL"] = 60] = "FATAL";
-})(exports.LogLevel || (exports.LogLevel = {}));
-var LogLevel = exports.LogLevel;
+})(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
 //var testThis = getEnvironmentVariable("logLevel", "TRACE");
 /** the logLevel of your environment.  used as the default when constructing a logging.Logger()
  * nodejs: set by running "node entrypoint.js logLevel=DEBUG" or by setting your systemenv var: logLevel=DEBUG
@@ -118,11 +118,11 @@ exports.isDebugBreakEnabled = (() => {
 /** the current environment.  prod or preprod.
 nodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD
 browser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag*/
+var EnvLevel;
 (function (EnvLevel) {
     EnvLevel[EnvLevel["PREPROD"] = 10] = "PREPROD";
     EnvLevel[EnvLevel["PROD"] = 40] = "PROD";
-})(exports.EnvLevel || (exports.EnvLevel = {}));
-var EnvLevel = exports.EnvLevel;
+})(EnvLevel = exports.EnvLevel || (exports.EnvLevel = {}));
 /** the current environment.  prod or preprod.  use to determine what database, domain names used, etc.
 nodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD
 browser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag*/

@@ -69,5 +69,4 @@ returns:  true == we just disposed.   false==already disposed so we do nothing *
 ClassBase._hashPrefix = "ClassBase:" + Date.now().toString() + ":";
 ClassBase._hashId = 0;
 exports.ClassBase = ClassBase;
-//export = ClassBase;
 //# sourceMappingURL=classbase.js.map

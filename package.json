@@ -38,7 +38,8 @@
     "validator": "^5.7.0"
   },
   "devDependencies": {
-    "mocha": "^3.0.2"
+    "mocha": "^3.0.2",
+    "typescript": "^2.2.0-dev.20161120"
   },
   "scripts": {
     "test": "mocha ./dist/**/*.js --watch",
