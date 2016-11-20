@@ -13,8 +13,13 @@ export interface IPropertySchema<TValue> {
     dbType: DbType;
     /** by default all properties are indexed (add +1x the entity size for each indexed field!  expensive!)  so you can disable this for properties that you know are not going to be sorted by, if a large number of entities of that kind need to be stored. */
     isDbIndexExcluded?: boolean;
-    /** can set an optional input format, used when using the react-jsonschema-form react plugin.   used as it's "type" field. */
-    inputType?: string;
+    /** can set an  input type, used when using the react-jsonschema-form react plugin.   used as it's "type" field.
+    if left undefined, user input will be as default which should usually be "string"
+    review inputText types found at https://www.npmjs.com/package/react-jsonschema-form for choices
+     */
+    inputWidget?: string;
+    /** optional, used for Jsf input */
+    inputFormat?: string;
     /** set this to modify the value as it's being written to the database.  For example, lets you set an "updateDate" timestamp */
     dbWriteTransform?: <TDbType>(/** current property value that needs to be transformed */ value?: TValue) => {
         value: TValue;
@@ -24,7 +29,7 @@ export interface IPropertySchema<TValue> {
     dbReadTransform?: <TDbType>(/**value read from the db that needs to be transformed*/ dbValue?: TDbType) => TValue;
 }
 export interface IStringProperty extends IPropertySchema<string> {
-    inputType?: "textarea" | "password" | "color" | "text";
+    inputWidget?: "textarea" | "password" | "color" | "string";
     inputFormat?: "email" | "uri" | "data-url" | "date" | "date-time";
     dbType: "string" | "none";
     /** if true, keeps empty strings, otherwise converts to null (when input or writing to db)
@@ -35,13 +40,13 @@ export interface IStringProperty extends IPropertySchema<string> {
     toLowercaseTrim?: boolean;
 }
 export interface IDateProperty extends IPropertySchema<Date> {
-    inputType?: "text";
+    inputWidget?: "string";
     inputFormat: "date" | "date-time";
     dbType: "date" | "none";
 }
 export interface INumberProperty extends IPropertySchema<number> {
     dbType: "double" | "integer" | "none";
-    inputType?: "updown" | "range" | "text";
+    inputWidget?: "updown" | "range" | "string";
     minimum?: number;
     maximum?: number;
     multipleOf?: number;
