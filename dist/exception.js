@@ -112,8 +112,8 @@ class Exception extends Error {
         //}
     }
 }
-Exception._getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
 exports.Exception = Exception;
+Exception._getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
 /** all errors thrown by corelib extend this error type */
 class CorelibException extends Exception {
 }

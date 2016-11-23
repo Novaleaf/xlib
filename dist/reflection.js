@@ -4,7 +4,6 @@
 //import arrayHelper = require("../arrayhelper");
 const ex = require("./exception");
 /** primitive types as identified by javascript, plus well known object types */
-var Type;
 (function (Type) {
     /** null is not undefined, unfortunately  */
     Type[Type["null"] = 0] = "null";
@@ -20,7 +19,8 @@ var Type;
     Type[Type["Array"] = 8] = "Array";
     Type[Type["RegExp"] = 9] = "RegExp";
     Type[Type["Date"] = 10] = "Date";
-})(Type = exports.Type || (exports.Type = {}));
+})(exports.Type || (exports.Type = {}));
+var Type = exports.Type;
 //OBSOLETE: just use getType() instead
 //export function isFunction(it) {
 //	return Object.prototype.toString.call(it) === "[object Function]";

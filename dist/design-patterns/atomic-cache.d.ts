@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import * as moment from "moment";
 import * as Promise from "bluebird";
 /**
