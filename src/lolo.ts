@@ -24,6 +24,8 @@ export var Exception = _exception.Exception;
 import * as moment from "moment";
 export { moment };
 
+import * as _ from "lodash";
+
 export function utcNow(): Date {
     return moment.utc().toDate();
 }

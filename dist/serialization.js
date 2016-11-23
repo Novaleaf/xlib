@@ -5,6 +5,7 @@ const reflection = require("./reflection");
 const ex = require("./exception");
 const json5 = require("json5");
 const stringHelper = require("./stringhelper");
+const _ = require("lodash");
 const util = require("util");
 /** JSON5.parse (forgiving) coupled with JSON.stringify (standards compliant serialization), plus extra helpers
  *

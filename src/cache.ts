@@ -38,7 +38,7 @@ export interface ICacheOptions {
     /**if we need to fetch, how long the new value will be valid for.  default 10 minutes. */
     fetchExpiresAmount?: number;
     /** default "minutes" */
-    fetchExpiresUnits?: moment.UnitOfTime;// string;
+    fetchExpiresUnits?: moment.unitOfTime.DurationConstructor;// string;
 
     /** if true, doesn't return the currently cached value, (if any).  If false (the default), will ignore any errors from the fetchFunction(), returning the last known good value instead.            */
     awaitNewOnExpired?: boolean;

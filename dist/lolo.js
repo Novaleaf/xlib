@@ -13,6 +13,7 @@ exports.Exception = _exception.Exception;
 //export { _exception.Exception as Exception };
 const moment = require("moment");
 exports.moment = moment;
+const _ = require("lodash");
 function utcNow() {
     return moment.utc().toDate();
 }

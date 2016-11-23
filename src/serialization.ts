@@ -8,6 +8,7 @@ import * as json5 from "json5";
 import * as stringHelper from "./stringhelper";
 import * as Promise from "bluebird";
 import * as moment from "moment";
+import * as _ from "lodash";
 
 
 /** An optional options object may be passed that alters certain aspects of the formatted string:
