@@ -1,3 +1,12 @@
+declare global  {
+    let _xlibConfigDefaults: {
+        logLevel: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL" | undefined;
+        envLevel: "PROD" | "PREPROD" | undefined;
+        isTest: "TRUE" | "FALSE" | undefined;
+        isDev: "TRUE" | "FALSE" | undefined;
+        sourceMapSupport: boolean | undefined;
+    };
+}
 import * as jsHelper from "./jshelper";
 export { jsHelper };
 import * as arrayHelper from "./arrayhelper";

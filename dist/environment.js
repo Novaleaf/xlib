@@ -96,7 +96,7 @@ var LogLevel;
  * nodejs: set by running "node entrypoint.js logLevel=DEBUG" or by setting your systemenv var: logLevel=DEBUG
  * browser: set by adding "logLevel=DEBUG" in your querystring, add a cookie, or as a attribute of your html tag
   */
-exports.logLevel = LogLevel[getEnvironmentVariable("logLevel", null)];
+exports.logLevel = LogLevel[getEnvironmentVariable("logLevel", _xlibConfigDefaults.logLevel)];
 if (exports.logLevel == null) {
     exports.logLevel = LogLevel.TRACE;
     console.info("logLevel varible is not set.  \n\tdefaulting to logLevel=TRACE.");
@@ -105,7 +105,7 @@ if (exports.logLevel == null) {
     console.info("\t\tnodejs: set by running 'node entrypoint.js logLevel=DEBUG' or by setting your systemenv var: logLevel=DEBUG");
     console.info("\t\tbrowser: set by adding 'logLevel= DEBUG' in your querystring, add a cookie, or as a attribute of your html tag\n");
 }
-else {
+else if (exports.logLevel !== LogLevel.ERROR) {
     console.info("logLevel=" + LogLevel[exports.logLevel]);
 }
 exports.isDebugBreakEnabled = (() => {
@@ -126,7 +126,7 @@ var EnvLevel;
 /** the current environment.  prod or preprod.  use to determine what database, domain names used, etc.
 nodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD
 browser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag*/
-exports.envLevel = EnvLevel[getEnvironmentVariable("envLevel", null)];
+exports.envLevel = EnvLevel[getEnvironmentVariable("envLevel", _xlibConfigDefaults.envLevel)];
 if (exports.envLevel == null) {
     exports.envLevel = EnvLevel.PREPROD;
     console.info("envLevel varible is not set.  \n\tdefaulting to envLevel=DEV.");
@@ -135,10 +135,10 @@ if (exports.envLevel == null) {
     console.info("\t\tnodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD");
     console.info("\t\tbrowser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag\n");
 }
-else {
+else if (exports.envLevel !== EnvLevel.PROD) {
     console.info("envLevel=" + EnvLevel[exports.envLevel]);
 }
-let _isTest = getEnvironmentVariable("isTest", null);
+let _isTest = getEnvironmentVariable("isTest", _xlibConfigDefaults.isTest);
 if (_isTest == null) {
     _isTest = "FALSE";
     console.info("isTest varible is not set.  \n\tdefaulting to isTest=FALSE.");
@@ -147,14 +147,14 @@ if (_isTest == null) {
     console.info("\t\tnodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE");
     console.info("\t\tbrowser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
 }
-else {
+else if (_isTest !== "FALSE") {
     console.info("isTest=" + _isTest);
 }
 /** if we are in test mode, meaning unit and scenario tests, etc.
 nodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE
 browser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag*/
 exports.isTest = _isTest.trim().toLowerCase() === "true";
-let _isDev = getEnvironmentVariable("isDev", null);
+let _isDev = getEnvironmentVariable("isDev", _xlibConfigDefaults.isDev);
 if (_isDev == null) {
     _isDev = "FALSE";
     console.info("isDev varible is not set.  \n\tdefaulting to isDev=FALSE.");
@@ -163,7 +163,7 @@ if (_isDev == null) {
     console.info("\t\tnodejs: set by running 'node entrypoint.js isDev=TRUE' or by setting your systemenv var: isDev=TRUE");
     console.info("\t\tbrowser: set by adding 'isDev=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
 }
-else {
+else if (_isDev !== "FALSE") {
     console.info("isDev=" + _isDev);
 }
 /** if we are in dev mode, meaning high-frequency polling, extra state validation code, etc.
