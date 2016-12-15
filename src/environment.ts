@@ -118,7 +118,8 @@ if (logLevel == null) {
     console.info("\tPossible values are TRACE, DEBUG, INFO, WARN, ERROR, FATAL.");
     console.info("\tHow to modify: ");
     console.info("\t\tnodejs: set by running 'node entrypoint.js logLevel=DEBUG' or by setting your systemenv var: logLevel=DEBUG");
-    console.info("\t\tbrowser: set by adding 'logLevel= DEBUG' in your querystring, add a cookie, or as a attribute of your html tag\n");
+	console.info("\t\tbrowser: set by adding 'logLevel= DEBUG' in your querystring, add a cookie, or as a attribute of your html tag\n");
+	console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { logLevel:'ERROR'} \n");
 } else if(logLevel!==LogLevel.ERROR) {
     console.info("logLevel=" + LogLevel[logLevel]);
 }
@@ -145,11 +146,12 @@ browser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as 
 export var envLevel: EnvLevel = (EnvLevel as any)[getEnvironmentVariable("envLevel", _xlibConfigDefaults.envLevel) as any];
 if (envLevel == null) {
     envLevel = EnvLevel.PREPROD;
-    console.info("envLevel varible is not set.  \n\tdefaulting to envLevel=DEV.");
+    console.info("envLevel varible is not set.  \n\tdefaulting to envLevel=PREPROD.");
     console.info("\tPossible values are PREPROD, PROD.");
     console.info("\tHow to modify: ");
-    console.info("\t\tnodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD");
-    console.info("\t\tbrowser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag\n");
+	console.info("\t\tnodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD");
+	console.info("\t\tbrowser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag\n");
+	console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { envLevel:'PROD'} \n");
 
 } else if(envLevel !==EnvLevel.PROD) {
     console.info("envLevel=" + EnvLevel[envLevel]);
@@ -163,7 +165,8 @@ if (_isTest == null) {
     console.info("\tPossible values are TRUE, FALSE.");
     console.info("\tHow to modify: ");
     console.info("\t\tnodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE");
-    console.info("\t\tbrowser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
+	console.info("\t\tbrowser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
+	console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { isTest:'FALSE'} \n");
 } else if(_isTest!=="FALSE") {
     console.info("isTest=" + _isTest);
 }
@@ -179,7 +182,8 @@ if (_isDev == null) {
     console.info("\tPossible values are TRUE, FALSE.");
     console.info("\tHow to modify: ");
     console.info("\t\tnodejs: set by running 'node entrypoint.js isDev=TRUE' or by setting your systemenv var: isDev=TRUE");
-    console.info("\t\tbrowser: set by adding 'isDev=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
+	console.info("\t\tbrowser: set by adding 'isDev=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
+	console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { isDev:'FALSE'} \n");
 } else if(_isDev!=="FALSE") {
     console.info("isDev=" + _isDev);
 }

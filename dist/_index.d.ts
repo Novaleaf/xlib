@@ -1,3 +1,5 @@
+import * as lodash from "lodash";
+export { lodash };
 declare global  {
     let _xlibConfigDefaults: {
         logLevel: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL" | undefined;
@@ -38,8 +40,6 @@ import * as compression from "./compression";
 export { compression };
 import * as threading from "./threading";
 export { threading };
-import * as lodash from "lodash";
-export { lodash };
 import * as promise from "./promise";
 export { promise };
 import * as net from "./net";

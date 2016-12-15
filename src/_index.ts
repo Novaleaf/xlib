@@ -1,4 +1,9 @@
 
+//export import lodash = require("lodash");
+import * as lodash from "lodash";
+export { lodash };
+
+
 //allow calling modules to specify config settings, without using environmental variables.
 declare global {
 	let _xlibConfigDefaults: {
@@ -9,16 +14,17 @@ declare global {
 		sourceMapSupport: boolean | undefined,		
 	}
 }
-
+let __configDefaults = {
+	logLevel: undefined,
+	envLevel: undefined,
+	isTest: undefined,
+	isDev: undefined,
+	sourceMapSupport: true,
+} as typeof _xlibConfigDefaults;
 if ((global as any)._xlibConfigDefaults == null) {
-	(global as any)._xlibConfigDefaults = {
-		logLevel: undefined,
-		envLevel: undefined,
-		isTest: undefined,
-		isDev: undefined,
-		sourceMapSupport: undefined,
-	} as typeof _xlibConfigDefaults;
+	(global as any)._xlibConfigDefaults = {};
 }
+lodash.defaults((global as any)._xlibConfigDefaults, __configDefaults);
 
 
 if (_xlibConfigDefaults.sourceMapSupport === true) {
@@ -46,45 +52,7 @@ if (_xlibConfigDefaults.sourceMapSupport === true) {
 import * as mockMocha from "./internal/mockmocha";
 mockMocha._initialize();
 
-//import * as jsHelper from "./jshelper";
-//export { jsHelper };
 
-//import * as exception from "./exception";
-//export { exception };
-
-//import * as environment from "./environment";
-//export { environment };
-
-//import * as lodash from "lodash";
-//export { lodash };
-
-
-
-
-//export import * as nodeHelper from "./node/nodehelper";
-//import * as browserHelper from "./browser/browserhelper";
-//import * as ex from "./exception";
-
-
-//var jsShims = require("./jsshims");
-
-
-
-
-
-//if (lolo.isLogDebug === true) { 
-//	//try {
-//	///** https://www.npmjs.com/package/source-map-support
-//	// * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
-//	//  */
-//	console.log("loading sourcemap support");
-//    var source_map_support = require("source-map-support");
-//    //source_map_support.install({ handleUncaughtExceptions: false });
-//	source_map_support.install();
-//	//} catch (ex) {
-//	//	console.log("eating sourcemap support call");
-//	//}
-//}
 
 
 ///** low-level javascript helpers, to smooth over warts in the language */
@@ -142,9 +110,6 @@ export { compression };
 import * as threading from "./threading";
 export { threading };
 
-//export import lodash = require("lodash");
-import * as lodash from "lodash";
-export { lodash };
 //set lodash as a global if it's not.
 if (environment.getGlobal()["_"] == null) {
 	environment.getGlobal()["_"] = lodash;
