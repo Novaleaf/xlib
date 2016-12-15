@@ -196,7 +196,6 @@ class BitFlags {
         return this.rawBuffer;
     }
 }
-exports.BitFlags = BitFlags;
 /** how many bytes can be stored by instances of this */
 BitFlags.MAXFLAGS = 32;
 //public static SIZEOF = 32;
@@ -204,6 +203,7 @@ BitFlags.MAXFLAGS = 32;
 BitFlags.ALL = new BitFlags(numHelper.INT32_MAX);
 /** all flags set to false (ctor of 0) */
 BitFlags.NONE = new BitFlags(0);
+exports.BitFlags = BitFlags;
 /**
  *  a dictionary that deletes items when they expire
  */

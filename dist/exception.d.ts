@@ -1,4 +1,3 @@
-/// <reference types="node" />
 export interface IExceptionOptions {
     innerException?: Error;
     /** truncate extra stack frames from the stack that's attached to this, a good way to remove logging/util functions from the trace */

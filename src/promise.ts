@@ -54,24 +54,24 @@ if (global.Promise == null) {
 var __isUnhandledHooked = false;
 let _unhandledDefaultLogger = new logging.Logger("promise.logPromiseUnhandledRejections")
 function logPromiseUnhandledRejections(logger = _unhandledDefaultLogger) {
-    if (__isUnhandledHooked === true) {
-        return;
-    }
-    __isUnhandledHooked = true;
+	if (__isUnhandledHooked === true) {
+		return;
+	}
+	__isUnhandledHooked = true;
 	logger.debug("exec xlib.diagnostics.logger.logPromiseUnhandledRejections()");
-    switch (environment.platformType) {
-        case environment.PlatformType.Browser:
-            window.addEventListener("unhandledrejection", (e: any) => {
-                var reason = e.detail.reason;
-                var promise = e.detail.promise;
+	switch (environment.platformType) {
+		case environment.PlatformType.Browser:
+			window.addEventListener("unhandledrejection", (e: any) => {
+				var reason = e.detail.reason;
+				var promise = e.detail.promise;
 
-                logger.error(reason, promise);
+				logger.error(reason, promise);
 
-                throw e;
-            });
-            break;
-        case environment.PlatformType.NodeJs:
-            process.on("unhandledRejection", function (reason: any, promise: Promise<any>,whut:any) {
+				throw e;
+			});
+			break;
+		case environment.PlatformType.NodeJs:
+			process.on("unhandledRejection", function (reason: any, promise: Promise<any>,whut:any) {
 				try {
 
 					
@@ -97,9 +97,9 @@ function logPromiseUnhandledRejections(logger = _unhandledDefaultLogger) {
 				}
 				throw reason;
 
-            });
-            break;
-    }
+			});
+			break;
+	}
 
 
 }
@@ -146,17 +146,17 @@ var retry = require('bluebird-retry');
 var i = 0;
 var err;
 var swing = function() {
-    i++;
-    console.log('strike ' + i);
-    if (i == 3) {
-        throw new retry.StopError('yer out');
-    }
-    throw new Error('still up at bat');
+	i++;
+	console.log('strike ' + i);
+	if (i == 3) {
+		throw new retry.StopError('yer out');
+	}
+	throw new Error('still up at bat');
 };
 
 retry(swing, {timeout: 10000})
 .catch(function(e) {
-    console.log(e.message)
+	console.log(e.message)
 });
 Will display:
 
@@ -196,16 +196,16 @@ var retry = require('bluebird-retry');
 
 var count = 0;
 function myfunc() {
-    console.log('myfunc called ' + (++count) + ' times');
-    if (count < 3) {
-        return Promise.reject(new Error('fail the first two times'));
-    } else {
-        return Promise.resolve('succeed the third time');
-    }
+	console.log('myfunc called ' + (++count) + ' times');
+	if (count < 3) {
+		return Promise.reject(new Error('fail the first two times'));
+	} else {
+		return Promise.resolve('succeed the third time');
+	}
 }
 
 retry(myfunc).done(function(result) {
-    console.log(result);
+	console.log(result);
 });
  */
 export var retry: _BluebirdRetryInternals.IRetryStatic = require("./internal/bluebird-retry");
@@ -227,79 +227,79 @@ export var retry: _BluebirdRetryInternals.IRetryStatic = require("./internal/blu
  */
 export class InitializeHelper<TInitResult, TOptions>  {
 
-    constructor(private _log: logging.Logger,
-        /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
-        private _initWork: (/** init options passed by the this.initalize() caller */ options: TOptions) => Promise<TInitResult>) {
+	constructor(private _log: logging.Logger,
+		/** the actual work that needs to be performed as part of the initialzation.  will only occur once */
+		private _initWork: (/** init options passed by the this.initalize() caller */ options: TOptions) => Promise<TInitResult>) {
 
-        if (_.isFunction(_initWork) !== true) {
-            throw _log.error("the _initWork parameter must be a function.  it is not");
-        }
+		if (_.isFunction(_initWork) !== true) {
+			throw _log.error("the _initWork parameter must be a function.  it is not");
+		}
 
-    }
+	}
 
-    /** the promise containing the results of the initialization (status and resulting value, if any) */
-    public result: Promise<TInitResult> | undefined;
-    /**
-     * perform the initialization work, or if it's already initialized, does nothing
-     */
-    public initialize(/** init options passed to the this._initWork() worker (callee) */  options?: TOptions): Promise<TInitResult> {
+	/** the promise containing the results of the initialization (status and resulting value, if any) */
+	public result: Promise<TInitResult> | undefined;
+	/**
+	 * perform the initialization work, or if it's already initialized, does nothing
+	 */
+	public initialize(/** init options passed to the this._initWork() worker (callee) */  options?: TOptions): Promise<TInitResult> {
 
-        if (this.result != null) {
-            //already called initialize, return it's promise
-            return this.result;
-        }
+		if (this.result != null) {
+			//already called initialize, return it's promise
+			return this.result;
+		}
 
-        this.result = Promise.try<TInitResult>(() => {
-            try {
-                return this._initWork(options as any);
-            } catch (ex) {
-                if (this._log == null) {
-                    throw new Error(`Type error, most likely because you didn't call .bind() to your initialize function.  ex:  export let initialize: typeof _init.initialize = _init.initialize.bind(_init);  Error=${ex}`)
-                }
-                throw ex;
-            }
-        });
-        return this.result;
-    }
-    /**
-     *  make sure this module's initialize method has been called and has finished successfully.
-     * if not, will log and throw an error.
-     */
-    public ensureFinished(/**optinoal. if fails, show your custom error message instead of the default */  errorMessage?:string) : void {
-        if (this.result == null || this.result.isPending()) {
-            throw this._log.error("initialization still pending");
-        }
-        if (this.result.isRejected()) {
-            if (errorMessage == null) {
-                throw this._log.error("init failed.  check result details:", { result: this.result.toJSON() });
-            } else {
-                throw this._log.error(errorMessage);
-            }
-        }
-    }
+		this.result = Promise.try<TInitResult>(() => {
+			try {
+				return this._initWork(options as any);
+			} catch (ex) {
+				if (this._log == null) {
+					throw new Error(`Type error, most likely because you didn't call .bind() to your initialize function.  ex:  export let initialize: typeof _init.initialize = _init.initialize.bind(_init);  Error=${ex}`)
+				}
+				throw ex;
+			}
+		});
+		return this.result;
+	}
+	/**
+	 *  make sure this module's initialize method has been called and has finished successfully.
+	 * if not, will log and throw an error.
+	 */
+	public ensureFinished(/**optinoal. if fails, show your custom error message instead of the default */  errorMessage?:string) : void {
+		if (this.result == null || this.result.isPending()) {
+			throw this._log.error("initialization still pending");
+		}
+		if (this.result.isRejected()) {
+			if (errorMessage == null) {
+				throw this._log.error("init failed.  check result details:", { result: this.result.toJSON() });
+			} else {
+				throw this._log.error(errorMessage);
+			}
+		}
+	}
 }
 
 export module _deprecated {
 	/** gets a promise which includes the "resolve()" and "reject()" methods to allow external code to fullfill it.*/
 	export function CreateExposedPromise<T>(callback?: (resolve: (resultOrThenable: T | Promise<T>) => void, reject: (error: any) => void) => void): IExposedPromise<T> {
 
-        var resolver: ( (resultOrThenable: T | Promise<T>) => void) | null = null;
-        var rejector: ( (error: any) => void)|null= null;
+		var resolver: ( (resultOrThenable: T | Promise<T>) => void) | null = null;
+		var rejector: ( (error: any) => void)|null= null;
 
 
-        
-        //create a new instance of a bluebird promise
-        var toReturn: IExposedPromise<T> = <any>new bluebird<T>(function (this: IExposedPromise<T>, resolve:any, reject:any) {
+		
+		//create a new instance of a bluebird promise
+		var toReturn: IExposedPromise<T> = <any>new bluebird<T>(function (this: IExposedPromise<T>, resolve:any, reject:any) {
 			resolver = resolve;
-            rejector = reject;
+			rejector = reject;
 			if (callback != null) {
 				callback.apply(toReturn, arguments);
 			}
-        });
-        //assign our resolver/rejectors to our promise object
-        //the above closure executes during the bluebird ctor method, so the values are always properly populated.
-        toReturn.resolve = resolver as any;
-        toReturn.reject = rejector as any;
+		});
+		//assign our resolver/rejectors to our promise object
+		//the above closure executes during the bluebird ctor method, so the values are always properly populated.
+		toReturn.resolve = resolver as any;
+		toReturn.reject = rejector as any;
 
 
 		return toReturn;
