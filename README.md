@@ -83,6 +83,28 @@ a robust and configurable logger, with log-levels set via global environment var
 
 ***limitations***:  only logs to console for now.  A configurable listener would be preferable, if you want to send a pull request!
 
+#### Environmental/Startup Options
+by default, when you import ```xlib``` it will initialize it's ```xlib.environment``` variables with default values, and verbosely log its self-setting of defaults:
+- ```logLevel``` defaults to ```TRACE```
+- ```envLevel``` defaults to ```PREPROD```
+- ```isTest``` defaults to ```FALSE```
+- ```isDev``` defaults to ```FALSE```
+
+if you don't want to set environmental or startup options, you can instead set a ```global._xlibConfigDefaults``` object.  This also silences the verbose console output.
+
+here's an example of how you can use it:
+``` typescript
+//specify xlib config options, without requiring environmental config
+(global as any)._xlibConfigDefaults = {
+	logLevel: "ERROR",
+	envLevel: "PROD",
+	isTest: "FALSE",
+	isDev: "FALSE",
+	sourceMapSupport: true,
+} as typeof _xlibConfigDefaults;
+import xlib = require("xlib");
+```
+ 
 
 --------
 # Versioning / Upgrading

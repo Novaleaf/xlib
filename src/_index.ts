@@ -1,4 +1,5 @@
 
+//allow calling modules to specify config settings, without using environmental variables.
 declare global {
 	let _xlibConfigDefaults: {
 		logLevel: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL" | undefined,
@@ -9,15 +10,15 @@ declare global {
 	}
 }
 
-
-(global as any)._xlibConfigDefaults = {
-	logLevel: undefined,
-	envLevel: undefined,
-	isTest: undefined,
-	isDev: undefined,
-	sourceMapSupport: undefined,
-} as typeof _xlibConfigDefaults;
-
+if ((global as any)._xlibConfigDefaults == null) {
+	(global as any)._xlibConfigDefaults = {
+		logLevel: undefined,
+		envLevel: undefined,
+		isTest: undefined,
+		isDev: undefined,
+		sourceMapSupport: undefined,
+	} as typeof _xlibConfigDefaults;
+}
 
 
 if (_xlibConfigDefaults.sourceMapSupport === true) {
@@ -29,8 +30,8 @@ if (_xlibConfigDefaults.sourceMapSupport === true) {
 	//can be removed by webpack
 	if (source_map_support != null && source_map_support.install != null) {
 		//console.info("source map support installing");
-		source_map_support.install();
-		console.info("source map support installed by xlib, as requested by calling module.");
+		source_map_support.install();		
+		//console.info("source map support installed by xlib, as requested by calling module.");
 	} else if (source_map_support != null && source_map_support.sourceMapSupport != null) {
 		//console.warn("source map support installing 2");
 		source_map_support.sourceMapSupport.install();

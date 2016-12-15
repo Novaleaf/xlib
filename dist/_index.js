@@ -1,11 +1,13 @@
 "use strict";
-global._xlibConfigDefaults = {
-    logLevel: undefined,
-    envLevel: undefined,
-    isTest: undefined,
-    isDev: undefined,
-    sourceMapSupport: undefined,
-};
+if (global._xlibConfigDefaults == null) {
+    global._xlibConfigDefaults = {
+        logLevel: undefined,
+        envLevel: undefined,
+        isTest: undefined,
+        isDev: undefined,
+        sourceMapSupport: undefined,
+    };
+}
 if (_xlibConfigDefaults.sourceMapSupport === true) {
     /** https://www.npmjs.com/package/source-map-support
      * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
@@ -16,7 +18,6 @@ if (_xlibConfigDefaults.sourceMapSupport === true) {
     if (source_map_support != null && source_map_support.install != null) {
         //console.info("source map support installing");
         source_map_support.install();
-        console.info("source map support installed by xlib, as requested by calling module.");
     }
     else if (source_map_support != null && source_map_support.sourceMapSupport != null) {
         //console.warn("source map support installing 2");
