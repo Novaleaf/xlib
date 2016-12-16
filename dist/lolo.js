@@ -73,5 +73,10 @@ exports.forIn = _.forIn;
 exports.forInRight = _.forInRight;
 exports.forOwn = _.forOwn;
 exports.forOwnRight = _.forOwnRight;
-//export let defaults:<T>()=>T = _.def 
+//export let defaults:<T>()=>T = _.def
+/** bind a function to an object, preserving it's input parameters */
+function bind(fcn, thisArg) {
+    return fcn.bind(thisArg);
+}
+exports.bind = bind;
 //# sourceMappingURL=lolo.js.map

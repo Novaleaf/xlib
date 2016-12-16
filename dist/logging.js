@@ -301,8 +301,6 @@ class Logger {
             case environment.PlatformType.Browser:
                 switch (targetLogLevel) {
                     case environment.LogLevel.TRACE:
-                        console.trace.apply(console, finalArgs);
-                        break;
                     case environment.LogLevel.DEBUG:
                         if (console.groupCollapsed != null) {
                             console.groupCollapsed.apply(console, finalArgs); //("...trace...");

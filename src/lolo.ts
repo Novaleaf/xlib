@@ -100,3 +100,8 @@ export let forOwn: _ILodashObjectEnumerator = _.forOwn;
 export let forOwnRight: _ILodashObjectEnumerator = _.forOwnRight;
 
 //export let defaults:<T>()=>T = _.def
+
+/** bind a function to an object, preserving it's input parameters */
+export function bind<TFcn extends Function>(fcn:TFcn,thisArg:any): TFcn{    
+    return fcn.bind(thisArg) as TFcn;
+}

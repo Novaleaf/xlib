@@ -15,9 +15,9 @@
 	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": true,
 	"tslint.enable": true,
 	"tslint.run": "onType",
-	"tslint.autoFixOnSave": true,
+	"tslint.autoFixOnSave": false,
 	/** use version of typescript saved as a dev dependency */
-	"typescript.tsdk": "./node_modules/typescript/lib",
+	//"typescript.tsdk": "./node_modules/typescript/lib",
 	/** use version of typescript saved to the npm globals folder */
 	//"typescript.tsdk": "C:/Users/jason/AppData/Roaming/npm/node_modules/typescript/lib",
 	//"typescript.tsdk": "%USERPROFILE%/AppData/Roaming/npm/node_modules/typescript/lib",

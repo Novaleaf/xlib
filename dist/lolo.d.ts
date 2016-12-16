@@ -58,3 +58,5 @@ export declare let forIn: _ILodashObjectEnumerator;
 export declare let forInRight: _ILodashObjectEnumerator;
 export declare let forOwn: _ILodashObjectEnumerator;
 export declare let forOwnRight: _ILodashObjectEnumerator;
+/** bind a function to an object, preserving it's input parameters */
+export declare function bind<TFcn extends Function>(fcn: TFcn, thisArg: any): TFcn;

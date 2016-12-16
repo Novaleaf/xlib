@@ -58,6 +58,9 @@ export interface IDateProperty extends IPropertySchema<Date> {
 	inputFormat: "date" | "date-time";
 	dbType: "date" | "none";
 }
+export interface IBooleanProperty extends IPropertySchema<boolean> {
+	dbType: "boolean" | "none";
+}
 
 export interface INumberProperty extends IPropertySchema<number> {
 	dbType: "double" | "integer" | "none";
