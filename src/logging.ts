@@ -44,31 +44,31 @@ interface IAnsiColor {
  * helper to convert ansi color codes to string representations.    conversions taken from https://en.wikipedia.org/wiki/ANSI_escape_code#graphics
  * @param input
  */
-function colorCodeToString(input: string, currentColor?: IAnsiColor): IAnsiColor {
+function colorCodeToString( input: string, currentColor?: IAnsiColor ): IAnsiColor {
 	var defaultColor: IAnsiColor = { foreground: "grey", background: "black", bold: false, highIntensity: false, };
 
-	var result = _.clone(defaultColor);
+	var result = _.clone( defaultColor );
 
-	if (currentColor != null) {
-		result = _.clone(currentColor);
+	if ( currentColor != null ) {
+		result = _.clone( currentColor );
 	}
 	input = input.trim();
-	if (input.indexOf("[") === 0) {
-		input = input.substring(1);
+	if ( input.indexOf( "[" ) === 0 ) {
+		input = input.substring( 1 );
 	}
 
-	if (input.indexOf("m") > 0) {
-		input = input.substring(0, input.length - 1);
+	if ( input.indexOf( "m" ) > 0 ) {
+		input = input.substring( 0, input.length - 1 );
 	}
 
-	var sections = input.split(";");
-	for (let i = 0; i < sections.length; i++) {
-		var num = parseInt(sections[i]);
+	var sections = input.split( ";" );
+	for ( let i = 0; i < sections.length; i++ ) {
+		var num = parseInt( sections[ i ] );
 		//color names from http://www.w3schools.com/cssref/css_colornames.asp
-		switch (num) {
+		switch ( num ) {
 			case 0: //reset
 			case 27: //positive
-				result = _.clone(defaultColor);
+				result = _.clone( defaultColor );
 				break;
 			case 1:
 				//bold
@@ -189,8 +189,8 @@ function colorCodeToString(input: string, currentColor?: IAnsiColor): IAnsiColor
 				result.background = "white";
 				break;
 			default:
-				if (environment.logLevel <= environment.LogLevel.DEBUG) {
-					throw new LoggerFatalException("colorCodeToString() unknown color " + input);
+				if ( environment.logLevel <= environment.LogLevel.DEBUG ) {
+					throw new LoggerFatalException( "colorCodeToString() unknown color " + input );
 				}
 			//no action (do not set anything)
 
@@ -207,7 +207,7 @@ interface IReplacement extends IAnsiColor {
 
 
 
-import path = require("path");
+import path = require( "path" );
 /** console logger logs to screen as simple text...*/
 export class Logger {
 	//INTERNAL NOTE:  This is a replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) 
@@ -225,72 +225,72 @@ export class Logger {
 			doNotTrimName?: boolean
 		} = {}) {
 
-		if (options.doNotTrimName !== true) {
-			this.name = stringHelper.removeMatchingPrefix(name, __dirname);
+		if ( options.doNotTrimName !== true ) {
+			this.name = stringHelper.removeMatchingPrefix( name, __dirname );
 		}
 	}
 	/** converts objects to strings, leaves primitive types intact */
-	private _normalizeArgs(args: any[]) {
+	private _normalizeArgs( args: any[] ) {
 		//generate log string
 		var finalArgs: any[] = [];
 
-		_.forEach(args, (arg) => {
-			var typeName = reflection.getTypeName(arg);
-			var type = reflection.getType(arg);
+		_.forEach( args, ( arg ) => {
+			var typeName = reflection.getTypeName( arg );
+			var type = reflection.getType( arg );
 
-			switch (type) {
+			switch ( type ) {
 				case reflection.Type.Error:
 					var objArg: any;
 					try {
-						objArg = (serialization.JSONX.inspectStringify(arg, 3, false, true, undefined, undefined, "\t"));
+						objArg = ( serialization.JSONX.inspectStringify( arg, 3, false, true, undefined, undefined, "\t" ) );
 						//finalArgs.push(JSON.stringify(arg,undefined,"\t"));
-					} catch (ex) {
-						objArg = ("[Object???]");
+					} catch ( ex ) {
+						objArg = ( "[Object???]" );
 
 					}
-					finalArgs.push(Chalk.red.bold(objArg));
+					finalArgs.push( Chalk.red.bold( objArg ) );
 					break;
 				case reflection.Type.object:
 					var objArg: any;
 					try {
-						objArg = (serialization.JSONX.inspectStringify(arg, 3, false, false, undefined, undefined, "\t"));
+						objArg = ( serialization.JSONX.inspectStringify( arg, 3, false, false, undefined, undefined, "\t" ) );
 						//finalArgs.push(JSON.stringify(arg,undefined,"\t"));
-					} catch (ex) {
-						objArg = ("[Object???]");
+					} catch ( ex ) {
+						objArg = ( "[Object???]" );
 
 					}
-					finalArgs.push(Chalk.green.bold(objArg));
+					finalArgs.push( Chalk.green.bold( objArg ) );
 					break;
 				default:
-					finalArgs.push(arg);
+					finalArgs.push( arg );
 			}
 		});
 		return finalArgs;
 	}
 
-	private _log(targetLogLevel: environment.LogLevel, args: any[]) {
-		if (targetLogLevel < this.logLevel) {
+	private _log( targetLogLevel: environment.LogLevel, args: any[] ) {
+		if ( targetLogLevel < this.logLevel ) {
 			return;
 		}
-		return this._doLog.apply(this, arguments) as string[];
+		return this._doLog.apply( this, arguments ) as string[];
 
 	}
 
-	private _doLog(targetLogLevel: environment.LogLevel, args: any[]) {
+	private _doLog( targetLogLevel: environment.LogLevel, args: any[] ) {
 
 		let finalArgs: any[];
-		switch (environment.platformType) {
+		switch ( environment.platformType ) {
 			case environment.PlatformType.Browser:
 				finalArgs = args;
 				break;
 			case environment.PlatformType.NodeJs:
 			default:
-				finalArgs = this._normalizeArgs(args);
+				finalArgs = this._normalizeArgs( args );
 				break;
 		}
 
 		var logLevelColor = Chalk.bgBlack;
-		switch (targetLogLevel) {
+		switch ( targetLogLevel ) {
 			case environment.LogLevel.TRACE:
 				logLevelColor = Chalk.bgWhite;
 				break;
@@ -311,11 +311,11 @@ export class Logger {
 				break;
 			default:
 				logLevelColor = Chalk.inverse.bold;
-				throw new LoggerFatalException("unknown targetLogLevel");
+				throw new LoggerFatalException( "unknown targetLogLevel" );
 			//break;
 		}
 		//format
-		switch (environment.platformType) {
+		switch ( environment.platformType ) {
 			// *****************************************************************
 			// *****************************************************************
 			// *****************************************************************
@@ -332,76 +332,76 @@ export class Logger {
 			default:
 				{
 					//terminal output
-					finalArgs.unshift(logLevelColor(environment.LogLevel[targetLogLevel]));
-					finalArgs.unshift(Chalk.cyan(this.name));
-					finalArgs.unshift(Chalk.gray(moment().toISOString()));
+					finalArgs.unshift( logLevelColor( environment.LogLevel[ targetLogLevel ] ) );
+					finalArgs.unshift( Chalk.cyan( this.name ) );
+					finalArgs.unshift( Chalk.gray( moment().toISOString() ) );
 				}
 				break;
 		}
 		//on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
-		switch (environment.platformType) {
+		switch ( environment.platformType ) {
 			case environment.PlatformType.Browser:
 
 
-				switch (targetLogLevel) {
+				switch ( targetLogLevel ) {
 					case environment.LogLevel.TRACE:
 					case environment.LogLevel.DEBUG:
-						if (console.groupCollapsed != null) {
-							console.groupCollapsed.apply(console, finalArgs);//("...trace...");
-							console.trace("...trace...");
+						if ( console.groupCollapsed != null ) {
+							console.groupCollapsed.apply( console, finalArgs );//("...trace...");
+							console.trace( "...trace..." );
 							console.groupEnd();
 						} else {
-							console.debug.apply(console, finalArgs);
+							console.debug.apply( console, finalArgs );
 						}
 						break;
 					case environment.LogLevel.INFO:
 						//console.info.apply(console, finalArgs);
-						if (console.groupCollapsed != null) {
-							console.groupCollapsed.apply(console, finalArgs);//("...trace...");
-							console.trace("...trace...");
+						if ( console.groupCollapsed != null ) {							
+							console.groupCollapsed.apply( console, finalArgs );//("...trace...");
+							console.trace( "...trace..." );
 							console.groupEnd();
 						} else {
-							console.info.apply(console, finalArgs);
+							console.info.apply( console, finalArgs );
 						}
 						break;
 					case environment.LogLevel.WARN:
-						console.warn.apply(console, finalArgs);
+						console.warn.apply( console, finalArgs );
 						break;
 					case environment.LogLevel.ERROR:
-						console.error.apply(console, finalArgs);
+						console.error.apply( console, finalArgs );
 						break;
 					case environment.LogLevel.FATAL:
-						console.error.apply(console, finalArgs);
+						console.error.apply( console, finalArgs );
 						break;
 					default:
-						throw new LoggerFatalException("unknown targetLogLevel");
+						throw new LoggerFatalException( "unknown targetLogLevel" );
 					//break;
 				}
 				break;
 			//on node, we use only show stacktrace for explicit trace call or errors.
 			case environment.PlatformType.NodeJs:
 			default:
-				switch (targetLogLevel) {
+				switch ( targetLogLevel ) {
 					case environment.LogLevel.TRACE:
-						console.trace.apply(console, finalArgs);
+						console.trace.apply( console, finalArgs );
 						break;
 					case environment.LogLevel.DEBUG:
-						console.log.apply(console, finalArgs);
+						console.log.apply( console, finalArgs );
 						break;
 					case environment.LogLevel.INFO:
-						console.log.apply(console, finalArgs);
+						console.log.apply( console, finalArgs );
 						break;
 					case environment.LogLevel.WARN:
-						console.warn.apply(console, finalArgs);
+						console.warn.apply( console, finalArgs );
 						break;
 					case environment.LogLevel.ERROR:
-						console.error.apply(console, finalArgs);
+						console.error.apply( console, finalArgs );
 						break;
 					case environment.LogLevel.FATAL:
-						console.error.apply(console, finalArgs);
+						console.error.apply( console, finalArgs );
 						break;
 					default:
-						throw new LoggerFatalException("unknown targetLogLevel");
+						throw new LoggerFatalException( "unknown targetLogLevel" );
 					//break;
 				}
 				break;
@@ -414,36 +414,36 @@ export class Logger {
 	 *  highest verbosity
 	 * @param args
 	 */
-	public trace(...args: any[]) {
-		this._log(environment.LogLevel.TRACE, args);
+	public trace( ...args: any[] ) {
+		this._log( environment.LogLevel.TRACE, args );
 	}
-	public debug(...args: any[]) {
-		this._log(environment.LogLevel.DEBUG, args);
+	public debug( ...args: any[] ) {
+		this._log( environment.LogLevel.DEBUG, args );
 	}
-	public info(...args: any[]) {
-		this._log(environment.LogLevel.INFO, args);
+	public info( ...args: any[] ) {
+		this._log( environment.LogLevel.INFO, args );
 	}
-	public warn(...args: any[]) {
-		this._log(environment.LogLevel.WARN, args);
+	public warn( ...args: any[] ) {
+		this._log( environment.LogLevel.WARN, args );
 	}
 	/**
 	 *  log as an error, and returns an exception you can throw.
 	ex:  throw log.error("something bad");
 	 * @param args
 	 */
-	public error(...args: any[]): ex.Exception {
-		let finalArgs = this._log(environment.LogLevel.ERROR, args);
+	public error( ...args: any[] ): ex.Exception {
+		let finalArgs = this._log( environment.LogLevel.ERROR, args );
 
-		if (finalArgs != null) {
+		if ( finalArgs != null ) {
 			let message: string;
-			if (finalArgs.length > 2) {
-				message = finalArgs[3]
+			if ( finalArgs.length > 2 ) {
+				message = finalArgs[ 3 ]
 			} else {
-				message = finalArgs.join("\n");
+				message = finalArgs.join( "\n" );
 			}
-			return new ex.Exception(message, {stackFramesToTruncate:1});
+			return new ex.Exception( message, { stackFramesToTruncate: 1 });
 		} else {
-			return new ex.Exception("Error", { stackFramesToTruncate: 1 });
+			return new ex.Exception( "Error", { stackFramesToTruncate: 1 });
 		}
 	}
 	/**
@@ -451,22 +451,22 @@ export class Logger {
 	 * @param testCondition
 	 * @param args
 	 */
-	public errorAndThrowIfFalse(testCondition: boolean, ...args: any[]): void {
-		if (testCondition === true) {
+	public errorAndThrowIfFalse( testCondition: boolean, ...args: any[] ): void {
+		if ( testCondition === true ) {
 			return;
 		}
-		if (testCondition !== false) {
-			throw new ex.Exception("first parameter to assert must evaluate to true or false");
+		if ( testCondition !== false ) {
+			throw new ex.Exception( "first parameter to assert must evaluate to true or false" );
 		}
-		throw this.error.apply(this, args);
+		throw this.error.apply( this, args );
 	}
 
-	public fatal(...args: any[]) {
-		args.unshift(false);
-		this.assert.apply(this, args);
+	public fatal( ...args: any[] ) {
+		args.unshift( false );
+		this.assert.apply( this, args );
 		args.shift();
 
-		throw new ex.Exception(stringHelper.format.apply(stringHelper, args), { stackFramesToTruncate: 1 });
+		throw new ex.Exception( stringHelper.format.apply( stringHelper, args ), { stackFramesToTruncate: 1 });
 	}
 
 	/**
@@ -474,47 +474,47 @@ export class Logger {
 	 * @param testCondition
 	 * @param args
 	 */
-	assert(testCondition: boolean, ...args: any[]): void {
-		if (testCondition === true) {
+	assert( testCondition: boolean, ...args: any[] ): void {
+		if ( testCondition === true ) {
 			return;
 		}
-		if (testCondition !== false) {
-			throw new ex.CorelibException("first parameter to assert must evaluate to true or false");
+		if ( testCondition !== false ) {
+			throw new ex.CorelibException( "first parameter to assert must evaluate to true or false" );
 		}
 
 		let finalArgs: any[];
-		switch (environment.platformType) {
+		switch ( environment.platformType ) {
 			case environment.PlatformType.Browser:
 				finalArgs = args;
 				break;
 			case environment.PlatformType.NodeJs:
 			default:
-				finalArgs = this._normalizeArgs(args);
+				finalArgs = this._normalizeArgs( args );
 				break;
 		}
 
 
-		finalArgs.unshift(Chalk.bgYellow("ASSERT"));
-		finalArgs.unshift(Chalk.cyan(this.name));
-		finalArgs.unshift(Chalk.gray(moment().toISOString()));
+		finalArgs.unshift( Chalk.bgYellow( "ASSERT" ) );
+		finalArgs.unshift( Chalk.cyan( this.name ) );
+		finalArgs.unshift( Chalk.gray( moment().toISOString() ) );
 		//finalArgs.unshift(false);
 
 		//on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
-		switch (environment.platformType) {
+		switch ( environment.platformType ) {
 			case environment.PlatformType.Browser:
-				finalArgs.unshift(false);
-				console.assert.apply(console, finalArgs);
+				finalArgs.unshift( false );
+				console.assert.apply( console, finalArgs );
 				//assert(false, finalArgs.join("\n"));
 				break;
 
 			case environment.PlatformType.NodeJs:
-				console.trace.apply(console, finalArgs);
-				assert(false, finalArgs.join("\n"));
+				console.trace.apply( console, finalArgs );
+				assert( false, finalArgs.join( "\n" ) );
 				break;
 			default:
-				finalArgs.unshift(false);
+				finalArgs.unshift( false );
 				//console.warn.apply(console, finalArgs);
-				console.assert.apply(console, finalArgs);
+				console.assert.apply( console, finalArgs );
 				break;
 		}
 
@@ -522,22 +522,22 @@ export class Logger {
 
 	}
 	/** use to mark code that needs to be finished before it can be run.   asserts when hit. */
-	todo(format = "TODO: not implemented", ...params: any[]): never {
-		var msg = "TODO: " + jsHelper.apply(stringHelper.format, null, params, [format]);//.apply(null,format, params);
-		this.assert(false, msg);
-		throw this.error(msg);
+	todo( format = "TODO: not implemented", ...params: any[] ): never {
+		var msg = "TODO: " + jsHelper.apply( stringHelper.format, null, params, [ format ] );//.apply(null,format, params);
+		this.assert( false, msg );
+		throw this.error( msg );
 	}
-	deprecated(message?: string) {
-		this.warn(`log.deprecated(${message})`);
+	deprecated( message?: string ) {
+		this.warn( `log.deprecated(${ message })` );
 		//this.assert(false, "implement deprecated");
 	}
 	/** note to redo this before shipping (any time not in envLevel===PROD mode).   when in prod mode, an error is thrown */
-	refactor(message?: string) {
+	refactor( message?: string ) {
 
-		if (environment.envLevel === environment.EnvLevel.PROD) {
-			throw this.error(`log.refactor(${message})`);
+		if ( environment.envLevel === environment.EnvLevel.PROD ) {
+			throw this.error( `log.refactor(${ message })` );
 		} else {
-			this.warn(`log.refactor(${message})`);
+			this.warn( `log.refactor(${ message })` );
 		}
 	}
 }

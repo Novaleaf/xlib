@@ -29,6 +29,8 @@ export declare function isReal(x: number): boolean;
 export declare function randomFloat(min_inc?: number, max_exc?: number): number;
 export declare function randomInt(min_inc?: number, max_exc?: number): number;
 export declare function randomBool(/** the probability that true will be returned.  default 0.5 (50%) */ trueChance?: number): boolean;
+/** get a random element from an array */
+export declare function randomElement<T>(array: T[], /** inclusive */ minIndex?: number, /** exclusive */ maxIndex?: number): T;
 export declare function round(value: number, 
     /** default = 0.  round(123.456,10)=>0;    round(123.456,2)=>100;   round(123.456,-2)=>123.46;   round(123.456,0)=>123;   round(123.456,-10)=>123.456;*/
     digitsOrNegativeForDecimals?: number): number;

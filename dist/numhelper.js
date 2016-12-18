@@ -145,6 +145,12 @@ function randomBool(/** the probability that true will be returned.  default 0.5
     //return randomInt(0, 2) === 0; 
 }
 exports.randomBool = randomBool;
+/** get a random element from an array */
+function randomElement(array, /** inclusive */ minIndex = 0, /** exclusive */ maxIndex = array.length) {
+    const index = randomInt(minIndex, maxIndex);
+    return array[index];
+}
+exports.randomElement = randomElement;
 function round(value, 
     /** default = 0.  round(123.456,10)=>0;    round(123.456,2)=>100;   round(123.456,-2)=>123.46;   round(123.456,0)=>123;   round(123.456,-10)=>123.456;*/
     digitsOrNegativeForDecimals = 0) {

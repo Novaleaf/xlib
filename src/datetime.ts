@@ -14,6 +14,14 @@ export function getDateFromIsoString(isoDateTimeString: string) {
 	}
 	return isoDateTimeString.substring(0, isoDateTimeString.lastIndexOf("T"));
 }
+
+
+/** helper to generate a random date between the two dates */
+export function randomDate(/** inclusive */start: Date,/** inclusive */ end:Date) {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+};
+
+
 //export class DateTime {
 
 //	protected _instance: moment.Moment;

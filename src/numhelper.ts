@@ -153,6 +153,13 @@ export function randomBool(/** the probability that true will be returned.  defa
     return Math.random() < trueChance;
     //return randomInt(0, 2) === 0; 
 }
+/** get a random element from an array */
+export function randomElement<T>(array:T[],/** inclusive */ minIndex:number=0, /** exclusive */maxIndex:number=array.length){
+const index = randomInt(minIndex, maxIndex);
+return array[index];
+
+}
+
 
 export function round(value: number,
 	/** default = 0.  round(123.456,10)=>0;    round(123.456,2)=>100;   round(123.456,-2)=>123.46;   round(123.456,0)=>123;   round(123.456,-10)=>123.456;*/

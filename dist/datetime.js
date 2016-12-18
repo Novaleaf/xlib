@@ -12,6 +12,12 @@ function getDateFromIsoString(isoDateTimeString) {
     return isoDateTimeString.substring(0, isoDateTimeString.lastIndexOf("T"));
 }
 exports.getDateFromIsoString = getDateFromIsoString;
+/** helper to generate a random date between the two dates */
+function randomDate(/** inclusive */ start, /** inclusive */ end) {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+}
+exports.randomDate = randomDate;
+;
 //export class DateTime {
 //	protected _instance: moment.Moment;
 //	/** To get the current date and time, just call moment() with no parameters.  This is essentially the same as calling moment(new Date()). */
