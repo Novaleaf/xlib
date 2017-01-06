@@ -37,26 +37,27 @@ export declare var isLogTrace: boolean;
 export declare var isLogDebug: boolean;
 export declare var formatNum: typeof numHelper.format;
 export import apply = _jsHelper.apply;
+export interface _ILodashArrayEnumerator {
+    <TValue>(array: TValue[], enumerator: (value: TValue, index: number, collection: TValue[]) => boolean | void): TValue[];
+}
 export interface _ILodashCollectionEnumerator {
     <TValue>(array: TValue[], enumerator: (value: TValue, index: number, collection: TValue[]) => false | void): TValue[];
-    <TValue>(collection: {
-        [key: string]: TValue;
-    }, enumerator: (value: TValue, key: string, collection: {
-        [key: string]: TValue;
-    }) => false | void): {
-        [key: string]: TValue;
-    };
-    <TValue, TCollection>(collection: TCollection, enumerator: (value: TValue, key: string, collection: TCollection) => false | void): TCollection;
+    <TCollection, TKey extends keyof TCollection>(collection: TCollection, enumerator: (value: TCollection[TKey], key: TKey, collection: TCollection) => false | void): TCollection;
 }
 export interface _ILodashObjectEnumerator {
     <TValue, TObject>(object: TObject, enumerator: (value: TValue, key: string, object: TObject) => false | void): TObject;
 }
 /** same as lodash, we just fix lodash.d.ts type signature problems */
+export declare let forEachArray: _ILodashArrayEnumerator;
 export declare let forEach: _ILodashCollectionEnumerator;
 export declare let forEachRight: _ILodashCollectionEnumerator;
 export declare let forIn: _ILodashObjectEnumerator;
 export declare let forInRight: _ILodashObjectEnumerator;
 export declare let forOwn: _ILodashObjectEnumerator;
 export declare let forOwnRight: _ILodashObjectEnumerator;
+/** filter out items where false is returned */
+export declare const filter: _ILodashCollectionEnumerator;
+/** convert an object collection into an array, using a filter.   return false to reject the element */
+export declare function filterValues<TCollection, TKey extends keyof TCollection>(collection: TCollection, enumerator: (value: TCollection[TKey], key: TKey, collection: TCollection) => boolean): TCollection[TKey][];
 /** bind a function to an object, preserving it's input parameters */
 export declare function bind<TFcn extends Function>(fcn: TFcn, thisArg: any): TFcn;

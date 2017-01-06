@@ -67,12 +67,29 @@ exports.formatNum = numHelper.format;
 //export var apply = _jsHelper.apply;
 exports.apply = _jsHelper.apply;
 /** same as lodash, we just fix lodash.d.ts type signature problems */
+exports.forEachArray = _.forEach;
 exports.forEach = _.forEach;
 exports.forEachRight = _.forEachRight;
 exports.forIn = _.forIn;
 exports.forInRight = _.forInRight;
 exports.forOwn = _.forOwn;
 exports.forOwnRight = _.forOwnRight;
+/** filter out items where false is returned */
+exports.filter = _.filter;
+/** convert an object collection into an array, using a filter.   return false to reject the element */
+function filterValues(collection, enumerator) {
+    // export function filterValues<TValue>( collection: { [ id: number ]: TValue }, enumerator: ( value: TValue, id: number, collection: { [ id: number ]: TValue }) => boolean ): TValue[];
+    // export function filterValues<TValue>( collection: { [ key: string ]: TValue }, enumerator: ( value: TValue, key: string, collection: { [ key: string ]: TValue }) => boolean ): TValue[];
+    // export function filterValues<TValue>( collection: any, enumerator: ( value: TValue, key: string | number, collection: any ) => boolean ): TValue[] {
+    let toReturn = [];
+    exports.forEach(collection, (val, idOrKey) => {
+        if (enumerator(val, idOrKey, collection) !== false) {
+            toReturn.push(val);
+        }
+    });
+    return toReturn;
+}
+exports.filterValues = filterValues;
 //export let defaults:<T>()=>T = _.def
 /** bind a function to an object, preserving it's input parameters */
 function bind(fcn, thisArg) {
