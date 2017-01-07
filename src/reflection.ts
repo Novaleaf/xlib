@@ -3,7 +3,7 @@
 //import stringHelper = require("../stringhelper");
 //import arrayHelper = require("../arrayhelper");
 import * as ex from "./exception";
-
+import _ = require("lodash");
 
 
 /** primitive types as identified by javascript, plus well known object types */
@@ -34,57 +34,81 @@ export enum Type {
 
 
 /** provides the primitive type of a variable. better than using 'typeof()' because this handles array and null. */
-export function getType(obj:any): Type {
-	if (obj === null) {
+export function getType( obj: any ): Type {
+	if ( obj === null ) {
 		return Type.null;
 	}
-	var type = typeof (obj);
-	switch (type) {
+	var type = typeof ( obj );
+	switch ( type ) {
 		case "string":
 		case "number":
 		case "boolean":
 		case "function":
 		case "undefined":
-			return (Type as any)[type];
+			return ( Type as any )[ type ];
 		case "object":
 			var name: string;
-			if (obj instanceof Array) {
+			if ( obj instanceof Array ) {
 				name = "Array";
-			} else if (obj instanceof Error) {
+			} else if ( obj instanceof Error ) {
 				name = "Error";
-			} else if (obj instanceof RegExp) {
+			} else if ( obj instanceof RegExp ) {
 				name = "RegExp";
-			} else if (obj instanceof Date) {
+			} else if ( obj instanceof Date ) {
 				name = "Date";
 			} else {
 				name = "object";
 			}
-			return (Type as any)[name];
+			return ( Type as any )[ name ];
 		default:
-			throw new ex.CorelibException("getType(), unknown primitive type: " + String(type));
+			throw new ex.CorelibException( "getType(), unknown primitive type: " + String( type ) );
 	}
 }
 
 /** get the name of an object's type. better than using 'typeof()' because this handles array and null.*/
-export function getTypeName(obj:any): string {
-	var type = getType(obj);
-	switch (type) {
+export function getTypeName( obj: any ): string {
+	const type = getType( obj );
+	switch ( type ) {
 		case Type.object:
-        case Type.Error:
-            try {
-                var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
-                var results = (_getTypeNameOrFuncNameRegex).exec((obj).constructor.toString());
-                return (results && results.length > 1) ? results[1] : "";
-            } catch (ex) {
-                try {
-                    return typeof (obj);
-                } catch (ex) {
-                    return "UnknownType";
-                }
-            }
-        default:
-            var str = Type[type]; //type.toString();
-            return str;
+		case Type.Error:
+			//by default, try reading the obj.constructor.name property
+			if(obj.constructor!=null && obj.constructor.name !=null && _.isString(obj.constructor.name)===true && obj.constructor.name.length>0){
+				return obj.constructor.name;
+			}
+			//fall back to extracting the name from the obj.constructor.toString() text
+			const ctorStr: string = ( obj ).constructor.toString();
+			if ( ctorStr.indexOf( "class" ) === 0 ) {
+				try {
+					const _getTypeNameOrClassNameRegex = /class\s(.{1,}?)\s/;
+					const results = ( _getTypeNameOrClassNameRegex ).exec( ctorStr );
+					return ( results && results.length > 1 ) ? results[ 1 ] : "UnknownType";
+				} catch ( ex ) {
+					try {
+						return typeof ( obj );
+					} catch ( ex ) {
+						return "UnknownType";
+					}
+				}
+			} else if ( ctorStr.indexOf( "function" ) === 0 ) {
+				try {
+					const _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
+					const results = ( _getTypeNameOrFuncNameRegex ).exec( ctorStr );
+					return ( results && results.length > 1 ) ? results[ 1 ] : "UnknownType";
+				} catch ( ex ) {
+					try {
+						return typeof ( obj );
+					} catch ( ex ) {
+						return "UnknownType";
+					}
+				}
+
+			} else {
+				return "UnknownType";
+			}
+			
+		default:
+			const str = Type[ type ]; //type.toString();
+			return str;
 
 	}
 }
@@ -101,21 +125,21 @@ export function getTypeName(obj:any): string {
 //}
 
 /** names of all parameters of a function */
-export function getArgumentNames(args: IArguments): string[];
-export function getArgumentNames(func: Function): string[];
-export function getArgumentNames(argsOrFunction: any): string[] {
+export function getArgumentNames( args: IArguments ): string[];
+export function getArgumentNames( func: Function ): string[];
+export function getArgumentNames( argsOrFunction: any ): string[] {
 	var func: Function;
-	if (typeof (argsOrFunction) === "function") {
+	if ( typeof ( argsOrFunction ) === "function" ) {
 		func = argsOrFunction;
 	} else {
 		var args: IArguments = argsOrFunction;
 		func = args.callee;
 	}
 	var reg = /\(([\s\S]*?)\)/;
-	var params = reg.exec(func.toString());
-	var paramNames:string[];
-	if (params) {
-		paramNames = params[1].split(",");
+	var params = reg.exec( func.toString() );
+	var paramNames: string[];
+	if ( params ) {
+		paramNames = params[ 1 ].split( "," );
 	} else {
 		paramNames = [];
 	}
@@ -125,14 +149,14 @@ export function getArgumentNames(argsOrFunction: any): string[] {
 /** returns a key-value collection of argument names (keys) and their mapped input arg (values).  
  * if no argumentNames are passed in, the current function's argument names are used.
  * useful for debugging/logging parameters */
-export function mapArgumentsValues(args: IArguments, argumentNames?: string[]): { [argName: string]: any } {
-	if (argumentNames == null) {
+export function mapArgumentsValues( args: IArguments, argumentNames?: string[] ): { [ argName: string ]: any } {
+	if ( argumentNames == null ) {
 		var caller = args.callee;
-		argumentNames = getArgumentNames(caller);
+		argumentNames = getArgumentNames( caller );
 	}
-	var toReturn: { [argName: string]: any } = {};
-	for (var i = 0; i < args.length; i++) {
-		toReturn[argumentNames[i]] = args[i];
+	var toReturn: { [ argName: string ]: any } = {};
+	for ( var i = 0; i < args.length; i++ ) {
+		toReturn[ argumentNames[ i ] ] = args[ i ];
 	}
 	return toReturn;
 }

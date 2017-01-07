@@ -3,6 +3,7 @@
 //import stringHelper = require("../stringhelper");
 //import arrayHelper = require("../arrayhelper");
 const ex = require("./exception");
+const _ = require("lodash");
 /** primitive types as identified by javascript, plus well known object types */
 var Type;
 (function (Type) {
@@ -63,25 +64,51 @@ function getType(obj) {
 exports.getType = getType;
 /** get the name of an object's type. better than using 'typeof()' because this handles array and null.*/
 function getTypeName(obj) {
-    var type = getType(obj);
+    const type = getType(obj);
     switch (type) {
         case Type.object:
         case Type.Error:
-            try {
-                var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
-                var results = (_getTypeNameOrFuncNameRegex).exec((obj).constructor.toString());
-                return (results && results.length > 1) ? results[1] : "";
+            //by default, try reading the obj.constructor.name property
+            if (obj.constructor != null && obj.constructor.name != null && _.isString(obj.constructor.name) === true && obj.constructor.name.length > 0) {
+                return obj.constructor.name;
             }
-            catch (ex) {
+            //fall back to extracting the name from the obj.constructor.toString() text
+            const ctorStr = (obj).constructor.toString();
+            if (ctorStr.indexOf("class") === 0) {
                 try {
-                    return typeof (obj);
+                    const _getTypeNameOrClassNameRegex = /class\s(.{1,}?)\s/;
+                    const results = (_getTypeNameOrClassNameRegex).exec(ctorStr);
+                    return (results && results.length > 1) ? results[1] : "UnknownType";
                 }
                 catch (ex) {
-                    return "UnknownType";
+                    try {
+                        return typeof (obj);
+                    }
+                    catch (ex) {
+                        return "UnknownType";
+                    }
                 }
             }
+            else if (ctorStr.indexOf("function") === 0) {
+                try {
+                    const _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
+                    const results = (_getTypeNameOrFuncNameRegex).exec(ctorStr);
+                    return (results && results.length > 1) ? results[1] : "UnknownType";
+                }
+                catch (ex) {
+                    try {
+                        return typeof (obj);
+                    }
+                    catch (ex) {
+                        return "UnknownType";
+                    }
+                }
+            }
+            else {
+                return "UnknownType";
+            }
         default:
-            var str = Type[type]; //type.toString();
+            const str = Type[type]; //type.toString();
             return str;
     }
 }
