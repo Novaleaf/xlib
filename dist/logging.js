@@ -326,10 +326,20 @@ class Logger {
                         console.warn.apply(console, finalArgs);
                         break;
                     case environment.LogLevel.ERROR:
-                        console.error.apply(console, finalArgs);
+                        if (environment.isDev === true) {
+                            console.assert.bind(console, false).apply(console, finalArgs);
+                        }
+                        else {
+                            console.error.apply(console, finalArgs);
+                        }
                         break;
                     case environment.LogLevel.FATAL:
-                        console.error.apply(console, finalArgs);
+                        if (environment.isDev === true) {
+                            console.assert.bind(console, false).apply(console, finalArgs);
+                        }
+                        else {
+                            console.error.apply(console, finalArgs);
+                        }
                         break;
                     default:
                         throw new LoggerFatalException("unknown targetLogLevel");
@@ -413,7 +423,11 @@ class Logger {
         if (testCondition !== false) {
             throw new ex.Exception("first parameter to assert must evaluate to true or false");
         }
-        throw this.error.apply(this, args);
+        let resultError = this.error.apply(this, args);
+        // if(environment.isDev===true){
+        // 	console.assert(false,"errorAndThrowIfFalse() failed test, about to throw.  investigate above error details. (note:  this assert is shown because environment.isDev===true)");
+        // }
+        throw resultError;
     }
     fatal(...args) {
         args.unshift(false);

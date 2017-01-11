@@ -1,10 +1,11 @@
 ///// <reference path="../../typings/all.d.ts" />
 "use strict";
 ///** a high-quality date-time library: http://momentjs.com/ Also includes the moment-timezone extension*/
-//export import moment = require("moment-timezone");
-/** a high-quality date-time library: http://momentjs.com/ */
-const moment = require("moment");
-exports.moment = moment;
+exports.moment = require("moment-timezone");
+// /** a high-quality date-time library: http://momentjs.com/ */
+// // import * as moment from "moment";
+// // export { moment };
+// export import moment =require("moment");
 function getDateFromIsoString(isoDateTimeString) {
     if (isoDateTimeString == null) {
         return null;
