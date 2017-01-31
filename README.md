@@ -19,7 +19,7 @@ While **```xlib```** aims to cover the range of functionality any frontend or ba
 
 ## Server (NodeJs)
 
-Tested with Node 6.x.
+Tested with Node 6.x.  **IMPORTANT!** known not to work on node 4.x and lower, due to some sub-resource incompatability.  sorry :(  please use Node 6.x
 
 ```bash
 npm install --save xlib

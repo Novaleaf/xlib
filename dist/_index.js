@@ -177,4 +177,6 @@ exports.lolo = lolo;
 // * This module has utilities for URL resolution and parsing. 
 // */
 //export import url = require("url");
+/** exposes helper utilities meant for internal use. */
+exports._internal = require("./internal/_index");
 //# sourceMappingURL=_index.js.map

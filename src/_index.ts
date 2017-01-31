@@ -225,4 +225,5 @@ export { lolo };
 // */
 //export import url = require("url");
 
-
+/** exposes helper utilities meant for internal use. */
+export import _internal = require("./internal/_index");

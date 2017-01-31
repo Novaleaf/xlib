@@ -59,3 +59,5 @@ import * as definitions from "./definitions/_index";
 export { definitions };
 import * as lolo from "./lolo";
 export { lolo };
+/** exposes helper utilities meant for internal use. */
+export import _internal = require("./internal/_index");

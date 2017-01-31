@@ -35,7 +35,7 @@
     "moment-timezone": "^0.5.11",
     "rwlock": "^5.0.0",
     "sanitize-html": "^1.13.0",
-    "source-map-support": "^0.4.3",
+    "source-map-support": "^0.4.11",
     "sprintf-js": "^1.0.3",
     "validator": "^5.7.0"
   },
