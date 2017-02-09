@@ -259,6 +259,19 @@ var _test;
                         return Promise.resolve();
                     });
                 });
+                it("status 429 response", () => {
+                    return exports.axios.post("https://phantomjscloud.com/examples/helpers/statusCode/429", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+                        .then((axiosResponse) => {
+                        throw log.error("should have failed with 429 error", { badUrl, axiosResponse });
+                    })
+                        .catch((err) => {
+                        if (err.response == null) {
+                            throw log.error("response should be defined", { err });
+                        }
+                        log.assert(err.response.status === 429, "wrong status code.", { err });
+                        return Promise.resolve();
+                    });
+                });
                 it("status 500 response", () => {
                     return exports.axios.post("https://phantomjscloud.com/examples/helpers/statusCode/500", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
                         .then((axiosResponse) => {
@@ -269,6 +282,19 @@ var _test;
                             throw log.error("response should be defined", { err });
                         }
                         log.assert(err.response.status === 500, "wrong status code.", { err });
+                        return Promise.resolve();
+                    });
+                });
+                it("status 503 response", () => {
+                    return exports.axios.post("https://phantomjscloud.com/examples/helpers/statusCode/503", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+                        .then((axiosResponse) => {
+                        throw log.error("should have failed with 503 error", { badUrl, axiosResponse });
+                    })
+                        .catch((err) => {
+                        if (err.response == null) {
+                            throw log.error("response should be defined", { err });
+                        }
+                        log.assert(err.response.status === 503, "wrong status code.", { err });
                         return Promise.resolve();
                     });
                 });
