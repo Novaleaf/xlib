@@ -75,7 +75,7 @@ class Exception extends Error {
         var msg = ex.name + ": " + ex.message;
         var stack = ex.stack;
         if (stack) {
-            if (stack.join != undefined) {
+            if (stack.join != null) {
                 stack = stack.join("\n");
             }
             if (environment.platformType === environment.PlatformType.NodeJs) {

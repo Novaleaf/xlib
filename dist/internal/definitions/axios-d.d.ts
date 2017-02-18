@@ -1,11 +1,9 @@
-export interface IThenable<R> {
-    then<U>(onFulfilled?: (value: R) => U | IThenable<U>, onRejected?: (error: any) => U | IThenable<U>): IThenable<U>;
-    then<U>(onFulfilled?: (value: R) => U | IThenable<U>, onRejected?: (error: any) => void): IThenable<U>;
-}
-export interface IPromise<R> extends IThenable<R> {
-    then<U>(onFulfilled?: (value: R) => U | IThenable<U>, onRejected?: (error: any) => U | IThenable<U>): IPromise<U>;
-    then<U>(onFulfilled?: (value: R) => U | IThenable<U>, onRejected?: (error: any) => void): IPromise<U>;
-    catch<U>(onRejected?: (error: any) => U | IThenable<U>): IPromise<U>;
+/** a NOT BLUEBIRD COMPATABLE, promise-like construct returned by axios calls.  should NOT passs this through the system.  you need to wrap it in a "new Promise((resolve,reject)=>{})" object.
+ * this interface actually is more promise-compatabile than what we expose, but we limit it to the minimum to force you to wrap in a 'new Promise()', otherwise BAD THINGS WILL HAPPEN TO YOU! */
+export interface IAxiosPromiseish<R> {
+    then<U>(onFulfilled?: (value: R) => void): {
+        catch(onRejected?: (error: AxiosErrorResponse<R>) => void): void;
+    };
 }
 /**
  * HTTP Basic auth details
@@ -143,7 +141,7 @@ export interface AxiosXHR<T> {
     config: AxiosXHRConfig<T>;
 }
 /** the response from an error.  this inherits from the Error object */
-export interface AxiosErrorResponse<T> {
+export interface AxiosErrorResponse<T> extends Error {
     /** inherited from the Error object*/
     name: "Error";
     /**human readable error message, such as ```getaddrinfo ENOTFOUND moo moo:443``` or ```Request failed with status code 401``` */
@@ -202,15 +200,15 @@ export interface AxiosInstance {
     /**
      * Send request as configured
      */
-    <T>(config: AxiosXHRConfig<T>): IPromise<AxiosXHR<T>>;
+    <T>(config: AxiosXHRConfig<T>): IAxiosPromiseish<AxiosXHR<T>>;
     /**
      * Send request as configured
      */
-    new <T>(config: AxiosXHRConfig<T>): IPromise<AxiosXHR<T>>;
+    new <T>(config: AxiosXHRConfig<T>): IAxiosPromiseish<AxiosXHR<T>>;
     /**
      * Send request as configured
      */
-    request<T>(config: AxiosXHRConfig<T>): IPromise<AxiosXHR<T>>;
+    request<T>(config: AxiosXHRConfig<T>): IAxiosPromiseish<AxiosXHR<T>>;
     /**
      * intercept requests or responses before they are handled by then or catch
      */
@@ -222,15 +220,15 @@ export interface AxiosInstance {
     /**
      * equivalent to `Promise.all`
      */
-    all<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(values: [T1 | IPromise<AxiosXHR<T1>>, T2 | IPromise<AxiosXHR<T2>>, T3 | IPromise<AxiosXHR<T3>>, T4 | IPromise<AxiosXHR<T4>>, T5 | IPromise<AxiosXHR<T5>>, T6 | IPromise<AxiosXHR<T6>>, T7 | IPromise<AxiosXHR<T7>>, T8 | IPromise<AxiosXHR<T8>>, T9 | IPromise<AxiosXHR<T9>>, T10 | IPromise<AxiosXHR<T10>>]): IPromise<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>, AxiosXHR<T6>, AxiosXHR<T7>, AxiosXHR<T8>, AxiosXHR<T9>, AxiosXHR<T10>]>;
-    all<T1, T2, T3, T4, T5, T6, T7, T8, T9>(values: [T1 | IPromise<AxiosXHR<T1>>, T2 | IPromise<AxiosXHR<T2>>, T3 | IPromise<AxiosXHR<T3>>, T4 | IPromise<AxiosXHR<T4>>, T5 | IPromise<AxiosXHR<T5>>, T6 | IPromise<AxiosXHR<T6>>, T7 | IPromise<AxiosXHR<T7>>, T8 | IPromise<AxiosXHR<T8>>, T9 | IPromise<AxiosXHR<T9>>]): IPromise<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>, AxiosXHR<T6>, AxiosXHR<T7>, AxiosXHR<T8>, AxiosXHR<T9>]>;
-    all<T1, T2, T3, T4, T5, T6, T7, T8>(values: [T1 | IPromise<AxiosXHR<T1>>, T2 | IPromise<AxiosXHR<T2>>, T3 | IPromise<AxiosXHR<T3>>, T4 | IPromise<AxiosXHR<T4>>, T5 | IPromise<AxiosXHR<T5>>, T6 | IPromise<AxiosXHR<T6>>, T7 | IPromise<AxiosXHR<T7>>, T8 | IPromise<AxiosXHR<T8>>]): IPromise<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>, AxiosXHR<T6>, AxiosXHR<T7>, AxiosXHR<T8>]>;
-    all<T1, T2, T3, T4, T5, T6, T7>(values: [T1 | IPromise<AxiosXHR<T1>>, T2 | IPromise<AxiosXHR<T2>>, T3 | IPromise<AxiosXHR<T3>>, T4 | IPromise<AxiosXHR<T4>>, T5 | IPromise<AxiosXHR<T5>>, T6 | IPromise<AxiosXHR<T6>>, T7 | IPromise<AxiosXHR<T7>>]): IPromise<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>, AxiosXHR<T6>, AxiosXHR<T7>]>;
-    all<T1, T2, T3, T4, T5, T6>(values: [T1 | IPromise<AxiosXHR<T1>>, T2 | IPromise<AxiosXHR<T2>>, T3 | IPromise<AxiosXHR<T3>>, T4 | IPromise<AxiosXHR<T4>>, T5 | IPromise<AxiosXHR<T5>>, T6 | IPromise<AxiosXHR<T6>>]): IPromise<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>, AxiosXHR<T6>]>;
-    all<T1, T2, T3, T4, T5>(values: [T1 | IPromise<AxiosXHR<T1>>, T2 | IPromise<AxiosXHR<T2>>, T3 | IPromise<AxiosXHR<T3>>, T4 | IPromise<AxiosXHR<T4>>, T5 | IPromise<AxiosXHR<T5>>]): IPromise<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>]>;
-    all<T1, T2, T3, T4>(values: [T1 | IPromise<AxiosXHR<T1>>, T2 | IPromise<AxiosXHR<T2>>, T3 | IPromise<AxiosXHR<T3>>, T4 | IPromise<AxiosXHR<T4>>]): IPromise<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>]>;
-    all<T1, T2, T3>(values: [T1 | IPromise<AxiosXHR<T1>>, T2 | IPromise<AxiosXHR<T2>>, T3 | IPromise<AxiosXHR<T3>>]): IPromise<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>]>;
-    all<T1, T2>(values: [T1 | IPromise<AxiosXHR<T1>>, T2 | IPromise<AxiosXHR<T2>>]): IPromise<[AxiosXHR<T1>, AxiosXHR<T2>]>;
+    all<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(values: [T1 | IAxiosPromiseish<AxiosXHR<T1>>, T2 | IAxiosPromiseish<AxiosXHR<T2>>, T3 | IAxiosPromiseish<AxiosXHR<T3>>, T4 | IAxiosPromiseish<AxiosXHR<T4>>, T5 | IAxiosPromiseish<AxiosXHR<T5>>, T6 | IAxiosPromiseish<AxiosXHR<T6>>, T7 | IAxiosPromiseish<AxiosXHR<T7>>, T8 | IAxiosPromiseish<AxiosXHR<T8>>, T9 | IAxiosPromiseish<AxiosXHR<T9>>, T10 | IAxiosPromiseish<AxiosXHR<T10>>]): IAxiosPromiseish<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>, AxiosXHR<T6>, AxiosXHR<T7>, AxiosXHR<T8>, AxiosXHR<T9>, AxiosXHR<T10>]>;
+    all<T1, T2, T3, T4, T5, T6, T7, T8, T9>(values: [T1 | IAxiosPromiseish<AxiosXHR<T1>>, T2 | IAxiosPromiseish<AxiosXHR<T2>>, T3 | IAxiosPromiseish<AxiosXHR<T3>>, T4 | IAxiosPromiseish<AxiosXHR<T4>>, T5 | IAxiosPromiseish<AxiosXHR<T5>>, T6 | IAxiosPromiseish<AxiosXHR<T6>>, T7 | IAxiosPromiseish<AxiosXHR<T7>>, T8 | IAxiosPromiseish<AxiosXHR<T8>>, T9 | IAxiosPromiseish<AxiosXHR<T9>>]): IAxiosPromiseish<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>, AxiosXHR<T6>, AxiosXHR<T7>, AxiosXHR<T8>, AxiosXHR<T9>]>;
+    all<T1, T2, T3, T4, T5, T6, T7, T8>(values: [T1 | IAxiosPromiseish<AxiosXHR<T1>>, T2 | IAxiosPromiseish<AxiosXHR<T2>>, T3 | IAxiosPromiseish<AxiosXHR<T3>>, T4 | IAxiosPromiseish<AxiosXHR<T4>>, T5 | IAxiosPromiseish<AxiosXHR<T5>>, T6 | IAxiosPromiseish<AxiosXHR<T6>>, T7 | IAxiosPromiseish<AxiosXHR<T7>>, T8 | IAxiosPromiseish<AxiosXHR<T8>>]): IAxiosPromiseish<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>, AxiosXHR<T6>, AxiosXHR<T7>, AxiosXHR<T8>]>;
+    all<T1, T2, T3, T4, T5, T6, T7>(values: [T1 | IAxiosPromiseish<AxiosXHR<T1>>, T2 | IAxiosPromiseish<AxiosXHR<T2>>, T3 | IAxiosPromiseish<AxiosXHR<T3>>, T4 | IAxiosPromiseish<AxiosXHR<T4>>, T5 | IAxiosPromiseish<AxiosXHR<T5>>, T6 | IAxiosPromiseish<AxiosXHR<T6>>, T7 | IAxiosPromiseish<AxiosXHR<T7>>]): IAxiosPromiseish<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>, AxiosXHR<T6>, AxiosXHR<T7>]>;
+    all<T1, T2, T3, T4, T5, T6>(values: [T1 | IAxiosPromiseish<AxiosXHR<T1>>, T2 | IAxiosPromiseish<AxiosXHR<T2>>, T3 | IAxiosPromiseish<AxiosXHR<T3>>, T4 | IAxiosPromiseish<AxiosXHR<T4>>, T5 | IAxiosPromiseish<AxiosXHR<T5>>, T6 | IAxiosPromiseish<AxiosXHR<T6>>]): IAxiosPromiseish<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>, AxiosXHR<T6>]>;
+    all<T1, T2, T3, T4, T5>(values: [T1 | IAxiosPromiseish<AxiosXHR<T1>>, T2 | IAxiosPromiseish<AxiosXHR<T2>>, T3 | IAxiosPromiseish<AxiosXHR<T3>>, T4 | IAxiosPromiseish<AxiosXHR<T4>>, T5 | IAxiosPromiseish<AxiosXHR<T5>>]): IAxiosPromiseish<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>, AxiosXHR<T5>]>;
+    all<T1, T2, T3, T4>(values: [T1 | IAxiosPromiseish<AxiosXHR<T1>>, T2 | IAxiosPromiseish<AxiosXHR<T2>>, T3 | IAxiosPromiseish<AxiosXHR<T3>>, T4 | IAxiosPromiseish<AxiosXHR<T4>>]): IAxiosPromiseish<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>, AxiosXHR<T4>]>;
+    all<T1, T2, T3>(values: [T1 | IAxiosPromiseish<AxiosXHR<T1>>, T2 | IAxiosPromiseish<AxiosXHR<T2>>, T3 | IAxiosPromiseish<AxiosXHR<T3>>]): IAxiosPromiseish<[AxiosXHR<T1>, AxiosXHR<T2>, AxiosXHR<T3>]>;
+    all<T1, T2>(values: [T1 | IAxiosPromiseish<AxiosXHR<T1>>, T2 | IAxiosPromiseish<AxiosXHR<T2>>]): IAxiosPromiseish<[AxiosXHR<T1>, AxiosXHR<T2>]>;
     /**
      * spread array parameter to `fn`.
      * note: alternative to `spread`, destructuring assignment.
@@ -239,27 +237,27 @@ export interface AxiosInstance {
     /**
      * convenience alias, method = GET
      */
-    get<T>(url: string, config?: AxiosXHRConfigBase<T>): IPromise<AxiosXHR<T>>;
+    get<T>(url: string, config?: AxiosXHRConfigBase<T>): IAxiosPromiseish<AxiosXHR<T>>;
     /**
      * convenience alias, method = DELETE
      */
-    delete<T>(url: string, config?: AxiosXHRConfigBase<T>): IPromise<AxiosXHR<T>>;
+    delete<T>(url: string, config?: AxiosXHRConfigBase<T>): IAxiosPromiseish<AxiosXHR<T>>;
     /**
      * convenience alias, method = HEAD
      */
-    head<T>(url: string, config?: AxiosXHRConfigBase<T>): IPromise<AxiosXHR<T>>;
+    head<T>(url: string, config?: AxiosXHRConfigBase<T>): IAxiosPromiseish<AxiosXHR<T>>;
     /**
      * convenience alias, method = POST
      */
-    post<T>(url: string, data?: any, config?: AxiosXHRConfigBase<T>): IPromise<AxiosXHR<T>>;
+    post<T>(url: string, data?: any, config?: AxiosXHRConfigBase<T>): IAxiosPromiseish<AxiosXHR<T>>;
     /**
      * convenience alias, method = PUT
      */
-    put<T>(url: string, data?: any, config?: AxiosXHRConfigBase<T>): IPromise<AxiosXHR<T>>;
+    put<T>(url: string, data?: any, config?: AxiosXHRConfigBase<T>): IAxiosPromiseish<AxiosXHR<T>>;
     /**
      * convenience alias, method = PATCH
      */
-    patch<T>(url: string, data?: any, config?: AxiosXHRConfigBase<T>): IPromise<AxiosXHR<T>>;
+    patch<T>(url: string, data?: any, config?: AxiosXHRConfigBase<T>): IAxiosPromiseish<AxiosXHR<T>>;
 }
 /**
  * <T> - expected response type,

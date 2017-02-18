@@ -1,3 +1,5 @@
+import * as promise from "./promise";
+import Promise = promise.bluebird;
 /** the axios httpClient library:  https://github.com/mzabriskie/axios */
 /** definition of axios */
 export import _axiosDTs = require("./internal/definitions/axios-d");
@@ -5,11 +7,14 @@ export import _axiosDTs = require("./internal/definitions/axios-d");
  * a low-level, but promise based http(s) library.
  *
  * **IMPORTANT**: recomend you DO NOT use this directly, as it does not provide retry logic.
- * instead, use the ``EzEndpoint`` we offer instead
+ * instead, use the ``EzEndpoint`` we offer instead.
+ * If you do use axios directly, be aware that though it returns something that appears to be a promise, it is NOT BLUEBIRD COMPATABLE for error handling, and so you will want to wrap it in a 'new Promise((resolve,reject)=>{ axios.... })' block.
  */
 export declare let axios: _axiosDTs.AxiosStatic;
-import * as promise from "./promise";
-import Promise = promise.bluebird;
+/**
+ *  wrapper over axios.post() so that it conforms to Bluebird Promise specifications
+ */
+export declare const axiosPost: typeof axios.post;
 /**
 *  a helper for constructing reusable endpoint functions
 * includes retry logic and exponential backoff.

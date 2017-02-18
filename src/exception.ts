@@ -103,7 +103,7 @@ export class Exception extends Error {
 		var msg = ex.name + ": " + ex.message;
 		var stack = (<any>ex).stack;
 		if (stack) {
-			if (stack.join != undefined) {			//if (__.arrayHelper.isArray(stack)) {
+			if (stack.join != null) {			//if (__.arrayHelper.isArray(stack)) {
 				stack = stack.join("\n");
 			}
 			if (environment.platformType === environment.PlatformType.NodeJs) {

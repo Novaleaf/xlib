@@ -1,10 +1,13 @@
-// Type definitions for axios 0.9.1
-// Project: https://github.com/mzabriskie/axios
-// Definitions by: Marcel Buesing <https://github.com/marcelbuesing>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+// Type definitions for axios based off of Definitions by: Marcel Buesing <https://github.com/marcelbuesing> but adapted for xlib use by JasonS@Novaleaf.com
 "use strict";
 //declare var axios: AxiosStatic;
 //declare module "axios" {
 //    export = axios;
 //}
+// export let axios: AxiosStatic = require( "axios" );
+// let originalPost = axios.post;
+// axios.post = function(...args:any[]){
+//     return new Promise((resolve,reject)=>{
+//     });
+// }.bind(axios) as any; 
 //# sourceMappingURL=axios-d.js.map

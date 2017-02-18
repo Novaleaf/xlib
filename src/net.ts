@@ -1,6 +1,19 @@
 ﻿"use strict";
 
 
+import * as promise from "./promise";
+import Promise = promise.bluebird;
+import * as _ from "lodash";
+
+import * as logging from "./logging";
+let log = new logging.Logger( __filename );
+
+import * as serialization from "./serialization";
+import * as exception from "./exception";
+import * as stringHelper from "./stringhelper";
+
+import jsHelper = require( "./jshelper" );
+
 //export import axios = require("axios");
 
 /** the axios httpClient library:  https://github.com/mzabriskie/axios */
@@ -9,27 +22,37 @@
 //export { axios };
 
 /** definition of axios */
-export import _axiosDTs = require("./internal/definitions/axios-d");
+export import _axiosDTs = require( "./internal/definitions/axios-d" );
 
 /**
  * a low-level, but promise based http(s) library.
  *
  * **IMPORTANT**: recomend you DO NOT use this directly, as it does not provide retry logic.
- * instead, use the ``EzEndpoint`` we offer instead
+ * instead, use the ``EzEndpoint`` we offer instead.
+ * If you do use axios directly, be aware that though it returns something that appears to be a promise, it is NOT BLUEBIRD COMPATABLE for error handling, and so you will want to wrap it in a 'new Promise((resolve,reject)=>{ axios.... })' block.
  */
-export let axios: _axiosDTs.AxiosStatic = require("axios");
+export let axios: _axiosDTs.AxiosStatic = require( "axios" );
 
 
-import * as promise from "./promise";
-import Promise = promise.bluebird;
-import * as _ from "lodash";
+function _axiosPost( ...args: any[] ) {
 
-import * as logging from "./logging";
-let log = new logging.Logger(__filename);
+	return new Promise(( resolve, reject ) => {
+		jsHelper.apply( axios.post, axios, args )
+			.then(( response ) => {
+				resolve( response );
+			})
+			.catch(( err ) => {
+				reject( err );
+			});
+	});
 
-import * as serialization from "./serialization";
-import * as exception from "./exception";
-import * as stringHelper from "./stringhelper";
+}
+/**
+ *  wrapper over axios.post() so that it conforms to Bluebird Promise specifications
+ */
+export const axiosPost: typeof axios.post = _axiosPost as any;
+
+
 
 
 
@@ -62,10 +85,10 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 		DEFAULT:  by default we will retry error 500 and above. */
 		public preRetryErrorIntercept: (
 			/** note: network issues are converted into err.response so you don't need to parse them differently.*/
-			err: _axiosDTs.AxiosErrorResponse<TRecievePayload>) => Promise<void> = (err) => {
-				if (err.response != null && err.response.status <= 499) {
+			err: _axiosDTs.AxiosErrorResponse<TRecievePayload> ) => Promise<void> = ( err ) => {
+				if ( err.response != null && err.response.status <= 499 ) {
 					//console.assert(false, "err");					
-					return Promise.reject(err);
+					return Promise.reject( err );
 				} else {
 					return Promise.resolve();
 				}
@@ -93,21 +116,21 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 		} = this.endpointOptions
 	): Promise<_axiosDTs.AxiosXHR<TRecievePayload>> {
 
-		log.debug(`EzEndpoint._doRequest() called`, { protocol });
+		log.debug( `EzEndpoint._doRequest() called`, { protocol });
 
 		return Promise.try(() => {
 
 			//copy parameters from our overrides, in an additive manner, allowing for example, customizing the origin while keeping the default path.
-			let finalEndpointOptions = _.defaults({}, overrideEndpointOptions, this.endpointOptions);
-			let finalRequestOptions = _.defaults({}, overrideRequestOptions, this.requestOptions);
-			let finalRetryOptions = _.defaults({}, overrideRetryOptions, this.retryOptions);
+			let finalEndpointOptions = _.defaults( {}, overrideEndpointOptions, this.endpointOptions );
+			let finalRequestOptions = _.defaults( {}, overrideRequestOptions, this.requestOptions );
+			let finalRetryOptions = _.defaults( {}, overrideRetryOptions, this.retryOptions );
 
 
-			if (finalEndpointOptions.origin == null || finalEndpointOptions.path == null) {
-				throw log.error("can not make endpoint request.  missing required endpointOptions", { finalEndpointOptions });
+			if ( finalEndpointOptions.origin == null || finalEndpointOptions.path == null ) {
+				throw log.error( "can not make endpoint request.  missing required endpointOptions", { finalEndpointOptions });
 			}
-			if (protocol === "get" && submitPayload != null) {
-				throw log.error("EzEndpoint._doRequest() submit payload was passed to a GET request, this is not supported by Axios and most endpoints", { finalEndpointOptions, submitPayload });
+			if ( protocol === "get" && submitPayload != null ) {
+				throw log.error( "EzEndpoint._doRequest() submit payload was passed to a GET request, this is not supported by Axios and most endpoints", { finalEndpointOptions, submitPayload });
 			}
 
 			let endpoint = overrideEndpointOptions.origin + overrideEndpointOptions.path;
@@ -120,7 +143,7 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 
 				//try {
 
-				log.debug("EzEndpoint._doRequest() in promise.retry block");
+				log.debug( "EzEndpoint._doRequest() in promise.retry block" );
 
 
 				return Promise.try(() => {
@@ -128,43 +151,49 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 					/**
 					 *  the actual HTTP request we send over the wire.
 					 */
-					let axiosRequestPromise: _axiosDTs.IPromise<_axiosDTs.AxiosXHR<TRecievePayload>>;
+					let axiosRequestPromise: _axiosDTs.IAxiosPromiseish<_axiosDTs.AxiosXHR<TRecievePayload>>;
 
-					switch (protocol) {
+					switch ( protocol ) {
 						case "post":
 							{
-								axiosRequestPromise = axios.post<TRecievePayload>(endpoint, submitPayload, finalRequestOptions);
+								axiosRequestPromise = axios.post<TRecievePayload>( endpoint, submitPayload, finalRequestOptions );
 							}
 							break;
 						case "get":
 							{
-								axiosRequestPromise = axios.get<TRecievePayload>(endpoint, finalRequestOptions);
+								axiosRequestPromise = axios.get<TRecievePayload>( endpoint, finalRequestOptions );
 							}
 							break;
 
 						default:
 							{
-								throw log.error(`EzEndpoint._doRequest() unknown protocol`, { protocol });
+								throw log.error( `EzEndpoint._doRequest() unknown protocol`, { protocol });
 							}
 
 
 					}
-					return axiosRequestPromise
-						.then((result) => {
-							log.debug("EzEndpoint._doRequest() got valid response");
-							return Promise.resolve(result);
-						}, (err: _axiosDTs.AxiosErrorResponse<TRecievePayload>) => {
-							log.debug("EzEndpoint._doRequest() got err");
+					return new Promise(( resolve, reject ) => {
+						//wrap axios in a REAL promise call, as it's hacky promises really sucks and breaks Bluebird
+						axiosRequestPromise.then(( axiosResponse ) => { resolve( axiosResponse ); })
+							.catch(( axiosErr ) => {
+								reject( axiosErr );
+							});
+					})
+						.then(( result ) => {
+							log.debug( "EzEndpoint._doRequest() got valid response" );
+							return Promise.resolve( result );
+						}, ( err: _axiosDTs.AxiosErrorResponse<TRecievePayload> ) => {
+							log.debug( "EzEndpoint._doRequest() got err" );
 
 
-							if (err.code != null) {
-								log.assert(err.response == null, "expect axios.response to be null on err.code value set");
-								switch (err.code) {
+							if ( err.code != null ) {
+								log.assert( err.response == null, "expect axios.response to be null on err.code value set" );
+								switch ( err.code ) {
 									case "ENOTFOUND":
 										{
 											err.response = {
 												status: 523,
-												statusText: `Origin is Unreachable: ${err.code}, ${err.message} `,
+												statusText: `Origin is Unreachable: ${ err.code }, ${ err.message } `,
 												config: err.config,
 												data: undefined as any,
 												headers: {},
@@ -175,7 +204,7 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 										{
 											err.response = {
 												status: 522,
-												statusText: `Connection Timed Out: ${err.code}, ${err.message} `,
+												statusText: `Connection Timed Out: ${ err.code }, ${ err.message } `,
 												config: err.config,
 												data: undefined as any,
 												headers: {},
@@ -186,7 +215,7 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 										{
 											err.response = {
 												status: 520,
-												statusText: `Unknown Error: ${err.code}, ${err.message} `,
+												statusText: `Unknown Error: ${ err.code }, ${ err.message } `,
 												config: err.config,
 												data: undefined as any,
 												headers: {},
@@ -195,8 +224,8 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 										break;
 								}
 							}
-							if (err.response != null) {
-								if (err.response.status === 0 && err.response.statusText === "" && err.response.data === "" as any) {
+							if ( err.response != null ) {
+								if ( err.response.status === 0 && err.response.statusText === "" && err.response.data === "" as any ) {
 									//log.debug("EzEndpointFunction axios.get timeout.", { endpoint });
 									err.response.status = 524;
 									err.response.statusText = "A Timeout Occurred: Request Aborted, EzEndpoint.requestOptions.timeout exceeded";
@@ -206,24 +235,24 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 							}
 
 
-							if (this.preRetryErrorIntercept != null) {
+							if ( this.preRetryErrorIntercept != null ) {
 
-								return this.preRetryErrorIntercept(err)
+								return this.preRetryErrorIntercept( err )
 									.then(() => {
 										//do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
 										lastErrorResult = err;
-										return Promise.reject(err);
+										return Promise.reject( err );
 
-									}, (rejectedErr) => {
+									}, ( rejectedErr ) => {
 										//rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
-										let stopError = new promise.retry.StopError("preRetryIntercept abort");
-										(stopError as any)["interceptResult"] = Promise.reject(rejectedErr);
-										return Promise.reject(stopError);
+										let stopError = new promise.retry.StopError( "preRetryIntercept abort" );
+										( stopError as any )[ "interceptResult" ] = Promise.reject( rejectedErr );
+										return Promise.reject( stopError );
 									});
 
 							}
 							lastErrorResult = err;
-							return Promise.reject(err);
+							return Promise.reject( err );
 						});
 				});
 
@@ -232,14 +261,14 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 				//	throw errThrown;
 				//}
 
-			}, finalRetryOptions)
+			}, finalRetryOptions )
 				//***************  finished retry loop
-				.catch((err: any) => {
-					log.debug("EzEndpoint._doRequest()  retry catch");
-					if (err.interceptResult != null) {
+				.catch(( err: any ) => {
+					log.debug( "EzEndpoint._doRequest()  retry catch" );
+					if ( err.interceptResult != null ) {
 						return err.interceptResult;
 					}
-					return Promise.reject(err);
+					return Promise.reject( err );
 				});
 
 		});
@@ -259,7 +288,7 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 			path?: string,
 		} = this.endpointOptions
 	) {
-		return this._doRequest("post", submitPayload, overrideRequestOptions, overrideRetryOptions, overrideEndpointOptions);
+		return this._doRequest( "post", submitPayload, overrideRequestOptions, overrideRetryOptions, overrideEndpointOptions );
 	}
 
 	public get(
@@ -273,7 +302,7 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 			path?: string,
 		} = this.endpointOptions
 	) {
-		return this._doRequest("get", undefined, overrideRequestOptions, overrideRetryOptions, overrideEndpointOptions);
+		return this._doRequest( "get", undefined, overrideRequestOptions, overrideRetryOptions, overrideEndpointOptions );
 	}
 
 	///////********************************
@@ -484,46 +513,154 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 
 module _test {
 
-	describe(__filename, () => {
+	describe( __filename, () => {
 
-		describe("axios", () => {
+		describe( "EzEndpoint", () => {
+
+			describe( "fail cases", () => {
+
+
+				let test: any = it( "basic retry, 429 error", () => {
+
+					const testEzEndpoint = new EzEndpoint<void, void>( { origin: "https://phantomjscloud.com", path: "/examples/helpers/statusCode/429" }, { timeout: 1000, interval: 100, backoff: 3 }, {}, );
+
+					return testEzEndpoint.post()
+						.then(( response ) => {
+							throw log.errorAndThrowIfFalse( response.status === 429, "should have failed with 429 response", { response });
+						}, ( err ) => {
+							const axiosErr = err as _axiosDTs.AxiosErrorResponse<void>;
+							if ( axiosErr.response != null ) {
+								log.assert( axiosErr.response.status === 429, "should have failed with 429 response", { axiosErr });
+							} else {
+								throw log.error( "expected a axiosErr but didn't get one", { err })
+							}
+						});
+				})
+				// set timeout increase (default=2000ms) https://mochajs.org/#timeouts
+				test.timeout( 5000 );
+
+				test = it( "invalid domain", () => {
+
+					const testEzEndpoint = new EzEndpoint<void, void>( { origin: "https://asdfasdfasdfasetasgoud.com", path: "/examples/helpers/statusCode/429" }, { timeout: 1000, interval: 100, backoff: 3 }, {}, );
+
+					return testEzEndpoint.post()
+						.then(( response ) => {
+							throw log.errorAndThrowIfFalse( response.status === 429, "should have failed with 429 response", { response });
+						}, ( err ) => {
+							//TODO: describe EzEndpoint fail error type, and add error definitions to bluebird
+							// // // // 	export interface AxiosErrorResponse<T> extends Error {
+
+							// // // // 	/** inherited from the Error object*/
+							// // // // 	name: "Error";
+							// // // // 	/**human readable error message, such as ```getaddrinfo ENOTFOUND moo moo:443``` or ```Request failed with status code 401``` */
+							// // // // 	message: string;
+							// // // // 	/**
+							// // // // 	 * config that was provided to `axios` for the request
+							// // // // 	 */
+							// // // // 	config: AxiosXHRConfig<T>;
+
+							// // // // 	/** The server response.  ```undefined``` if no response from server (such as invalid url or network timeout */
+							// // // // 	response?: AxiosXHR<T>;
+
+							// // // // 	/** example ```ETIMEDOUT```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+							// // // // 	code?: string;
+
+							// // // // 	/** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+							// // // // failure?:{
+							// // // // 	name:string;
+
+							// // // // 	/**human readable error message, such as ```getaddrinfo ENOTFOUND moo moo:443``` or ```Request failed with status code 401``` */
+							// // // // 	message: string;
+
+							// // // // 	/** example ```ENOTFOUND```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+							// // // // 	code: string;
+							// // // // 	/** example ```ENOTFOUND```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+							// // // // 	errno: string;
+
+							// // // // 	/** example ```getaddrinfo```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+							// // // // 	syscall: string;
+							// // // // 	/** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+							// // // // 	hostname: string;
+							// // // // 	/** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+							// // // // 	host: string;
+							// // // // 	/** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+							// // // // 	port: number;
+							// // // // };
+						});
+				})
+				// set timeout increase (default=2000ms) https://mochajs.org/#timeouts
+				test.timeout( 5000 );
+			});
+		});
+
+		describe( "axios", () => {
 
 			const targetUrl = "https://phantomjscloud.com/examples/helpers/requestdata";
 			const samplePostPayload1 = { hi: 1, bye: "two", inner: { three: 4 } };
 			const sampleHeader1 = { head1: "val1" };
-			describe("success cases", () => {
+			describe( "success cases", () => {
 
-				it("basic e2e", () => {
+				it( "basic e2e", () => {
 
 
-					return axios.post(targetUrl, samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
-						.then((axiosResponse) => {
-							log.assert(axiosResponse.config != null, "missing property", { axiosResponse });
-							log.assert(axiosResponse.data != null, "missing property", { axiosResponse });
-							log.assert(axiosResponse.headers != null, "missing property", { axiosResponse });
-							log.assert(axiosResponse.status != null, "missing property", { axiosResponse });
-							log.assert(axiosResponse.status != null, "missing property", { axiosResponse });
-							log.assert(axiosResponse.statusText != null, "missing property", { axiosResponse });
+					return axios.post( targetUrl, samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+						.then(( axiosResponse ) => {
+							log.assert( axiosResponse.config != null, "missing property", { axiosResponse });
+							log.assert( axiosResponse.data != null, "missing property", { axiosResponse });
+							log.assert( axiosResponse.headers != null, "missing property", { axiosResponse });
+							log.assert( axiosResponse.status != null, "missing property", { axiosResponse });
+							log.assert( axiosResponse.status != null, "missing property", { axiosResponse });
+							log.assert( axiosResponse.statusText != null, "missing property", { axiosResponse });
 
-							log.assert(axiosResponse.status === 200, "status code wrong", { axiosResponse });
+							log.assert( axiosResponse.status === 200, "status code wrong", { axiosResponse });
 
 							return Promise.resolve();
 						});
 				});
 			});
 
-			describe("fail cases", () => {
+			describe( "fail cases", () => {
 
+				it( "basic fail e2e", () => {
+					return axios.post( "https://phantomjscloud.com/examples/helpers/statusCode/400", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+						.then(( axiosResponse ) => {
+							throw log.error( "should have failed with 400 error", { badUrl, axiosResponse });
+						})
+						.catch(( err: _axiosDTs.AxiosErrorResponse<any> ) => {
+
+							if ( err.response == null ) {
+								throw log.error( "response should be defined", { err });
+							}
+
+
+							log.assert( err.config != null, "missing property config", { err });
+							log.assert( err.message != null, "missing property message", { err });
+							log.assert( err.name != null, "missing property name", { err });
+							log.assert( err.response != null, "missing property response", { err });
+							log.assert( err.stack != null, "missing property stack", { err });
+
+							log.assert( err.response.config != null, "missing property response.config", { err });
+							log.assert( err.response.data != null, "missing property response.data", { err });
+							log.assert( err.response.headers != null, "missing property response.headers", { err });
+							log.assert( err.response.status != null, "missing property response.status ", { err });
+							log.assert( err.response.statusText != null, "missing property response.statusText", { err });
+
+							log.assert( err.response.status === 400, "wrong status code.", { err });
+
+							return Promise.resolve();
+
+						});
+				});
 
 
 				const badUrl = "https://moo";
 
-				let test: any = it("invlid url", () => {
-					return axios.post(badUrl, samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
-						.then((axiosResponse) => {
-							throw log.error("should have failed with invalid url", { badUrl, axiosResponse });
+				let test: any = it( "invlid url", () => {
+					return axios.post( badUrl, samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+						.then(( axiosResponse ) => {
+							throw log.error( "should have failed with invalid url", { badUrl, axiosResponse });
 						})
-						.catch((err: _axiosDTs.AxiosErrorResponse<any>) => {
+						.catch(( err: _axiosDTs.AxiosErrorResponse<any> ) => {
 
 							//log.info("got error as expected", { err });
 
@@ -532,70 +669,70 @@ module _test {
 						});
 				});
 				// set timeout increase (default=2000ms) https://mochajs.org/#timeouts
-				test.timeout(5000);
+				test.timeout( 5000 );
 
 
-				it("status 401 response", () => {
-					return axios.post("https://phantomjscloud.com/examples/helpers/statusCode/401", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
-						.then((axiosResponse) => {
-							throw log.error("should have failed with 401 error", { badUrl, axiosResponse });
+				it( "status 401 response", () => {
+					return axios.post( "https://phantomjscloud.com/examples/helpers/statusCode/401", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+						.then(( axiosResponse ) => {
+							throw log.error( "should have failed with 401 error", { badUrl, axiosResponse });
 						})
-						.catch((err: _axiosDTs.AxiosErrorResponse<any>) => {
+						.catch(( err: _axiosDTs.AxiosErrorResponse<any> ) => {
 
-							if (err.response == null) {
-								throw log.error("response should be defined", { err });
+							if ( err.response == null ) {
+								throw log.error( "response should be defined", { err });
 							}
-							log.assert(err.response.status === 401, "wrong status code.", { err });
+							log.assert( err.response.status === 401, "wrong status code.", { err });
 
 							return Promise.resolve();
 
 						});
 				});
 
-				it("status 429 response", () => {
-					return axios.post("https://phantomjscloud.com/examples/helpers/statusCode/429", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
-						.then((axiosResponse) => {
-							throw log.error("should have failed with 429 error", { badUrl, axiosResponse });
+				it( "status 429 response", () => {
+					return axios.post( "https://phantomjscloud.com/examples/helpers/statusCode/429", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+						.then(( axiosResponse ) => {
+							throw log.error( "should have failed with 429 error", { badUrl, axiosResponse });
 						})
-						.catch((err: _axiosDTs.AxiosErrorResponse<any>) => {
+						.catch(( err: _axiosDTs.AxiosErrorResponse<any> ) => {
 
-							if (err.response == null) {
-								throw log.error("response should be defined", { err });
+							if ( err.response == null ) {
+								throw log.error( "response should be defined", { err });
 							}
-							log.assert(err.response.status === 429, "wrong status code.", { err });
+							log.assert( err.response.status === 429, "wrong status code.", { err });
 
 							return Promise.resolve();
 
 						});
 				});
 
-				it("status 500 response", () => {
-					return axios.post("https://phantomjscloud.com/examples/helpers/statusCode/500", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
-						.then((axiosResponse) => {
-							throw log.error("should have failed with 500 error", { badUrl, axiosResponse });
+				it( "status 500 response", () => {
+					return axios.post( "https://phantomjscloud.com/examples/helpers/statusCode/500", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+						.then(( axiosResponse ) => {
+							throw log.error( "should have failed with 500 error", { badUrl, axiosResponse });
 						})
-						.catch((err: _axiosDTs.AxiosErrorResponse<any>) => {
+						.catch(( err: _axiosDTs.AxiosErrorResponse<any> ) => {
 
-							if (err.response == null) {
-								throw log.error("response should be defined", { err });
+							if ( err.response == null ) {
+								throw log.error( "response should be defined", { err });
 							}
-							log.assert(err.response.status === 500, "wrong status code.", { err });
+							log.assert( err.response.status === 500, "wrong status code.", { err });
 
 							return Promise.resolve();
 
 						});
 				});
-				it("status 503 response", () => {
-					return axios.post("https://phantomjscloud.com/examples/helpers/statusCode/503", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
-						.then((axiosResponse) => {
-							throw log.error("should have failed with 503 error", { badUrl, axiosResponse });
+				it( "status 503 response", () => {
+					return axios.post( "https://phantomjscloud.com/examples/helpers/statusCode/503", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+						.then(( axiosResponse ) => {
+							throw log.error( "should have failed with 503 error", { badUrl, axiosResponse });
 						})
-						.catch((err: _axiosDTs.AxiosErrorResponse<any>) => {
+						.catch(( err: _axiosDTs.AxiosErrorResponse<any> ) => {
 
-							if (err.response == null) {
-								throw log.error("response should be defined", { err });
+							if ( err.response == null ) {
+								throw log.error( "response should be defined", { err });
 							}
-							log.assert(err.response.status === 503, "wrong status code.", { err });
+							log.assert( err.response.status === 503, "wrong status code.", { err });
 
 							return Promise.resolve();
 

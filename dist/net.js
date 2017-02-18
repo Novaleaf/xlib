@@ -1,4 +1,10 @@
 "use strict";
+const promise = require("./promise");
+var Promise = promise.bluebird;
+const _ = require("lodash");
+const logging = require("./logging");
+let log = new logging.Logger(__filename);
+const jsHelper = require("./jshelper");
 //export import axios = require("axios");
 /** the axios httpClient library:  https://github.com/mzabriskie/axios */
 //export import axios = require("axios");
@@ -10,14 +16,25 @@ exports._axiosDTs = require("./internal/definitions/axios-d");
  * a low-level, but promise based http(s) library.
  *
  * **IMPORTANT**: recomend you DO NOT use this directly, as it does not provide retry logic.
- * instead, use the ``EzEndpoint`` we offer instead
+ * instead, use the ``EzEndpoint`` we offer instead.
+ * If you do use axios directly, be aware that though it returns something that appears to be a promise, it is NOT BLUEBIRD COMPATABLE for error handling, and so you will want to wrap it in a 'new Promise((resolve,reject)=>{ axios.... })' block.
  */
 exports.axios = require("axios");
-const promise = require("./promise");
-var Promise = promise.bluebird;
-const _ = require("lodash");
-const logging = require("./logging");
-let log = new logging.Logger(__filename);
+function _axiosPost(...args) {
+    return new Promise((resolve, reject) => {
+        jsHelper.apply(exports.axios.post, exports.axios, args)
+            .then((response) => {
+            resolve(response);
+        })
+            .catch((err) => {
+            reject(err);
+        });
+    });
+}
+/**
+ *  wrapper over axios.post() so that it conforms to Bluebird Promise specifications
+ */
+exports.axiosPost = _axiosPost;
 /**
 *  a helper for constructing reusable endpoint functions
 * includes retry logic and exponential backoff.
@@ -105,7 +122,13 @@ class EzEndpoint {
                                 throw log.error(`EzEndpoint._doRequest() unknown protocol`, { protocol });
                             }
                     }
-                    return axiosRequestPromise
+                    return new Promise((resolve, reject) => {
+                        //wrap axios in a REAL promise call, as it's hacky promises really sucks and breaks Bluebird
+                        axiosRequestPromise.then((axiosResponse) => { resolve(axiosResponse); })
+                            .catch((axiosErr) => {
+                            reject(axiosErr);
+                        });
+                    })
                         .then((result) => {
                         log.debug("EzEndpoint._doRequest() got valid response");
                         return Promise.resolve(result);
@@ -213,6 +236,69 @@ exports.EzEndpoint = EzEndpoint;
 var _test;
 (function (_test) {
     describe(__filename, () => {
+        describe("EzEndpoint", () => {
+            describe("fail cases", () => {
+                let test = it("basic retry, 429 error", () => {
+                    const testEzEndpoint = new EzEndpoint({ origin: "https://phantomjscloud.com", path: "/examples/helpers/statusCode/429" }, { timeout: 1000, interval: 100, backoff: 3 }, {});
+                    return testEzEndpoint.post()
+                        .then((response) => {
+                        throw log.errorAndThrowIfFalse(response.status === 429, "should have failed with 429 response", { response });
+                    }, (err) => {
+                        const axiosErr = err;
+                        if (axiosErr.response != null) {
+                            log.assert(axiosErr.response.status === 429, "should have failed with 429 response", { axiosErr });
+                        }
+                        else {
+                            throw log.error("expected a axiosErr but didn't get one", { err });
+                        }
+                    });
+                });
+                // set timeout increase (default=2000ms) https://mochajs.org/#timeouts
+                test.timeout(5000);
+                test = it("invalid domain", () => {
+                    const testEzEndpoint = new EzEndpoint({ origin: "https://asdfasdfasdfasetasgoud.com", path: "/examples/helpers/statusCode/429" }, { timeout: 1000, interval: 100, backoff: 3 }, {});
+                    return testEzEndpoint.post()
+                        .then((response) => {
+                        throw log.errorAndThrowIfFalse(response.status === 429, "should have failed with 429 response", { response });
+                    }, (err) => {
+                        //TODO: describe EzEndpoint fail error type, and add error definitions to bluebird
+                        // // // // 	export interface AxiosErrorResponse<T> extends Error {
+                        // // // // 	/** inherited from the Error object*/
+                        // // // // 	name: "Error";
+                        // // // // 	/**human readable error message, such as ```getaddrinfo ENOTFOUND moo moo:443``` or ```Request failed with status code 401``` */
+                        // // // // 	message: string;
+                        // // // // 	/**
+                        // // // // 	 * config that was provided to `axios` for the request
+                        // // // // 	 */
+                        // // // // 	config: AxiosXHRConfig<T>;
+                        // // // // 	/** The server response.  ```undefined``` if no response from server (such as invalid url or network timeout */
+                        // // // // 	response?: AxiosXHR<T>;
+                        // // // // 	/** example ```ETIMEDOUT```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+                        // // // // 	code?: string;
+                        // // // // 	/** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+                        // // // // failure?:{
+                        // // // // 	name:string;
+                        // // // // 	/**human readable error message, such as ```getaddrinfo ENOTFOUND moo moo:443``` or ```Request failed with status code 401``` */
+                        // // // // 	message: string;
+                        // // // // 	/** example ```ENOTFOUND```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+                        // // // // 	code: string;
+                        // // // // 	/** example ```ENOTFOUND```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+                        // // // // 	errno: string;
+                        // // // // 	/** example ```getaddrinfo```, but only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+                        // // // // 	syscall: string;
+                        // // // // 	/** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+                        // // // // 	hostname: string;
+                        // // // // 	/** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+                        // // // // 	host: string;
+                        // // // // 	/** only set if unable to get response from server.  otherwise does not exist (not even undefined!). */
+                        // // // // 	port: number;
+                        // // // // };
+                    });
+                });
+                // set timeout increase (default=2000ms) https://mochajs.org/#timeouts
+                test.timeout(5000);
+            });
+        });
         describe("axios", () => {
             const targetUrl = "https://phantomjscloud.com/examples/helpers/requestdata";
             const samplePostPayload1 = { hi: 1, bye: "two", inner: { three: 4 } };
@@ -233,6 +319,29 @@ var _test;
                 });
             });
             describe("fail cases", () => {
+                it("basic fail e2e", () => {
+                    return exports.axios.post("https://phantomjscloud.com/examples/helpers/statusCode/400", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+                        .then((axiosResponse) => {
+                        throw log.error("should have failed with 400 error", { badUrl, axiosResponse });
+                    })
+                        .catch((err) => {
+                        if (err.response == null) {
+                            throw log.error("response should be defined", { err });
+                        }
+                        log.assert(err.config != null, "missing property config", { err });
+                        log.assert(err.message != null, "missing property message", { err });
+                        log.assert(err.name != null, "missing property name", { err });
+                        log.assert(err.response != null, "missing property response", { err });
+                        log.assert(err.stack != null, "missing property stack", { err });
+                        log.assert(err.response.config != null, "missing property response.config", { err });
+                        log.assert(err.response.data != null, "missing property response.data", { err });
+                        log.assert(err.response.headers != null, "missing property response.headers", { err });
+                        log.assert(err.response.status != null, "missing property response.status ", { err });
+                        log.assert(err.response.statusText != null, "missing property response.statusText", { err });
+                        log.assert(err.response.status === 400, "wrong status code.", { err });
+                        return Promise.resolve();
+                    });
+                });
                 const badUrl = "https://moo";
                 let test = it("invlid url", () => {
                     return exports.axios.post(badUrl, samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
