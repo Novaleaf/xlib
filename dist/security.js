@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //import * as exception from "./exception";
 //import * as stringHelper from "./stringhelper";
 //import * as numHelper from "./numhelper";
@@ -146,6 +147,7 @@ function humanFriendlyKey(digits, digitGroupings, userInputToParse, groupingSepe
                 char = replacement;
             }
             else {
+                //noop
             }
         }
         finalKey.push(char);

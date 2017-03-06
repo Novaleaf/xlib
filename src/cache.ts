@@ -17,7 +17,7 @@ import * as logging from "./logging";
 //import * as promise from "./promise";
 import * as Promise from "bluebird";
 
-var log = new logging.Logger(__filename);
+var log = new logging.Logger( __filename );
 
 export interface ICacheItem<TValue> {
 	/** if UNDEFINED the cache is invalid.   Important note:  NULL is a valid cached value.*/
@@ -67,11 +67,11 @@ export class Cache {
 	constructor() {
 		this._storage = {};
 	}
-	private _storage: { [key: string]: ICacheItem<any> } = {};
+	private _storage: { [ key: string ]: ICacheItem<any> } = {};
 
 	private _cleanupKeys: string[] = [];
 	private _cleanupNextPosition: number = 0;
-	
+
 	/**
 	 * allows caching values for a period of time.   upon expiring, new values will be fetched via the "fetchFunction".
 	 * by default we return the cached value, and lazily (asynchronously) populate the value with the fetchFunction.
@@ -87,70 +87,71 @@ export class Cache {
 
 
 
+		const _defaultGcAfterMultipler = 3;
 
 
-		if (options == null) {
+		if ( options == null ) {
 			options = {};
 		}
 
-		let _options = options;
+		const _options: ICacheOptions = options;
 
 
-		if (options.fetchExpiresAmount == null) {
+		if ( options.fetchExpiresAmount == null ) {
 			options.fetchExpiresAmount = 10;
 		}
-		if (options.fetchExpiresUnits == null) {
+		if ( options.fetchExpiresUnits == null ) {
 			options.fetchExpiresUnits = "minutes";
 		}
-		if (options.gcAfterMultipler == null) {
-			options.gcAfterMultipler = 3;
+		if ( options.gcAfterMultipler == null ) {
+			options.gcAfterMultipler = _defaultGcAfterMultipler;
 		}
 
-		let fetchExpiresDuration = moment.duration(options.fetchExpiresAmount, options.fetchExpiresUnits);
+		let fetchExpiresDuration = moment.duration( options.fetchExpiresAmount, options.fetchExpiresUnits );
 
-		function _returnOrClone<TValue>(potentialValue: TValue): TValue {
+		function _returnOrClone<TValue>( potentialValue: TValue ): TValue {
 			let toReturn: TValue
-			if (_options.noClone) {
+			if ( _options.noClone ) {
 				//use newValue directly
 				toReturn = potentialValue;
-			} else if (_options.shallowClone === true) {
-				toReturn = _.clone(potentialValue);
+			} else if ( _options.shallowClone === true ) {
+				toReturn = _.clone( potentialValue );
 			} else {
-				toReturn = _.cloneDeep(potentialValue);
+				toReturn = _.cloneDeep( potentialValue );
 			}
 			return toReturn;
 		}
 
 		let now = moment();
-		if (options.fetchExpiresAmount <= 0) {
-			throw new exception.CorelibException("Cache: item to insert is alreadey expired (fetchExpiresAmount less than or equal to zero)");
+		if ( options.fetchExpiresAmount <= 0 ) {
+			throw new exception.CorelibException( "Cache: item to insert is alreadey expired (fetchExpiresAmount less than or equal to zero)" );
 		}
 		// do a garbage collection pass (one item checked per read call) 
-		this._tryGCOne(now);
+		this._tryGCOne( now );
 
-		let cacheItem = this._storage[key];
-		if (cacheItem == null) {
+		let cacheItem = this._storage[ key ];
+		if ( cacheItem == null ) {
 			cacheItem = {
 				value: undefined as any,
 				currentFetch: null as any,
-				expires: moment(0),
-				gcAfter: now.clone().add(fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds"),
+				expires: moment( 0 ),
+				gcAfter: now.clone().add( fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds" ),
 			};
-			this._storage[key] = cacheItem;
+			this._storage[ key ] = cacheItem;
 		}
 
-		if (cacheItem.value !== undefined && cacheItem.expires > now) {
+		if ( cacheItem.value !== undefined && cacheItem.expires > now ) {
 			//stored is valid
-			return Promise.resolve(_returnOrClone(cacheItem.value));
+			return Promise.resolve( _returnOrClone( cacheItem.value ) );
 		}
 
-		if (cacheItem.currentFetch != null) {
+		if ( cacheItem.currentFetch != null ) {
 			//already a fetch in progress, so we should not kick off another
 
 			if (
 				options.awaitNewOnExpired === true //expired                    
 				|| cacheItem.value === undefined //no value                    
-				|| (options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.clone().add(options.awaitNewOnExpiredThreshhold).isBefore(moment())) //threshhold exceeded
+				|| ( options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.clone().add( options.awaitNewOnExpiredThreshhold ).isBefore( moment() ) ) //threshhold exceeded
 			) {
 
 				//await currentFetch
@@ -158,7 +159,7 @@ export class Cache {
 
 			} else {
 				//return cached value
-				return Promise.resolve(_returnOrClone(cacheItem.value));
+				return Promise.resolve( _returnOrClone( cacheItem.value ) );
 			}
 		}
 
@@ -169,21 +170,25 @@ export class Cache {
 
 
 		//ASYNC:  after the fetch completes, update our cacheItem
-		cacheItem.currentFetch.then((newValue) => {
+		cacheItem.currentFetch.then(( newValue ) => {
 			let now = moment();
-			this._storage[key] = cacheItem; //in case gc deleted it
+			this._storage[ key ] = cacheItem; //in case gc deleted it
 
 			cacheItem.value = newValue;
-			cacheItem.expires = now.clone().add(fetchExpiresDuration);
-			cacheItem.gcAfter = cacheItem.expires.clone().add(fetchExpiresDuration.asSeconds() * _options.gcAfterMultipler, "seconds");
+			cacheItem.expires = now.clone().add( fetchExpiresDuration );
+
+			if ( _options.gcAfterMultipler == null ) {
+				_options.gcAfterMultipler = _defaultGcAfterMultipler;
+			}
+			cacheItem.gcAfter = cacheItem.expires.clone().add( fetchExpiresDuration.asSeconds() * _options.gcAfterMultipler, "seconds" );
 
 			//we might want to clone the resule
-			return Promise.resolve(_returnOrClone(cacheItem.value));
-		});
+			return Promise.resolve( _returnOrClone( cacheItem.value ) );
+		} );
 
 
 
-		if (cacheItem.value === undefined) {
+		if ( cacheItem.value === undefined ) {
 			//nothing cached at all, so await current fetch
 			return cacheItem.currentFetch;
 		}
@@ -191,15 +196,15 @@ export class Cache {
 
 
 		//check if we force waiting for a new value, or are ok with returning an expired value while refetching.
-		if (options.awaitNewOnExpired === true //expired                    
-			|| (options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.clone().add(options.awaitNewOnExpiredThreshhold).isBefore(moment())) //threshhold exceeded
+		if ( options.awaitNewOnExpired === true //expired                    
+			|| ( options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.clone().add( options.awaitNewOnExpiredThreshhold ).isBefore( moment() ) ) //threshhold exceeded
 		) {
 			//we don't accept an expired, await the refetch
 			return cacheItem.currentFetch;
 		}
 
 		//ok with the stale value
-		return Promise.resolve(_returnOrClone(cacheItem.value));
+		return Promise.resolve( _returnOrClone( cacheItem.value ) );
 	}
 
 	/**
@@ -207,12 +212,12 @@ export class Cache {
 	 * @param key
 	 * @param newCacheItem
 	 */
-	public write<TValue>(key: string, newCacheItem: ICacheItem<TValue>) {
+	public write<TValue>( key: string, newCacheItem: ICacheItem<TValue> ) {
 
-		if (newCacheItem == null) {
-			delete this._storage[key];
+		if ( newCacheItem == null ) {
+			delete this._storage[ key ];
 		} else {
-			this._storage[key] = newCacheItem;
+			this._storage[ key ] = newCacheItem;
 		}
 	}
 
@@ -220,32 +225,32 @@ export class Cache {
 	 *  lazy "garbage collector", every .get() call we will walk one item in our cache to see if it's expired.   if so, we remove it.
 	 * @param now
 	 */
-	private _tryGCOne(now: moment.Moment) {
+	private _tryGCOne( now: moment.Moment ) {
 
-		if (this._cleanupNextPosition >= this._cleanupKeys.length) {
-			this._cleanupKeys = Object.keys(this._storage);
+		if ( this._cleanupNextPosition >= this._cleanupKeys.length ) {
+			this._cleanupKeys = Object.keys( this._storage );
 			this._cleanupNextPosition = 0;
 		}
-		if (this._cleanupKeys.length <= 0) {
+		if ( this._cleanupKeys.length <= 0 ) {
 			//nothing to try cleaning up
 			return;
 		}
 
-		let key = this._cleanupKeys[this._cleanupNextPosition];
+		let key = this._cleanupKeys[ this._cleanupNextPosition ];
 		this._cleanupNextPosition++;
-		let tryCleanup = this._storage[key];
-		if (tryCleanup == null) {
-			delete this._storage[key];
+		let tryCleanup = this._storage[ key ];
+		if ( tryCleanup == null ) {
+			delete this._storage[ key ];
 			return;
 		}
-		if (tryCleanup.gcAfter > now) {
+		if ( tryCleanup.gcAfter > now ) {
 			//not expired;
 			return;
 		}
 
 
 		//no early exit clauses triggered, so cleanup
-		delete this._storage[key];
+		delete this._storage[ key ];
 		return;
 	}
 

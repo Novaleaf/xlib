@@ -16,7 +16,7 @@ import * as Promise from "bluebird";
 
 export var defaultIfNull = _jsHelper.defaultIfNull;
 //export { _jsHelper.defaultIfNull as defaultIfNull };
-
+export import defaultIfThrow = _jsHelper.defaultIfThrow;
 import * as _exception from "./exception";
 export var Exception = _exception.Exception;
 //export { _exception.Exception as Exception };
@@ -129,7 +129,7 @@ export function filterValues<TCollection, TKey extends keyof TCollection>( colle
     // export function filterValues<TValue>( collection: { [ key: string ]: TValue }, enumerator: ( value: TValue, key: string, collection: { [ key: string ]: TValue }) => boolean ): TValue[];
     // export function filterValues<TValue>( collection: any, enumerator: ( value: TValue, key: string | number, collection: any ) => boolean ): TValue[] {
     let toReturn: TCollection[ TKey ][] = [];
-    forEach( collection, ( val, idOrKey ) => {
+    forEach( collection, ( val, idOrKey : TKey ) => {
         if ( enumerator( val as any, idOrKey, collection ) !== false ) {
             toReturn.push( val as any );
         }

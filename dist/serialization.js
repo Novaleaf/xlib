@@ -1,5 +1,6 @@
 ///// <reference path="../../../typings/all.d.ts" />
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const jsHelper = require("./jshelper");
 const reflection = require("./reflection");
 const ex = require("./exception");
@@ -45,6 +46,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
         maxInputLength = -1) {
         if (text == null || text.length < 1) {
             return null;
+            //throw new ex.CorelibException("JsonX.parse() failed due to null/empty input");
         }
         if (text.length === undefined) {
             throw new ex.CorelibException("JsonX.parse() failed due to non string/Buffer input");
@@ -276,6 +278,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                                             delete bufferDetails["[*TYPE*]"];
                                         }
                                         if (!showVerboseDetails) {
+                                            //return bufferDetails.value;
                                         }
                                         return bufferDetails;
                                     }
@@ -398,6 +401,8 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                                 return;
                             }
                             otherParams[key] = _JSONifyWorker(value, depth + 1, nodeDepthSearchDisabled);
+                            //the following would also work (like the above) but more heavy weight
+                            //otherParams[key] = JSONX.inspectJSONify(value, maxSearchDepth - (depth + 1), hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut);
                         }
                         catch (ex) {
                             otherParams[key] = `[*ERROR*] can not Jsonify: ${ex.toString()}`;
@@ -410,6 +415,14 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                     _.defaults(toReturn, otherParams);
                 }
                 catch (ex) { }
+                //one more pass to remove our recursion tracking tokens
+                //if (!disableCircularDetection) {
+                //	//clean up node tracker markers
+                //	jsHelper.forEachArray(_processedNodes, (_value) => {
+                //		delete _value[_superStringifyTokenId];
+                //	});
+                //	_processedNodes.length = 0;
+                //}
             }
             return toReturn;
         }

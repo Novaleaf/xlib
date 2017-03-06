@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //import * as ex from "../exception";
 //import * as ex from "../exception";
 /** helpers for backend node.js stuff  NODE.JS ONLY!!! */

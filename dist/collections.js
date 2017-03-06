@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const stringHelper = require("./stringhelper");
 //import * as arrayHelper from "./arrayhelper";
 const numHelper = require("./numhelper");

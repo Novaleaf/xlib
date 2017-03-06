@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //export import _ = require("lodash");
 const _ = require("lodash");
 exports._ = _;
@@ -32,6 +33,16 @@ function defaultIfNull(value, defaultValue) {
     return value == null ? defaultValue : value;
 }
 exports.defaultIfNull = defaultIfNull;
+/** if an unhandled exception is thrown when evaluating the "action" function, the defaultValue will be used" */
+function defaultIfThrow(action, defaultValue) {
+    try {
+        return action();
+    }
+    catch (ex) {
+        return defaultValue;
+    }
+}
+exports.defaultIfThrow = defaultIfThrow;
 function forEachArray(
     /** if a collection (an object with a .length property), will enumerate indicies */
     collection, func, 

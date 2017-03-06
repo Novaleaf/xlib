@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const ex = require("./exception");
 const environment = require("./environment");
 const stringHelper = require("./stringhelper");
@@ -209,6 +210,7 @@ class Logger {
                     var objArg;
                     try {
                         objArg = (serialization.JSONX.inspectStringify(arg, 3, false, true, undefined, undefined, "\t"));
+                        //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
                     }
                     catch (ex) {
                         objArg = ("[Object???]");
@@ -219,6 +221,7 @@ class Logger {
                     var objArg;
                     try {
                         objArg = (serialization.JSONX.inspectStringify(arg, 3, false, false, undefined, undefined, "\t"));
+                        //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
                     }
                     catch (ex) {
                         objArg = ("[Object???]");

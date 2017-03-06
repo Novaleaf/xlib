@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const arrayHelper = require("./arrayhelper");
 const _ = require("lodash");
 const __ = require("./lolo");
@@ -25,6 +26,7 @@ if (__.isLogDebug == true) {
     });
 }
 else {
+    //
 }
 if (global.Promise == null) {
     global.Promise = bluebird;
@@ -67,12 +69,15 @@ function logPromiseUnhandledRejections(logger = _unhandledDefaultLogger) {
                     //logger.error(__.JSONX.stringify(promise.reason()));
                     //logger.error({abc:123,cde:"xyz"});
                     logger.error("xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection", reason); //, { promise: promise.toJSON() });
+                    //logger.error("xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection", reason, { promise: JSON.parse(JSON.stringify(promise)) });
+                    //logger.error(reason, promise);
                 }
                 catch (ex) {
                     //try {
                     //	logger.error("xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection TRY2", JSON.stringify({ reason, promise }));
                     //} catch (ex) {
                     console.log("xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection try 2 failed!");
+                    //}
                 }
                 throw reason;
             });

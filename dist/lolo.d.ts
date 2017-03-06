@@ -6,6 +6,7 @@ import * as validation from "./validation";
 export declare var scrub: typeof validation.scrub;
 import * as Promise from "bluebird";
 export declare var defaultIfNull: typeof _jsHelper.defaultIfNull;
+export import defaultIfThrow = _jsHelper.defaultIfThrow;
 import * as _exception from "./exception";
 export declare var Exception: typeof _exception.Exception;
 import * as moment from "moment";

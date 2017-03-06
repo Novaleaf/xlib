@@ -7,6 +7,8 @@ export { _ };
  * @param defaultValue
  */
 export declare function defaultIfNull<T>(value: T, defaultValue: T): T;
+/** if an unhandled exception is thrown when evaluating the "action" function, the defaultValue will be used" */
+export declare function defaultIfThrow<TValue>(action: () => TValue, defaultValue: TValue): TValue;
 /**
 * Helper function for iterating over values in the array. If the func returns
 * a false value, it will break out of the loop.

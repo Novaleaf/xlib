@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /* tslint:disable:no-bitwise */
 const ex = require("./exception");
 exports.INT8_MAX = 127;

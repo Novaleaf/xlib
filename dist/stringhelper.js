@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 /** Clean up user-submitted HTML, preserving whitelisted elements and whitelisted attributes on a per-element basis
  https://www.npmjs.com/package/sanitize-html
@@ -246,6 +247,10 @@ function removePrefix(target, ...prefixToRemove) {
                 target = target.substr(trimLen);
                 loop = true;
             }
+            //while (endsWith(target, toTrim)) {
+            //	target = target.substr(0, target.length - trimLen);
+            //	loop = true;
+            //}
         }
     } while (loop);
     return target;

@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const promise = require("./promise");
 var Promise = promise.bluebird;
 const _ = require("lodash");
@@ -94,7 +95,7 @@ class EzEndpoint {
             if (protocol === "get" && submitPayload != null) {
                 throw log.error("EzEndpoint._doRequest() submit payload was passed to a GET request, this is not supported by Axios and most endpoints", { finalEndpointOptions, submitPayload });
             }
-            let endpoint = overrideEndpointOptions.origin + overrideEndpointOptions.path;
+            let endpoint = finalEndpointOptions.origin + finalEndpointOptions.path;
             let lastErrorResult = null;
             //************
             //retry loop

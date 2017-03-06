@@ -1,5 +1,6 @@
 // Type definitions for axios based off of Definitions by: Marcel Buesing <https://github.com/marcelbuesing> but adapted for xlib use by JasonS@Novaleaf.com
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //declare var axios: AxiosStatic;
 //declare module "axios" {
 //    export = axios;

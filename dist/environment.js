@@ -3,6 +3,7 @@
 //import browserHelper = require("./internal/browserhelper");
 //import * as ex from "./exception";
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const nodeHelper = require("./internal/nodehelper");
 const browserHelper = require("./internal/browserhelper");
 //import * as ex from "./exception";
@@ -209,6 +210,7 @@ function _ifDebug(fcn) {
         //no op
         /* tslint:disable */
         return () => { };
+        /* tslint:enable */
     }
 }
 exports._ifDebug = _ifDebug;
@@ -223,6 +225,7 @@ function _ifTest(fcn) {
         //no op
         /* tslint:disable */
         return () => { };
+        /* tslint:enable */
     }
 }
 exports._ifTest = _ifTest;

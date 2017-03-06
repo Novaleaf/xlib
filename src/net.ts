@@ -133,7 +133,7 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 				throw log.error( "EzEndpoint._doRequest() submit payload was passed to a GET request, this is not supported by Axios and most endpoints", { finalEndpointOptions, submitPayload });
 			}
 
-			let endpoint = overrideEndpointOptions.origin + overrideEndpointOptions.path;
+			let endpoint = finalEndpointOptions.origin + finalEndpointOptions.path;
 
 			let lastErrorResult: any = null;
 

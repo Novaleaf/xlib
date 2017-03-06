@@ -22,6 +22,17 @@ export function randomDate(/** inclusive */start: Date,/** inclusive */ end:Date
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 };
 
+export function format(date:Date,/** defaults to "YYYY-MM-DDTHH:mm:ss" */ fmt:string = "YYYY-MM-DDTHH:mm:ss"){
+	return moment(date).utc().format(fmt);
+	
+}
+
+export function formatLocalTz(date:Date,/** defaults to "YYYY-MM-DDTHH:mm:ss" */ dateFmt:string = "YYYY-MM-DDTHH:mm:ss", /** defaults to "(Z, z)" */tzFmt:string = "(Z, z)"){
+	const asMoment = moment.tz(date, moment.tz.guess());
+	const localTimeAsText = asMoment.format(dateFmt);
+	const timeZoneAsText = asMoment.format(tzFmt);
+	return { date: localTimeAsText, tz: timeZoneAsText };
+}
 
 //export class DateTime {
 

@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //import * as logging from "./logging";
 const ex = require("../exception");
 /** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.

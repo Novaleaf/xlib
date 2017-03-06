@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function copy(array, startIndex = 0, endIndex) {
     return Array.prototype.slice.call(array, startIndex, endIndex);
 }

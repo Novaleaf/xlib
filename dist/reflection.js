@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //export import _common = require("./reflection/_common");
 //import stringHelper = require("../stringhelper");
 //import arrayHelper = require("../arrayhelper");

@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //import * as ex from "./exception";
 const ex = require("./exception");
 /** root class, includes the following functionality:

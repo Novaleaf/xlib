@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /// <reference path="../typings/all.d.ts" />
 ///** https://adambom.github.io/parallel.js/ 
 // * Parallel Computing with Javascript

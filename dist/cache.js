@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const moment = require("moment");
 const exception = require("./exception");
@@ -26,10 +27,11 @@ class Cache {
      * @param fetchFunction
      */
     read(key, fetchFunction, options) {
+        const _defaultGcAfterMultipler = 3;
         if (options == null) {
             options = {};
         }
-        let _options = options;
+        const _options = options;
         if (options.fetchExpiresAmount == null) {
             options.fetchExpiresAmount = 10;
         }
@@ -37,7 +39,7 @@ class Cache {
             options.fetchExpiresUnits = "minutes";
         }
         if (options.gcAfterMultipler == null) {
-            options.gcAfterMultipler = 3;
+            options.gcAfterMultipler = _defaultGcAfterMultipler;
         }
         let fetchExpiresDuration = moment.duration(options.fetchExpiresAmount, options.fetchExpiresUnits);
         function _returnOrClone(potentialValue) {
@@ -96,6 +98,9 @@ class Cache {
             this._storage[key] = cacheItem; //in case gc deleted it
             cacheItem.value = newValue;
             cacheItem.expires = now.clone().add(fetchExpiresDuration);
+            if (_options.gcAfterMultipler == null) {
+                _options.gcAfterMultipler = _defaultGcAfterMultipler;
+            }
             cacheItem.gcAfter = cacheItem.expires.clone().add(fetchExpiresDuration.asSeconds() * _options.gcAfterMultipler, "seconds");
             //we might want to clone the resule
             return Promise.resolve(_returnOrClone(cacheItem.value));

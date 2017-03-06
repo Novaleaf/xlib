@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //export import lodash = require("lodash");
 const lodash = require("lodash");
 exports.lodash = lodash;
@@ -23,6 +24,7 @@ if (_xlibConfigDefaults.sourceMapSupport === true) {
     if (source_map_support != null && source_map_support.install != null) {
         //console.info("source map support installing");
         source_map_support.install();
+        //console.info("source map support installed by xlib, as requested by calling module.");
     }
     else if (source_map_support != null && source_map_support.sourceMapSupport != null) {
         //console.warn("source map support installing 2");

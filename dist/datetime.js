@@ -1,5 +1,6 @@
 ///// <reference path="../../typings/all.d.ts" />
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 ///** a high-quality date-time library: http://momentjs.com/ Also includes the moment-timezone extension*/
 exports.moment = require("moment-timezone");
 // /** a high-quality date-time library: http://momentjs.com/ */
@@ -19,6 +20,17 @@ function randomDate(/** inclusive */ start, /** inclusive */ end) {
 }
 exports.randomDate = randomDate;
 ;
+function format(date, /** defaults to "YYYY-MM-DDTHH:mm:ss" */ fmt = "YYYY-MM-DDTHH:mm:ss") {
+    return exports.moment(date).utc().format(fmt);
+}
+exports.format = format;
+function formatLocalTz(date, /** defaults to "YYYY-MM-DDTHH:mm:ss" */ dateFmt = "YYYY-MM-DDTHH:mm:ss", /** defaults to "(Z, z)" */ tzFmt = "(Z, z)") {
+    const asMoment = exports.moment.tz(date, exports.moment.tz.guess());
+    const localTimeAsText = asMoment.format(dateFmt);
+    const timeZoneAsText = asMoment.format(tzFmt);
+    return { date: localTimeAsText, tz: timeZoneAsText };
+}
+exports.formatLocalTz = formatLocalTz;
 //export class DateTime {
 //	protected _instance: moment.Moment;
 //	/** To get the current date and time, just call moment() with no parameters.  This is essentially the same as calling moment(new Date()). */

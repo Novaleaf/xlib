@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const numHelper = require("./numhelper");
 const _jsHelper = require("./jshelper");
 const serialization = require("./serialization");
@@ -8,6 +9,7 @@ const validation = require("./validation");
 exports.scrub = validation.scrub;
 exports.defaultIfNull = _jsHelper.defaultIfNull;
 //export { _jsHelper.defaultIfNull as defaultIfNull };
+exports.defaultIfThrow = _jsHelper.defaultIfThrow;
 const _exception = require("./exception");
 exports.Exception = _exception.Exception;
 //export { _exception.Exception as Exception };

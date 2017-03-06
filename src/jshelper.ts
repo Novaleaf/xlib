@@ -36,10 +36,18 @@ export { _ };
  * @param value
  * @param defaultValue
  */
-export function defaultIfNull<T>(value: T, defaultValue: T): T {
+export function defaultIfNull<T>( value: T, defaultValue: T ): T {
 	return value == null ? defaultValue : value;
 }
 
+/** if an unhandled exception is thrown when evaluating the "action" function, the defaultValue will be used" */
+export function defaultIfThrow<TValue>( action: () => TValue, defaultValue: TValue ): TValue {
+	try {
+		return action();
+	} catch ( ex ) {
+		return defaultValue;
+	}
+}
 
 /**
 * Helper function for iterating over values in the array. If the func returns
@@ -53,7 +61,7 @@ export function forEachArray<T>
 	, func: (
 		/** null values are not discarded (unlike most foreach methods do!) */
 		value: T
-	/** this is the index. */
+		/** this is the index. */
 		, index: number
 		, collection: T[]
 	) => boolean,
@@ -68,7 +76,7 @@ export function forEachArray<T>
 	, func: (
 		/** null values are not discarded (unlike most foreach methods do!) */
 		value: T
-	/** this is the index. */
+		/** this is the index. */
 		, index: number
 		, collection: T[]
 	) => void,
@@ -83,7 +91,7 @@ export function forEachArray<T>
 	, func: (
 		/** null values are not discarded (unlike most foreach methods do!) */
 		value: T
-	/** this is the index. */
+		/** this is the index. */
 		, index: number
 		, collection: T[]
 	) => boolean,
@@ -91,17 +99,17 @@ export function forEachArray<T>
 this is useful if you wish to add/remove from the original collection while enumerating */
 	enumerateCopy = false
 	): boolean {
-	if (collection==null) { throw new Error("input collection is null/undefined") }
-	if (collection["length"] == null) {
-		throw new Error("should have length property");
+	if ( collection == null ) { throw new Error( "input collection is null/undefined" ) }
+	if ( collection[ "length" ] == null ) {
+		throw new Error( "should have length property" );
 	}
 
-	if (enumerateCopy) {
-		collection = collection.slice(0);
+	if ( enumerateCopy ) {
+		collection = collection.slice( 0 );
 	}
 
-	for (var i = 0; i < collection.length; i++) {
-		if (func(collection[i], i, collection) === false) {
+	for ( var i = 0; i < collection.length; i++ ) {
+		if ( func( collection[ i ], i, collection ) === false ) {
 			//yielded
 			return false;
 		}
@@ -120,7 +128,7 @@ export function forEachArrayReverse<T>
 	, func: (
 		/** null values are not discarded (unlike most foreach methods do!) */
 		value: T
-	/** this is the index. */
+		/** this is the index. */
 		, index: number
 		, collection: T[]
 	) => boolean,
@@ -128,16 +136,16 @@ export function forEachArrayReverse<T>
 this is useful if you wish to add/remove from the original collection while enumerating */
 	enumerateCopy = false
 	): boolean {
-	if (collection==null) { throw new Error("input collection is null/undefined") }
-	if (!(length in collection)) {
-		throw new Error("should have length property");
+	if ( collection == null ) { throw new Error( "input collection is null/undefined" ) }
+	if ( !( length in collection ) ) {
+		throw new Error( "should have length property" );
 	}
 
-	if (enumerateCopy) {
-		collection = collection.slice(0);
+	if ( enumerateCopy ) {
+		collection = collection.slice( 0 );
 	}
-	for (var i = collection.length - 1; i >= 0; i--) {
-		if (func(collection[i], i, collection) === false) {
+	for ( var i = collection.length - 1; i >= 0; i-- ) {
+		if ( func( collection[ i ], i, collection ) === false ) {
 			//yielded
 			return false;
 		}
@@ -147,37 +155,37 @@ this is useful if you wish to add/remove from the original collection while enum
 }
 export function forEachProperty<T>(
 	/** enumerate hasOwnProperties of this   */
-	object:any
+	object: any
 	, func: (
 		/** null values are not discarded (unlike most foreach methods do!) */
 		value: T
-	/** the name of the property the value is assigned to */
+		/** the name of the property the value is assigned to */
 		, key: string
 		, collection: any
 	) => void
-	, recursive?: boolean): void;
+	, recursive?: boolean ): void;
 export function forEachProperty<T>(
 	/** enumerate hasOwnProperties of this   */
 	object: any
 	, func: (
 		/** null values are not discarded (unlike most foreach methods do!) */
 		value: T
-	/** the name of the property the value is assigned to */
+		/** the name of the property the value is assigned to */
 		, key: string
 		, collection: any
 	) => boolean
-	, recursive = false): boolean {
-	if (object == null) { throw new Error("input object is null/undefined") }
-	for (var key in object) {
-		if (object.hasOwnProperty(key)) {
-			if (func(object[key], key, object) === false) {
+	, recursive = false ): boolean {
+	if ( object == null ) { throw new Error( "input object is null/undefined" ) }
+	for ( var key in object ) {
+		if ( object.hasOwnProperty( key ) ) {
+			if ( func( object[ key ], key, object ) === false ) {
 				//yielded
 				return false;
 			}
-			if (recursive === true && (typeof (object[key]) === "object")) {
-				var result: boolean = <any>forEachProperty(object[key], func, recursive);
+			if ( recursive === true && ( typeof ( object[ key ] ) === "object" ) ) {
+				var result: boolean = <any>forEachProperty( object[ key ], func, recursive );
 
-				if (result === false) {
+				if ( result === false ) {
 					//if a recursive call returns TRUE, we abort all calls
 					return false;
 				}
@@ -248,27 +256,27 @@ export function forEachProperty<T>(
 
 /** same as function.apply, but allows prepending arguments in front of an array of arguments */
 //export function apply<TReturn>(targetFcn: (arg1: any, ...anyArgs: any[]) => TReturn, thisObj: any, argArray: any[], ...argsToPrepend: any[]): TReturn
-export function apply<TReturn>(targetFcn: (...args: any[]) => TReturn, thisObj: any, argArray: any[], argsToPrepend: any[] = [], argsToPostpend: any[] = []): TReturn {
+export function apply<TReturn>( targetFcn: ( ...args: any[] ) => TReturn, thisObj: any, argArray: any[], argsToPrepend: any[] = [], argsToPostpend: any[] = [] ): TReturn {
 	//in case this is IArguments or something of the sort, make a new array
-	if (argArray.unshift == null) {
-		var tmp:any[] = [];
-		for (var i = 0; i < argArray.length; i++) {
-			tmp.push(argArray[i]);
+	if ( argArray.unshift == null ) {
+		var tmp: any[] = [];
+		for ( var i = 0; i < argArray.length; i++ ) {
+			tmp.push( argArray[ i ] );
 		}
 		argArray = tmp;
 	} else {
 		//make a copy to not modify original args passed in
 		argArray = argArray.slice();
 	}
-	argArray.unshift.apply(argArray, argsToPrepend);
-	argArray = argArray.concat(argsToPostpend);
+	argArray.unshift.apply( argArray, argsToPrepend );
+	argArray = argArray.concat( argsToPostpend );
 
 	//for (var i = argsToPrepend.length-1; i >= 0; i--)
 	//{
 	//	argArray.unshift(argsToPrepend[i]);
 	//}
 
-	return targetFcn.apply(thisObj, argArray);
+	return targetFcn.apply( thisObj, argArray );
 }
 
 ///** if the targetFcn is null, silently ignore (no errors) */
@@ -395,69 +403,69 @@ export function apply<TReturn>(targetFcn: (...args: any[]) => TReturn, thisObj: 
 
 
 /** replace a branch of your JSON object.  good for pruning nested hiearchies, for example when wanting to decrease verbosity sent to user (before doing a JSON.stringify() ) */
-export function replaceNodes(targetObject: any,
+export function replaceNodes( targetObject: any,
 	/** example:  'a.b.c.d' will remove the d node, replacing it (with null by default, effectively deleting)*/
-	nodeHiearchyStrings: string[], replaceWith: any = null, replaceEmptyLeafNodes: boolean = false) {
+	nodeHiearchyStrings: string[], replaceWith: any = null, replaceEmptyLeafNodes: boolean = false ) {
 
 	/** recursive helper for walking through the current hiearchy, replacing as it goes*/
-	function currentNodeProcessor(previousNode: any, nodeName: string, hiearchyIndex: number, hiearchy: string[]) {
+	function currentNodeProcessor( previousNode: any, nodeName: string, hiearchyIndex: number, hiearchy: string[] ) {
 
-		if (previousNode == null || _.isString(previousNode)) {
+		if ( previousNode == null || _.isString( previousNode ) ) {
 			//if our previous node is null (or a string), nothing to do.
 			return;
 		}
 
 
-		if (hiearchyIndex === (hiearchy.length - 1)) {
+		if ( hiearchyIndex === ( hiearchy.length - 1 ) ) {
 			//the node is the last node in our hiearchy, 
 			//so we are on the node to remove.remove it and we are done
-			if (previousNode[nodeName] != null || replaceEmptyLeafNodes === true) {
-				previousNode[nodeName] = replaceWith;
+			if ( previousNode[ nodeName ] != null || replaceEmptyLeafNodes === true ) {
+				previousNode[ nodeName ] = replaceWith;
 			}
 			return;
 		}
 
 		//walk down the hiearchy
-		var thisNode = previousNode[nodeName];
+		var thisNode = previousNode[ nodeName ];
 		var nextHiearchyIndex = hiearchyIndex + 1;
-		var nextNodeName = hiearchy[nextHiearchyIndex];
-		if (_.isArray(thisNode) === true && _.isString(thisNode) === false) {
+		var nextNodeName = hiearchy[ nextHiearchyIndex ];
+		if ( _.isArray( thisNode ) === true && _.isString( thisNode ) === false ) {
 			//walk each element in the array automatically
-			_.forEach(thisNode, (element) => {
-				currentNodeProcessor(element, nextNodeName, nextHiearchyIndex, hiearchy);
-			});
+			_.forEach( thisNode, ( element ) => {
+				currentNodeProcessor( element, nextNodeName, nextHiearchyIndex, hiearchy );
+			} );
 			return;
 		} else {
-			currentNodeProcessor(thisNode, nextNodeName, nextHiearchyIndex, hiearchy);
+			currentNodeProcessor( thisNode, nextNodeName, nextHiearchyIndex, hiearchy );
 		}
 
 	}
 
 
 	//loop through all nodeHiearchyStrings to remove, removing the leaf.
-	_.forEach(nodeHiearchyStrings, (hiearchyString) => {
+	_.forEach( nodeHiearchyStrings, ( hiearchyString ) => {
 
 
-		var hiearchy = hiearchyString.split(".");
+		var hiearchy = hiearchyString.split( "." );
 
-		if (hiearchy.length < 1) {
+		if ( hiearchy.length < 1 ) {
 			return;
 		}
 
-		currentNodeProcessor(targetObject, hiearchy[0], 0, hiearchy);
+		currentNodeProcessor( targetObject, hiearchy[ 0 ], 0, hiearchy );
 
-	});
+	} );
 }
 
 
 /** allows chaining callbacks (sequentially)
 example usage:  object.callback = __.chainCallbacks(object.callback, myCallback, otherCallback, anotherAddedCallback);
 */
-export function chainCallbacks(...callbacks: Function[]): (...args: any[]) => void {
-	return (...args: any[]) => {
-		for (var i = 0; i < callbacks.length; i++) {
-			if (callbacks[i] != null) {
-				callbacks[i].apply(null, args);
+export function chainCallbacks( ...callbacks: Function[] ): ( ...args: any[] ) => void {
+	return ( ...args: any[] ) => {
+		for ( var i = 0; i < callbacks.length; i++ ) {
+			if ( callbacks[ i ] != null ) {
+				callbacks[ i ].apply( null, args );
 			}
 		}
 	};
@@ -477,24 +485,24 @@ export function createCallableInstance(
 	nakedCallableMethod: Function,
 	/** name of the class you want to create an instance of
 	example:  class MyClass{} */
-	classType: any, ...args: any[]): any {
+	classType: any, ...args: any[] ): any {
 	//can add properties to naked functions, but not naked functions to objects
-	var toReturn = <any>function (...args: any[]) { return nakedCallableMethod.apply(toReturn, args); };
+	var toReturn = <any>function ( ...args: any[] ) { return nakedCallableMethod.apply( toReturn, args ); };
 	//copy properties from our prototype
-	for (var x in classType.prototype) {
-		if (classType.prototype.hasOwnProperty(x)) {
-			toReturn[x] = classType.prototype[x];
+	for ( var x in classType.prototype ) {
+		if ( classType.prototype.hasOwnProperty( x ) ) {
+			toReturn[ x ] = classType.prototype[ x ];
 		}
 	}
 	toReturn.constructor = classType.prototype.constructor;
 	//copy properties from our function
-	for (var x in nakedCallableMethod.prototype) {
-		if (nakedCallableMethod.prototype.hasOwnProperty(x)) {
-			toReturn[x] = classType.prototype[x];
+	for ( var x in nakedCallableMethod.prototype ) {
+		if ( nakedCallableMethod.prototype.hasOwnProperty( x ) ) {
+			toReturn[ x ] = classType.prototype[ x ];
 		}
 	}
 	//invoke the prototype's constructor
-	toReturn.constructor.apply(toReturn, args);
+	toReturn.constructor.apply( toReturn, args );
 	//return our instance
 	return toReturn;
 	/* tslint:enable */
@@ -502,15 +510,15 @@ export function createCallableInstance(
 
 /** disallow enumeration of a property
 return true if succesfull false otherwise (such as if platform doesn't support it)*/
-export function disablePropertyEnumeration(obj: any, propertyName: string): boolean {
+export function disablePropertyEnumeration( obj: any, propertyName: string ): boolean {
 	try {
-		if (Object.defineProperty != null) {
-			Object.defineProperty(obj, propertyName, { enumerable: false });
+		if ( Object.defineProperty != null ) {
+			Object.defineProperty( obj, propertyName, { enumerable: false } );
 			return true;
 		} else {
 			return false;
 		}
-	} catch (ex) {
+	} catch ( ex ) {
 		//could not set for some reason
 		return false;
 	}

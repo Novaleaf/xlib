@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //declare class Error {
 //	public name: string;
 //	public message: string;
