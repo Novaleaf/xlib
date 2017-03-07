@@ -15,6 +15,9 @@ export declare let axios: _axiosDTs.AxiosStatic;
  *  wrapper over axios.post() so that it conforms to Bluebird Promise specifications
  */
 export declare const axiosPost: typeof axios.post;
+export declare type IEzEndpointRequestOptions<TRecievePayload> = _axiosDTs.AxiosXHRConfigBase<TRecievePayload> & {
+    ezGzipRequest?: boolean;
+};
 /**
 *  a helper for constructing reusable endpoint functions
 * includes retry logic and exponential backoff.
@@ -34,8 +37,12 @@ export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
     };
     /** default is to retry for up to 20 seconds, using a graceful exponential backoff */
     retryOptions: promise._BluebirdRetryInternals.IOptions;
-    /** default is to timeout (err 524) after 15 seconds*/
-    requestOptions: _axiosDTs.AxiosXHRConfigBase<TRecievePayload>;
+    /** default is:  {
+        timeout: 15000,
+        headers: {
+            "Accept-Encoding": "gzip, deflate"
+        } */
+    requestOptions: IEzEndpointRequestOptions<TRecievePayload>;
     /** allows aborting retries (if any).
     return a Promise.reject() to ABORT RETRY (stop immediately with the error passed to reject())
     return a Promise.resolve() to signal that the request should be retried.
@@ -53,8 +60,12 @@ export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
     }, 
         /** default is to retry for up to 20 seconds, using a graceful exponential backoff */
         retryOptions?: promise._BluebirdRetryInternals.IOptions, 
-        /** default is to timeout (err 524) after 15 seconds*/
-        requestOptions?: _axiosDTs.AxiosXHRConfigBase<TRecievePayload>, 
+        /** default is:  {
+            timeout: 15000,
+            headers: {
+                "Accept-Encoding": "gzip, deflate"
+            } */
+        requestOptions?: IEzEndpointRequestOptions<TRecievePayload>, 
         /** allows aborting retries (if any).
         return a Promise.reject() to ABORT RETRY (stop immediately with the error passed to reject())
         return a Promise.resolve() to signal that the request should be retried.
@@ -68,7 +79,7 @@ export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
             path?: string | undefined;
         };
         retryOptions: promise._BluebirdRetryInternals.IOptions;
-        requestOptions: _axiosDTs.AxiosXHRConfigBase<TRecievePayload>;
+        requestOptions: IEzEndpointRequestOptions<TRecievePayload>;
     };
     private _doRequest(protocol, 
         /** pass a payload to POST */
@@ -83,7 +94,7 @@ export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
         /** pass a payload to POST */
         submitPayload?: TSubmitPayload, 
         /**override defaults, pass undefined to skip */
-        overrideRequestOptions?: _axiosDTs.AxiosXHRConfigBase<TRecievePayload>, 
+        overrideRequestOptions?: IEzEndpointRequestOptions<TRecievePayload>, 
         /**override defaults, pass undefined to skip */
         overrideRetryOptions?: promise._BluebirdRetryInternals.IOptions, 
         /**override defaults, pass undefined to skip */
@@ -93,7 +104,7 @@ export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
     }): Promise<_axiosDTs.AxiosXHR<TRecievePayload>>;
     get(
         /**override defaults, pass undefined to skip */
-        overrideRequestOptions?: _axiosDTs.AxiosXHRConfigBase<TRecievePayload>, 
+        overrideRequestOptions?: IEzEndpointRequestOptions<TRecievePayload>, 
         /**override defaults, pass undefined to skip */
         overrideRetryOptions?: promise._BluebirdRetryInternals.IOptions, 
         /**override defaults, pass undefined to skip */

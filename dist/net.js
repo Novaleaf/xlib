@@ -50,9 +50,13 @@ class EzEndpoint {
         /** default endpoint (domain+path) to connect to.  this can be overridden in the actual .post() or .get() method call*/
         endpointOptions, 
         /** default is to retry for up to 20 seconds, using a graceful exponential backoff */
-        retryOptions = { timeout: 20000, interval: 100, backoff: 2, max_interval: 5000 }, 
-        /** default is to timeout (err 524) after 15 seconds*/
-        requestOptions = { timeout: 15000 }, 
+        retryOptions = {}, 
+        /** default is:  {
+            timeout: 15000,
+            headers: {
+                "Accept-Encoding": "gzip, deflate"
+            } */
+        requestOptions = {}, 
         /** allows aborting retries (if any).
         return a Promise.reject() to ABORT RETRY (stop immediately with the error passed to reject())
         return a Promise.resolve() to signal that the request should be retried.
@@ -70,6 +74,18 @@ class EzEndpoint {
         this.retryOptions = retryOptions;
         this.requestOptions = requestOptions;
         this.preRetryErrorIntercept = preRetryErrorIntercept;
+        const defaultRetryOptions = { timeout: 20000, interval: 100, backoff: 2, max_interval: 5000 };
+        const defaultRequestOptions = {
+            timeout: 15000,
+            headers: {
+                /** by default allow server to send a compressed response */
+                "Accept-Encoding": "gzip, deflate"
+            }
+        };
+        // this.retryOptions = { ...defaultRetryOptions, ...retryOptions };
+        // this.requestOptions = { ...defaultRequestOptions, ...requestOptions };
+        this.requestOptions = _.defaultsDeep({}, requestOptions, defaultRequestOptions);
+        this.retryOptions = _.defaultsDeep({}, retryOptions, defaultRetryOptions);
     }
     toJson() {
         return { endpointOptions: this.endpointOptions, retryOptions: this.retryOptions, requestOptions: this.requestOptions };
@@ -238,9 +254,34 @@ var _test;
 (function (_test) {
     describe(__filename, () => {
         describe("EzEndpoint", () => {
+            describe("success cases", () => {
+                let test = it("basic ezEndpoint, roundtrip phantomjscloud", () => {
+                    const testEzEndpoint = new EzEndpoint({ origin: "http://phantomjscloud.com", path: "/api/browser/v2/a-demo-key-with-low-quota-per-ip-address/" }, { timeout: 3000, interval: 100, backoff: 3 }, {});
+                    const targetUrl = "https://example.com";
+                    const requestPayload = {
+                        pages: [
+                            {
+                                url: targetUrl,
+                                renderType: "html",
+                                outputAsJson: true,
+                            }
+                        ],
+                    };
+                    return testEzEndpoint.post(requestPayload)
+                        .then((response) => {
+                        log.assert(response.status === 200, "should get success response", { response });
+                        log.assert(targetUrl === response.data.pageResponses[0].pageRequest.url, "response contents should contain a value of response.data.pageResponses[0].pageRequest.url that matchest targetUrl", { targetUrl, gotTargetUrl: response.data.pageResponses[0].pageRequest.url, response });
+                    }, (err) => {
+                        const axiosErr = err;
+                        throw log.error("did not expect an axiosErr", { err });
+                    });
+                });
+                // set timeout increase (default=2000ms) https://mochajs.org/#timeouts
+                test.timeout(5000);
+            });
             describe("fail cases", () => {
                 let test = it("basic retry, 429 error", () => {
-                    const testEzEndpoint = new EzEndpoint({ origin: "https://phantomjscloud.com", path: "/examples/helpers/statusCode/429" }, { timeout: 1000, interval: 100, backoff: 3 }, {});
+                    const testEzEndpoint = new EzEndpoint({ origin: "http://phantomjscloud.com", path: "/examples/helpers/statusCode/429" }, { timeout: 1000, interval: 100, backoff: 3 }, {});
                     return testEzEndpoint.post()
                         .then((response) => {
                         throw log.errorAndThrowIfFalse(response.status === 429, "should have failed with 429 response", { response });
@@ -257,7 +298,7 @@ var _test;
                 // set timeout increase (default=2000ms) https://mochajs.org/#timeouts
                 test.timeout(5000);
                 test = it("invalid domain", () => {
-                    const testEzEndpoint = new EzEndpoint({ origin: "https://asdfasdfasdfasetasgoud.com", path: "/examples/helpers/statusCode/429" }, { timeout: 1000, interval: 100, backoff: 3 }, {});
+                    const testEzEndpoint = new EzEndpoint({ origin: "http://asdfasdfasdfasetasgoud.com", path: "/examples/helpers/statusCode/429" }, { timeout: 1000, interval: 100, backoff: 3 }, {});
                     return testEzEndpoint.post()
                         .then((response) => {
                         throw log.errorAndThrowIfFalse(response.status === 429, "should have failed with 429 response", { response });
@@ -301,7 +342,7 @@ var _test;
             });
         });
         describe("axios", () => {
-            const targetUrl = "https://phantomjscloud.com/examples/helpers/requestdata";
+            const targetUrl = "http://phantomjscloud.com/examples/helpers/requestdata";
             const samplePostPayload1 = { hi: 1, bye: "two", inner: { three: 4 } };
             const sampleHeader1 = { head1: "val1" };
             describe("success cases", () => {
@@ -321,7 +362,7 @@ var _test;
             });
             describe("fail cases", () => {
                 it("basic fail e2e", () => {
-                    return exports.axios.post("https://phantomjscloud.com/examples/helpers/statusCode/400", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+                    return exports.axios.post("http://phantomjscloud.com/examples/helpers/statusCode/400", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
                         .then((axiosResponse) => {
                         throw log.error("should have failed with 400 error", { badUrl, axiosResponse });
                     })
@@ -343,7 +384,7 @@ var _test;
                         return Promise.resolve();
                     });
                 });
-                const badUrl = "https://moo";
+                const badUrl = "http://moo";
                 let test = it("invlid url", () => {
                     return exports.axios.post(badUrl, samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
                         .then((axiosResponse) => {
@@ -357,7 +398,7 @@ var _test;
                 // set timeout increase (default=2000ms) https://mochajs.org/#timeouts
                 test.timeout(5000);
                 it("status 401 response", () => {
-                    return exports.axios.post("https://phantomjscloud.com/examples/helpers/statusCode/401", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+                    return exports.axios.post("http://phantomjscloud.com/examples/helpers/statusCode/401", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
                         .then((axiosResponse) => {
                         throw log.error("should have failed with 401 error", { badUrl, axiosResponse });
                     })
@@ -370,7 +411,7 @@ var _test;
                     });
                 });
                 it("status 429 response", () => {
-                    return exports.axios.post("https://phantomjscloud.com/examples/helpers/statusCode/429", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+                    return exports.axios.post("http://phantomjscloud.com/examples/helpers/statusCode/429", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
                         .then((axiosResponse) => {
                         throw log.error("should have failed with 429 error", { badUrl, axiosResponse });
                     })
@@ -383,7 +424,7 @@ var _test;
                     });
                 });
                 it("status 500 response", () => {
-                    return exports.axios.post("https://phantomjscloud.com/examples/helpers/statusCode/500", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+                    return exports.axios.post("http://phantomjscloud.com/examples/helpers/statusCode/500", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
                         .then((axiosResponse) => {
                         throw log.error("should have failed with 500 error", { badUrl, axiosResponse });
                     })
@@ -396,7 +437,7 @@ var _test;
                     });
                 });
                 it("status 503 response", () => {
-                    return exports.axios.post("https://phantomjscloud.com/examples/helpers/statusCode/503", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
+                    return exports.axios.post("http://phantomjscloud.com/examples/helpers/statusCode/503", samplePostPayload1, { headers: sampleHeader1, responseType: "json" })
                         .then((axiosResponse) => {
                         throw log.error("should have failed with 503 error", { badUrl, axiosResponse });
                     })
