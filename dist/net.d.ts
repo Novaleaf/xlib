@@ -15,9 +15,13 @@ export declare let axios: _axiosDTs.AxiosStatic;
  *  wrapper over axios.post() so that it conforms to Bluebird Promise specifications
  */
 export declare const axiosPost: typeof axios.post;
-export declare type IEzEndpointRequestOptions<TRecievePayload> = _axiosDTs.AxiosXHRConfigBase<TRecievePayload> & {
-    ezGzipRequest?: boolean;
-};
+export declare type IEzEndpointRequestOptions<TRecievePayload> = _axiosDTs.AxiosXHRConfigBase<TRecievePayload> & {};
+export interface IEzEndpoint_EndpointOptions {
+    /** if you don't set this, you'll need to pass it to every call to .post() or .get() */
+    origin?: string;
+    /** if you don't set this, you'll need to pass it to every call to .post() or .get() */
+    path?: string;
+}
 /**
 *  a helper for constructing reusable endpoint functions
 * includes retry logic and exponential backoff.
@@ -29,12 +33,7 @@ export declare type IEzEndpointRequestOptions<TRecievePayload> = _axiosDTs.Axios
 */
 export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
     /** default endpoint (domain+path) to connect to.  this can be overridden in the actual .post() or .get() method call*/
-    endpointOptions: {
-        /** if you don't set this, you'll need to pass it to every call to .post() or .get() */
-        origin?: string;
-        /** if you don't set this, you'll need to pass it to every call to .post() or .get() */
-        path?: string;
-    };
+    endpointOptions: IEzEndpoint_EndpointOptions;
     /** default is to retry for up to 20 seconds, using a graceful exponential backoff */
     retryOptions: promise._BluebirdRetryInternals.IOptions;
     /** default is:  {
@@ -52,12 +51,7 @@ export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
         err: _axiosDTs.AxiosErrorResponse<TRecievePayload>) => Promise<void>;
     constructor(
         /** default endpoint (domain+path) to connect to.  this can be overridden in the actual .post() or .get() method call*/
-        endpointOptions: {
-        /** if you don't set this, you'll need to pass it to every call to .post() or .get() */
-        origin?: string;
-        /** if you don't set this, you'll need to pass it to every call to .post() or .get() */
-        path?: string;
-    }, 
+        endpointOptions: IEzEndpoint_EndpointOptions, 
         /** default is to retry for up to 20 seconds, using a graceful exponential backoff */
         retryOptions?: promise._BluebirdRetryInternals.IOptions, 
         /** default is:  {
@@ -74,10 +68,7 @@ export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
         /** note: network issues are converted into err.response so you don't need to parse them differently.*/
         err: _axiosDTs.AxiosErrorResponse<TRecievePayload>) => Promise<void>);
     toJson(): {
-        endpointOptions: {
-            origin?: string | undefined;
-            path?: string | undefined;
-        };
+        endpointOptions: IEzEndpoint_EndpointOptions;
         retryOptions: promise._BluebirdRetryInternals.IOptions;
         requestOptions: IEzEndpointRequestOptions<TRecievePayload>;
     };
@@ -98,18 +89,12 @@ export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
         /**override defaults, pass undefined to skip */
         overrideRetryOptions?: promise._BluebirdRetryInternals.IOptions, 
         /**override defaults, pass undefined to skip */
-        overrideEndpointOptions?: {
-        origin?: string;
-        path?: string;
-    }): Promise<_axiosDTs.AxiosXHR<TRecievePayload>>;
+        overrideEndpointOptions?: IEzEndpoint_EndpointOptions): Promise<_axiosDTs.AxiosXHR<TRecievePayload>>;
     get(
         /**override defaults, pass undefined to skip */
         overrideRequestOptions?: IEzEndpointRequestOptions<TRecievePayload>, 
         /**override defaults, pass undefined to skip */
         overrideRetryOptions?: promise._BluebirdRetryInternals.IOptions, 
         /**override defaults, pass undefined to skip */
-        overrideEndpointOptions?: {
-        origin?: string;
-        path?: string;
-    }): Promise<_axiosDTs.AxiosXHR<TRecievePayload>>;
+        overrideEndpointOptions?: IEzEndpoint_EndpointOptions): Promise<_axiosDTs.AxiosXHR<TRecievePayload>>;
 }

@@ -26,7 +26,9 @@ export interface AxiosXHRConfigBase<T> {
     /**
      * custom headers to be sent
      */
-    headers?: Object;
+    headers?: {
+        [key: string]: string;
+    };
     /**
      * URL parameters to be sent with the request
      */
@@ -98,23 +100,6 @@ export interface AxiosXHRConfig<T> extends AxiosXHRConfigBase<T> {
     data?: T;
 }
 export interface AxiosXHRConfigDefaults<T> extends AxiosXHRConfigBase<T> {
-    /**
-     * custom headers to be sent
-     */
-    headers: {
-        common: {
-            [index: string]: string;
-        };
-        patch: {
-            [index: string]: string;
-        };
-        post: {
-            [index: string]: string;
-        };
-        put: {
-            [index: string]: string;
-        };
-    };
 }
 /**
  * <T> - expected response type,

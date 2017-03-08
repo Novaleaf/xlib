@@ -14,6 +14,7 @@ import * as stringHelper from "./stringhelper";
 
 import jsHelper = require( "./jshelper" );
 
+import compression = require( "./compression" );
 //export import axios = require("axios");
 
 /** the axios httpClient library:  https://github.com/mzabriskie/axios */
@@ -54,8 +55,17 @@ export const axiosPost: typeof axios.post = _axiosPost as any;
 
 
 
-export type IEzEndpointRequestOptions<TRecievePayload> =_axiosDTs.AxiosXHRConfigBase<TRecievePayload>  & { /** set to true and EzEndpoint will gzip compress the request body  */ezGzipRequest?:boolean;} ;
+export type IEzEndpointRequestOptions<TRecievePayload> = _axiosDTs.AxiosXHRConfigBase<TRecievePayload> & {
+	/** set to true and EzEndpoint will gzip compress the payload of POST requests.  in doing so we set the 'Content-Encoding' and 'Content-Length' headers properly for you.  */
+	//ezGzipPostPayload?: boolean;
+};
 
+export interface IEzEndpoint_EndpointOptions {
+	/** if you don't set this, you'll need to pass it to every call to .post() or .get() */
+	origin?: string,
+	/** if you don't set this, you'll need to pass it to every call to .post() or .get() */
+	path?: string,
+}
 /**
 *  a helper for constructing reusable endpoint functions
 * includes retry logic and exponential backoff.
@@ -69,12 +79,7 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 
 	constructor(
 		/** default endpoint (domain+path) to connect to.  this can be overridden in the actual .post() or .get() method call*/
-		public endpointOptions: {
-			/** if you don't set this, you'll need to pass it to every call to .post() or .get() */
-			origin?: string,
-			/** if you don't set this, you'll need to pass it to every call to .post() or .get() */
-			path?: string,
-		},
+		public endpointOptions: IEzEndpoint_EndpointOptions,
 		/** default is to retry for up to 20 seconds, using a graceful exponential backoff */
 		public retryOptions: promise._BluebirdRetryInternals.IOptions = {},
 		/** default is:  { 
@@ -82,7 +87,7 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 			headers: { 
 				"Accept-Encoding": "gzip, deflate" 
 			} */
-		public requestOptions:IEzEndpointRequestOptions<TRecievePayload> = {},
+		public requestOptions: IEzEndpointRequestOptions<TRecievePayload> = {},
 		/** allows aborting retries (if any).
 		return a Promise.reject() to ABORT RETRY (stop immediately with the error passed to reject())
 		return a Promise.resolve() to signal that the request should be retried.        
@@ -100,12 +105,12 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 	) {
 
 		const defaultRetryOptions: promise._BluebirdRetryInternals.IOptions = { timeout: 20000, interval: 100, backoff: 2, max_interval: 5000 };
-		const defaultRequestOptions: IEzEndpointRequestOptions<TRecievePayload> = { 
-			timeout: 15000, 
-			headers: { 
+		const defaultRequestOptions: IEzEndpointRequestOptions<TRecievePayload> = {
+			timeout: 15000,
+			headers: {
 				/** by default allow server to send a compressed response */
-				"Accept-Encoding": "gzip, deflate" 
-			} 
+				"Accept-Encoding": "gzip, deflate"
+			}
 		};
 		// this.retryOptions = { ...defaultRetryOptions, ...retryOptions };
 		// this.requestOptions = { ...defaultRequestOptions, ...requestOptions };
@@ -123,14 +128,11 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 		/** pass a payload to POST */
 		submitPayload?: TSubmitPayload,
 		/**override defaults, pass undefined to skip */
-		overrideRequestOptions: IEzEndpointRequestOptions<TRecievePayload> = this.requestOptions,
+		overrideRequestOptions: IEzEndpointRequestOptions<TRecievePayload> = {},
 		/**override defaults, pass undefined to skip */
-		overrideRetryOptions: promise._BluebirdRetryInternals.IOptions = this.retryOptions,
+		overrideRetryOptions: promise._BluebirdRetryInternals.IOptions = {},
 		/**override defaults, pass undefined to skip */
-		overrideEndpointOptions: {
-			origin?: string,
-			path?: string,
-		} = this.endpointOptions
+		overrideEndpointOptions: IEzEndpoint_EndpointOptions = {}
 	): Promise<_axiosDTs.AxiosXHR<TRecievePayload>> {
 
 		log.debug( `EzEndpoint._doRequest() called`, { protocol } );
@@ -138,186 +140,214 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 		return Promise.try(() => {
 
 			//copy parameters from our overrides, in an additive manner, allowing for example, customizing the origin while keeping the default path.
-			let finalEndpointOptions = _.defaults( {}, overrideEndpointOptions, this.endpointOptions );
-			let finalRequestOptions = _.defaults( {}, overrideRequestOptions, this.requestOptions );
-			let finalRetryOptions = _.defaults( {}, overrideRetryOptions, this.retryOptions );
-
+			let finalEndpointOptions: IEzEndpoint_EndpointOptions = _.defaultsDeep( {}, overrideEndpointOptions, this.endpointOptions );
+			let finalRequestOptions: IEzEndpointRequestOptions<TRecievePayload> = _.defaultsDeep( {}, overrideRequestOptions, this.requestOptions );
+			let finalRetryOptions: promise._BluebirdRetryInternals.IOptions = _.defaultsDeep( {}, overrideRetryOptions, this.retryOptions );
 
 			if ( finalEndpointOptions.origin == null || finalEndpointOptions.path == null ) {
 				throw log.error( "can not make endpoint request.  missing required endpointOptions", { finalEndpointOptions } );
 			}
+			let endpoint = finalEndpointOptions.origin + finalEndpointOptions.path;
+
 			if ( protocol === "get" && submitPayload != null ) {
 				throw log.error( "EzEndpoint._doRequest() submit payload was passed to a GET request, this is not supported by Axios and most endpoints", { finalEndpointOptions, submitPayload } );
 			}
 
-			let endpoint = finalEndpointOptions.origin + finalEndpointOptions.path;
+			// //compress payload, maybe.
+			// return new Promise<TSubmitPayload>(( resolve, reject ) => {
+			// 	if ( submitPayload == null || finalRequestOptions.ezGzipPostPayload !== true ) {
+			// 		return resolve( submitPayload );
+			// 	}
+			// 	const buff = Buffer.from( JSON.stringify( submitPayload ) );
+			// 	//compression.zlib.deflate( buff, ( err, result ) => {
+			// 	compression.zlib.gzip( buff, ( err, result ) => {
 
-			let lastErrorResult: any = null;
+			// 		if ( err != null ) {
+			// 			return reject( err );
+			// 		}
 
-			//************
-			//retry loop
-			return promise.retry<_axiosDTs.AxiosXHR<TRecievePayload>>(() => {
+			// 		//set proper headers to inform of compressed payload
+			// 		if ( finalRequestOptions.headers == null ) {
+			// 			finalRequestOptions.headers = {};
+			// 		}
 
-				//try {
+			// 		let compressedStr = result.toString( "utf8" );
 
-				log.debug( "EzEndpoint._doRequest() in promise.retry block" );
+			// 		finalRequestOptions.headers[ "Content-Encoding" ] = "gzip";
+			// 		//finalRequestOptions.headers[ "Transfer-Encoding" ] = "chunked";
+			// 		finalRequestOptions.headers[ "Content-Length" ] = `${compressedStr.length}`;
+			// 		//finalRequestOptions.headers[ "content-encoding" ] = "deflate";
+			// 		//finalRequestOptions.headers[ "content-type" ] = "application/json; charset=utf-8";
+			// 		//result.toString("utf8")
+			// 		log.warn( "compressStr len = ", compressedStr.length );
+			// 		return resolve( compressedStr as any );
 
+			// 	} );
+			// } )
+			// 	.then(( submitPayload ) => {
+			return Promise.try(() => {
 
-				return Promise.try(() => {
+				let lastErrorResult: any = null;
 
-					/**
-					 *  the actual HTTP request we send over the wire.
-					 */
-					let axiosRequestPromise: _axiosDTs.IAxiosPromiseish<_axiosDTs.AxiosXHR<TRecievePayload>>;
+				//************
+				//retry loop
+				return promise.retry<_axiosDTs.AxiosXHR<TRecievePayload>>(() => {
 
-					switch ( protocol ) {
-						case "post":
-							{
-								axiosRequestPromise = axios.post<TRecievePayload>( endpoint, submitPayload, finalRequestOptions );
-							}
-							break;
-						case "get":
-							{
-								axiosRequestPromise = axios.get<TRecievePayload>( endpoint, finalRequestOptions );
-							}
-							break;
+					//try {
 
-						default:
-							{
-								throw log.error( `EzEndpoint._doRequest() unknown protocol`, { protocol } );
-							}
+					log.debug( "EzEndpoint._doRequest() in promise.retry block" );
 
 
-					}
-					return new Promise(( resolve, reject ) => {
-						//wrap axios in a REAL promise call, as it's hacky promises really sucks and breaks Bluebird
-						axiosRequestPromise.then(( axiosResponse ) => { resolve( axiosResponse ); } )
-							.catch(( axiosErr ) => {
-								reject( axiosErr );
+					return Promise.try(() => {
+
+						/**
+						 *  the actual HTTP request we send over the wire.
+						 */
+						let axiosRequestPromise: _axiosDTs.IAxiosPromiseish<_axiosDTs.AxiosXHR<TRecievePayload>>;
+
+						switch ( protocol ) {
+							case "post":
+								{
+									//axios.post(endpoint,null,{})
+									axiosRequestPromise = axios.post<TRecievePayload>( endpoint, submitPayload, finalRequestOptions );
+								}
+								break;
+							case "get":
+								{
+									axiosRequestPromise = axios.get<TRecievePayload>( endpoint, finalRequestOptions );
+								}
+								break;
+
+							default:
+								{
+									throw log.error( `EzEndpoint._doRequest() unknown protocol`, { protocol } );
+								}
+
+
+						}
+						return new Promise(( resolve, reject ) => {
+							//wrap axios in a REAL promise call, as it's hacky promises really sucks and breaks Bluebird
+							axiosRequestPromise.then(( axiosResponse ) => { resolve( axiosResponse ); } )
+								.catch(( axiosErr ) => {
+									reject( axiosErr );
+								} );
+						} )
+							.then(( result ) => {
+								log.debug( "EzEndpoint._doRequest() got valid response" );
+								return Promise.resolve( result );
+							}, ( err: _axiosDTs.AxiosErrorResponse<TRecievePayload> ) => {
+								log.debug( "EzEndpoint._doRequest() got err" );
+
+
+								if ( err.code != null ) {
+									log.assert( err.response == null, "expect axios.response to be null on err.code value set" );
+									switch ( err.code ) {
+										case "ENOTFOUND":
+											{
+												err.response = {
+													status: 523,
+													statusText: `Origin is Unreachable: ${ err.code }, ${ err.message } `,
+													config: err.config,
+													data: undefined as any,
+													headers: {},
+												};
+											}
+											break;
+										case "ECONNREFUSED":
+											{
+												err.response = {
+													status: 522,
+													statusText: `Connection Timed Out: ${ err.code }, ${ err.message } `,
+													config: err.config,
+													data: undefined as any,
+													headers: {},
+												};
+											}
+											break;
+										default:
+											{
+												err.response = {
+													status: 520,
+													statusText: `Unknown Error: ${ err.code }, ${ err.message } `,
+													config: err.config,
+													data: undefined as any,
+													headers: {},
+												};
+											}
+											break;
+									}
+								}
+								if ( err.response != null ) {
+									if ( err.response.status === 0 && err.response.statusText === "" && err.response.data === "" as any ) {
+										//log.debug("EzEndpointFunction axios.get timeout.", { endpoint });
+										err.response.status = 524;
+										err.response.statusText = "A Timeout Occurred: Request Aborted, EzEndpoint.requestOptions.timeout exceeded";
+										err.response.data = "Axios->EzEndpointFunction timeout." as any;
+									}
+
+								}
+
+
+								if ( this.preRetryErrorIntercept != null ) {
+
+									return this.preRetryErrorIntercept( err )
+										.then(() => {
+											//do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
+											lastErrorResult = err;
+											return Promise.reject( err );
+
+										}, ( rejectedErr ) => {
+											//rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
+											let stopError = new promise.retry.StopError( "preRetryIntercept abort" );
+											( stopError as any )[ "interceptResult" ] = Promise.reject( rejectedErr );
+											return Promise.reject( stopError );
+										} );
+
+								}
+								lastErrorResult = err;
+								return Promise.reject( err );
 							} );
-					} )
-						.then(( result ) => {
-							log.debug( "EzEndpoint._doRequest() got valid response" );
-							return Promise.resolve( result );
-						}, ( err: _axiosDTs.AxiosErrorResponse<TRecievePayload> ) => {
-							log.debug( "EzEndpoint._doRequest() got err" );
+					} );
 
+					//} catch (errThrown) {
+					//	log.debug("EzEndpoint._doRequest() in root promise.retry block,  got errThrown", errThrown.toString());
+					//	throw errThrown;
+					//}
 
-							if ( err.code != null ) {
-								log.assert( err.response == null, "expect axios.response to be null on err.code value set" );
-								switch ( err.code ) {
-									case "ENOTFOUND":
-										{
-											err.response = {
-												status: 523,
-												statusText: `Origin is Unreachable: ${ err.code }, ${ err.message } `,
-												config: err.config,
-												data: undefined as any,
-												headers: {},
-											};
-										}
-										break;
-									case "ECONNREFUSED":
-										{
-											err.response = {
-												status: 522,
-												statusText: `Connection Timed Out: ${ err.code }, ${ err.message } `,
-												config: err.config,
-												data: undefined as any,
-												headers: {},
-											};
-										}
-										break;
-									default:
-										{
-											err.response = {
-												status: 520,
-												statusText: `Unknown Error: ${ err.code }, ${ err.message } `,
-												config: err.config,
-												data: undefined as any,
-												headers: {},
-											};
-										}
-										break;
-								}
-							}
-							if ( err.response != null ) {
-								if ( err.response.status === 0 && err.response.statusText === "" && err.response.data === "" as any ) {
-									//log.debug("EzEndpointFunction axios.get timeout.", { endpoint });
-									err.response.status = 524;
-									err.response.statusText = "A Timeout Occurred: Request Aborted, EzEndpoint.requestOptions.timeout exceeded";
-									err.response.data = "Axios->EzEndpointFunction timeout." as any;
-								}
+				}, finalRetryOptions )
+					//***************  finished retry loop
+					.catch(( err: any ) => {
+						log.debug( "EzEndpoint._doRequest()  retry catch" );
+						if ( err.interceptResult != null ) {
+							return err.interceptResult;
+						}
+						return Promise.reject( err );
+					} );
 
-							}
-
-
-							if ( this.preRetryErrorIntercept != null ) {
-
-								return this.preRetryErrorIntercept( err )
-									.then(() => {
-										//do nothing special, ie the error gets returned back and axios retry functionality tries to kick in.
-										lastErrorResult = err;
-										return Promise.reject( err );
-
-									}, ( rejectedErr ) => {
-										//rejected the error retry.  construct a "stopError" to abort axios retry functionality and return it.
-										let stopError = new promise.retry.StopError( "preRetryIntercept abort" );
-										( stopError as any )[ "interceptResult" ] = Promise.reject( rejectedErr );
-										return Promise.reject( stopError );
-									} );
-
-							}
-							lastErrorResult = err;
-							return Promise.reject( err );
-						} );
-				} );
-
-				//} catch (errThrown) {
-				//	log.debug("EzEndpoint._doRequest() in root promise.retry block,  got errThrown", errThrown.toString());
-				//	throw errThrown;
-				//}
-
-			}, finalRetryOptions )
-				//***************  finished retry loop
-				.catch(( err: any ) => {
-					log.debug( "EzEndpoint._doRequest()  retry catch" );
-					if ( err.interceptResult != null ) {
-						return err.interceptResult;
-					}
-					return Promise.reject( err );
-				} );
-
+			} );
 		} );
-
 	}
 
 	public post(
 		/** pass a payload to POST */
 		submitPayload?: TSubmitPayload,
 		/**override defaults, pass undefined to skip */
-		overrideRequestOptions: IEzEndpointRequestOptions<TRecievePayload> = this.requestOptions,
+		overrideRequestOptions?: IEzEndpointRequestOptions<TRecievePayload>,
 		/**override defaults, pass undefined to skip */
-		overrideRetryOptions: promise._BluebirdRetryInternals.IOptions = this.retryOptions,
+		overrideRetryOptions?: promise._BluebirdRetryInternals.IOptions,
 		/**override defaults, pass undefined to skip */
-		overrideEndpointOptions: {
-			origin?: string,
-			path?: string,
-		} = this.endpointOptions
+		overrideEndpointOptions?: IEzEndpoint_EndpointOptions
 	) {
 		return this._doRequest( "post", submitPayload, overrideRequestOptions, overrideRetryOptions, overrideEndpointOptions );
 	}
 
 	public get(
 		/**override defaults, pass undefined to skip */
-		overrideRequestOptions: IEzEndpointRequestOptions<TRecievePayload> = this.requestOptions,
+		overrideRequestOptions?: IEzEndpointRequestOptions<TRecievePayload>,
 		/**override defaults, pass undefined to skip */
-		overrideRetryOptions: promise._BluebirdRetryInternals.IOptions = this.retryOptions,
+		overrideRetryOptions?: promise._BluebirdRetryInternals.IOptions,
 		/**override defaults, pass undefined to skip */
-		overrideEndpointOptions: {
-			origin?: string,
-			path?: string,
-		} = this.endpointOptions
+		overrideEndpointOptions?: IEzEndpoint_EndpointOptions
 	) {
 		return this._doRequest( "get", undefined, overrideRequestOptions, overrideRetryOptions, overrideEndpointOptions );
 	}
@@ -336,9 +366,9 @@ module _test {
 
 				let test: any = it( "basic ezEndpoint, roundtrip phantomjscloud", () => {
 
-					const testEzEndpoint = new EzEndpoint<any, any>( { origin: "http://phantomjscloud.com", path: "/api/browser/v2/a-demo-key-with-low-quota-per-ip-address/" }, { timeout: 3000, interval: 100, backoff: 3 }, {}, );
+					const testEzEndpoint = new EzEndpoint<any, any>( { origin: "http://phantomjscloud.com", path: "/api/browser/v2/a-demo-key-with-low-quota-per-ip-address/" }, { timeout: 3000, interval: 100, backoff: 3 }, {  }, );
 
-const targetUrl = "https://example.com";
+					const targetUrl = "https://example.com";
 					const requestPayload = {
 						pages: [
 							{
@@ -352,8 +382,8 @@ const targetUrl = "https://example.com";
 
 					return testEzEndpoint.post( requestPayload )
 						.then(( response ) => {
-							log.assert( response.status === 200,"should get success response", { response } );
-							log.assert(targetUrl === response.data.pageResponses[0].pageRequest.url,"response contents should contain a value of response.data.pageResponses[0].pageRequest.url that matchest targetUrl",{targetUrl, gotTargetUrl:response.data.pageResponses[0].pageRequest.url, response});							
+							log.assert( response.status === 200, "should get success response", { response } );
+							log.assert( targetUrl === response.data.pageResponses[ 0 ].pageRequest.url, "response contents should contain a value of response.data.pageResponses[0].pageRequest.url that matchest targetUrl", { targetUrl, gotTargetUrl: response.data.pageResponses[ 0 ].pageRequest.url, response } );
 						}, ( err ) => {
 							const axiosErr = err as _axiosDTs.AxiosErrorResponse<void>;
 							throw log.error( "did not expect an axiosErr", { err } );
