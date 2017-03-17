@@ -9,16 +9,16 @@ uses the npm package: https://www.npmjs.com/package/base64url
  */
 //module base64Url {
 function padString(input) {
-    let segmentLength = 4;
-    let stringLength = input.length;
-    let diff = stringLength % segmentLength;
+    var segmentLength = 4;
+    var stringLength = input.length;
+    var diff = stringLength % segmentLength;
     if (!diff) {
         return input;
     }
-    let position = stringLength;
-    let padLength = segmentLength - diff;
-    let paddedStringLength = stringLength + padLength;
-    let buffer = new Buffer(paddedStringLength);
+    var position = stringLength;
+    var padLength = segmentLength - diff;
+    var paddedStringLength = stringLength + padLength;
+    var buffer = new Buffer(paddedStringLength);
     buffer.write(input);
     while (padLength--) {
         buffer.write("=", position++);
@@ -32,7 +32,8 @@ Example
 > base64url('ladies and gentlemen, we are floating in space')
 'bGFkaWVzIGFuZCBnZW50bGVtYW4sIHdlIGFyZSBmbG9hdGluZyBpbiBzcGFjZQ'
 ```*/
-function encode(input, encoding = "utf8") {
+function encode(input, encoding) {
+    if (encoding === void 0) { encoding = "utf8"; }
     if (Buffer.isBuffer(input)) {
         return fromBase64(input.toString("base64"));
     }
@@ -45,7 +46,8 @@ exports.encode = encode;
 > base64url.decode('cmlkZTogZHJlYW1zIGJ1cm4gZG93bg')
 'ride: dreams burn down'
 ```*/
-function decode(base64url, encoding = "utf8") {
+function decode(base64url, encoding) {
+    if (encoding === void 0) { encoding = "utf8"; }
     return new Buffer(toBase64(base64url), "base64").toString(encoding);
 }
 exports.decode = decode;

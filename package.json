@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@types/async": "^2.0.32",
-    "@types/axios": "^0.14.0",
     "@types/bluebird": "^3.0.33",
     "@types/chalk": "^0.4.29",
     "@types/d3-dsv": "^1.0.29",
@@ -41,7 +40,7 @@
   },
   "devDependencies": {
     "mocha": "^3.0.2",
-    "typescript": "^2.1.0"
+    "typescript": "^2.2.1"
   },
   "scripts": {
     "test": "mocha ./dist/**/*.js --watch",

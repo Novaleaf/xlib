@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 //export import lodash = require("lodash");
-const lodash = require("lodash");
+var lodash = require("lodash");
 exports.lodash = lodash;
-let __configDefaults = {
+var __configDefaults = {
     logLevel: undefined,
     envLevel: undefined,
     isTest: undefined,
@@ -37,26 +37,26 @@ if (_xlibConfigDefaults.sourceMapSupport === true) {
 }
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 //import mockMocha = require("./internal/mockmocha");
-const mockMocha = require("./internal/mockmocha");
+var mockMocha = require("./internal/mockmocha");
 mockMocha._initialize();
 ///** low-level javascript helpers, to smooth over warts in the language */
 //export import * as jsHelper from "./jshelper";
 //export import * as arrayHelper from "./arrayhelper";
 //export import ClassBase = require("./classbase");
 //export import * as logging from "./logging";
-const jsHelper = require("./jshelper");
+var jsHelper = require("./jshelper");
 exports.jsHelper = jsHelper;
-const arrayHelper = require("./arrayhelper");
+var arrayHelper = require("./arrayhelper");
 exports.arrayHelper = arrayHelper;
-const classbase_1 = require("./classbase");
+var classbase_1 = require("./classbase");
 exports.ClassBase = classbase_1.ClassBase;
-const logging = require("./logging");
+var logging = require("./logging");
 exports.logging = logging;
 //export import * as exception from "./exception";
 //export import collections = require("./collections");
-const exception = require("./exception");
+var exception = require("./exception");
 exports.exception = exception;
-const collections = require("./collections");
+var collections = require("./collections");
 exports.collections = collections;
 /** various math and numerical conversion/manipulation related helper functions */
 //export import * as numHelper from "./numhelper";
@@ -64,27 +64,27 @@ exports.collections = collections;
 //export import * as reflection from "./reflection";
 //export import * as environment from "./environment";
 //export import dateTime = require("./datetime");
-const numHelper = require("./numhelper");
+var numHelper = require("./numhelper");
 exports.numHelper = numHelper;
-const stringHelper = require("./stringhelper");
+var stringHelper = require("./stringhelper");
 exports.stringHelper = stringHelper;
-const reflection = require("./reflection");
+var reflection = require("./reflection");
 exports.reflection = reflection;
-const environment = require("./environment");
+var environment = require("./environment");
 exports.environment = environment;
-const dateTime = require("./datetime");
+var dateTime = require("./datetime");
 exports.dateTime = dateTime;
 //export import * as validation from "./validation";
 //export import * as serialization from "./serialization";
-const validation = require("./validation");
+var validation = require("./validation");
 exports.validation = validation;
-const serialization = require("./serialization");
+var serialization = require("./serialization");
 exports.serialization = serialization;
 //export import compression = require("./compression");
 //export import threading = require("./threading");
-const compression = require("./compression");
+var compression = require("./compression");
 exports.compression = compression;
-const threading = require("./threading");
+var threading = require("./threading");
 exports.threading = threading;
 //set lodash as a global if it's not.
 if (environment.getGlobal()["_"] == null) {
@@ -93,32 +93,32 @@ if (environment.getGlobal()["_"] == null) {
 //export import * as promise from "./promise";
 //export import net = require("./net");
 //export import cache = require("./cache");
-const promise = require("./promise");
+var promise = require("./promise");
 exports.promise = promise;
-const net = require("./net");
+var net = require("./net");
 exports.net = net;
-const cache = require("./cache");
+var cache = require("./cache");
 exports.cache = cache;
 /** templates for various design patterns */
 //export import designPatterns = require("./design-patterns/_index");
-const designPatterns = require("./design-patterns/_index");
+var designPatterns = require("./design-patterns/_index");
 exports.designPatterns = designPatterns;
 /** security and cryptographic helpers.   (cross-platform)
  *  note:  our ```KDF``` is nodejs only, and can be found in the ```nlib.security``` module.
  * */
 //export import security = require("./security");
-const security = require("./security");
+var security = require("./security");
 exports.security = security;
 /** custom type definitions */
 //export import definitions = require("./definitions/_index");
-const definitions = require("./definitions/_index");
+var definitions = require("./definitions/_index");
 exports.definitions = definitions;
 ///** decimal.js: high precision numbers
 //https://www.npmjs.com/package/decimal.js
 //*/
 //export import decimal = require("decimal.js");
 //export import lolo = require("./lolo");
-const lolo = require("./lolo");
+var lolo = require("./lolo");
 exports.lolo = lolo;
 ///** cross-platform implementation of the nodejs module: http://nodejs.org/api/events.html
 // * -------------------

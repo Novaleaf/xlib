@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const arrayHelper = require("./arrayhelper");
-const _ = require("lodash");
-const __ = require("./lolo");
-const logging = require("./logging");
-const environment = require("./environment");
+var arrayHelper = require("./arrayhelper");
+var _ = require("lodash");
+var __ = require("./lolo");
+var logging = require("./logging");
+var environment = require("./environment");
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance
  * global.Promise is aliased to this.
  */
-const bluebird = require("bluebird");
+var bluebird = require("bluebird");
 exports.bluebird = bluebird;
-const Promise = require("bluebird");
+var Promise = require("bluebird");
 //bluebird.longStackTraces();
 if (__.isLogDebug == true) {
     //http://bluebirdjs.com/docs/api/promise.config.html
@@ -42,8 +42,9 @@ if (global.Promise == null) {
 //import * as Rx from "@reactivex/rxjs";
 //import Rx = require("rxjs");
 var __isUnhandledHooked = false;
-let _unhandledDefaultLogger = new logging.Logger("promise.logPromiseUnhandledRejections");
-function logPromiseUnhandledRejections(logger = _unhandledDefaultLogger) {
+var _unhandledDefaultLogger = new logging.Logger("promise.logPromiseUnhandledRejections");
+function logPromiseUnhandledRejections(logger) {
+    if (logger === void 0) { logger = _unhandledDefaultLogger; }
     if (__isUnhandledHooked === true) {
         return;
     }
@@ -51,7 +52,7 @@ function logPromiseUnhandledRejections(logger = _unhandledDefaultLogger) {
     logger.debug("exec xlib.diagnostics.logger.logPromiseUnhandledRejections()");
     switch (environment.platformType) {
         case environment.PlatformType.Browser:
-            window.addEventListener("unhandledrejection", (e) => {
+            window.addEventListener("unhandledrejection", function (e) {
                 var reason = e.detail.reason;
                 var promise = e.detail.promise;
                 logger.error(reason, promise);
@@ -90,7 +91,7 @@ NOTE: executes all asynchronously.  if you need to only execute + complete one p
 function forEach(array, callback) {
     try {
         var results = [];
-        _.forEach(array, (value) => {
+        _.forEach(array, function (value) {
             var resultPromise = callback(value);
             results.push(resultPromise);
         });
@@ -145,8 +146,8 @@ exports.retry = require("./internal/bluebird-retry");
  * }
  * ```
  */
-class InitializeHelper {
-    constructor(_log, 
+var InitializeHelper = (function () {
+    function InitializeHelper(_log, 
         /** the actual work that needs to be performed as part of the initialzation.  will only occur once */
         _initWork) {
         this._log = _log;
@@ -158,29 +159,30 @@ class InitializeHelper {
     /**
      * perform the initialization work, or if it's already initialized, does nothing
      */
-    initialize(/** init options passed to the this._initWork() worker (callee) */ options) {
+    InitializeHelper.prototype.initialize = function (/** init options passed to the this._initWork() worker (callee) */ options) {
+        var _this = this;
         if (this.result != null) {
             //already called initialize, return it's promise
             return this.result;
         }
-        this.result = Promise.try(() => {
+        this.result = Promise.try(function () {
             try {
-                return this._initWork(options);
+                return _this._initWork(options);
             }
             catch (ex) {
-                if (this._log == null) {
-                    throw new Error(`Type error, most likely because you didn't call .bind() to your initialize function.  ex:  export let initialize: typeof _init.initialize = _init.initialize.bind(_init);  Error=${ex}`);
+                if (_this._log == null) {
+                    throw new Error("Type error, most likely because you didn't call .bind() to your initialize function.  ex:  export let initialize: typeof _init.initialize = _init.initialize.bind(_init);  Error=" + ex);
                 }
                 throw ex;
             }
         });
         return this.result;
-    }
+    };
     /**
      *  make sure this module's initialize method has been called and has finished successfully.
      * if not, will log and throw an error.
      */
-    ensureFinished(/**optinoal. if fails, show your custom error message instead of the default */ errorMessage) {
+    InitializeHelper.prototype.ensureFinished = function (/**optinoal. if fails, show your custom error message instead of the default */ errorMessage) {
         if (this.result == null || this.result.isPending()) {
             throw this._log.error("initialization still pending");
         }
@@ -192,8 +194,9 @@ class InitializeHelper {
                 throw this._log.error(errorMessage);
             }
         }
-    }
-}
+    };
+    return InitializeHelper;
+}());
 exports.InitializeHelper = InitializeHelper;
 var _deprecated;
 (function (_deprecated) {
@@ -239,10 +242,10 @@ var _deprecated;
             //get the next call to process
             var args = __enqueuedCallArguments.shift();
             var currentPromise = func.apply(__this, args);
-            currentPromise.then((currentValue) => {
+            currentPromise.then(function (currentValue) {
                 __batchResults.push(currentValue);
                 __doNext();
-            }, (error) => {
+            }, function (error) {
                 var tempPromise = __batchPromise;
                 __resetVariables();
                 tempPromise.reject(error);

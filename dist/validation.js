@@ -1,21 +1,40 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const stringHelper = require("./stringhelper");
-const numHelper = require("./numhelper");
-const jsHelper = require("./jshelper");
-const ex = require("./exception");
-const _ = require("lodash");
-const serialization = require("./serialization");
-const reflection = require("./reflection");
-class ScrubFailureException extends ex.CorelibException {
-}
+var stringHelper = require("./stringhelper");
+var numHelper = require("./numhelper");
+var jsHelper = require("./jshelper");
+var ex = require("./exception");
+var _ = require("lodash");
+var serialization = require("./serialization");
+var reflection = require("./reflection");
+var ScrubFailureException = (function (_super) {
+    __extends(ScrubFailureException, _super);
+    function ScrubFailureException() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return ScrubFailureException;
+}(ex.CorelibException));
 /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
-const validator = require("validator");
+var validator = require("validator");
 exports.validator = validator;
-const logging = require("./logging");
-let log = new logging.Logger(__filename);
-class Scrub {
-    constructor(inputs, clone = false, deepClone = false, /** fail message if the inputs are not an object */ errorMessage = "Scrub.ctor(inputs) invalid Arguments. 'inputs' must be an 'object'. Instead it was of type '" + typeof (inputs) + "'. ", printInvalidValues = true) {
+var logging = require("./logging");
+var log = new logging.Logger(__filename);
+var Scrub = (function () {
+    function Scrub(inputs, clone, deepClone, /** fail message if the inputs are not an object */ errorMessage, printInvalidValues) {
+        if (clone === void 0) { clone = false; }
+        if (deepClone === void 0) { deepClone = false; }
+        if (errorMessage === void 0) { errorMessage = "Scrub.ctor(inputs) invalid Arguments. 'inputs' must be an 'object'. Instead it was of type '" + typeof (inputs) + "'. "; }
+        if (printInvalidValues === void 0) { printInvalidValues = true; }
         this.isValid = true;
         this.invalid = {};
         this.errorMessages = [];
@@ -52,31 +71,34 @@ class Scrub {
         //log.debug("Scrub Inputs", this.valid);
     }
     /** if this.invalid contains anything, will set .isValid=false*/
-    _maintainValidState() {
+    Scrub.prototype._maintainValidState = function () {
+        var _this = this;
         this.isValid = true;
-        _.forEach(this.invalid, (value) => {
-            this.isValid = false;
+        _.forEach(this.invalid, function (value) {
+            _this.isValid = false;
             return false;
         });
-    }
+    };
     /** reject a value, and adds to errorMessages list if your errorMessage is supplied*/
-    _reject(key, errorMessage, printInvalidValues = false, invalidValues = {}) {
+    Scrub.prototype._reject = function (key, errorMessage, printInvalidValues, invalidValues) {
+        if (printInvalidValues === void 0) { printInvalidValues = false; }
+        if (invalidValues === void 0) { invalidValues = {}; }
         this.isValid = false;
         this.invalid[key] = this.valid[key];
         delete this.valid[key];
         if (errorMessage != null) {
             this._appendErrorMessage(errorMessage, printInvalidValues, invalidValues);
         }
-    }
+    };
     /** make sure you invoke _maintainValidState() when done with all your accepts*/
-    _accept(key, value) {
+    Scrub.prototype._accept = function (key, value) {
         delete this.invalid[key];
         this.valid[key] = value;
-    }
+    };
     /** constructs an errorMessage with values, pushes it onto our errorMessages array, then returns the constructed value.*/
-    _appendErrorMessage(errorMessage, printInvalidValues, invalidValues) {
+    Scrub.prototype._appendErrorMessage = function (errorMessage, printInvalidValues, invalidValues) {
         if (printInvalidValues) {
-            errorMessage += `  ${Object.keys(invalidValues).length} invalid/missing values. The following required keys+types were invalid: ${serialization.JSONX.inspectStringify(invalidValues, -1, true, false, true, undefined, "")}`;
+            errorMessage += "  " + Object.keys(invalidValues).length + " invalid/missing values. The following required keys+types were invalid: " + serialization.JSONX.inspectStringify(invalidValues, -1, true, false, true, undefined, "");
             //stringHelper.format(
             //    "  %i invalid/missing values. The following required keys+types were invalid: %s",
             //    Object.keys(invalidValues).length,
@@ -84,17 +106,18 @@ class Scrub {
         }
         this.errorMessages.push(errorMessage);
         return errorMessage;
-    }
+    };
     /** allows you to fix up failed validations. */
-    fix(/** returning a non-undefined value will result in fixing the key.  returning null is not undefined! */ func) {
+    Scrub.prototype.fix = function (/** returning a non-undefined value will result in fixing the key.  returning null is not undefined! */ func) {
+        var _this = this;
         if (this.isValid === true) {
             return;
         }
         var didAFix = false;
-        _.forEach(this.invalid, (value, key) => {
-            var fixedValue = func(value, key, this);
+        _.forEach(this.invalid, function (value, key) {
+            var fixedValue = func(value, key, _this);
             if (fixedValue !== undefined) {
-                this._accept(key, fixedValue);
+                _this._accept(key, fixedValue);
                 didAFix = true;
             }
         });
@@ -102,27 +125,32 @@ class Scrub {
         if (didAFix === true) {
             this._maintainValidState();
         }
-    }
+    };
     /** loop through all this.valid values, return false to fail validation. this will move the key/value to this.invalid */
-    forEach(action) {
-        _.forEach(this.valid, (value, key) => {
+    Scrub.prototype.forEach = function (action) {
+        var _this = this;
+        _.forEach(this.valid, function (value, key) {
             try {
                 var result = action(value, key);
                 if (result === false) {
-                    this._reject(key);
+                    _this._reject(key);
                 }
             }
             catch (ex) {
-                this._reject(key, ex.toString());
+                _this._reject(key, ex.toString());
             }
         });
-    }
+    };
     /** if invalid, will assert*/
-    failAssert(
+    Scrub.prototype.failAssert = function (
         /** if null, the default validation.logger will be used */
         logger, 
         /** if null, a generica failure string will be generated, outputting all messages found in this.errorMessages */
-        format, ...params) {
+        format) {
+        var params = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            params[_i - 2] = arguments[_i];
+        }
         if (this.isValid === true) {
             return;
         }
@@ -133,25 +161,27 @@ class Scrub {
             logger = log;
         }
         jsHelper.apply(logger.assert, logger, params, [false, format]);
-    }
+    };
     /** perform an action when a scrub failure is detected.  if isValid, nothing will be triggered.   */
-    failAction(action) {
+    Scrub.prototype.failAction = function (action) {
         if (this.isValid) {
             return null;
         }
         return action();
-    }
+    };
     /** if a scrub failure is detected, will throw an exception. */
-    failThrow(exceptionMessage = stringHelper.format("Validation failed due to %s reasons: %s", this.errorMessages.length, serialization.JSONX.stringifyX(this.errorMessages))) {
+    Scrub.prototype.failThrow = function (exceptionMessage) {
+        if (exceptionMessage === void 0) { exceptionMessage = stringHelper.format("Validation failed due to %s reasons: %s", this.errorMessages.length, serialization.JSONX.stringifyX(this.errorMessages)); }
         if (this.isValid) {
             return;
         }
         throw new ScrubFailureException(exceptionMessage);
-    }
-    _enumerationHelper(errorMessage, printInvalidValues, /** enumeration worker.  return TRUE if the value fails validation.  false otherwise */ isRejectedFunc) {
+    };
+    Scrub.prototype._enumerationHelper = function (errorMessage, printInvalidValues, /** enumeration worker.  return TRUE if the value fails validation.  false otherwise */ isRejectedFunc) {
+        var _this = this;
         var invalidValues = {};
-        _.forEach(this.valid, (value, key) => {
-            let isRejected = false;
+        _.forEach(this.valid, function (value, key) {
+            var isRejected = false;
             try {
                 isRejected = isRejectedFunc(value, key);
             }
@@ -160,14 +190,14 @@ class Scrub {
                 errorMessage = "Exception threw when validating: " + errorMessage;
             }
             if (isRejected === true) {
-                this._reject(key);
+                _this._reject(key);
                 invalidValues[key] = value;
             }
         });
         if (Object.keys(invalidValues).length > 0) {
             this._appendErrorMessage(errorMessage, printInvalidValues, invalidValues);
         }
-    }
+    };
     //public isReal(errorMessage = "Inputs must be string (not null or empty) or number (not NaN).", printInvalidValues = true): Scrub<T> {
     //	var invalidValues: any[] = [];
     //	jsHelper.forEach(<any>this.inputs,(value, index) => {
@@ -191,26 +221,29 @@ class Scrub {
      * @param errorMessage
      * @param printInvalidValues
      */
-    is(/** return true if valid */ validationFunction, errorMessage, printInvalidValues = true) {
+    Scrub.prototype.is = function (/** return true if valid */ validationFunction, errorMessage, printInvalidValues) {
+        if (printInvalidValues === void 0) { printInvalidValues = true; }
         if (errorMessage == null) {
             errorMessage = "failed the is() validationFunction test";
             if (printInvalidValues === true) {
                 errorMessage += ": " + stringHelper.summarize(validationFunction.toString());
             }
         }
-        this._enumerationHelper(errorMessage, printInvalidValues, (value, key) => {
-            let isValid = validationFunction(value, key);
+        this._enumerationHelper(errorMessage, printInvalidValues, function (value, key) {
+            var isValid = validationFunction(value, key);
             return !isValid;
         });
         return this;
-    }
+    };
     /**
      *  Inputs must be string (not null or empty) or number (not NaN).
      * @param errorMessage
      * @param printInvalidValues
      */
-    isReal(errorMessage = "Inputs must be string (not null or empty) or number (not NaN).", printInvalidValues = true) {
-        this._enumerationHelper(errorMessage, printInvalidValues, (value, key) => {
+    Scrub.prototype.isReal = function (errorMessage, printInvalidValues) {
+        if (errorMessage === void 0) { errorMessage = "Inputs must be string (not null or empty) or number (not NaN)."; }
+        if (printInvalidValues === void 0) { printInvalidValues = true; }
+        this._enumerationHelper(errorMessage, printInvalidValues, function (value, key) {
             if (value == null) {
                 return true;
             }
@@ -223,15 +256,19 @@ class Scrub {
             return false;
         });
         return this;
-    }
-    isUUID(errorMessage = "Inputs must be UUID (GUID).", printInvalidValues = true) {
-        this._enumerationHelper(errorMessage, printInvalidValues, (value, key) => {
+    };
+    Scrub.prototype.isUUID = function (errorMessage, printInvalidValues) {
+        if (errorMessage === void 0) { errorMessage = "Inputs must be UUID (GUID)."; }
+        if (printInvalidValues === void 0) { printInvalidValues = true; }
+        this._enumerationHelper(errorMessage, printInvalidValues, function (value, key) {
             return validator.isUUID(value) ? false : true;
         });
         return this;
-    }
-    isString(errorMessage = "Inputs must be of type string.", printInvalidValues = true) {
-        this._enumerationHelper(errorMessage, printInvalidValues, (value, key) => {
+    };
+    Scrub.prototype.isString = function (errorMessage, printInvalidValues) {
+        if (errorMessage === void 0) { errorMessage = "Inputs must be of type string."; }
+        if (printInvalidValues === void 0) { printInvalidValues = true; }
+        this._enumerationHelper(errorMessage, printInvalidValues, function (value, key) {
             if (value == null) {
                 return true;
             }
@@ -241,9 +278,11 @@ class Scrub {
             return false;
         });
         return this;
-    }
-    isNumber(errorMessage = "Inputs must be of type number.", printInvalidValues = true) {
-        this._enumerationHelper(errorMessage, printInvalidValues, (value, key) => {
+    };
+    Scrub.prototype.isNumber = function (errorMessage, printInvalidValues) {
+        if (errorMessage === void 0) { errorMessage = "Inputs must be of type number."; }
+        if (printInvalidValues === void 0) { printInvalidValues = true; }
+        this._enumerationHelper(errorMessage, printInvalidValues, function (value, key) {
             if (value == null) {
                 return true;
             }
@@ -253,9 +292,11 @@ class Scrub {
             return false;
         });
         return this;
-    }
-    isType(typeName, errorMessage = "Inputs must be of type " + typeName, printInvalidValues = true) {
-        this._enumerationHelper(errorMessage, printInvalidValues, (value, key) => {
+    };
+    Scrub.prototype.isType = function (typeName, errorMessage, printInvalidValues) {
+        if (errorMessage === void 0) { errorMessage = "Inputs must be of type " + typeName; }
+        if (printInvalidValues === void 0) { printInvalidValues = true; }
+        this._enumerationHelper(errorMessage, printInvalidValues, function (value, key) {
             if (value == null) {
                 return true;
             }
@@ -265,14 +306,16 @@ class Scrub {
             return false;
         });
         return this;
-    }
+    };
     /** ensure that this object being scrubbed has all the properties found in a template, and the same type.  only works for first-order children right now*/
-    isTemplatePopulated(template, errorMessage, printInvalidValues = true) {
+    Scrub.prototype.isTemplatePopulated = function (template, errorMessage, printInvalidValues) {
+        var _this = this;
+        if (printInvalidValues === void 0) { printInvalidValues = true; }
         if (errorMessage == null) {
             errorMessage = "required values are not present.  ";
         }
         var invalid = {};
-        _.forEach(template, (templateValue, key) => {
+        _.forEach(template, function (templateValue, key) {
             //log.debug("key", key, "templateValue", templateValue,"value",this.valid[key]);
             if (templateValue == null) {
                 //ignore null
@@ -282,11 +325,11 @@ class Scrub {
             if (templateValueType === "object") {
                 throw new ex.CorelibException("template is a complex JSON object.   template currently only works for first-order children right now");
             }
-            if (this.valid[key] == null) {
+            if (_this.valid[key] == null) {
                 invalid[key] = templateValueType;
             }
             else {
-                var currentValue = this.valid[key];
+                var currentValue = _this.valid[key];
                 var currentValueType = reflection.getTypeName(currentValue);
                 if (templateValueType !== currentValueType) {
                     invalid[key] = templateValueType;
@@ -299,15 +342,16 @@ class Scrub {
             this._maintainValidState();
         }
         return this;
-    }
-    getValid(key, valueIfUndefined) {
+    };
+    Scrub.prototype.getValid = function (key, valueIfUndefined) {
         var value = this.valid[key];
         if (value !== undefined) {
             return value;
         }
         return valueIfUndefined;
-    }
-}
+    };
+    return Scrub;
+}());
 exports.Scrub = Scrub;
 /**
  *  allows scrubbing of user input.
@@ -315,7 +359,9 @@ exports.Scrub = Scrub;
  * @param clone
  * @param deepClone
  */
-function scrub(values, clone = false, deepClone = false) {
+function scrub(values, clone, deepClone) {
+    if (clone === void 0) { clone = false; }
+    if (deepClone === void 0) { deepClone = false; }
     return new Scrub(values, clone, deepClone);
 }
 exports.scrub = scrub;
@@ -325,23 +371,23 @@ function isTemplatePopulated(input, /** required values that must exist in the i
         if (templateTargetNode == null) {
             return { valid: true };
         }
-        nodeChain = `${nodeChain}.${key}`;
+        nodeChain = nodeChain + "." + key;
         if (inputTargetNode == null) {
-            return { valid: false, invalidMessage: `input is missing the required node: ${nodeChain}` };
+            return { valid: false, invalidMessage: "input is missing the required node: " + nodeChain };
         }
         //make sure the types of the nodes match
-        let templateNodeType = reflection.getType(templateTargetNode);
-        let inputNodeType = reflection.getType(inputTargetNode);
+        var templateNodeType = reflection.getType(templateTargetNode);
+        var inputNodeType = reflection.getType(inputTargetNode);
         if (templateNodeType !== inputNodeType) {
-            return { valid: false, invalidMessage: `input node is of the wrong type.  Got ${reflection.Type[inputNodeType]} but expected ${reflection.Type[templateNodeType]} at node: ${nodeChain}` };
+            return { valid: false, invalidMessage: "input node is of the wrong type.  Got " + reflection.Type[inputNodeType] + " but expected " + reflection.Type[templateNodeType] + " at node: " + nodeChain };
         }
         //if the template node isn't an object, stop becasue we are at a leaf
         if (templateNodeType !== reflection.Type.object) {
             return { valid: true };
         }
         //template node has children
-        let tempNodeResult = null;
-        _.forEach(templateTargetNode, (nextValue, nextKey) => {
+        var tempNodeResult = null;
+        _.forEach(templateTargetNode, function (nextValue, nextKey) {
             tempNodeResult = nodeLoop(inputTargetNode[nextKey], templateTargetNode[nextKey], nextKey, nodeChain);
             if (tempNodeResult.valid === false) {
                 return false;
@@ -354,14 +400,16 @@ function isTemplatePopulated(input, /** required values that must exist in the i
         }
         return tempNodeResult;
     }
-    let finalResult = nodeLoop(input, template, "value", "");
+    var finalResult = nodeLoop(input, template, "value", "");
     return finalResult;
 }
 exports.isTemplatePopulated = isTemplatePopulated;
-function scrubUserInput(untrustedUserInput, requiredValues, defaultValues = {}, options = {}) {
-    let targetTemplate = _.merge({}, requiredValues, defaultValues);
-    let parsedInput = serialization.JSONX.parseUsingTemplate(targetTemplate, untrustedUserInput, options);
-    let templateResult = isTemplatePopulated(parsedInput, targetTemplate);
+function scrubUserInput(untrustedUserInput, requiredValues, defaultValues, options) {
+    if (defaultValues === void 0) { defaultValues = {}; }
+    if (options === void 0) { options = {}; }
+    var targetTemplate = _.merge({}, requiredValues, defaultValues);
+    var parsedInput = serialization.JSONX.parseUsingTemplate(targetTemplate, untrustedUserInput, options);
+    var templateResult = isTemplatePopulated(parsedInput, targetTemplate);
     if (templateResult.valid !== true) {
         throw new Error("scrubUserInput failed, error while validating the template.  error= " + templateResult.invalidMessage);
     }
@@ -372,50 +420,50 @@ exports.scrubUserInput = scrubUserInput;
 var _tests;
 (function (_tests) {
     //"use strict";
-    describe(__filename, () => {
-        describe("isTemplatePopulated()", () => {
-            let simple1 = { hi: "there", nested: { bye: 2 } };
+    describe(__filename, function () {
+        describe("isTemplatePopulated()", function () {
+            var simple1 = { hi: "there", nested: { bye: 2 } };
             //let simple1 = { hi: "there" };
-            let simple2 = { hi: "there", nested: { bye: 2 }, another: 3 };
-            let simple3 = { hi: "there", nested: { bye: 2, anotherNested: 4 }, another: 3 };
-            let simple1_wrongType = { hi: "there", nested: { bye: "two not 2" } };
+            var simple2 = { hi: "there", nested: { bye: 2 }, another: 3 };
+            var simple3 = { hi: "there", nested: { bye: 2, anotherNested: 4 }, another: 3 };
+            var simple1_wrongType = { hi: "there", nested: { bye: "two not 2" } };
             //let simple1_wrongType = { hi: 1 };
-            let simple3_wrongType = { hi: "there", nested: { bye: 2, anotherNested: "four not 4" }, another: 3 };
-            it("parse identical template", () => {
-                let input = simple1;
-                let template = simple1;
-                let result = isTemplatePopulated(input, template);
+            var simple3_wrongType = { hi: "there", nested: { bye: 2, anotherNested: "four not 4" }, another: 3 };
+            it("parse identical template", function () {
+                var input = simple1;
+                var template = simple1;
+                var result = isTemplatePopulated(input, template);
                 log.assert(result.valid === true);
             });
-            it("parse input has more values", () => {
-                let input = simple3;
-                let template = simple1;
-                let result = isTemplatePopulated(input, template);
+            it("parse input has more values", function () {
+                var input = simple3;
+                var template = simple1;
+                var result = isTemplatePopulated(input, template);
                 log.assert(result.valid === true);
             });
-            it("fail template, missing node", () => {
-                let input = simple1;
-                let template = simple2;
-                let result = isTemplatePopulated(input, template);
-                log.assert(result.valid === false, { result });
+            it("fail template, missing node", function () {
+                var input = simple1;
+                var template = simple2;
+                var result = isTemplatePopulated(input, template);
+                log.assert(result.valid === false, { result: result });
             });
-            it("fail template, type mismatch", () => {
-                let input = simple1_wrongType;
-                let template = simple1;
-                let result = isTemplatePopulated(input, template);
-                log.assert(result.valid === false, { result });
+            it("fail template, type mismatch", function () {
+                var input = simple1_wrongType;
+                var template = simple1;
+                var result = isTemplatePopulated(input, template);
+                log.assert(result.valid === false, { result: result });
             });
-            it("fail template, missing child node", () => {
-                let input = simple2;
-                let template = simple3;
-                let result = isTemplatePopulated(input, template);
-                log.assert(result.valid === false, { result });
+            it("fail template, missing child node", function () {
+                var input = simple2;
+                var template = simple3;
+                var result = isTemplatePopulated(input, template);
+                log.assert(result.valid === false, { result: result });
             });
-            it("fail template, type mismatch on nested node", () => {
-                let input = simple3_wrongType;
-                let template = simple3;
-                let result = isTemplatePopulated(input, template);
-                log.assert(result.valid === false, { result });
+            it("fail template, type mismatch on nested node", function () {
+                var input = simple3_wrongType;
+                var template = simple3;
+                var result = isTemplatePopulated(input, template);
+                log.assert(result.valid === false, { result: result });
             });
         });
     });

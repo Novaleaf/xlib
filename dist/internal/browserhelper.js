@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 //import * as ex from "../exception";
 //import jsHelper = require("../jshelper");
 //import * as ex from "../exception";
-const _ = require("lodash");
+var _ = require("lodash");
 /** DEPRECATED:  use jsHelper.platformType instead.
 determine if running in a browser (if false, most likely running in node.js) */
 exports.isBrowser = typeof window !== "undefined" && typeof phantom === "undefined";
@@ -62,7 +62,8 @@ exports.onLoad = onLoad;
 example:
 var amdMain = getFirstAttribute("script","data-amd-main");
 */
-function getDomAttribute(elementType, attribute, searchTopDown = false) {
+function getDomAttribute(elementType, attribute, searchTopDown) {
+    if (searchTopDown === void 0) { searchTopDown = false; }
     if (typeof (document) === "undefined") {
         return null;
     }
@@ -76,7 +77,8 @@ exports.getDomAttribute = getDomAttribute;
 /** get the first html element found and return it.  */
 function getDomElement(elementType, 
     /** if not null, finds an element with this attribute */
-    attribute, attributeValue, searchTopDown = false) {
+    attribute, attributeValue, searchTopDown) {
+    if (searchTopDown === void 0) { searchTopDown = false; }
     if (typeof (document) === "undefined") {
         return null;
     }
@@ -91,7 +93,7 @@ function getDomElement(elementType,
     }
     else {
         //search for attribute name
-        var searchPredicate = (element) => {
+        var searchPredicate = function (element) {
             var foundAttributeValue = element.getAttribute(attribute);
             if (foundAttributeValue) {
                 if (attributeValue == null) {
@@ -131,7 +133,7 @@ exports.getDomElement = getDomElement;
 ////	document.getElementsByTagName("head")[0].appendChild(link);
 ////}
 /** obatin all cookies */
-exports.getCookies = (() => {
+exports.getCookies = (function () {
     /** cached query so we only get cookies once per pageload*/
     var parsedCookies;
     function _getCookies() {
@@ -205,7 +207,7 @@ function getCookie(key, valueIfNullOrEmpty) {
     return result;
 }
 exports.getCookie = getCookie;
-exports.getQuerystringVariables = (() => {
+exports.getQuerystringVariables = (function () {
     /** cached query so we only get cookies once per pageload*/
     var parsedQuerystrings;
     function _getQuerystringVariables() {

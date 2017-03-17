@@ -20,14 +20,17 @@ function randomDate(/** inclusive */ start, /** inclusive */ end) {
 }
 exports.randomDate = randomDate;
 ;
-function format(date, /** defaults to "YYYY-MM-DDTHH:mm:ss" */ fmt = "YYYY-MM-DDTHH:mm:ss") {
+function format(date, /** defaults to "YYYY-MM-DDTHH:mm:ss" */ fmt) {
+    if (fmt === void 0) { fmt = "YYYY-MM-DDTHH:mm:ss"; }
     return exports.moment(date).utc().format(fmt);
 }
 exports.format = format;
-function formatLocalTz(date, /** defaults to "YYYY-MM-DDTHH:mm:ss" */ dateFmt = "YYYY-MM-DDTHH:mm:ss", /** defaults to "(Z, z)" */ tzFmt = "(Z, z)") {
-    const asMoment = exports.moment.tz(date, exports.moment.tz.guess());
-    const localTimeAsText = asMoment.format(dateFmt);
-    const timeZoneAsText = asMoment.format(tzFmt);
+function formatLocalTz(date, /** defaults to "YYYY-MM-DDTHH:mm:ss" */ dateFmt, /** defaults to "(Z, z)" */ tzFmt) {
+    if (dateFmt === void 0) { dateFmt = "YYYY-MM-DDTHH:mm:ss"; }
+    if (tzFmt === void 0) { tzFmt = "(Z, z)"; }
+    var asMoment = exports.moment.tz(date, exports.moment.tz.guess());
+    var localTimeAsText = asMoment.format(dateFmt);
+    var timeZoneAsText = asMoment.format(tzFmt);
     return { date: localTimeAsText, tz: timeZoneAsText };
 }
 exports.formatLocalTz = formatLocalTz;

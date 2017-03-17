@@ -107,7 +107,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * example:  "myKey=myValue" will return, but "someValue" will not.
  * if you need single value args, access process.argv directly.
  */
-exports.getCommandlineArgs = (() => {
+exports.getCommandlineArgs = (function () {
     /** cached query so we only get args once per js load*/
     var parsedCommandlineArgs;
     function _getCommandlineArgs() {

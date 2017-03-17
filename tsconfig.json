@@ -13,7 +13,7 @@
     "pretty": true,
     "stripInternal": true,
     "diagnostics": true,
-    "target": "es2015",
+    "target": "es5",
     "watch": false,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,

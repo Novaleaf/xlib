@@ -1,21 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const numHelper = require("./numhelper");
-const _jsHelper = require("./jshelper");
-const serialization = require("./serialization");
+var numHelper = require("./numhelper");
+var _jsHelper = require("./jshelper");
+var serialization = require("./serialization");
 exports.JSONX = serialization.JSONX;
 //export { serialization.JSONX as JSONX };
-const validation = require("./validation");
+var validation = require("./validation");
 exports.scrub = validation.scrub;
 exports.defaultIfNull = _jsHelper.defaultIfNull;
 //export { _jsHelper.defaultIfNull as defaultIfNull };
 exports.defaultIfThrow = _jsHelper.defaultIfThrow;
-const _exception = require("./exception");
+var _exception = require("./exception");
 exports.Exception = _exception.Exception;
 //export { _exception.Exception as Exception };
-const moment = require("moment");
+var moment = require("moment");
 exports.moment = moment;
-const _ = require("lodash");
+var _ = require("lodash");
 function utcNow() {
     return moment.utc().toDate();
 }
@@ -29,7 +29,7 @@ function utcNowTimestamp() {
 }
 exports.utcNowTimestamp = utcNowTimestamp;
 //import _cache = require("./cache");
-const _cache = require("./cache");
+var _cache = require("./cache");
 /**
  * read method from the defaultCache object (xlib.cache.defaultCache.read).
  * for your own namespace, instantiate a new xlib.cache.Cache class instance instead.
@@ -44,7 +44,7 @@ exports.cache = _cache.defaultCache.read.bind(_cache.defaultCache);
 // *  converts db escaped user input into sanitized html (includes whitelisted markeup) for ui formatting
 // */
 //export var htmlSanitize = _stringHelper.htmlSanitizeEscapedUserInput;
-const environment = require("./environment");
+var environment = require("./environment");
 /**
  *   shortcut for ```environment.isDev```
  */
@@ -83,8 +83,8 @@ function filterValues(collection, enumerator) {
     // export function filterValues<TValue>( collection: { [ id: number ]: TValue }, enumerator: ( value: TValue, id: number, collection: { [ id: number ]: TValue }) => boolean ): TValue[];
     // export function filterValues<TValue>( collection: { [ key: string ]: TValue }, enumerator: ( value: TValue, key: string, collection: { [ key: string ]: TValue }) => boolean ): TValue[];
     // export function filterValues<TValue>( collection: any, enumerator: ( value: TValue, key: string | number, collection: any ) => boolean ): TValue[] {
-    let toReturn = [];
-    exports.forEach(collection, (val, idOrKey) => {
+    var toReturn = [];
+    exports.forEach(collection, function (val, idOrKey) {
         if (enumerator(val, idOrKey, collection) !== false) {
             toReturn.push(val);
         }

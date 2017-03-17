@@ -1,5 +1,5 @@
 "use strict";
-const Promise = require("bluebird");
+var Promise = require("bluebird");
 /**
  *  Stopping
 The library also supports stopping the retry loop before the timeout occurs by throwing a new instance of retry.StopError from within the called function.

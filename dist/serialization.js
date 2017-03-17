@@ -1,17 +1,19 @@
 ///// <reference path="../../../typings/all.d.ts" />
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const jsHelper = require("./jshelper");
-const reflection = require("./reflection");
-const ex = require("./exception");
-const json5 = require("json5");
-const stringHelper = require("./stringhelper");
-const _ = require("lodash");
-const util = require("util");
+var jsHelper = require("./jshelper");
+var reflection = require("./reflection");
+var ex = require("./exception");
+var json5 = require("json5");
+var stringHelper = require("./stringhelper");
+var _ = require("lodash");
+var util = require("util");
 /** JSON5.parse (forgiving) coupled with JSON.stringify (standards compliant serialization), plus extra helpers
  *
  */
-class JsonX {
+var JsonX = (function () {
+    function JsonX() {
+    }
     /**
       * === JSON5.Parse (much more forgiving parser). ===
       * see http://json5.org/
@@ -39,11 +41,15 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
     Numbers can begin with an explicit plus (+) sign.
     == Comments ==
     Both inline (single-line) and block (multi-line) comments are allowed. */
-    parse(text, reviver, 
+    JsonX.prototype.parse = function (text, reviver, 
         /** if true, will sanitize strings to prevent injection attacks.  default false. */
-        escapeStrings = false, 
+        escapeStrings, 
         /** if set, throws an exception if the input is too long */
-        maxInputLength = -1) {
+        maxInputLength) {
+        /** if true, will sanitize strings to prevent injection attacks.  default false. */
+        if (escapeStrings === void 0) { escapeStrings = false; }
+        /** if set, throws an exception if the input is too long */
+        if (maxInputLength === void 0) { maxInputLength = -1; }
         if (text == null || text.length < 1) {
             return null;
             //throw new ex.CorelibException("JsonX.parse() failed due to null/empty input");
@@ -53,7 +59,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
         }
         if (maxInputLength >= 0) {
             if (text.length > maxInputLength) {
-                throw new ex.CorelibException(`JsonX.parse() failed due to input length of ${text.length} exceeding max of ${maxInputLength} `);
+                throw new ex.CorelibException("JsonX.parse() failed due to input length of " + text.length + " exceeding max of " + maxInputLength + " ");
             }
         }
         var typeName = reflection.getTypeName(text);
@@ -74,7 +80,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
             pojo = json5.parse.apply(json5, arguments);
         }
         catch (err) {
-            var message = `JsonX.parse() failed: ${err.message} original input=${text}`;
+            var message = "JsonX.parse() failed: " + err.message + " original input=" + text;
             throw new ex.CorelibException(message);
         }
         function recurser(node) {
@@ -84,7 +90,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                 return sanitizedValue;
             }
             else if (nodeType === "object") {
-                jsHelper.forEachProperty(node, (nodeValue, nodeKey) => {
+                jsHelper.forEachProperty(node, function (nodeValue, nodeKey) {
                     node[nodeKey] = recurser(nodeValue);
                 });
                 return node;
@@ -97,11 +103,19 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
             pojo = recurser(pojo);
         }
         return pojo;
-    }
-    stringify(...args) {
+    };
+    JsonX.prototype.stringify = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
         return JSON.stringify.apply(JSON, arguments);
-    }
-    stringifyX(...args) {
+    };
+    JsonX.prototype.stringifyX = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
         try {
             return json5.stringify.apply(json5, arguments);
         }
@@ -109,13 +123,18 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
             //if json5 fails, try normal json
             return JSON.stringify.apply(JSON, arguments);
         }
-    }
+    };
     /** parses your object, then attempts to parse string values in your object.  failed parse() calls will return the original string for that variable */
-    parseRecursive(textOrObj, reviver, 
+    JsonX.prototype.parseRecursive = function (textOrObj, reviver, 
         /** if true, will sanitize strings to prevent injection attacks.  default false. */
-        escapeStrings = false, 
+        escapeStrings, 
         /** if set, throws an exception if the input is too long */
-        maxInputLength = -1) {
+        maxInputLength) {
+        var _this = this;
+        /** if true, will sanitize strings to prevent injection attacks.  default false. */
+        if (escapeStrings === void 0) { escapeStrings = false; }
+        /** if set, throws an exception if the input is too long */
+        if (maxInputLength === void 0) { maxInputLength = -1; }
         if (typeof (textOrObj) === "string") {
             try {
                 textOrObj = this.parse(textOrObj, reviver, escapeStrings, maxInputLength);
@@ -124,13 +143,13 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                 return textOrObj;
             }
         }
-        jsHelper.forEachProperty(textOrObj, (value, key, obj) => {
+        jsHelper.forEachProperty(textOrObj, function (value, key, obj) {
             if (typeof (value) === "string") {
-                obj[key] = this.parseRecursive(value, reviver, escapeStrings, maxInputLength);
+                obj[key] = _this.parseRecursive(value, reviver, escapeStrings, maxInputLength);
             }
         });
         return textOrObj;
-    }
+    };
     /** take any object (including complex/circular referenced) and generate an object that's compatable with JSON.stringify().
     good for data visualization, but not much else
     important note:  arrays are converted to json objects.  you can tell it was an array by looking at the '[*TYPE*]' and that the keys will be integers starting from '0'.
@@ -143,17 +162,23 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
     * @param maxSearchDepth default=2.  if the object has circular references, this is the max depth we brute-force through trying to find JSON.stringifiable objects.
     * note once we find an an object is stringifiable (no circular references), maxSearchDepth is ignored for that object and it's children.
     * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.*/
-    inspectJSONify(value, maxSearchDepth = 2, hideType = false, showVerboseDetails = false, disableCircularDetection = false, replacer, verboseObjectsOut = []) {
+    JsonX.prototype.inspectJSONify = function (value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut) {
+        if (maxSearchDepth === void 0) { maxSearchDepth = 2; }
+        if (hideType === void 0) { hideType = false; }
+        if (showVerboseDetails === void 0) { showVerboseDetails = false; }
+        if (disableCircularDetection === void 0) { disableCircularDetection = false; }
+        if (verboseObjectsOut === void 0) { verboseObjectsOut = []; }
         var _superStringifyTokenId = "___JSONX.inspectJSONify.depthTrackingToken_ignoreThis_";
         /** tracks objects that are flagged as circular references (we remove our tracking tag at the end) */
         var _processedNodes = [];
         /** recurses through a node's key/value pairs (all properties) */
-        function _nodePropertyRecurser(node, depth, typeName, nodeDepthSearchDisabled = false) {
+        function _nodePropertyRecurser(node, depth, typeName, nodeDepthSearchDisabled) {
+            if (nodeDepthSearchDisabled === void 0) { nodeDepthSearchDisabled = false; }
             var objResult = {};
             if (!hideType && typeName !== "[*POJO*]") {
                 objResult["[*TYPE*]"] = typeName;
             }
-            jsHelper.forEachProperty(node, (_value, _key) => {
+            jsHelper.forEachProperty(node, function (_value, _key) {
                 if (!disableCircularDetection && _key === _superStringifyTokenId) {
                     //don't show our marker
                     return;
@@ -168,7 +193,8 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
             return objResult;
         }
         /** does the main parsing of a node and figure's out how to act on it */
-        function _JSONifyWorker(node, depth, nodeDepthSearchDisabled = false) {
+        function _JSONifyWorker(node, depth, nodeDepthSearchDisabled) {
+            if (nodeDepthSearchDisabled === void 0) { nodeDepthSearchDisabled = false; }
             var TYPE = reflection.Type;
             var type = reflection.getType(node);
             var typeName = reflection.getTypeName(node);
@@ -266,7 +292,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                                 case "Buffer":
                                     try {
                                         var buffer = node;
-                                        let strOutput;
+                                        var strOutput = void 0;
                                         if (buffer.toString == null) {
                                             strOutput = "ERROR_buffer2_no_toString_method";
                                         }
@@ -297,7 +323,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                                     }
                                     return streamDetails;
                                 case "Moment":
-                                    let momentValue = node;
+                                    var momentValue = node;
                                     var momentDetails = { "[*TYPE*]": typeName, value: momentValue.toJSON() };
                                     if (hideType) {
                                         delete momentDetails["[*TYPE*]"];
@@ -308,7 +334,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                                     return momentDetails;
                                 case "IncommingMessage":
                                     try {
-                                        let req = node;
+                                        var req = node;
                                         var msgDetails = { "[*TYPE*]": typeName, value: { headers: req.headers, method: req.method, statusCode: req.statusCode, httpVersion: req.httpVersion, statusMessage: req.statusMessage, url: req.url } };
                                         if (hideType) {
                                             delete msgDetails["[*TYPE*]"];
@@ -386,33 +412,33 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                     return "error:  {0}" + String(ex);
                 }
             }
-            let toReturn = __processNode();
+            var toReturn = __processNode();
             if (_.isObject(toReturn)) {
                 //also process any other nodes that may have been missed, for example if we have a custom Parser for Error objects, but the user injects other custom properties onto it too
                 if (_.isString(toReturn)) {
                     throw new Error("error, string being returned and our reprocess logic didn't recognize it");
                 }
                 try {
-                    let otherParams = {};
-                    _.forEach(node, (value, key) => {
+                    var otherParams_1 = {};
+                    _.forEach(node, function (value, key) {
                         try {
                             if (toReturn[key] != null) {
                                 //key already set, so skip
                                 return;
                             }
-                            otherParams[key] = _JSONifyWorker(value, depth + 1, nodeDepthSearchDisabled);
+                            otherParams_1[key] = _JSONifyWorker(value, depth + 1, nodeDepthSearchDisabled);
                             //the following would also work (like the above) but more heavy weight
                             //otherParams[key] = JSONX.inspectJSONify(value, maxSearchDepth - (depth + 1), hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut);
                         }
                         catch (ex) {
-                            otherParams[key] = `[*ERROR*] can not Jsonify: ${ex.toString()}`;
+                            otherParams_1[key] = "[*ERROR*] can not Jsonify: " + ex.toString();
                         }
                         //as we were able to convert to a JSON POJO, remove our recursive tracking token
-                        delete otherParams[key][_superStringifyTokenId];
+                        delete otherParams_1[key][_superStringifyTokenId];
                     });
                     //delete otherParams[_superStringifyTokenId];
                     //combine the missing nodes back to the return value
-                    _.defaults(toReturn, otherParams);
+                    _.defaults(toReturn, otherParams_1);
                 }
                 catch (ex) { }
                 //one more pass to remove our recursion tracking tokens
@@ -433,13 +459,13 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
         finally {
             if (!disableCircularDetection) {
                 //clean up node tracker markers
-                jsHelper.forEachArray(_processedNodes, (_value) => {
+                jsHelper.forEachArray(_processedNodes, function (_value) {
                     delete _value[_superStringifyTokenId];
                 });
                 _processedNodes.length = 0;
             }
         }
-    }
+    };
     /**
     Converts a JavaScript value to a bastardized (but still valid) JSON string.
     This is simply superJSONify() but outputs to a sting instead of an object. (ie: for human presentation)
@@ -452,18 +478,20 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
     * @param maxSearchDepth default=2.  if the object has circular references, this is the max depth we brute-force through trying to find JSON.stringifiable objects.
     * note once we find an an object is stringifiable (no circular references), maxSearchDepth is ignored for that object and it's children.
     * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.*/
-    inspectStringify(value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, space = "\t", verboseObjectsOut) {
+    JsonX.prototype.inspectStringify = function (value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, space, verboseObjectsOut) {
+        if (space === void 0) { space = "\t"; }
         var normalizedResult = this.inspectJSONify(value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut);
         var toReturn = this.stringifyX(normalizedResult, replacer, space);
         return toReturn;
-    }
+    };
     /** convert user input (options,config,etc) into the format expected by you (as defined by the template parameter).
      * similar to parseRecursive, but doesn't attempt to recursively parse fields not found in the template (unless the parseOrphans parameter is set).
      * DOES NOT fail if user input doesn't include fields in the template.  they just won't exist in the output.  to specify "default values" for these missing fields, use runtime.jsHelper.mixin()
     */
-    parseUsingTemplate(templateObj, 
+    JsonX.prototype.parseUsingTemplate = function (templateObj, 
         /** you can pass a string or Buffer (to parse to an object) or an existing object */
         input, options) {
+        var _this = this;
         if (options == null) {
             options = {};
         }
@@ -475,10 +503,10 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
         if (inputType === "Buffer") {
             if (options.maxInputLength >= 0) {
                 if (input.length > options.maxInputLength) {
-                    throw new ex.CorelibException(`JsonX.parseUsingTemplate() failed.  input lenght of ${input.length} exceeds max of ${options.maxInputLength}.`);
+                    throw new ex.CorelibException("JsonX.parseUsingTemplate() failed.  input lenght of " + input.length + " exceeds max of " + options.maxInputLength + ".");
                 }
             }
-            let strOutput;
+            var strOutput = void 0;
             if (input.toString == null) {
                 strOutput = "ERROR_input_no_toString_method";
             }
@@ -491,26 +519,26 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
         if (inputType === "string") {
             if (options.maxInputLength >= 0) {
                 if (input.length > options.maxInputLength) {
-                    throw new ex.CorelibException(`JsonX.parseUsingTemplate() failed.  input lenght of ${input.length} exceeds max of ${options.maxInputLength}.`);
+                    throw new ex.CorelibException("JsonX.parseUsingTemplate() failed.  input lenght of " + input.length + " exceeds max of " + options.maxInputLength + ".");
                 }
             }
             try {
                 outputObject = this.parse(input, options.reviver, options.escapeStrings);
             }
             catch (err) {
-                throw new ex.CorelibException(`JsonX.parseUsingTemplate() failed.  err=${err}`);
+                throw new ex.CorelibException("JsonX.parseUsingTemplate() failed.  err=" + err);
             }
         }
         else {
             //object
             if (options.allowObjectInput !== true) {
-                throw new ex.CorelibException(`JsonX.parseUsingTemplate() failed. input is object and options.allowObjectInput!==true`);
+                throw new ex.CorelibException("JsonX.parseUsingTemplate() failed. input is object and options.allowObjectInput!==true");
             }
             outputObject = input;
         }
         /** helper to recursively walk through both our templateObj and parseFirstPass, attempting to deserialize */
-        var recursive = (templateCurrentNode, outputCurrentNode) => {
-            jsHelper.forEachProperty(outputCurrentNode, (value, key) => {
+        var recursive = function (templateCurrentNode, outputCurrentNode) {
+            jsHelper.forEachProperty(outputCurrentNode, function (value, key) {
                 var parseType = typeof (outputCurrentNode[key]);
                 var templateType = typeof (templateCurrentNode[key]);
                 if (templateCurrentNode[key] === null) {
@@ -523,13 +551,13 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                         delete outputCurrentNode[key];
                     }
                     else if (options.parseOrphans) {
-                        outputCurrentNode[key] = this.parseRecursive(outputCurrentNode[key], options.reviver, options.escapeStrings);
+                        outputCurrentNode[key] = _this.parseRecursive(outputCurrentNode[key], options.reviver, options.escapeStrings);
                     }
                     return;
                 }
                 if (templateType !== "string" && parseType === "string") {
                     //need to parse the parseTarget[key] so it hopefully matches
-                    outputCurrentNode[key] = this.parse(outputCurrentNode[key], options.reviver, false);
+                    outputCurrentNode[key] = _this.parse(outputCurrentNode[key], options.reviver, false);
                     parseType = typeof (outputCurrentNode[key]);
                 }
                 if (parseType !== templateType) {
@@ -545,7 +573,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
         };
         recursive(templateObj, outputObject);
         return outputObject;
-    }
+    };
     /** == wrapper over nodejs.util.inspect().  the output is *NOT* JSON compatable! ==
     ----------------
     Return a string representation of object, which is useful for debugging.
@@ -573,10 +601,11 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 
     util.inspect(obj);
       // "{nate}" */
-    inspectToText(object, options) {
+    JsonX.prototype.inspectToText = function (object, options) {
         return util.inspect(object, options);
-    }
-}
+    };
+    return JsonX;
+}());
 exports.JsonX = JsonX;
 /** JSON5.parse (forgiving) coupled with JSON.stringify (standards compliant serialization), plus extra helpers
  */

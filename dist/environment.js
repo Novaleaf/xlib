@@ -4,8 +4,8 @@
 //import * as ex from "./exception";
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const nodeHelper = require("./internal/nodehelper");
-const browserHelper = require("./internal/browserhelper");
+var nodeHelper = require("./internal/nodehelper");
+var browserHelper = require("./internal/browserhelper");
 //import * as ex from "./exception";
 var PlatformType;
 (function (PlatformType) {
@@ -44,7 +44,7 @@ var OsName;
     OsName[OsName["unix"] = 6] = "unix";
 })(OsName = exports.OsName || (exports.OsName = {}));
 /** the name of the os we detect running.  uses user agent in browsers, process.platform in nodejs */
-exports.osName = (() => {
+exports.osName = (function () {
     if (typeof (process) !== "undefined") {
         return OsName[process.platform];
     }
@@ -110,7 +110,7 @@ if (exports.logLevel == null) {
 else if (exports.logLevel !== LogLevel.ERROR) {
     console.info("logLevel=" + LogLevel[exports.logLevel]);
 }
-exports.isDebugBreakEnabled = (() => {
+exports.isDebugBreakEnabled = (function () {
     if (exports.logLevel <= LogLevel.DEBUG && global.v8debug != null) {
         global.v8debug.Debug.setBreakOnException();
         return true;
@@ -141,7 +141,7 @@ if (exports.envLevel == null) {
 else if (exports.envLevel !== EnvLevel.PROD) {
     console.info("envLevel=" + EnvLevel[exports.envLevel]);
 }
-let _isTest = getEnvironmentVariable("isTest", _xlibConfigDefaults.isTest);
+var _isTest = getEnvironmentVariable("isTest", _xlibConfigDefaults.isTest);
 if (_isTest == null) {
     _isTest = "FALSE";
     console.info("isTest varible is not set.  \n\tdefaulting to isTest=FALSE.");
@@ -158,7 +158,7 @@ else if (_isTest !== "FALSE") {
 nodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE
 browser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag*/
 exports.isTest = _isTest.trim().toLowerCase() === "true";
-let _isDev = getEnvironmentVariable("isDev", _xlibConfigDefaults.isDev);
+var _isDev = getEnvironmentVariable("isDev", _xlibConfigDefaults.isDev);
 if (_isDev == null) {
     _isDev = "FALSE";
     console.info("isDev varible is not set.  \n\tdefaulting to isDev=FALSE.");
@@ -209,7 +209,7 @@ function _ifDebug(fcn) {
     else {
         //no op
         /* tslint:disable */
-        return () => { };
+        return function () { };
         /* tslint:enable */
     }
 }
@@ -224,7 +224,7 @@ function _ifTest(fcn) {
     else {
         //no op
         /* tslint:disable */
-        return () => { };
+        return function () { };
         /* tslint:enable */
     }
 }

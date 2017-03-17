@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 //export import _ = require("lodash");
-const _ = require("lodash");
+var _ = require("lodash");
 exports._ = _;
 //import * as ex from "./exception";
 //import * as lodash from "lodash";
@@ -48,7 +48,10 @@ function forEachArray(
     collection, func, 
     /** if true, a copy of the collection is made and enumerated.
 this is useful if you wish to add/remove from the original collection while enumerating */
-    enumerateCopy = false) {
+    enumerateCopy) {
+    /** if true, a copy of the collection is made and enumerated.
+this is useful if you wish to add/remove from the original collection while enumerating */
+    if (enumerateCopy === void 0) { enumerateCopy = false; }
     if (collection == null) {
         throw new Error("input collection is null/undefined");
     }
@@ -77,7 +80,10 @@ function forEachArrayReverse(
     collection, func, 
     /** if true, a copy of the collection is made and enumerated.
 this is useful if you wish to add/remove from the original collection while enumerating */
-    enumerateCopy = false) {
+    enumerateCopy) {
+    /** if true, a copy of the collection is made and enumerated.
+this is useful if you wish to add/remove from the original collection while enumerating */
+    if (enumerateCopy === void 0) { enumerateCopy = false; }
     if (collection == null) {
         throw new Error("input collection is null/undefined");
     }
@@ -99,7 +105,8 @@ this is useful if you wish to add/remove from the original collection while enum
 exports.forEachArrayReverse = forEachArrayReverse;
 function forEachProperty(
     /** enumerate hasOwnProperties of this   */
-    object, func, recursive = false) {
+    object, func, recursive) {
+    if (recursive === void 0) { recursive = false; }
     if (object == null) {
         throw new Error("input object is null/undefined");
     }
@@ -169,7 +176,9 @@ exports.forEachProperty = forEachProperty;
 ////}
 /** same as function.apply, but allows prepending arguments in front of an array of arguments */
 //export function apply<TReturn>(targetFcn: (arg1: any, ...anyArgs: any[]) => TReturn, thisObj: any, argArray: any[], ...argsToPrepend: any[]): TReturn
-function apply(targetFcn, thisObj, argArray, argsToPrepend = [], argsToPostpend = []) {
+function apply(targetFcn, thisObj, argArray, argsToPrepend, argsToPostpend) {
+    if (argsToPrepend === void 0) { argsToPrepend = []; }
+    if (argsToPostpend === void 0) { argsToPostpend = []; }
     //in case this is IArguments or something of the sort, make a new array
     if (argArray.unshift == null) {
         var tmp = [];
@@ -304,7 +313,9 @@ exports.apply = apply;
 /** replace a branch of your JSON object.  good for pruning nested hiearchies, for example when wanting to decrease verbosity sent to user (before doing a JSON.stringify() ) */
 function replaceNodes(targetObject, 
     /** example:  'a.b.c.d' will remove the d node, replacing it (with null by default, effectively deleting)*/
-    nodeHiearchyStrings, replaceWith = null, replaceEmptyLeafNodes = false) {
+    nodeHiearchyStrings, replaceWith, replaceEmptyLeafNodes) {
+    if (replaceWith === void 0) { replaceWith = null; }
+    if (replaceEmptyLeafNodes === void 0) { replaceEmptyLeafNodes = false; }
     /** recursive helper for walking through the current hiearchy, replacing as it goes*/
     function currentNodeProcessor(previousNode, nodeName, hiearchyIndex, hiearchy) {
         if (previousNode == null || _.isString(previousNode)) {
@@ -325,7 +336,7 @@ function replaceNodes(targetObject,
         var nextNodeName = hiearchy[nextHiearchyIndex];
         if (_.isArray(thisNode) === true && _.isString(thisNode) === false) {
             //walk each element in the array automatically
-            _.forEach(thisNode, (element) => {
+            _.forEach(thisNode, function (element) {
                 currentNodeProcessor(element, nextNodeName, nextHiearchyIndex, hiearchy);
             });
             return;
@@ -335,7 +346,7 @@ function replaceNodes(targetObject,
         }
     }
     //loop through all nodeHiearchyStrings to remove, removing the leaf.
-    _.forEach(nodeHiearchyStrings, (hiearchyString) => {
+    _.forEach(nodeHiearchyStrings, function (hiearchyString) {
         var hiearchy = hiearchyString.split(".");
         if (hiearchy.length < 1) {
             return;
@@ -347,8 +358,16 @@ exports.replaceNodes = replaceNodes;
 /** allows chaining callbacks (sequentially)
 example usage:  object.callback = __.chainCallbacks(object.callback, myCallback, otherCallback, anotherAddedCallback);
 */
-function chainCallbacks(...callbacks) {
-    return (...args) => {
+function chainCallbacks() {
+    var callbacks = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        callbacks[_i] = arguments[_i];
+    }
+    return function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
         for (var i = 0; i < callbacks.length; i++) {
             if (callbacks[i] != null) {
                 callbacks[i].apply(null, args);
@@ -371,9 +390,19 @@ function createCallableInstance(
     nakedCallableMethod, 
     /** name of the class you want to create an instance of
     example:  class MyClass{} */
-    classType, ...args) {
+    classType) {
+    var args = [];
+    for (var _i = 2; _i < arguments.length; _i++) {
+        args[_i - 2] = arguments[_i];
+    }
     //can add properties to naked functions, but not naked functions to objects
-    var toReturn = function (...args) { return nakedCallableMethod.apply(toReturn, args); };
+    var toReturn = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return nakedCallableMethod.apply(toReturn, args);
+    };
     //copy properties from our prototype
     for (var x in classType.prototype) {
         if (classType.prototype.hasOwnProperty(x)) {

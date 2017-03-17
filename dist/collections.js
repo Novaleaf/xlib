@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const stringHelper = require("./stringhelper");
+var stringHelper = require("./stringhelper");
 //import * as arrayHelper from "./arrayhelper";
-const numHelper = require("./numhelper");
-const ex = require("./exception");
+var numHelper = require("./numhelper");
+var ex = require("./exception");
 //import runtime = require("./runtime");
 //import diagnostics = require("./diagnostics");
 //import datetime = require("./datetime");
-const moment = require("moment");
+var moment = require("moment");
 //import * as promise from "./promise";
-const Promise = require("bluebird");
+var Promise = require("bluebird");
 /** up to 32 true/false values stored in 32bits (a bitmask) */
-class BitFlags {
-    constructor(bitFlagsOrRawBuffer) {
+var BitFlags = (function () {
+    function BitFlags(bitFlagsOrRawBuffer) {
         /** internal storage for our bitflags (just a number!) */
         this.rawBuffer = 0;
         if (bitFlagsOrRawBuffer == null) {
@@ -27,22 +27,22 @@ class BitFlags {
             this.rawBuffer = flags.rawBuffer;
         }
     }
-    static assertIndexInRange(index) {
+    BitFlags.assertIndexInRange = function (index) {
         if (index < BitFlags.MAXFLAGS && index >= 0) {
             return;
         }
         throw new ex.CorelibException(stringHelper.format("index out of bounds.  You supplied %s while expected range is 0 to %i", index, BitFlags.MAXFLAGS - 1));
-    }
+    };
     /** return the value of a certain flag */
-    getFlag(index) {
+    BitFlags.prototype.getFlag = function (index) {
         BitFlags.assertIndexInRange(index);
         return ((this.rawBuffer & (0x01 << index)) !== 0);
-    }
-    static getFlag(rawBuffer, index) {
+    };
+    BitFlags.getFlag = function (rawBuffer, index) {
         BitFlags.assertIndexInRange(index);
         return ((rawBuffer & (0x01 << index)) !== 0);
-    }
-    setFlag(index, value) {
+    };
+    BitFlags.prototype.setFlag = function (index, value) {
         BitFlags.assertIndexInRange(index);
         if (value) {
             this.rawBuffer |= (0x01) << index;
@@ -50,8 +50,8 @@ class BitFlags {
         else {
             this.rawBuffer &= (~(0x01) << index);
         }
-    }
-    static setFlag(rawBuffer, index, value) {
+    };
+    BitFlags.setFlag = function (rawBuffer, index, value) {
         BitFlags.assertIndexInRange(index);
         if (value) {
             rawBuffer |= (0x01) << index;
@@ -59,21 +59,21 @@ class BitFlags {
         else {
             rawBuffer &= (~(0x01) << index);
         }
-    }
+    };
     /** flips the value of the flag */
-    flipFlag(index) {
+    BitFlags.prototype.flipFlag = function (index) {
         BitFlags.assertIndexInRange(index);
         this.rawBuffer ^= ((0x01 << index));
-    }
-    static flipFlag(rawBuffer, index) {
+    };
+    BitFlags.flipFlag = function (rawBuffer, index) {
         BitFlags.assertIndexInRange(index);
         rawBuffer ^= ((0x01 << index));
-    }
+    };
     /** reset everything to false */
-    clear() {
+    BitFlags.prototype.clear = function () {
         this.rawBuffer = 0;
-    }
-    add(bitFlagsOrRawBuffer) {
+    };
+    BitFlags.prototype.add = function (bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             this.rawBuffer |= rawBufferInput;
@@ -82,8 +82,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             this.rawBuffer |= flags.rawBuffer;
         }
-    }
-    static add(rawBuffer, bitFlagsOrRawBuffer) {
+    };
+    BitFlags.add = function (rawBuffer, bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             rawBuffer |= rawBufferInput;
@@ -92,8 +92,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             rawBuffer |= flags.rawBuffer;
         }
-    }
-    subtract(bitFlagsOrRawBuffer) {
+    };
+    BitFlags.prototype.subtract = function (bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             this.rawBuffer &= ~rawBufferInput;
@@ -102,8 +102,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             this.rawBuffer &= ~flags.rawBuffer;
         }
-    }
-    static subtract(rawBuffer, bitFlagsOrRawBuffer) {
+    };
+    BitFlags.subtract = function (rawBuffer, bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             rawBuffer &= ~rawBufferInput;
@@ -112,8 +112,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             rawBuffer &= ~flags.rawBuffer;
         }
-    }
-    flip(bitFlagsOrRawBuffer) {
+    };
+    BitFlags.prototype.flip = function (bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             this.rawBuffer ^= rawBufferInput;
@@ -122,8 +122,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             this.rawBuffer ^= flags.rawBuffer;
         }
-    }
-    static flip(rawBuffer, bitFlagsOrRawBuffer) {
+    };
+    BitFlags.flip = function (rawBuffer, bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             rawBuffer ^= rawBufferInput;
@@ -132,8 +132,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             rawBuffer ^= flags.rawBuffer;
         }
-    }
-    isAllOn(bitFlagsOrRawBuffer) {
+    };
+    BitFlags.prototype.isAllOn = function (bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             return (this.rawBuffer & rawBufferInput) === rawBufferInput;
@@ -142,8 +142,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             return (this.rawBuffer & flags.rawBuffer) === flags.rawBuffer;
         }
-    }
-    static isAllOn(rawBuffer, bitFlagsOrRawBuffer) {
+    };
+    BitFlags.isAllOn = function (rawBuffer, bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             return (rawBuffer & rawBufferInput) === rawBufferInput;
@@ -152,8 +152,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             return (rawBuffer & flags.rawBuffer) === flags.rawBuffer;
         }
-    }
-    isAnyOn(bitFlagsOrRawBuffer) {
+    };
+    BitFlags.prototype.isAnyOn = function (bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             return (this.rawBuffer & rawBufferInput) !== 0;
@@ -162,8 +162,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             return (this.rawBuffer & flags.rawBuffer) !== 0;
         }
-    }
-    static isAnyOn(rawBuffer, bitFlagsOrRawBuffer) {
+    };
+    BitFlags.isAnyOn = function (rawBuffer, bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             return (rawBuffer & rawBufferInput) !== 0;
@@ -172,8 +172,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             return (rawBuffer & flags.rawBuffer) !== 0;
         }
-    }
-    equals(bitFlagsOrRawBuffer) {
+    };
+    BitFlags.prototype.equals = function (bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             return this.rawBuffer === rawBufferInput;
@@ -182,8 +182,8 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             return this.rawBuffer === flags.rawBuffer;
         }
-    }
-    static equals(rawBuffer, bitFlagsOrRawBuffer) {
+    };
+    BitFlags.equals = function (rawBuffer, bitFlagsOrRawBuffer) {
         if (typeof (bitFlagsOrRawBuffer) === "number") {
             var rawBufferInput = bitFlagsOrRawBuffer;
             return rawBuffer === rawBufferInput;
@@ -192,11 +192,12 @@ class BitFlags {
             var flags = bitFlagsOrRawBuffer;
             return rawBuffer === flags.rawBuffer;
         }
-    }
-    getHashCode() {
+    };
+    BitFlags.prototype.getHashCode = function () {
         return this.rawBuffer;
-    }
-}
+    };
+    return BitFlags;
+}());
 /** how many bytes can be stored by instances of this */
 BitFlags.MAXFLAGS = 32;
 //public static SIZEOF = 32;
@@ -208,8 +209,9 @@ exports.BitFlags = BitFlags;
 /**
  *  a dictionary that deletes items when they expire
  */
-class ExpiresDictionary {
-    constructor(autoTryCleanupInterval, defaultLifetime) {
+var ExpiresDictionary = (function () {
+    function ExpiresDictionary(autoTryCleanupInterval, defaultLifetime) {
+        var _this = this;
         this.autoTryCleanupInterval = autoTryCleanupInterval;
         this.defaultLifetime = defaultLifetime;
         this._storage = {};
@@ -217,11 +219,11 @@ class ExpiresDictionary {
         this._inspectKeys = [];
         /** estimates the non-expired items contained (this is an upper-bound).   increased by setting (new items created), decreased by garbage cleanup. */
         this._allocatedItemSlots = 0;
-        setInterval(() => {
-            this._tryCleanupOne();
+        setInterval(function () {
+            _this._tryCleanupOne();
         }, this.autoTryCleanupInterval.asMilliseconds());
     }
-    _tryCleanupOne() {
+    ExpiresDictionary.prototype._tryCleanupOne = function () {
         if (this._nextInspectIndex >= this._inspectKeys.length) {
             //past end, re-aquire
             this._nextInspectIndex = 0;
@@ -231,10 +233,10 @@ class ExpiresDictionary {
             return; //nothing to do;
         }
         //try to clean up (dispose) an item that's too old
-        let currentIndex = this._nextInspectIndex;
+        var currentIndex = this._nextInspectIndex;
         this._nextInspectIndex++;
-        let key = this._inspectKeys[currentIndex];
-        let item = this._storage[key];
+        var key = this._inspectKeys[currentIndex];
+        var item = this._storage[key];
         if (item != null && item.expires < moment()) {
             //console.log("ExpiresDictionary auto.cleanup", key);
             delete this._storage[key];
@@ -247,9 +249,9 @@ class ExpiresDictionary {
             setTimeout(this._tryCleanupOne.bind(this));
             this._allocatedItemSlots--;
         }
-    }
-    get(key, defaultIfUndefined) {
-        let item = this._storage[key];
+    };
+    ExpiresDictionary.prototype.get = function (key, defaultIfUndefined) {
+        var item = this._storage[key];
         if (item === undefined) {
             return defaultIfUndefined;
         }
@@ -260,17 +262,19 @@ class ExpiresDictionary {
             return defaultIfUndefined;
         }
         return item.value;
-    }
-    set(key, value, customLifetime = this.defaultLifetime) {
+    };
+    ExpiresDictionary.prototype.set = function (key, value, customLifetime) {
+        if (customLifetime === void 0) { customLifetime = this.defaultLifetime; }
         if (this._storage[key] === undefined) {
             this._allocatedItemSlots++;
         }
         this._storage[key] = { value: value, expires: moment().add(customLifetime) };
-    }
-    delete(key) {
+    };
+    ExpiresDictionary.prototype.delete = function (key) {
         delete this._storage[key];
-    }
-}
+    };
+    return ExpiresDictionary;
+}());
 exports.ExpiresDictionary = ExpiresDictionary;
 /**
  *  enumerate over the key+items in a collection, removing each pair as they are enumerated. *
@@ -280,24 +284,24 @@ function ezForEachAndRemove(
     collection, 
     /** return a rejected promise from the callback to abort enumeration.  item is removed from collection immediatly prior to the callback being invoked, so if you wish it to remain in the collection you will need to manually re-add it.*/
     callback) {
-    let keys = Object.keys(collection);
-    let nextIndex = 0;
-    let toReturn = new Promise((resolve, reject) => {
+    var keys = Object.keys(collection);
+    var nextIndex = 0;
+    var toReturn = new Promise(function (resolve, reject) {
         function _iterationWorker() {
             if (nextIndex >= keys.length) {
                 resolve();
                 return;
             }
-            let currentIndex = nextIndex;
+            var currentIndex = nextIndex;
             nextIndex++;
-            let currentKey = keys[currentIndex];
-            let currentItem = collection[currentKey];
+            var currentKey = keys[currentIndex];
+            var currentItem = collection[currentKey];
             //remove value to be enumerated
             delete collection[currentKey];
             callback(currentItem, currentKey)
-                .then(() => {
+                .then(function () {
                 _iterationWorker();
-            }, (err) => {
+            }, function (err) {
                 return reject(err);
             });
         }
