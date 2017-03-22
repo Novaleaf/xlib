@@ -1,3 +1,4 @@
+/// <reference types="bluebird" />
 import * as promise from "./promise";
 import Promise = promise.bluebird;
 /** the axios httpClient library:  https://github.com/mzabriskie/axios */

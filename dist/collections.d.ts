@@ -1,3 +1,4 @@
+/// <reference types="bluebird" />
 import * as moment from "moment";
 import * as Promise from "bluebird";
 /** up to 32 true/false values stored in 32bits (a bitmask) */

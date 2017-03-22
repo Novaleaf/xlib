@@ -1,4 +1,6 @@
+/// <reference types="lodash" />
 /// <reference types="node" />
+/// <reference types="bluebird" />
 import * as _ from "lodash";
 import * as serialization from "./serialization";
 /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */

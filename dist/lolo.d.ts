@@ -1,3 +1,4 @@
+/// <reference types="bluebird" />
 import * as numHelper from "./numhelper";
 import * as _jsHelper from "./jshelper";
 import * as serialization from "./serialization";

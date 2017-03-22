@@ -1,4 +1,5 @@
 /// <reference types="node" />
+/// <reference types="sprintf-js" />
 /** Clean up user-submitted HTML, preserving whitelisted elements and whitelisted attributes on a per-element basis
  https://www.npmjs.com/package/sanitize-html
 */

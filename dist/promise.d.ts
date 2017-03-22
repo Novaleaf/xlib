@@ -1,3 +1,4 @@
+/// <reference types="bluebird" />
 import * as logging from "./logging";
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance
  * global.Promise is aliased to this.
