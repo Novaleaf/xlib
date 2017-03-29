@@ -17,7 +17,7 @@
     "@types/lodash": "^4.14.45",
     "@types/mocha": "^2.2.32",
     "@types/moment-timezone": "^0.2.34",
-    "@types/node": "^6.0.41",
+    "@types/node": "^6.0.66",
     "@types/sanitize-html": "^1.13.31",
     "@types/sprintf-js": "0.0.27",
     "@types/validator": "^5.7.32",
