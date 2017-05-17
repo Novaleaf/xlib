@@ -177,7 +177,7 @@ export function forEachProperty<T>(
 	, recursive = false ): boolean {
 	if ( object == null ) { throw new Error( "input object is null/undefined" ) }
 	for ( var key in object ) {
-		if ( object.hasOwnProperty( key ) ) {
+		if (object.hasOwnProperty !=null && object.hasOwnProperty( key ) ) {
 			if ( func( object[ key ], key, object ) === false ) {
 				//yielded
 				return false;
