@@ -1,8 +1,8 @@
+"use strict";
 //"use strict";
 //import nodeHelper = require("./internal/nodehelper");
 //import browserHelper = require("./internal/browserhelper");
 //import * as ex from "./exception";
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var nodeHelper = require("./internal/nodehelper");
 var browserHelper = require("./internal/browserhelper");
@@ -92,6 +92,7 @@ var LogLevel;
     LogLevel[LogLevel["ERROR"] = 50] = "ERROR";
     LogLevel[LogLevel["FATAL"] = 60] = "FATAL";
 })(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
+var showMissingVarMessage = false;
 //var testThis = getEnvironmentVariable("logLevel", "TRACE");
 /** the logLevel of your environment.  used as the default when constructing a logging.Logger()
  * nodejs: set by running "node entrypoint.js logLevel=DEBUG" or by setting your systemenv var: logLevel=DEBUG
@@ -99,15 +100,11 @@ var LogLevel;
   */
 exports.logLevel = LogLevel[getEnvironmentVariable("logLevel", _xlibConfigDefaults.logLevel)];
 if (exports.logLevel == null) {
+    console.warn("failed to set logLevel");
     exports.logLevel = LogLevel.TRACE;
-    console.info("logLevel varible is not set.  \n\tdefaulting to logLevel=TRACE.");
-    console.info("\tPossible values are TRACE, DEBUG, INFO, WARN, ERROR, FATAL.");
-    console.info("\tHow to modify: ");
-    console.info("\t\tnodejs: set by running 'node entrypoint.js logLevel=DEBUG' or by setting your systemenv var: logLevel=DEBUG");
-    console.info("\t\tbrowser: set by adding 'logLevel= DEBUG' in your querystring, add a cookie, or as a attribute of your html tag\n");
-    console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { logLevel:'ERROR'} \n");
+    showMissingVarMessage = true;
 }
-else if (exports.logLevel !== LogLevel.ERROR) {
+if (_xlibConfigDefaults.startupMessageSuppress !== true) {
     console.info("logLevel=" + LogLevel[exports.logLevel]);
 }
 exports.isDebugBreakEnabled = (function () {
@@ -130,28 +127,20 @@ nodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your sys
 browser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag*/
 exports.envLevel = EnvLevel[getEnvironmentVariable("envLevel", _xlibConfigDefaults.envLevel)];
 if (exports.envLevel == null) {
+    console.warn("failed to set envLevel");
     exports.envLevel = EnvLevel.PREPROD;
-    console.info("envLevel varible is not set.  \n\tdefaulting to envLevel=PREPROD.");
-    console.info("\tPossible values are PREPROD, PROD.");
-    console.info("\tHow to modify: ");
-    console.info("\t\tnodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD");
-    console.info("\t\tbrowser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag\n");
-    console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { envLevel:'PROD'} \n");
+    showMissingVarMessage = true;
 }
-else if (exports.envLevel !== EnvLevel.PROD) {
+if (_xlibConfigDefaults.startupMessageSuppress !== true) {
     console.info("envLevel=" + EnvLevel[exports.envLevel]);
 }
 var _isTest = getEnvironmentVariable("isTest", _xlibConfigDefaults.isTest);
 if (_isTest == null) {
+    console.warn("failed to set isTest");
     _isTest = "FALSE";
-    console.info("isTest varible is not set.  \n\tdefaulting to isTest=FALSE.");
-    console.info("\tPossible values are TRUE, FALSE.");
-    console.info("\tHow to modify: ");
-    console.info("\t\tnodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE");
-    console.info("\t\tbrowser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
-    console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { isTest:'FALSE'} \n");
+    showMissingVarMessage = true;
 }
-else if (_isTest !== "FALSE") {
+if (_xlibConfigDefaults.startupMessageSuppress !== true) {
     console.info("isTest=" + _isTest);
 }
 /** if we are in test mode, meaning unit and scenario tests, etc.
@@ -160,16 +149,51 @@ browser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a 
 exports.isTest = _isTest.trim().toLowerCase() === "true";
 var _isDev = getEnvironmentVariable("isDev", _xlibConfigDefaults.isDev);
 if (_isDev == null) {
+    console.warn("failed to set isDev");
     _isDev = "FALSE";
-    console.info("isDev varible is not set.  \n\tdefaulting to isDev=FALSE.");
-    console.info("\tPossible values are TRUE, FALSE.");
-    console.info("\tHow to modify: ");
-    console.info("\t\tnodejs: set by running 'node entrypoint.js isDev=TRUE' or by setting your systemenv var: isDev=TRUE");
-    console.info("\t\tbrowser: set by adding 'isDev=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
-    console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { isDev:'FALSE'} \n");
+    showMissingVarMessage = true;
 }
-else if (_isDev !== "FALSE") {
+if (_xlibConfigDefaults.startupMessageSuppress !== true) {
     console.info("isDev=" + _isDev);
+}
+if (showMissingVarMessage === true) {
+    console.warn("*********************** \nXLIB STARTUP WARNING!  \nmissing startup variable detected, see above lines to see what variable(s) were missing");
+    console.warn("\t How to modify: ");
+    console.warn("\t\t nodejs: set by running 'node entrypoint.js logLevel=DEBUG' or by setting your systemenv var: logLevel=DEBUG");
+    console.warn("\t\t browser: set by adding 'logLevel=DEBUG' in your querystring, add a cookie (key=logLevel), or as a attribute of your html tag");
+    console.warn("\t\t typescript code: at the top of your entrypoint file, add the following code: ");
+    console.warn("\t\t\t //specify xlib config options, without requiring environmental config\n\t\t\t (global as any)._xlibConfigDefaults = {\n\t\t\t \t...{\n\t\t\t \t\tlogLevel: \"WARN\",\n\t\t\t \t\tenvLevel: \"PROD\",\n\t\t\t \t\tisTest: \"FALSE\",\n\t\t\t \t\tisDev: \"FALSE\",\n\t\t\t \t\tsourceMapSupport: true,\n\t\t\t\t\tstartupMessageSuppress: true,\n\t\t\t \t} as typeof _xlibConfigDefaults,\n\t\t\t \t...(global as any)._xlibConfigDefaults,\n\t\t\t };");
+    console.warn("\t\t ORDER OF PRECIDENCE: execution-time parameters, env parameters, code parameters.");
+    console.warn("\n\t possible values are as follows:");
+    console.warn("\t\t logLevel: TRACE, DEBUG, INFO, WARN, ERROR, FATAL.");
+    console.warn("\t\t envLevel: values are PREPROD, PROD.");
+    console.warn("\t\t isTest: TRUE, FALSE.");
+    console.warn("\t\t isDev: TRUE, FALSE.");
+    console.warn("***********************");
+    //console.info("logLevel varible is not set.  \n\tdefaulting to logLevel=TRACE.");
+    //console.info("\tPossible values are TRACE, DEBUG, INFO, WARN, ERROR, FATAL.");
+    //console.info("\tHow to modify: ");
+    //console.info("\t\tnodejs: set by running 'node entrypoint.js logLevel=DEBUG' or by setting your systemenv var: logLevel=DEBUG");
+    //console.info("\t\tbrowser: set by adding 'logLevel= DEBUG' in your querystring, add a cookie, or as a attribute of your html tag\n");
+    //console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { logLevel:'ERROR'} \n");
+    //console.info("envLevel varible is not set.  \n\tdefaulting to envLevel=PREPROD.");
+    //console.info("\tPossible values are PREPROD, PROD.");
+    //console.info("\tHow to modify: ");
+    //console.info("\t\tnodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD");
+    //console.info("\t\tbrowser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag\n");
+    //console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { envLevel:'PROD'} \n");
+    //console.info("isTest varible is not set.  \n\tdefaulting to isTest=FALSE.");
+    //console.info("\tPossible values are TRUE, FALSE.");
+    //console.info("\tHow to modify: ");
+    //console.info("\t\tnodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE");
+    //console.info("\t\tbrowser: set by adding 'isTest=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
+    //console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { isTest:'FALSE'} \n");
+    //console.info("isDev varible is not set.  \n\tdefaulting to isDev=FALSE.");
+    //console.info("\tPossible values are TRUE, FALSE.");
+    //console.info("\tHow to modify: ");
+    //console.info("\t\tnodejs: set by running 'node entrypoint.js isDev=TRUE' or by setting your systemenv var: isDev=TRUE");
+    //console.info("\t\tbrowser: set by adding 'isDev=TRUE' in your querystring, add a cookie, or as a attribute of your html tag\n");
+    //console.info("\t\tjavascript modules: set global._xlibConfigDefaults = { isDev:'FALSE'} \n");
 }
 /** if we are in dev mode, meaning high-frequency polling, extra state validation code, etc.
 nodejs: set by running 'node entrypoint.js isTest=TRUE' or by setting your systemenv var: isTest=TRUE

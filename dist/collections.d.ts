@@ -89,3 +89,20 @@ export declare function ezForEachAndRemove<TItem>(
 }, 
     /** return a rejected promise from the callback to abort enumeration.  item is removed from collection immediatly prior to the callback being invoked, so if you wish it to remain in the collection you will need to manually re-add it.*/
     callback: (item: TItem, key: string) => Promise<any>): Promise<void>;
+/** a queue that returns Promises, allowing oversubscribing.   if there is a deficit of available items an unresolve promise will be returned by .dequeue().  processing occurs in a FIFO fashion.  */
+export declare class PromiseQueue<T> {
+    /** stores queue values */
+    private _storage;
+    /** stores deficit (unresolved) promises */
+    private _awaitQueue;
+    /** how many items are currently available for dequeing.  If this is more than zero, .awaitCount will be zero. */
+    readonly availableCount: number;
+    /** number of deficit requests.   if this is more than zero, .availableCount will be zero. */
+    readonly awaitCount: number;
+    /** private helper that processes available values */
+    private _processPending();
+    /** obtain a promise for a value.   if no values are available, will return an unresolved promise.   Unresolved promises are resolved in a FIFO fashion when .enqueue() is called. */
+    dequeue(): Promise<T>;
+    /** enqueue a value.  if there are pending deqeueue() requests they are resolved in a FIFO fashion when you call this. */
+    enqueue(val: T): void;
+}
