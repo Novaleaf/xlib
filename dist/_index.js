@@ -1,4 +1,13 @@
 "use strict";
+//need the following ///reference line so that ambient @types .d.ts declarations get loaded.
+/// <reference types="node" /> 
+///// <reference types="mocha" /> 
+//declare namespace Mocha{
+//	interface IRunnable{
+//		/** specify how long before the test timesout.  default if not set is 2000 (2 sec) */
+//		timeout:(ms:number)=>this;
+//	}
+//}
 Object.defineProperty(exports, "__esModule", { value: true });
 //export import lodash = require("lodash");
 var lodash = require("lodash");

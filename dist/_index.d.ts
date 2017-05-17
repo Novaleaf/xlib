@@ -6,7 +6,8 @@ declare global  {
         envLevel: "PROD" | "PREPROD" | undefined;
         isTest: "TRUE" | "FALSE" | undefined;
         isDev: "TRUE" | "FALSE" | undefined;
-        sourceMapSupport: boolean | undefined;
+        sourceMapSupport?: boolean;
+        startupMessageSuppress?: boolean;
     };
 }
 import * as jsHelper from "./jshelper";

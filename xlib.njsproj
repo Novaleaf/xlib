@@ -39,6 +39,8 @@
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="custom-dts\" />
+    <Folder Include="custom-dts\mocha\" />
     <Folder Include="src\" />
     <Folder Include="src\definitions\" />
     <Folder Include="src\design-patterns\" />
@@ -46,6 +48,7 @@
     <Folder Include="src\internal\definitions\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="custom-dts\mocha\index.d.ts" />
     <TypeScriptCompile Include="src\arrayhelper.ts" />
     <TypeScriptCompile Include="src\cache.ts" />
     <TypeScriptCompile Include="src\classbase.ts" />
