@@ -242,7 +242,7 @@ export class Logger {
 				case reflection.Type.Error:
 					var objArg: any;
 					try {
-						objArg = ( serialization.JSONX.inspectStringify( arg, 3, false, true, undefined, undefined, "\t" ) );
+						objArg = ( serialization.JSONX.inspectStringify( arg, 4, false, true, undefined, undefined, "\t" ) );
 						//finalArgs.push(JSON.stringify(arg,undefined,"\t"));
 					} catch ( ex ) {
 						objArg = ( "[Object???]" );
@@ -253,7 +253,7 @@ export class Logger {
 				case reflection.Type.object:
 					var objArg: any;
 					try {
-						objArg = ( serialization.JSONX.inspectStringify( arg, 3, false, false, undefined, undefined, "\t" ) );
+						objArg = ( serialization.JSONX.inspectStringify( arg, 4, false, false, undefined, undefined, "\t" ) );
 						//finalArgs.push(JSON.stringify(arg,undefined,"\t"));
 					} catch ( ex ) {
 						objArg = ( "[Object???]" );
