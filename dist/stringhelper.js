@@ -457,49 +457,4 @@ exports.hash = hash;
 var _sprintf = require("sprintf-js");
 exports.format = _sprintf.sprintf;
 exports.format2 = _sprintf.vsprintf;
-///** string.format, supports the following style:  formatAlt(" hello {0}!","world")
-//*/
-//export function formatAlt(toFormat: string, ...args: any[]): string {
-//	var newArgs: string[] = [];
-//	//convert our args to strings
-//	for (var i = 0; i < args.length; i++) {
-//		if (args[i] == null) {
-//			//replace null with string
-//			args[i] = "NULL";
-//		} else {
-//			//convert our arg to string
-//			var originalArg = args[i];
-//			args[i] = originalArg.toString();
-//			//if we show a non-meaningful "object" lets try to at least show it's typeName.  
-//			if (args[i] === "[object Object]") {
-//				try {
-//					var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
-//					var results = (_getTypeNameOrFuncNameRegex).exec((originalArg).constructor.toString());
-//					var typeName = (results && results.length > 1) ? results[1] : "";
-//					args[i] = typeName; // JSON.stringify(originalArg);
-//				} catch (ex) {
-//					//eat it, just show our first string version
-//				}
-//			}
-//		}
-//	}
-//	//if (logger._DEBUG_MODE) {
-//	//	//verify that our toFormat string has proper formatting numbers
-//	//	for (var i = 0; i < args.length; i++) {
-//	//		var toFind = "{" + i.toString() + "}";
-//	//		if (toFormat.indexOf(toFind) < 0) {
-//	//			logger.inspectDebug("__.format() missing from string", toFind, toFormat);
-//	//			//logger.assert(false, "__.format() failed.  missing '{0}' from your string '{1}'", toFind, toFormat);
-//	//		}
-//	//	}
-//	//}
-//	//__.forEach(args, (arg) => { newArgs.push(arg == null ? "NULL" : arg.toString()); });
-//	newArgs = args;
-//	return toFormat.replace(/\{(\d+)\}/g, <any>function (argToken, argNum) { //HACK: typescript 0.9.5, added <any> cast
-//		return typeof newArgs[argNum] !== "undefined"
-//			? newArgs[argNum].toString()
-//			: argToken
-//			;
-//	});
-//}; 
 //# sourceMappingURL=stringhelper.js.map

@@ -22,6 +22,4 @@ function _initialize() {
     }
 }
 exports._initialize = _initialize;
-///** auto called when including this module, but you may explicitly call it if your minifier/compiler requires explicit use of imports.*/
-//_initialize();
 //# sourceMappingURL=mockmocha.js.map

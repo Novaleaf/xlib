@@ -71,7 +71,7 @@ export declare class EzEndpoint<TSubmitPayload, TRecievePayload> {
     toJson(): {
         endpointOptions: IEzEndpoint_EndpointOptions;
         retryOptions: promise._BluebirdRetryInternals.IOptions;
-        requestOptions: IEzEndpointRequestOptions<TRecievePayload>;
+        requestOptions: _axiosDTs.AxiosXHRConfigBase<TRecievePayload>;
     };
     private _doRequest(protocol, 
         /** pass a payload to POST */

@@ -33,6 +33,10 @@ export interface ITemplateParseOptions {
     /** if set, throws an exception if the input is too long */
     maxInputLength?: number;
 }
+/** json-truncate code, from https://github.com/mrsteele/json-truncate/blob/master/src/json-truncate.js.  does not modify input, returns object with truncations. */
+export declare function truncateJson(obj: any, maxDepth?: number, options?: {
+    replace?: string;
+}, curDepth?: number): any;
 /** JSON5.parse (forgiving) coupled with JSON.stringify (standards compliant serialization), plus extra helpers
  *
  */
@@ -149,8 +153,9 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
     * @param verboseObjectsOut pass an array to have error objects and functions added.  useful if you want to show error details (Ex: stack traces) seperately.
     * @param maxSearchDepth default=2.  if the object has circular references, this is the max depth we brute-force through trying to find JSON.stringifiable objects.
     * note once we find an an object is stringifiable (no circular references), maxSearchDepth is ignored for that object and it's children.
-    * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.*/
-    inspectJSONify(value: any, maxSearchDepth?: number, hideType?: boolean, showVerboseDetails?: boolean, disableCircularDetection?: boolean, replacer?: (key: string, value: any) => any, verboseObjectsOut?: Array<Error>): any;
+    * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.
+    * @param maxNodeDepth default=3.  truncates all nodes deeper than this.*/
+    inspectJSONify(value: any, maxSearchDepth?: number, hideType?: boolean, showVerboseDetails?: boolean, disableCircularDetection?: boolean, replacer?: (key: string, value: any) => any, verboseObjectsOut?: Array<Error>, maxNodeDepth?: number): any;
     /**
     Converts a JavaScript value to a bastardized (but still valid) JSON string.
     This is simply superJSONify() but outputs to a sting instead of an object. (ie: for human presentation)
@@ -162,8 +167,9 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
     * @param verboseObjectsOut pass an array to have error objects and functions added.  useful if you want to show error details (Ex: stack traces) seperately.
     * @param maxSearchDepth default=2.  if the object has circular references, this is the max depth we brute-force through trying to find JSON.stringifiable objects.
     * note once we find an an object is stringifiable (no circular references), maxSearchDepth is ignored for that object and it's children.
-    * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.*/
-    inspectStringify(value: any, maxSearchDepth?: number, hideType?: boolean, showVerboseDetails?: boolean, disableCircularDetection?: boolean, replacer?: (key: string, value: any) => any, space?: any, verboseObjectsOut?: Array<Error>): string;
+    * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.
+    * @param maxNodeDepth default=3.  the max depth of nodes we will returne..*/
+    inspectStringify(value: any, maxSearchDepth?: number, hideType?: boolean, showVerboseDetails?: boolean, disableCircularDetection?: boolean, replacer?: (key: string, value: any) => any, space?: any, verboseObjectsOut?: Array<Error>, maxNodeDepth?: number): string;
     /** convert user input (options,config,etc) into the format expected by you (as defined by the template parameter).
      * similar to parseRecursive, but doesn't attempt to recursively parse fields not found in the template (unless the parseOrphans parameter is set).
      * DOES NOT fail if user input doesn't include fields in the template.  they just won't exist in the output.  to specify "default values" for these missing fields, use runtime.jsHelper.mixin()
