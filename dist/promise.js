@@ -42,14 +42,18 @@ if (global.Promise == null) {
 //import * as Rx from "@reactivex/rxjs";
 //import Rx = require("rxjs");
 var __isUnhandledHooked = false;
-var _unhandledDefaultLogger = new logging.Logger("promise.logPromiseUnhandledRejections");
+var _unhandledDefaultLogger = new logging.Logger(__filename + ":logPromiseUnhandledRejections");
+/**
+ * wrapper over bluebird unhandled promise rejections, so that they can be logged before throwing.
+ * @param logger
+ */
 function logPromiseUnhandledRejections(logger) {
     if (logger === void 0) { logger = _unhandledDefaultLogger; }
     if (__isUnhandledHooked === true) {
         return;
     }
     __isUnhandledHooked = true;
-    logger.debug("exec xlib.diagnostics.logger.logPromiseUnhandledRejections()");
+    //logger.trace("exec xlib.diagnostics.logger.logPromiseUnhandledRejections()");
     switch (environment.platformType) {
         case environment.PlatformType.Browser:
             window.addEventListener("unhandledrejection", function (e) {

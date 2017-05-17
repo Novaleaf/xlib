@@ -54,13 +54,17 @@ if (global.Promise == null) {
 
 
 var __isUnhandledHooked = false;
-let _unhandledDefaultLogger = new logging.Logger("promise.logPromiseUnhandledRejections")
+let _unhandledDefaultLogger = new logging.Logger(__filename + ":logPromiseUnhandledRejections");
+/**
+ * wrapper over bluebird unhandled promise rejections, so that they can be logged before throwing.
+ * @param logger
+ */
 function logPromiseUnhandledRejections(logger = _unhandledDefaultLogger) {
 	if (__isUnhandledHooked === true) {
 		return;
 	}
 	__isUnhandledHooked = true;
-	logger.debug("exec xlib.diagnostics.logger.logPromiseUnhandledRejections()");
+	//logger.trace("exec xlib.diagnostics.logger.logPromiseUnhandledRejections()");
 	switch (environment.platformType) {
 		case environment.PlatformType.Browser:
 			window.addEventListener("unhandledrejection", (e: any) => {
