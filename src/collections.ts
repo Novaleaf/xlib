@@ -372,6 +372,53 @@ export function ezForEachAndRemove<TItem>(
 }
 
 
+
+interface IDeferred<T>{
+	promise:Promise<T>;
+	resolve: (val:T | Promise.Thenable<T> | undefined)=>void,
+	reject:(err:Error)=>void,
+}
+/** a queue that returns Promises, allowing oversubscribing.   if there is a deficit of available items an unresolve promise will be returned by .dequeue().  processing occurs in a FIFO fashion.  */
+export class PromiseQueue<T>{
+    /** stores queue values */
+    private _storage: T[] = [];
+    /** stores deficit (unresolved) promises */
+    private _awaitQueue: IDeferred<T>[] = [];
+    /** how many items are currently available for dequeing.  If this is more than zero, .awaitCount will be zero. */
+    public get availableCount() { return this._storage.length; }
+    /** number of deficit requests.   if this is more than zero, .availableCount will be zero. */
+    public get awaitCount() { return this._awaitQueue.length; }
+
+    /** private helper that processes available values */
+    private _processPending() {
+        while (this.availableCount > 0 && this.awaitCount > 0) {
+            let val = this._storage.shift();
+            let toProcess = this._awaitQueue.shift();
+			if(toProcess == null){
+				throw new Error("corrupted state, PromiseQueue._awaitQueue failed to dequeue");
+			}
+            toProcess.resolve(val as any);
+        }
+    }
+    /** obtain a promise for a value.   if no values are available, will return an unresolved promise.   Unresolved promises are resolved in a FIFO fashion when .enqueue() is called. */
+    public dequeue(): Promise<T> {
+
+		let deferred: IDeferred<T> = {} as any;
+        deferred.promise = new Promise<T>((resolve,reject)=>{
+			deferred.resolve = resolve;
+			deferred.reject = reject;
+		});
+        this._awaitQueue.push(deferred);
+        this._processPending();
+        return deferred.promise;
+    }
+    /** enqueue a value.  if there are pending deqeueue() requests they are resolved in a FIFO fashion when you call this. */
+    public enqueue(val: T): void {
+        this._storage.push(val);
+        this._processPending();
+    }
+
+}
 ///** simple interface to allow casting of simple javascript object collection's values to specific types. 
 //== example usage ==
 //var myStuff:ICollection<number>={};
