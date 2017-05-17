@@ -1,5 +1,5 @@
-///// <reference path="../../../typings/all.d.ts" />
 "use strict";
+///// <reference path="../../../typings/all.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 var jsHelper = require("./jshelper");
 var reflection = require("./reflection");
@@ -8,6 +8,51 @@ var json5 = require("json5");
 var stringHelper = require("./stringhelper");
 var _ = require("lodash");
 var util = require("util");
+/** json-truncate code, from https://github.com/mrsteele/json-truncate/blob/master/src/json-truncate.js.  does not modify input, returns object with truncations. */
+function truncateJson(obj, maxDepth, options, curDepth) {
+    if (maxDepth === void 0) { maxDepth = 10; }
+    if (options === void 0) { options = {}; }
+    if (curDepth === void 0) { curDepth = 0; }
+    var flatTypes = [String, Number, Boolean];
+    function isDefined(val) {
+        return val !== null && val !== undefined;
+    }
+    function isFlat(val) {
+        return !isDefined(val) || flatTypes.indexOf(val.constructor) !== -1;
+    }
+    if (curDepth < maxDepth) {
+        var newDepth_1 = curDepth + 1;
+        if (isFlat(obj)) {
+            return obj;
+        }
+        else if (Array.isArray(obj)) {
+            var newArr_1 = [];
+            obj.map(function (value) {
+                if (isFlat(value)) {
+                    newArr_1.push(value);
+                }
+                else {
+                    newArr_1.push(truncateJson(value, maxDepth, options, newDepth_1));
+                }
+            });
+            return newArr_1;
+        }
+        else {
+            var newObj = {};
+            for (var key in obj) {
+                if (isFlat(obj[key])) {
+                    newObj[key] = obj[key];
+                }
+                else {
+                    newObj[key] = truncateJson(obj[key], maxDepth, options, newDepth_1);
+                }
+            }
+            return newObj;
+        }
+    }
+    return options.replace;
+}
+exports.truncateJson = truncateJson;
 /** JSON5.parse (forgiving) coupled with JSON.stringify (standards compliant serialization), plus extra helpers
  *
  */
@@ -161,13 +206,15 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
     * @param verboseObjectsOut pass an array to have error objects and functions added.  useful if you want to show error details (Ex: stack traces) seperately.
     * @param maxSearchDepth default=2.  if the object has circular references, this is the max depth we brute-force through trying to find JSON.stringifiable objects.
     * note once we find an an object is stringifiable (no circular references), maxSearchDepth is ignored for that object and it's children.
-    * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.*/
-    JsonX.prototype.inspectJSONify = function (value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut) {
+    * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.
+    * @param maxNodeDepth default=3.  truncates all nodes deeper than this.*/
+    JsonX.prototype.inspectJSONify = function (value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut, maxNodeDepth) {
         if (maxSearchDepth === void 0) { maxSearchDepth = 2; }
         if (hideType === void 0) { hideType = false; }
         if (showVerboseDetails === void 0) { showVerboseDetails = false; }
         if (disableCircularDetection === void 0) { disableCircularDetection = false; }
         if (verboseObjectsOut === void 0) { verboseObjectsOut = []; }
+        if (maxNodeDepth === void 0) { maxNodeDepth = 4; }
         var _superStringifyTokenId = "___JSONX.inspectJSONify.depthTrackingToken_ignoreThis_";
         /** tracks objects that are flagged as circular references (we remove our tracking tag at the end) */
         var _processedNodes = [];
@@ -190,6 +237,9 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                 //invoke our main worker recursively on children
                 objResult[_key] = _JSONifyWorker(_value, depth + 1, nodeDepthSearchDisabled);
             });
+            if (maxNodeDepth != null) {
+                objResult = truncateJson(objResult, maxNodeDepth, { replace: "[*MAX_NODE_DEPTH*]" });
+            }
             return objResult;
         }
         /** does the main parsing of a node and figure's out how to act on it */
@@ -368,7 +418,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                             catch (ex) {
                                 //couldn't stringify
                                 if (depth >= maxSearchDepth) {
-                                    return "[*MAX_DEPTH*]";
+                                    return "[*MAX_SEARCH_DEPTH*]";
                                 }
                                 //can't stringify it, so...
                                 if (ex.message.toLowerCase().indexOf("circular") < 0 && ex.message.toLowerCase().indexOf("typeerror") < 0) {
@@ -413,42 +463,54 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                 }
             }
             var toReturn = __processNode();
-            if (_.isObject(toReturn)) {
-                //also process any other nodes that may have been missed, for example if we have a custom Parser for Error objects, but the user injects other custom properties onto it too
-                if (_.isString(toReturn)) {
-                    throw new Error("error, string being returned and our reprocess logic didn't recognize it");
+            {
+                /**also process any other nodes that may have been missed, for example if we have a custom Parser for Error objects, but the user injects other custom properties onto it too*/
+                var processExtraNodes = false;
+                switch (typeName) {
+                    case "Buffer":
+                        //don't search buffer for child nodes, as it's a very large numerical array
+                        break;
+                    default:
+                        if (_.isObject(toReturn)) {
+                            processExtraNodes = true;
+                        }
                 }
-                try {
-                    var otherParams_1 = {};
-                    _.forEach(node, function (value, key) {
-                        try {
-                            if (toReturn[key] != null) {
-                                //key already set, so skip
-                                return;
+                if (processExtraNodes === true) {
+                    if (_.isString(toReturn)) {
+                        throw new Error("error, string being returned and our reprocess logic didn't recognize it");
+                    }
+                    try {
+                        var otherParams_1 = {};
+                        _.forEach(node, function (value, key) {
+                            try {
+                                if (toReturn[key] != null) {
+                                    //key already set, so skip
+                                    return;
+                                }
+                                otherParams_1[key] = _JSONifyWorker(value, depth + 1, nodeDepthSearchDisabled);
+                                //the following would also work (like the above) but more heavy weight
+                                //otherParams[key] = JSONX.inspectJSONify(value, maxSearchDepth - (depth + 1), hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut);
                             }
-                            otherParams_1[key] = _JSONifyWorker(value, depth + 1, nodeDepthSearchDisabled);
-                            //the following would also work (like the above) but more heavy weight
-                            //otherParams[key] = JSONX.inspectJSONify(value, maxSearchDepth - (depth + 1), hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut);
-                        }
-                        catch (ex) {
-                            otherParams_1[key] = "[*ERROR*] can not Jsonify: " + ex.toString();
-                        }
-                        //as we were able to convert to a JSON POJO, remove our recursive tracking token
-                        delete otherParams_1[key][_superStringifyTokenId];
-                    });
-                    //delete otherParams[_superStringifyTokenId];
-                    //combine the missing nodes back to the return value
-                    _.defaults(toReturn, otherParams_1);
+                            catch (ex) {
+                                otherParams_1[key] = "[*ERROR*] can not Jsonify: " + ex.toString();
+                            }
+                            //as we were able to convert to a JSON POJO, remove our recursive tracking token
+                            delete otherParams_1[key][_superStringifyTokenId];
+                        });
+                        //delete otherParams[_superStringifyTokenId];
+                        //combine the missing nodes back to the return value
+                        _.defaults(toReturn, otherParams_1);
+                    }
+                    catch (ex) { }
+                    //one more pass to remove our recursion tracking tokens
+                    //if (!disableCircularDetection) {
+                    //	//clean up node tracker markers
+                    //	jsHelper.forEachArray(_processedNodes, (_value) => {
+                    //		delete _value[_superStringifyTokenId];
+                    //	});
+                    //	_processedNodes.length = 0;
+                    //}
                 }
-                catch (ex) { }
-                //one more pass to remove our recursion tracking tokens
-                //if (!disableCircularDetection) {
-                //	//clean up node tracker markers
-                //	jsHelper.forEachArray(_processedNodes, (_value) => {
-                //		delete _value[_superStringifyTokenId];
-                //	});
-                //	_processedNodes.length = 0;
-                //}
             }
             return toReturn;
         }
@@ -477,10 +539,12 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
     * @param verboseObjectsOut pass an array to have error objects and functions added.  useful if you want to show error details (Ex: stack traces) seperately.
     * @param maxSearchDepth default=2.  if the object has circular references, this is the max depth we brute-force through trying to find JSON.stringifiable objects.
     * note once we find an an object is stringifiable (no circular references), maxSearchDepth is ignored for that object and it's children.
-    * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.*/
-    JsonX.prototype.inspectStringify = function (value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, space, verboseObjectsOut) {
+    * @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.
+    * @param maxNodeDepth default=3.  the max depth of nodes we will returne..*/
+    JsonX.prototype.inspectStringify = function (value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, space, verboseObjectsOut, maxNodeDepth) {
         if (space === void 0) { space = "\t"; }
-        var normalizedResult = this.inspectJSONify(value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut);
+        if (maxNodeDepth === void 0) { maxNodeDepth = 4; }
+        var normalizedResult = this.inspectJSONify(value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut, maxNodeDepth);
         var toReturn = this.stringifyX(normalizedResult, replacer, space);
         return toReturn;
     };

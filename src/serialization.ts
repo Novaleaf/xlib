@@ -49,13 +49,56 @@ export interface ITemplateParseOptions {
 	maxInputLength?: number;
 }
 
+/** json-truncate code, from https://github.com/mrsteele/json-truncate/blob/master/src/json-truncate.js.  does not modify input, returns object with truncations. */
+export function truncateJson(obj: any, maxDepth = 10, options: { replace?: string } = {}, curDepth = 0): any {
 
+	const flatTypes = [String, Number, Boolean];
+
+	function isDefined(val: any) {
+		return val !== null && val !== undefined
+	}
+
+	function isFlat(val: any) {
+		return !isDefined(val) || flatTypes.indexOf(val.constructor) !== -1
+	}
+
+	if (curDepth < maxDepth) {
+		const newDepth = curDepth + 1
+
+		if (isFlat(obj)) {
+			return obj
+		} else if (Array.isArray(obj)) {
+			const newArr: any[] = []
+			obj.map(value => {
+				if (isFlat(value)) {
+					newArr.push(value)
+				} else {
+					newArr.push(truncateJson(value, maxDepth, options, newDepth))
+				}
+			})
+			return newArr
+		} else {
+			const newObj: { [key: string]: any } = {}
+			for (let key in obj) {
+				if (isFlat(obj[key])) {
+					newObj[key] = obj[key]
+				} else {
+					newObj[key] = truncateJson(obj[key], maxDepth, options, newDepth)
+				}
+			}
+			return newObj
+		}
+	}
+	return options.replace as any
+}
 
 
 /** JSON5.parse (forgiving) coupled with JSON.stringify (standards compliant serialization), plus extra helpers
  * 
  */
 export class JsonX {
+
+
 	/**
 	  * === JSON5.Parse (much more forgiving parser). ===
 	  * see http://json5.org/
@@ -269,11 +312,12 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 	* @param verboseObjectsOut pass an array to have error objects and functions added.  useful if you want to show error details (Ex: stack traces) seperately.
 	* @param maxSearchDepth default=2.  if the object has circular references, this is the max depth we brute-force through trying to find JSON.stringifiable objects.  
 	* note once we find an an object is stringifiable (no circular references), maxSearchDepth is ignored for that object and it's children.
-	* @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.*/
+	* @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.
+	* @param maxNodeDepth default=3.  truncates all nodes deeper than this.*/
 	inspectJSONify(
 		value: any,
 		maxSearchDepth = 2, hideType = false, showVerboseDetails = false,
-		disableCircularDetection = false, replacer?: (key: string, value: any) => any, verboseObjectsOut: Array<Error> = []): any {
+		disableCircularDetection = false, replacer?: (key: string, value: any) => any, verboseObjectsOut: Array<Error> = [], maxNodeDepth = 4): any {
 
 		var _superStringifyTokenId = "___JSONX.inspectJSONify.depthTrackingToken_ignoreThis_";
 		/** tracks objects that are flagged as circular references (we remove our tracking tag at the end) */
@@ -299,9 +343,11 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 				}
 				//invoke our main worker recursively on children
 				objResult[_key] = _JSONifyWorker(_value, depth + 1, nodeDepthSearchDisabled);
-				
-			});
 
+			});
+			if (maxNodeDepth != null) {
+				objResult = truncateJson(objResult, maxNodeDepth, { replace: "[*MAX_NODE_DEPTH*]" });
+			}
 			return objResult;
 		}
 		/** does the main parsing of a node and figure's out how to act on it */
@@ -477,7 +523,7 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 							} catch (ex) {
 								//couldn't stringify
 								if (depth >= maxSearchDepth) {
-									return "[*MAX_DEPTH*]";
+									return "[*MAX_SEARCH_DEPTH*]";
 								}
 								//can't stringify it, so...
 								if (ex.message.toLowerCase().indexOf("circular") < 0 && ex.message.toLowerCase().indexOf("typeerror") < 0) {
@@ -523,46 +569,59 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 			}
 			let toReturn = __processNode();
 
-			if (_.isObject(toReturn)) {
-				//also process any other nodes that may have been missed, for example if we have a custom Parser for Error objects, but the user injects other custom properties onto it too
-				if (_.isString(toReturn)) {
-					throw new Error("error, string being returned and our reprocess logic didn't recognize it");
-				}
-				try {
-					let otherParams: any = {};
-
-					_.forEach(node, (value:any, key:string) => {
-						try {
-							if (toReturn[key] != null) {
-								//key already set, so skip
-								return;
-							}
-
-							otherParams[key] = _JSONifyWorker(value, depth + 1, nodeDepthSearchDisabled);
-							//the following would also work (like the above) but more heavy weight
-							//otherParams[key] = JSONX.inspectJSONify(value, maxSearchDepth - (depth + 1), hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut);
-						} catch (ex) {
-							otherParams[key] = `[*ERROR*] can not Jsonify: ${ex.toString()}`;
+			{
+				/**also process any other nodes that may have been missed, for example if we have a custom Parser for Error objects, but the user injects other custom properties onto it too*/
+				let processExtraNodes = false;
+				switch (typeName) {
+					case "Buffer":
+						//don't search buffer for child nodes, as it's a very large numerical array
+						break;
+					default:
+						if (_.isObject(toReturn)) {
+							processExtraNodes = true;
 						}
-						//as we were able to convert to a JSON POJO, remove our recursive tracking token
-						delete otherParams[key][_superStringifyTokenId];
-					});
-					//delete otherParams[_superStringifyTokenId];
+				}
+				if (processExtraNodes === true) {
+
+					if (_.isString(toReturn)) {
+						throw new Error("error, string being returned and our reprocess logic didn't recognize it");
+					}
+					try {
+						let otherParams: any = {};
+
+						_.forEach(node, (value: any, key: string) => {
+							try {
+								if (toReturn[key] != null) {
+									//key already set, so skip
+									return;
+								}
+
+								otherParams[key] = _JSONifyWorker(value, depth + 1, nodeDepthSearchDisabled);
+								//the following would also work (like the above) but more heavy weight
+								//otherParams[key] = JSONX.inspectJSONify(value, maxSearchDepth - (depth + 1), hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut);
+							} catch (ex) {
+								otherParams[key] = `[*ERROR*] can not Jsonify: ${ex.toString()}`;
+							}
+							//as we were able to convert to a JSON POJO, remove our recursive tracking token
+							delete otherParams[key][_superStringifyTokenId];
+						});
+						//delete otherParams[_superStringifyTokenId];
 
 
-					//combine the missing nodes back to the return value
-					_.defaults(toReturn, otherParams);
-				} catch (ex)
-				{ }
-				//one more pass to remove our recursion tracking tokens
+						//combine the missing nodes back to the return value
+						_.defaults(toReturn, otherParams);
+					} catch (ex)
+					{ }
+					//one more pass to remove our recursion tracking tokens
 
-				//if (!disableCircularDetection) {
-				//	//clean up node tracker markers
-				//	jsHelper.forEachArray(_processedNodes, (_value) => {
-				//		delete _value[_superStringifyTokenId];
-				//	});
-				//	_processedNodes.length = 0;
-				//}
+					//if (!disableCircularDetection) {
+					//	//clean up node tracker markers
+					//	jsHelper.forEachArray(_processedNodes, (_value) => {
+					//		delete _value[_superStringifyTokenId];
+					//	});
+					//	_processedNodes.length = 0;
+					//}
+				}
 			}
 			return toReturn;
 
@@ -592,12 +651,13 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
 	* @param verboseObjectsOut pass an array to have error objects and functions added.  useful if you want to show error details (Ex: stack traces) seperately.
 	* @param maxSearchDepth default=2.  if the object has circular references, this is the max depth we brute-force through trying to find JSON.stringifiable objects.
 	* note once we find an an object is stringifiable (no circular references), maxSearchDepth is ignored for that object and it's children.
-	* @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.*/
+	* @param space Adds indentation, white space (default is \t), and line break characters to the return-value JSON text to make it easier to read.	
+	* @param maxNodeDepth default=3.  the max depth of nodes we will returne..*/
 	inspectStringify(
 		value: any, maxSearchDepth?: number, hideType?: boolean, showVerboseDetails?: boolean,
-		disableCircularDetection?: boolean, replacer?: (key: string, value: any) => any, space: any = "\t", verboseObjectsOut?: Array<Error>
+		disableCircularDetection?: boolean, replacer?: (key: string, value: any) => any, space: any = "\t", verboseObjectsOut?: Array<Error>, maxNodeDepth = 4
 	): string {
-		var normalizedResult = this.inspectJSONify(value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut);
+		var normalizedResult = this.inspectJSONify(value, maxSearchDepth, hideType, showVerboseDetails, disableCircularDetection, replacer, verboseObjectsOut, maxNodeDepth);
 		var toReturn = this.stringifyX(normalizedResult, replacer as any, space);
 		return toReturn;
 	}
