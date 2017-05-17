@@ -74,6 +74,9 @@ export function getTypeName( obj: any ): string {
 			//by default, try reading the obj.constructor.name property
 			if(obj.constructor!=null && obj.constructor.name !=null && _.isString(obj.constructor.name)===true && obj.constructor.name.length>0){
 				return obj.constructor.name;
+			}			
+			if(obj.constructor == null || obj.constructor.toString ==null){
+				return "[*POJO*]";
 			}
 			//fall back to extracting the name from the obj.constructor.toString() text
 			const ctorStr: string = ( obj ).constructor.toString();

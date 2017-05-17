@@ -73,6 +73,9 @@ function getTypeName(obj) {
             if (obj.constructor != null && obj.constructor.name != null && _.isString(obj.constructor.name) === true && obj.constructor.name.length > 0) {
                 return obj.constructor.name;
             }
+            if (obj.constructor == null || obj.constructor.toString == null) {
+                return "[*POJO*]";
+            }
             //fall back to extracting the name from the obj.constructor.toString() text
             var ctorStr = (obj).constructor.toString();
             if (ctorStr.indexOf("class") === 0) {
