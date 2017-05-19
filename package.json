@@ -47,7 +47,7 @@
     "docs": "typedoc "
   },
   "main": "./dist/_index.js",
-  "types": "./dist/_index.d.ts",
+  "types": "./src/_index.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/Novaleaf/xlib"

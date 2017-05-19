@@ -1,5 +1,6 @@
 //need the following ///reference line so that ambient @types .d.ts declarations get loaded.
 /// <reference types="node" /> 
+/// <reference types="bluebird" /> 
 ///// <reference types="mocha" /> 
 //declare namespace Mocha{
 //	interface IRunnable{
