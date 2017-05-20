@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //import * as jsHelper from "../jshelper";
 //import * as ex from "../exception";
 //import jsHelper = require("../jshelper");
@@ -16,6 +17,7 @@ exports.ieVersion = (function () {
     var undef, v = 3, div = document.createElement("div"), all = div.getElementsByTagName("i");
     while (div.innerHTML = "<!--[if gt IE " + (++v) + "]><i></i><![endif]-->",
         all[0]) {
+        //no op
     }
     ;
     return v > 4 ? v : undef;
@@ -48,6 +50,10 @@ function onLoad(domElement, callback) {
             //if (!environment._DEBUG_MODE) {
             // Handle memory leak in IE
             domElement.onload = domElement.onreadystatechange = null;
+            //if (domElement && scriptElement.parentNode) {
+            //	domElement.removeChild(scriptElement);
+            //}
+            //}
         }
     };
 }
@@ -107,9 +113,11 @@ function getDomElement(elementType,
         };
         if (searchTopDown) {
             _.forEach(elements, searchPredicate);
+            //jsHelper.forEachArray(elements, searchPredicate);
         }
         else {
             _.forEachRight(elements, searchPredicate);
+            //jsHelper.forEachArrayReverse(elements, searchPredicate);
         }
     }
     return foundElement;
@@ -173,6 +181,15 @@ exports.getCookies = (function () {
                     //}
                     parsedCookies[key] = value;
                 }
+                //for (var i = rawCookies.length - 1; i >= 0; i--) {
+                //	var cookie = rawCookies[i].split("=");
+                //	if (cookie.length !== 2) {
+                //		throw new Error("invalid cookie format.  cookie= " + rawCookies[i]);
+                //	}
+                //	var key = cookie[0];
+                //	var value = cookie[1];
+                //	parsedCookies[key] = value;
+                //}
             }
         }
         return parsedCookies;
@@ -220,6 +237,7 @@ exports.getQuerystringVariables = (function () {
                     else {
                         key = pair[0];
                         value = rawVars[i].substring(key.length);
+                        //throw new Error("invalid querystring format.  var= " + rawVars[i]);
                     }
                     parsedQuerystrings[key] = value;
                 }
@@ -241,3 +259,4 @@ function getQuerystringVariable(key, valueIfNullOrEmpty) {
     return result;
 }
 exports.getQuerystringVariable = getQuerystringVariable;
+//# sourceMappingURL=browserhelper.js.map

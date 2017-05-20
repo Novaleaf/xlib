@@ -1,6 +1,7 @@
+"use strict";
 //copied source code from the npm package: https://www.npmjs.com/package/base64url on 20160926.
 //why:  because that npm package used the old "typings" system and it causes visual studio to error on virtual projects.
-"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  *  Converting to, and from, base64url https://en.wikipedia.org/wiki/Base64#RFC_4648
 example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
@@ -107,3 +108,4 @@ exports.toBuffer = toBuffer;
 //base64url.fromBase64 = fromBase64;
 //base64url.toBuffer = toBuffer;
 //export = base64url;
+//# sourceMappingURL=base64url.js.map

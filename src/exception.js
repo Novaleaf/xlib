@@ -1,9 +1,15 @@
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 //declare class Error {
 //	public name: string;
 //	public message: string;
@@ -20,14 +26,16 @@ from https://stackoverflow.com/questions/12915412/how-do-i-extend-a-host-object-
 */
 var Exception = (function (_super) {
     __extends(Exception, _super);
-    function Exception(message, innerException, 
-        /** truncate extra stack frames from the stack that's attached to this, a good way to remove logging/util functions from the trace */
-        stackFramesToTruncate) {
-        /** truncate extra stack frames from the stack that's attached to this, a good way to remove logging/util functions from the trace */
-        if (stackFramesToTruncate === void 0) { stackFramesToTruncate = 0; }
+    function Exception(message, options) {
         var _this = _super.call(this, message) || this;
         _this.message = message;
-        _this.innerException = innerException;
+        if (options == null) {
+            options = {};
+        }
+        if (options.stackFramesToTruncate == null) {
+            options.stackFramesToTruncate = 0;
+        }
+        _this.options = options;
         //if (environment.logLevel > environment.LogLevel.DEBUG) {
         //	innerException = null;
         //} else {
@@ -35,8 +43,8 @@ var Exception = (function (_super) {
         //		this.message = message + ": " + innerException.message;
         //	}
         //}
-        if (innerException != null) {
-            _this.message = message + " +details: " + innerException.message;
+        if (options.innerException != null) {
+            _this.message = message + " +details: " + options.innerException.message;
         }
         //get name based on type.  snippet taken from ./runtime/reflection.ts code
         //this.name = "Exception";
@@ -44,17 +52,26 @@ var Exception = (function (_super) {
         _this.name = (results && results.length > 1) ? results[1] : "";
         //this.message = message;
         //this.stack = (<any>new Error()).stack;		
-        var tempStack = new Error("boogah").stack;
-        //console.log("================START STACK================");
-        //console.log(tempStack);
-        //console.log("================END STACK================");
+        //remove our Error ctor from the stack (reduce unneeded verbosity of stack trace)
+        var defaultFramesToRemove = 1;
+        var tempStack;
+        if (_this.stack == null) {
+            tempStack = new Error("Error Shim").stack;
+            //remove our extra errorShim ctor off the stack trace
+            defaultFramesToRemove = 2;
+        }
+        else {
+            tempStack = _this.stack;
+        }
+        //truncate the stack if set by options
         var _array = tempStack.split("\n");
-        if (_array.length > (2 + stackFramesToTruncate)) {
+        if (_array.length > (defaultFramesToRemove + options.stackFramesToTruncate)) {
             var line1 = _array.shift();
             var line2 = _array.shift();
-            for (var i = 0; i < stackFramesToTruncate; i++) {
+            for (var i = 0; i < options.stackFramesToTruncate; i++) {
                 _array.shift();
             }
+            //put the message as the first item in the stack (as what normally is seen)
             _array.unshift(_this.name + ": " + _this.message);
         }
         var finalStack = _array.join("\n");
@@ -71,7 +88,7 @@ var Exception = (function (_super) {
         var msg = ex.name + ": " + ex.message;
         var stack = ex.stack;
         if (stack) {
-            if (stack.join != undefined) {
+            if (stack.join != null) {
                 stack = stack.join("\n");
             }
             if (environment.platformType === environment.PlatformType.NodeJs) {
@@ -86,19 +103,19 @@ var Exception = (function (_super) {
     };
     Exception.prototype.toString = function () {
         if (environment.logLevel > environment.LogLevel.DEBUG) {
-            if (this.innerException == null) {
+            if (this.options.innerException == null) {
                 return this.message;
             }
             else {
-                return this.message + "\n\t innerException: " + this.innerException.message;
+                return this.message + "\n\t innerException: " + this.options.innerException.message;
             }
         }
         else {
-            if (this.innerException == null) {
+            if (this.options.innerException == null) {
                 return this.toStringWithStack();
             }
             else {
-                return Exception.exceptionToString(this) + "\n\t innerException: " + this.innerException.toString();
+                return Exception.exceptionToString(this) + "\n\t innerException: " + this.options.innerException.toString();
             }
         }
         //if (this.innerException == null) {
@@ -109,13 +126,13 @@ var Exception = (function (_super) {
     };
     return Exception;
 }(Error));
-exports.Exception = Exception;
 Exception._getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
+exports.Exception = Exception;
 /** all errors thrown by corelib extend this error type */
 var CorelibException = (function (_super) {
     __extends(CorelibException, _super);
     function CorelibException() {
-        return _super.apply(this, arguments) || this;
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     return CorelibException;
 }(Exception));
@@ -134,3 +151,4 @@ var HttpStatusCodeException = (function (_super) {
     return HttpStatusCodeException;
 }(Exception));
 exports.HttpStatusCodeException = HttpStatusCodeException;
+//# sourceMappingURL=exception.js.map

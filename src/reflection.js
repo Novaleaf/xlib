@@ -1,9 +1,12 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //export import _common = require("./reflection/_common");
 //import stringHelper = require("../stringhelper");
 //import arrayHelper = require("../arrayhelper");
 var ex = require("./exception");
+var _ = require("lodash");
 /** primitive types as identified by javascript, plus well known object types */
+var Type;
 (function (Type) {
     /** null is not undefined, unfortunately  */
     Type[Type["null"] = 0] = "null";
@@ -19,8 +22,7 @@ var ex = require("./exception");
     Type[Type["Array"] = 8] = "Array";
     Type[Type["RegExp"] = 9] = "RegExp";
     Type[Type["Date"] = 10] = "Date";
-})(exports.Type || (exports.Type = {}));
-var Type = exports.Type;
+})(Type = exports.Type || (exports.Type = {}));
 //OBSOLETE: just use getType() instead
 //export function isFunction(it) {
 //	return Object.prototype.toString.call(it) === "[object Function]";
@@ -28,7 +30,7 @@ var Type = exports.Type;
 /** provides the primitive type of a variable. better than using 'typeof()' because this handles array and null. */
 function getType(obj) {
     if (obj === null) {
-        return Type["null"];
+        return Type.null;
     }
     var type = typeof (obj);
     switch (type) {
@@ -67,18 +69,47 @@ function getTypeName(obj) {
     switch (type) {
         case Type.object:
         case Type.Error:
-            try {
-                var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
-                var results = (_getTypeNameOrFuncNameRegex).exec((obj).constructor.toString());
-                return (results && results.length > 1) ? results[1] : "";
+            //by default, try reading the obj.constructor.name property
+            if (obj.constructor != null && obj.constructor.name != null && _.isString(obj.constructor.name) === true && obj.constructor.name.length > 0) {
+                return obj.constructor.name;
             }
-            catch (ex) {
+            if (obj.constructor == null || obj.constructor.toString == null) {
+                return "[*POJO*]";
+            }
+            //fall back to extracting the name from the obj.constructor.toString() text
+            var ctorStr = (obj).constructor.toString();
+            if (ctorStr.indexOf("class") === 0) {
                 try {
-                    return typeof (obj);
+                    var _getTypeNameOrClassNameRegex = /class\s(.{1,}?)\s/;
+                    var results = (_getTypeNameOrClassNameRegex).exec(ctorStr);
+                    return (results && results.length > 1) ? results[1] : "UnknownType";
                 }
                 catch (ex) {
-                    return "UnknownType";
+                    try {
+                        return typeof (obj);
+                    }
+                    catch (ex) {
+                        return "UnknownType";
+                    }
                 }
+            }
+            else if (ctorStr.indexOf("function") === 0) {
+                try {
+                    var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
+                    var results = (_getTypeNameOrFuncNameRegex).exec(ctorStr);
+                    return (results && results.length > 1) ? results[1] : "UnknownType";
+                }
+                catch (ex) {
+                    try {
+                        return typeof (obj);
+                    }
+                    catch (ex) {
+                        return "UnknownType";
+                    }
+                }
+            }
+            else {
+                return "UnknownType";
             }
         default:
             var str = Type[type]; //type.toString();
@@ -134,3 +165,4 @@ exports.mapArgumentsValues = mapArgumentsValues;
 //	var names = getArgumentNames(caller);
 //	return _nameArgs(names, args);
 //}
+//# sourceMappingURL=reflection.js.map

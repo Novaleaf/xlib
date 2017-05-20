@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //export import _ = require("lodash");
 var _ = require("lodash");
 exports._ = _;
@@ -32,6 +33,16 @@ function defaultIfNull(value, defaultValue) {
     return value == null ? defaultValue : value;
 }
 exports.defaultIfNull = defaultIfNull;
+/** if an unhandled exception is thrown when evaluating the "action" function, the defaultValue will be used" */
+function defaultIfThrow(action, defaultValue) {
+    try {
+        return action();
+    }
+    catch (ex) {
+        return defaultValue;
+    }
+}
+exports.defaultIfThrow = defaultIfThrow;
 function forEachArray(
     /** if a collection (an object with a .length property), will enumerate indicies */
     collection, func, 
@@ -100,7 +111,7 @@ function forEachProperty(
         throw new Error("input object is null/undefined");
     }
     for (var key in object) {
-        if (object.hasOwnProperty(key)) {
+        if (object.hasOwnProperty != null && object.hasOwnProperty(key)) {
             if (func(object[key], key, object) === false) {
                 //yielded
                 return false;
@@ -350,12 +361,12 @@ example usage:  object.callback = __.chainCallbacks(object.callback, myCallback,
 function chainCallbacks() {
     var callbacks = [];
     for (var _i = 0; _i < arguments.length; _i++) {
-        callbacks[_i - 0] = arguments[_i];
+        callbacks[_i] = arguments[_i];
     }
     return function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
+            args[_i] = arguments[_i];
         }
         for (var i = 0; i < callbacks.length; i++) {
             if (callbacks[i] != null) {
@@ -388,7 +399,7 @@ function createCallableInstance(
     var toReturn = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
+            args[_i] = arguments[_i];
         }
         return nakedCallableMethod.apply(toReturn, args);
     };
@@ -430,26 +441,4 @@ function disablePropertyEnumeration(obj, propertyName) {
     }
 }
 exports.disablePropertyEnumeration = disablePropertyEnumeration;
-//import * as util from "util";
-///** inherit the prototype methods from one constructor into another. The prototype of constructor will be set to a new object created from superConstructor.
-//As an additional convenience, superConstructor will be accessible through the constructor.super_ property.
-//var util = require("util");
-//var events = require("events");
-//function MyStream() {
-//	events.EventEmitter.call(this);
-//}
-//util.inherits(MyStream, events.EventEmitter);
-//MyStream.prototype.write = function(data) {
-//	this.emit("data", data);
-//}
-//var stream = new MyStream();
-//console.log(stream instanceof events.EventEmitter); // true
-//console.log(MyStream.super_ === events.EventEmitter); // true
-//stream.on("data", function(data) {
-//	console.log('Received data: "' + data + '"');
-//})
-//stream.write("It works!"); // Received data: "It works!" 
-//*/
-//export function inherits(constructor: any, superConstructor: any) {
-//	util.inherits(constructor, superConstructor);
-//}
+//# sourceMappingURL=jshelper.js.map

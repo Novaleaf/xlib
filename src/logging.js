@@ -1,9 +1,15 @@
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var ex = require("./exception");
 var environment = require("./environment");
 var stringHelper = require("./stringhelper");
@@ -20,7 +26,7 @@ var Exception = ex.Exception;
 var LoggerFatalException = (function (_super) {
     __extends(LoggerFatalException, _super);
     function LoggerFatalException() {
-        return _super.apply(this, arguments) || this;
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     return LoggerFatalException;
 }(Exception));
@@ -43,7 +49,7 @@ var Chalk = require("chalk");
  * @param input
  */
 function colorCodeToString(input, currentColor) {
-    var defaultColor = { foreground: "grey", background: "black", bold: false, highIntensity: false };
+    var defaultColor = { foreground: "grey", background: "black", bold: false, highIntensity: false, };
     var result = _.clone(defaultColor);
     if (currentColor != null) {
         result = _.clone(currentColor);
@@ -190,7 +196,7 @@ function colorCodeToString(input, currentColor) {
     }
     return result;
 }
-/** console logger logs to screen as simple text....*/
+/** console logger logs to screen as simple text...*/
 var Logger = (function () {
     //INTERNAL NOTE:  This is a replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) 
     //works well, but it would be better with a pluggable global listener, to log to various other locations (email)
@@ -221,7 +227,8 @@ var Logger = (function () {
                 case reflection.Type.Error:
                     var objArg;
                     try {
-                        objArg = (serialization.JSONX.inspectStringify(arg, 3, false, true, undefined, undefined, "\t"));
+                        objArg = (serialization.JSONX.inspectStringify(arg, 4, false, true, undefined, undefined, "\t"));
+                        //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
                     }
                     catch (ex) {
                         objArg = ("[Object???]");
@@ -231,7 +238,8 @@ var Logger = (function () {
                 case reflection.Type.object:
                     var objArg;
                     try {
-                        objArg = (serialization.JSONX.inspectStringify(arg, 3, false, false, undefined, undefined, "\t"));
+                        objArg = (serialization.JSONX.inspectStringify(arg, 4, false, false, undefined, undefined, "\t"));
+                        //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
                     }
                     catch (ex) {
                         objArg = ("[Object???]");
@@ -314,8 +322,6 @@ var Logger = (function () {
             case environment.PlatformType.Browser:
                 switch (targetLogLevel) {
                     case environment.LogLevel.TRACE:
-                        console.trace.apply(console, finalArgs);
-                        break;
                     case environment.LogLevel.DEBUG:
                         if (console.groupCollapsed != null) {
                             console.groupCollapsed.apply(console, finalArgs); //("...trace...");
@@ -341,10 +347,20 @@ var Logger = (function () {
                         console.warn.apply(console, finalArgs);
                         break;
                     case environment.LogLevel.ERROR:
-                        console.error.apply(console, finalArgs);
+                        if (environment.isDev === true) {
+                            console.assert.bind(console, false).apply(console, finalArgs);
+                        }
+                        else {
+                            console.error.apply(console, finalArgs);
+                        }
                         break;
                     case environment.LogLevel.FATAL:
-                        console.error.apply(console, finalArgs);
+                        if (environment.isDev === true) {
+                            console.assert.bind(console, false).apply(console, finalArgs);
+                        }
+                        else {
+                            console.error.apply(console, finalArgs);
+                        }
                         break;
                     default:
                         throw new LoggerFatalException("unknown targetLogLevel");
@@ -386,28 +402,28 @@ var Logger = (function () {
     Logger.prototype.trace = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
+            args[_i] = arguments[_i];
         }
         this._log(environment.LogLevel.TRACE, args);
     };
     Logger.prototype.debug = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
+            args[_i] = arguments[_i];
         }
         this._log(environment.LogLevel.DEBUG, args);
     };
     Logger.prototype.info = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
+            args[_i] = arguments[_i];
         }
         this._log(environment.LogLevel.INFO, args);
     };
     Logger.prototype.warn = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
+            args[_i] = arguments[_i];
         }
         this._log(environment.LogLevel.WARN, args);
     };
@@ -419,7 +435,7 @@ var Logger = (function () {
     Logger.prototype.error = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
+            args[_i] = arguments[_i];
         }
         var finalArgs = this._log(environment.LogLevel.ERROR, args);
         if (finalArgs != null) {
@@ -430,10 +446,10 @@ var Logger = (function () {
             else {
                 message = finalArgs.join("\n");
             }
-            return new ex.Exception(message, undefined, 1);
+            return new ex.Exception(message, { stackFramesToTruncate: 1 });
         }
         else {
-            return new ex.Exception("Error", undefined, 1);
+            return new ex.Exception("Error", { stackFramesToTruncate: 1 });
         }
     };
     /**
@@ -441,7 +457,7 @@ var Logger = (function () {
      * @param testCondition
      * @param args
      */
-    Logger.prototype.errorAndThrowIf = function (testCondition) {
+    Logger.prototype.errorAndThrowIfFalse = function (testCondition) {
         var args = [];
         for (var _i = 1; _i < arguments.length; _i++) {
             args[_i - 1] = arguments[_i];
@@ -450,19 +466,23 @@ var Logger = (function () {
             return;
         }
         if (testCondition !== false) {
-            throw new ex.CorelibException("first parameter to assert must evaluate to true or false");
+            throw new ex.Exception("first parameter to assert must evaluate to true or false");
         }
-        throw this.error.apply(this, args);
+        var resultError = this.error.apply(this, args);
+        // if(environment.isDev===true){
+        // 	console.assert(false,"errorAndThrowIfFalse() failed test, about to throw.  investigate above error details. (note:  this assert is shown because environment.isDev===true)");
+        // }
+        throw resultError;
     };
     Logger.prototype.fatal = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
+            args[_i] = arguments[_i];
         }
         args.unshift(false);
         this.assert.apply(this, args);
         args.shift();
-        throw new ex.CorelibException(stringHelper.format.apply(stringHelper, args), undefined, 1);
+        throw new ex.Exception(stringHelper.format.apply(stringHelper, args), { stackFramesToTruncate: 1 });
     };
     /**
      *  for dev-time and testing,   not for catching production issues as this can be no-opted during minification.  if you want to test in a production environment, use .errorAndThrowIf()
@@ -521,6 +541,7 @@ var Logger = (function () {
         }
         var msg = "TODO: " + jsHelper.apply(stringHelper.format, null, params, [format]); //.apply(null,format, params);
         this.assert(false, msg);
+        throw this.error(msg);
     };
     Logger.prototype.deprecated = function (message) {
         this.warn("log.deprecated(" + message + ")");
@@ -822,4 +843,5 @@ exports.Logger = Logger;
 //////////		}
 //////////		log.trace("corelib.Logger", " ======== NO TRACE FILTERS HAVE BEEN SPECIFIED!  ALL TRACES ENABLED!  =================  \n{0}\n-------------------------------------", msg);
 //////////	}
-//////////} 
+//////////}
+//# sourceMappingURL=logging.js.map

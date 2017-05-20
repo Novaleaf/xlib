@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //import * as ex from "../exception";
 //import * as ex from "../exception";
 /** helpers for backend node.js stuff  NODE.JS ONLY!!! */
@@ -150,3 +151,4 @@ function getCommandlineArg(key, valueIfNullOrEmpty) {
     return result;
 }
 exports.getCommandlineArg = getCommandlineArg;
+//# sourceMappingURL=nodehelper.js.map

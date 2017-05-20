@@ -7,7 +7,7 @@
     "sourceMap": true,
     "inlineSources": false,
     "inlineSourceMap": false,
-    "declaration": true,
+    //"declaration": true,
     "jsx": "react",
     "newLine": "LF",
     "pretty": true,
@@ -17,9 +17,11 @@
     "watch": false,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
+    "downlevelIteration": true,
 
-    "outDir": "./dist",
-    "rootDir": "./src",
+    //"outDir": "./dist",
+    //"rootDir": "./src",
+    //"sourceRoot": "../",
 
     "noImplicitReturns": true,
     "noImplicitAny": true,
@@ -30,7 +32,6 @@
     //"types": ["bluebird", "mocha", "node"],
     //workaround for npm linking projects and associated dupe identifier bugs: https://github.com/Microsoft/TypeScript/issues/9566#issuecomment-287633339
     "baseUrl": "./",
-
     "paths": {
       "*": [
         "node_modules/@types/*",
