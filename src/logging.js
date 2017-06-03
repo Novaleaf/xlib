@@ -225,26 +225,32 @@ var Logger = (function () {
             var type = reflection.getType(arg);
             switch (type) {
                 case reflection.Type.Error:
-                    var objArg;
-                    try {
-                        objArg = (serialization.JSONX.inspectStringify(arg, 4, false, true, undefined, undefined, "\t"));
-                        //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
+                    {
+                        var objArg = void 0;
+                        try {
+                            objArg = (serialization.JSONX.inspectStringify(arg, 4, false, true, undefined, undefined, "\t"));
+                            //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
+                        }
+                        catch (ex) {
+                            objArg = ("[Object???]");
+                        }
+                        objArg = stringHelper.summarize(objArg, 3000); //set max length of object being logged.
+                        finalArgs.push(Chalk.red.bold(objArg));
                     }
-                    catch (ex) {
-                        objArg = ("[Object???]");
-                    }
-                    finalArgs.push(Chalk.red.bold(objArg));
                     break;
                 case reflection.Type.object:
-                    var objArg;
-                    try {
-                        objArg = (serialization.JSONX.inspectStringify(arg, 4, false, false, undefined, undefined, "\t"));
-                        //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
+                    {
+                        var objArg = void 0;
+                        try {
+                            objArg = (serialization.JSONX.inspectStringify(arg, 4, false, false, undefined, undefined, "\t"));
+                            //finalArgs.push(JSON.stringify(arg,undefined,"\t"));
+                        }
+                        catch (ex) {
+                            objArg = ("[Object???]");
+                        }
+                        objArg = stringHelper.summarize(objArg, 3000); //set max length of object being logged.
+                        finalArgs.push(Chalk.green.bold(objArg));
                     }
-                    catch (ex) {
-                        objArg = ("[Object???]");
-                    }
-                    finalArgs.push(Chalk.green.bold(objArg));
                     break;
                 default:
                     finalArgs.push(arg);

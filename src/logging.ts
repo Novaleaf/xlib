@@ -240,26 +240,32 @@ export class Logger {
 
 			switch ( type ) {
 				case reflection.Type.Error:
-					var objArg: any;
-					try {
-						objArg = ( serialization.JSONX.inspectStringify( arg, 4, false, true, undefined, undefined, "\t" ) );
-						//finalArgs.push(JSON.stringify(arg,undefined,"\t"));
-					} catch ( ex ) {
-						objArg = ( "[Object???]" );
+					{
+						let objArg: string;
+						try {
+							objArg = (serialization.JSONX.inspectStringify(arg, 4, false, true, undefined, undefined, "\t"));
+							//finalArgs.push(JSON.stringify(arg,undefined,"\t"));
+						} catch (ex) {
+							objArg = ("[Object???]");
 
+						}
+						objArg = stringHelper.summarize(objArg, 3000);//set max length of object being logged.
+						finalArgs.push(Chalk.red.bold(objArg));
 					}
-					finalArgs.push( Chalk.red.bold( objArg ) );
 					break;
 				case reflection.Type.object:
-					var objArg: any;
-					try {
-						objArg = ( serialization.JSONX.inspectStringify( arg, 4, false, false, undefined, undefined, "\t" ) );
-						//finalArgs.push(JSON.stringify(arg,undefined,"\t"));
-					} catch ( ex ) {
-						objArg = ( "[Object???]" );
+					{
+						let objArg: string;
+						try {
+							objArg = (serialization.JSONX.inspectStringify(arg, 4, false, false, undefined, undefined, "\t"));
+							//finalArgs.push(JSON.stringify(arg,undefined,"\t"));
+						} catch (ex) {
+							objArg = ("[Object???]");
 
+						}
+						objArg = stringHelper.summarize(objArg, 3000); //set max length of object being logged.
+						finalArgs.push(Chalk.green.bold(objArg));
 					}
-					finalArgs.push( Chalk.green.bold( objArg ) );
 					break;
 				default:
 					finalArgs.push( arg );
