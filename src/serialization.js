@@ -401,9 +401,14 @@ deserializes from a more relaxed superset of json (allows syntactically correct 
                                 default:
                                     //try to see if a .toJSON() method exists
                                     if (typeof (node["toJSON"]) !== "undefined") {
-                                        var toJsonDetails = node.toJSON();
-                                        toJsonDetails["[*TYPE*]"] = typeName;
-                                        return toJsonDetails;
+                                        try {
+                                            var toJsonDetails = node.toJSON();
+                                            toJsonDetails["[*TYPE*]"] = typeName;
+                                            return toJsonDetails;
+                                        }
+                                        catch (ex) {
+                                            //fall back to a recursion method below....
+                                        }
                                     }
                                     break;
                             }
