@@ -7,6 +7,7 @@
 //import * as environment from "./environment";
 import * as environment from "./environment";
 import * as _ from "lodash";
+import { jsHelper } from "../microclib";
 
 /** shape of errors */
 export interface IError {
@@ -126,7 +127,7 @@ export class Exception extends Error {
 	constructor( public message: string, options?: IExceptionOptions ) {
 
 		super( message );
-		Object.setPrototypeOf( this, new.target.prototype ); //fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
+		jsHelper.setPrototypeOf( this, new.target.prototype ); //fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
 
 		options = {
 			stackFramesToTruncate: 0,
@@ -184,10 +185,11 @@ export class Exception extends Error {
 
 
 		//get name based on type.  snippet taken from ./runtime/reflection.ts code
-		if ( this.constructor.name != null ) {
+		if ( ( this.constructor as any ).name != null ) {
 			//es6
-			this.name = this.constructor.name;
+			this.name = ( this.constructor as any ).name;
 		} else {
+			//es5
 			var results = ( Exception._getTypeNameOrFuncNameRegex ).exec( ( this ).constructor.toString() );
 			this.name = ( results && results.length > 1 ) ? results[ 1 ] : "";
 		}

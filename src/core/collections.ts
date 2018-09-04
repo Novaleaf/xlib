@@ -6,7 +6,7 @@ import numHelper = require( "./numhelper" );
 import ex = require( "./exception" )
 //import runtime = require("./runtime");
 //import diagnostics = require("./diagnostics");
-
+import * as bb from "bluebird";
 import * as moment from "moment";
 
 /** up to 32 true/false values stored in 32bits (a bitmask) */
@@ -337,11 +337,11 @@ interface IExpiresDictionaryItem<TValue> {
  * @param collection
  * @param callback
  */
-export function ezForEachAndRemove<TItem>( collection: { [ key: string ]: TItem }, callback: ( item: TItem, key: string ) => Promise<any> ): Promise<void> {
+export function ezForEachAndRemove<TItem>( collection: { [ key: string ]: TItem }, callback: ( item: TItem, key: string ) => bb<any> ): bb<void> {
 
 	let keys = Object.keys( collection );
 	let nextIndex = 0;
-	let toReturn = new Promise<void>( ( resolve, reject ) => {
+	let toReturn = new bb<void>( ( resolve, reject ) => {
 		function _iterationWorker() {
 			if ( nextIndex >= keys.length ) {
 				return resolve();

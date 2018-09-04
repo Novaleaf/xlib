@@ -6,6 +6,7 @@ const numHelper = require("./numhelper");
 const ex = require("./exception");
 //import runtime = require("./runtime");
 //import diagnostics = require("./diagnostics");
+const bb = require("bluebird");
 const moment = require("moment");
 /** up to 32 true/false values stored in 32bits (a bitmask) */
 class BitFlags {
@@ -278,7 +279,7 @@ exports.ExpiresDictionary = ExpiresDictionary;
 function ezForEachAndRemove(collection, callback) {
     let keys = Object.keys(collection);
     let nextIndex = 0;
-    let toReturn = new Promise((resolve, reject) => {
+    let toReturn = new bb((resolve, reject) => {
         function _iterationWorker() {
             if (nextIndex >= keys.length) {
                 return resolve();

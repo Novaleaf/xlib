@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const bb = require("bluebird");
 const _ = require("lodash");
 const moment = require("moment");
 const exception = require("./exception");
@@ -69,7 +70,7 @@ class Cache {
         }
         if (cacheItem.value !== undefined && cacheItem.expires > now) {
             //stored is valid
-            return Promise.resolve(returnOrClone(cacheItem.value));
+            return bb.resolve(returnOrClone(cacheItem.value));
         }
         if (cacheItem.currentFetch != null) {
             //already a fetch in progress, so we should not kick off another
@@ -82,7 +83,7 @@ class Cache {
             }
             else {
                 //return cached value
-                return Promise.resolve(returnOrClone(cacheItem.value));
+                return bb.resolve(returnOrClone(cacheItem.value));
             }
         }
         //need to fetch a new value, so start refetching new
@@ -95,7 +96,7 @@ class Cache {
             cacheItem.expires = now.clone().add(fetchExpiresDuration);
             cacheItem.gcAfter = cacheItem.expires.clone().add(fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds");
             //we might want to clone the resule
-            return Promise.resolve(returnOrClone(cacheItem.value));
+            return bb.resolve(returnOrClone(cacheItem.value));
         });
         if (cacheItem.value === undefined) {
             //nothing cached at all, so await current fetch
@@ -110,7 +111,7 @@ class Cache {
             return cacheItem.currentFetch;
         }
         //ok with the stale value
-        return Promise.resolve(returnOrClone(cacheItem.value));
+        return bb.resolve(returnOrClone(cacheItem.value));
     }
     /**
      *  force update/insert the cache.   to delete, set newCacheItem to null

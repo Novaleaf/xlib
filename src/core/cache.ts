@@ -1,5 +1,7 @@
 ﻿"use strict";
 
+import * as bb from "bluebird";
+
 import stringHelper = require( "./stringhelper" );
 
 import _ = require( "lodash" );
@@ -12,7 +14,7 @@ import exception = require( "./exception" );
 
 import reflection = require( "./reflection" );
 
-import diagnostics = require( "./diagnostics" )
+import diagnostics = require( "./diagnostics" );
 var log = new diagnostics.logging.Logger( __filename );
 
 interface ICacheItem<TValue> {
@@ -24,7 +26,7 @@ interface ICacheItem<TValue> {
     //*/
     //awaitNewOnExpired?: boolean | moment.Duration;
     /** set if a fetch is occuring.  if true, we will not kick off another fetch, but (if awaitNewOnExpired) will await the currentFetch results */
-    currentFetch?: Promise<TValue>;
+    currentFetch?: bb<TValue>;
 
     /** specifies when this can be collected by the GC (when cache item is not used) */
     gcAfter: moment.Moment;
@@ -52,7 +54,7 @@ export class Cache {
      * @param key
      * @param fetchFunction
      */
-    public read<TValue>( key: string, fetchFunction: () => Promise<TValue>,
+    public read<TValue>( key: string, fetchFunction: () => bb<TValue>,
 
         options?: {
             /**if we need to fetch, how long the new value will be valid for.  default 10 minutes. */
@@ -73,7 +75,7 @@ export class Cache {
             /** multipler for how long the cache item should be kept after the fetchExpires threshhold is exceeded.    default is 3x (so a total of 4x from when the request was made)*/
             gcAfterMultipler?: number;
         }
-    ): Promise<TValue> {
+    ): bb<TValue> {
 
 
 
@@ -126,7 +128,7 @@ export class Cache {
 
         if ( cacheItem.value !== undefined && cacheItem.expires > now ) {
             //stored is valid
-            return Promise.resolve( returnOrClone( cacheItem.value ) );
+            return bb.resolve( returnOrClone( cacheItem.value ) );
         }
 
         if ( cacheItem.currentFetch != null ) {
@@ -143,7 +145,7 @@ export class Cache {
 
             } else {
                 //return cached value
-                return Promise.resolve( returnOrClone( cacheItem.value ) );
+                return bb.resolve( returnOrClone( cacheItem.value ) );
             }
         }
 
@@ -163,7 +165,7 @@ export class Cache {
             cacheItem.gcAfter = cacheItem.expires.clone().add( fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds" );
 
             //we might want to clone the resule
-            return Promise.resolve( returnOrClone( cacheItem.value ) );
+            return bb.resolve( returnOrClone( cacheItem.value ) );
         } );
 
 
@@ -184,7 +186,7 @@ export class Cache {
         }
 
         //ok with the stale value
-        return Promise.resolve( returnOrClone( cacheItem.value ) );
+        return bb.resolve( returnOrClone( cacheItem.value ) );
     }
 
     /**

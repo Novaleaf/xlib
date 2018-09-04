@@ -39,12 +39,13 @@ log.info("hi",{some:"data"});
 ```
 
 ## Functionality
-*this section will probabbly be removed when API documentation generation is working.*
+
+see [the generated api docs here](./docs/index.html). though the doc generator (TypeDoc) is severely lacking, so best to use the intelisence of your favorite code editor.
+
 
 The main functional areas ```xlib``` covers
 - Cache (collection with expiring values)
 - Collection (utilities for collections)
-- Compression (just zlib for now)
 - DateTime (moment and moment utils)
 - Environment (cross-platform environment variables and platform detection)
 - Exception (improved exception base class)
@@ -54,7 +55,7 @@ The main functional areas ```xlib``` covers
 - Reflection (hight quality runtime type detection and utils)
 - Security (crypto utils)
 - Serialization (robust and user friendly JSON (de)serialization)
-- Threading (read/write lock and async)
+- Threading (read/write lock)
 - Validation (user input scrubbing)
 - Utility (lodash, jsHelpers, Array/Number/String utils)
 

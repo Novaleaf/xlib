@@ -9,6 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
+const bb = require("bluebird");
+//declare var Promise: bb<any>;
+//import * as Promise from "bluebird";
 // /// <reference path="../typings/all.d.ts" />
 // ///** https://adambom.github.io/parallel.js/ 
 // // * Parallel Computing with Javascript
@@ -148,7 +151,7 @@ class AsyncReaderWriterLock {
                 //this.pendingReads.push(promise.CreateExposedPromise());
                 this.pendingReadCount++;
                 while (this.pendingWrites.length > 0) {
-                    yield Promise.all(this.pendingWrites);
+                    yield bb.all(this.pendingWrites);
                 }
                 this.pendingReadCount--;
             }
@@ -188,7 +191,7 @@ class AsyncReaderWriterLock {
             }
             //wait while there are still active reads
             while (this.currentReads.length > 0) {
-                yield Promise.all(this.currentReads);
+                yield bb.all(this.currentReads);
             }
             //now on the item        
             log.assert(this.currentWrite == null, "race, current write should not be possible while start writing");
@@ -200,8 +203,8 @@ class AsyncReaderWriterLock {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 //log.assert( thisWrite._tags.writeId === writeId, "writeId mismatch" );
-                if (valueOrWritePromise instanceof Promise || (_.isObject(valueOrWritePromise) && _.isFunction(valueOrWritePromise.then))) {
-                    this._value = yield Promise.resolve(valueOrWritePromise);
+                if (valueOrWritePromise instanceof bb || (_.isObject(valueOrWritePromise) && _.isFunction(valueOrWritePromise.then))) {
+                    this._value = yield bb.resolve(valueOrWritePromise);
                 }
                 else {
                     this._value = valueOrWritePromise;
@@ -226,7 +229,7 @@ class AsyncReaderWriterLock {
             yield this.readBegin();
             try {
                 if (readFcn != null) {
-                    yield Promise.resolve(this._value).then(readFcn);
+                    yield bb.resolve(this._value).then(readFcn);
                 }
                 return this._value;
             }

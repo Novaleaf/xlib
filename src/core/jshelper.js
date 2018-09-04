@@ -29,6 +29,17 @@ function defaultIfNull(value, defaultValue) {
     return value == null ? defaultValue : value;
 }
 exports.defaultIfNull = defaultIfNull;
+/** invokes the native es6 Object.setPrototypeOf() if it exists.  if not, calls a pollyfill.  Note: pollyfill works on old Chrome/Firefox, NOT IE10 or below. */
+function setPrototypeOf(obj, newPrototype) {
+    if (Object.setPrototypeOf != null) {
+        return Object.setPrototypeOf(obj, newPrototype);
+    }
+    else {
+        obj.__proto__ = newPrototype;
+        return obj;
+    }
+}
+exports.setPrototypeOf = setPrototypeOf;
 /**
 * Helper function for iterating over values in the array. If the func returns
 * a false value, it will break out of the loop.

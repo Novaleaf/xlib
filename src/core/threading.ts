@@ -1,5 +1,10 @@
 "use strict";
 import * as _ from "lodash";
+import * as bb from "bluebird";
+//declare var Promise: bb<any>;
+
+
+//import * as Promise from "bluebird";
 // /// <reference path="../typings/all.d.ts" />
 
 // ///** https://adambom.github.io/parallel.js/ 
@@ -162,7 +167,7 @@ export class AsyncReaderWriterLock<TValue=void> {
             //this.pendingReads.push(promise.CreateExposedPromise());
             this.pendingReadCount++;
             while ( this.pendingWrites.length > 0 ) {
-                await Promise.all( this.pendingWrites );
+                await bb.all( this.pendingWrites );
             }
             this.pendingReadCount--;
         }
@@ -206,7 +211,7 @@ export class AsyncReaderWriterLock<TValue=void> {
         }
         //wait while there are still active reads
         while ( this.currentReads.length > 0 ) {
-            await Promise.all( this.currentReads );
+            await bb.all( this.currentReads );
         }
         //now on the item        
         log.assert( this.currentWrite == null, "race, current write should not be possible while start writing" );
@@ -219,8 +224,8 @@ export class AsyncReaderWriterLock<TValue=void> {
 
         try {
             //log.assert( thisWrite._tags.writeId === writeId, "writeId mismatch" );
-            if ( valueOrWritePromise instanceof Promise || ( _.isObject( valueOrWritePromise ) && _.isFunction( ( valueOrWritePromise as any as Promise<any> ).then ) ) ) {
-                this._value = await Promise.resolve( valueOrWritePromise );
+            if ( valueOrWritePromise instanceof bb || ( _.isObject( valueOrWritePromise ) && _.isFunction( ( valueOrWritePromise as any as Promise<any> ).then ) ) ) {
+                this._value = await bb.resolve( valueOrWritePromise );
             } else {
                 this._value = valueOrWritePromise as any;
             }
@@ -245,7 +250,7 @@ export class AsyncReaderWriterLock<TValue=void> {
 
         try {
             if ( readFcn != null ) {
-                await Promise.resolve( this._value ).then( readFcn );
+                await bb.resolve( this._value ).then( readFcn );
             }
             return this._value;
         } finally {
