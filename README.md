@@ -1,37 +1,24 @@
-*Best used with Typescript 2.x*
+*Best used with Typescript 3.x*
+
 
 --------
 # Abstract
+
 **```xlib```** is a monolitic core/utilities library.  It's designed to be a one-stop-shop for professional developers who need functionality that will work across Browser or Server.  
 
---------
-# Limitations
-While **```xlib```** aims to cover the range of functionality any frontend or backend developer would need, there are a few caveats: 
 
-1) No ```.md``` or ```.html``` API Docs yet.  ```xlib``` was designed with Typescript 2.x in mind, but the main documentation tool [TypeDoc](http://typedoc.org) does not yet support Typescript 2.x.  When TypeDoc is upgraded, we will add docs.  However, if you are using Typescriptt 2.x the intellisence works fine right now!
-1) ```xlib``` *(mostly)* doesn't include the ```NodeJs``` standard modules.  This is because we expect you to use ```WebPack``` or ```Browserify``` when building a Browser app (thus getting the ```NodeJs``` Modules already)
-1) Only **cross-platform** functionality is included.  Browser or Server specific functionality can be found in the 
-**[```blib```](https://www.npmjs.com/package/blib)** or **[```slib```](https://www.npmjs.com/package/slib)** libraries.
-1) Missing a scenario you need?  Please feel free to make a pull request, or add an issue to the issue tracker.
+# expected setup
 
---------
-# Installation
+While you can use ```npm install xlib``` to use this in just about any javascript project or environment, here are what we test with:
 
-## Server (NodeJs)
+- vscode v.latest
+- ts v3.x
+- node v8.x
 
-Tested with Node 6.x.  **IMPORTANT!** known not to work on node 4.x and lower, due to some sub-resource incompatability.  sorry :(  please use Node 6.x
 
-```bash
-npm install --save xlib
-```
 
 You can check out the [PhantomJsCloud](https://www.npmjs.com/package/phantomjscloud) NPM library for a real-life usage example.
 
-## Browser
-
-Tested with WebPack, works down to IE9.  Designed for development using Chrome (logging and stack traces tested)
-
-Use ```WebPack``` or ```Browserify```.  ```xlib``` is tested and compatible with WebPack.  Here is [an example using ```xlib``` with WebPack and React](https://www.npmjs.com/package/xlib-webpack-react-test) that includes minification.
 
 --------
 # Usage
@@ -39,11 +26,10 @@ Use ```WebPack``` or ```Browserify```.  ```xlib``` is tested and compatible with
 ```xlib``` is transpiled to ```es5``` compatable javascript using ```commonjs``` module format.   Thus you can consume it as you would any other NPM module:
 
 ```javascript
-//typescript 2.0 /es6 example:
+//typescript 3.0 /es6 example:
 
-import xlib = require("xlib");
-//or
 import * as xlib from "xlib";
+//override environment variables we otherwise read from the node.commandline, system.env, or browser.querystring
 
 
 //log something
@@ -110,8 +96,13 @@ import xlib = require("xlib");
 # Versioning / Upgrading
 ```xlib``` follows [Semver](https://docs.npmjs.com/getting-started/semantic-versioning) versioning.  Thus any breaking change will be released under a major version, and new functionality will be released under minor versions.  
 
-```xlib```'s core functionality has been used in production code for more than a year so major refactoring is not expected to occur.
+## v10.x restructure
 
+the 10.x  branch (and semver) is a restructure of this project to take advantage of the now fully mature typescript ecosystem.  Prior to 10.x, to publish a typescript project was a tedious process.
+
+## future work
+
+```xlib```'s core functionality has been used in production code since 2015.   While mostly stable since, a major refactor is expected to occur in the Dec 2018 timeframe, to better take advantage of improvements in typescript and javascript ecosystems.
 
 --------
 # Why

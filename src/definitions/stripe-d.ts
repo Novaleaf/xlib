@@ -1,15 +1,13 @@
-﻿
-/** stripe's values in definetely typed are for the online stripe checkout only.   this is for the node api.   anyone who want's to merge this with the definetely typed stored version can be my guest. */
 
-export interface StripeStatic {
-	(apiKey: string): StripeInstance;
-}
+
+export type StripeStatic = ( apiKey: string ) => StripeInstance;
 
 
 
 export interface IMetadata {
-	[key: string]: string
+	[ key: string ]: string
 }
+/** wrapper for how stripe returns arrays */
 export interface IList<T> {
 	/**
 	 * Value is 'list'
@@ -30,6 +28,173 @@ export interface IList<T> {
 	 * but you can request it by specifying ?include[]=total_count
 	 */
 	total_count: number;
+}
+/** Errors
+Stripe uses conventional HTTP response codes to indicate the success or failure of an API request. In general, codes in the 2xx range indicate success, codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.), and codes in the 5xx range indicate an error with Stripe's servers (these are rare).
+Not all errors map cleanly onto HTTP response codes, however. When a request is valid but does not complete successfully (e.g., a card is declined), we return a 402 error code. To understand why a card is declined, refer to the list of codes in the documentation.*/
+export interface IError extends Error {
+	/** inherited from Error, A human-readable message providing more details about the error. For card errors, these messages can be shown to your users */
+	message: string;
+	/** some processed form of rawType.   for example, 'card_error' turns to 'StripeCardError'. */
+	type: string;
+
+	/**The type of error returned. Can be: api_connection_error, api_error, authentication_error, card_error, invalid_request_error, or rate_limit_error.*/
+	rawType: string;// "api_connection_error" | "api_error" | "authentication_error" | "card_error" | "invalid_request_error" | "rate_limit_error";
+
+	/** inherited from Error */
+	stack: string;
+
+	/** "Error" */
+	name: string;
+	/**optional
+	For card errors, a short string from amongst those listed on the right describing the kind of card error that occurred.
+	example:  "card_declined"
+	*/
+	code?: string;
+	/**optional
+The parameter the error relates to if the error is parameter-specific. You can use this to display a message near the correct form field, for example.*/
+	param?: any;
+
+	detail?: string;
+	requestId?: string;
+	statusCode?: number;
+
+	/** raw error details returned from the stripe api.   see https://stripe.com/docs/api#errors */
+	raw: {
+		/**The type of error returned. Can be: api_connection_error, api_error, authentication_error, card_error, invalid_request_error, or rate_limit_error.*/
+		type: string;//"api_connection_error" | "api_error" | "authentication_error" | "card_error" | "invalid_request_error" | "rate_limit_error";
+		/**The ID of the failed charge.*/
+		charge: string;
+		/** optional. A human-readable message providing more details about the error. For card errors, these messages can be shown to your users.*/
+		message?: string;
+		/**optional
+	For card errors, a short string from amongst those listed on the right describing the kind of card error that occurred.
+		example:  "card_declined"*/
+		code?: string;
+		/**optional
+	For card errors resulting from a bank decline, a short string indicating the bank's reason for the decline if they provide one.
+		example:  "generic_decline"*/
+		decline_code?: string;
+		/**optional
+	The parameter the error relates to if the error is parameter-specific. You can use this to display a message near the correct form field, for example.*/
+		param?: any;
+	}
+
+}
+
+
+/**
+ *  helper function that will generate a user friendly debug POJO based on the error returned by stripe.
+ * @param error
+ */
+export function generateUserDebugInfo( error: IError ) {
+
+	const toReturn = {
+		name: error.name,
+		statusCode: error.statusCode,
+		type: error.rawType,
+		param: error.param,
+		message: error.message,
+		code: error.code,
+		details: error.detail,
+	};
+
+	if ( toReturn.details == null ) {
+		toReturn.details = "";
+	}
+
+	if ( error.raw == null ) {
+		//nothing more to do
+		return toReturn;
+	}
+
+	toReturn[ "charge" ] = error.raw.charge;
+
+	if ( error.raw.decline_code == null ) {
+		//nothing more to do
+		return toReturn;
+	}
+
+
+	toReturn[ "decline_code" ] = error.raw.decline_code;
+
+	let declineDetails: string;
+	switch ( error.raw.decline_code ) {
+
+		case "approve_with_id": declineDetails = "The payment cannot be authorized	The payment should be attempted again.If it still cannot be processed, the customer needs to contact their bank.";
+			break;
+		case "call_issuer": declineDetails = "The card has been declined for an unknown reason	The customer needs to contact their bank for more information.";
+			break;
+		case "card_not_supported": declineDetails = "The card does not support this type of purchase	The customer needs to contact their bank to make sure their card can be used to make this type of purchase.";
+			break;
+		case "card_velocity_exceeded": declineDetails = "The customer has exceeded the balance or credit limit available on their card.The customer should contact their bank for more information.";
+			break;
+		case "currency_not_supported": declineDetails = "The card does not support the specified currency.The customer needs check with the issuer that the card can be used for the type of currency specified.";
+			break;
+		case "do_not_honor": declineDetails = "The card has been declined for an unknown reason	The customer needs to contact their bank for more information.";
+			break;
+		case "do_not_try_again": declineDetails = "The card has been declined for an unknown reason	The customer should contact their bank for more information.";
+			break;
+		case "fraudulent": declineDetails = "The payment has been declined as the issuer suspects it is fraudulent	The customer should contact their bank for more information.";
+			break;
+		case "insufficient_funds": declineDetails = "The card has insufficient funds to complete the purchase	The customer should use an alternative payment method.";
+			break;
+		case "invalid_account": declineDetails = "The card, or account the card is connected to, is invalid	The customer needs to contact their bank to check that the card is working correctly.";
+			break;
+		case "invalid_amount": declineDetails = "The payment amount is invalid, or exceeds the amount that is allowed	If the amount appears to be correct, the customer needs to check with their bank that they can make purchases of that amount.";
+			break;
+		case "invalid_pin": declineDetails = "The PIN entered is incorrect.This decline code only applies to payments made with a card reader.The customer should try again using the correct PIN.";
+			break;
+		case "issuer_not_available": declineDetails = "The card issuer could not be reached, so the payment could not be authorized	The payment should be attempted again.If it still cannot be processed, the customer needs to contact their bank.";
+			break;
+		//case "lost_card": bankDeclineReason = "The payment has been declined because the card is reported lost	The specific reason for the decline should not be reported to the customer.Instead, it needs to be presented as a generic decline.";
+		//	break;
+		case "new_account_information_available": declineDetails = "The card, or account the card is connected to, is invalid	The customer needs to contact their bank for more information.";
+			break;
+		case "no_action_taken": declineDetails = "The card has been declined for an unknown reason	The customer should contact their bank for more information.";
+			break;
+		case "not_permitted": declineDetails = "The payment is not permitted	The customer needs to contact their bank for more information.";
+			break;
+		case "pickup_card": declineDetails = "The card cannot be used to make this payment (it is possible it has been reported lost or stolen)	The customer needs to contact their bank for more information.";
+			break;
+		case "reenter_transaction": declineDetails = "The payment could not be processed by the issuer for an unknown reason.The payment should be attempted again.If it still cannot be processed, the customer needs to contact their bank.";
+			break;
+		case "restricted_card": declineDetails = "The card cannot be used to make this payment (it is possible it has been reported lost or stolen)	The customer needs to contact their bank for more information.";
+			break;
+		case "revocation_of_all_authorizations": declineDetails = "The card has been declined for an unknown reason	The customer should contact their bank for more information.";
+			break;
+		case "revocation_of_authorization": declineDetails = "The card has been declined for an unknown reason	The customer should contact their bank for more information.";
+			break;
+		case "security_violation": declineDetails = "The card has been declined for an unknown reason	The customer needs to contact their bank for more information.";
+			break;
+		case "service_not_allowed": declineDetails = "The card has been declined for an unknown reason	The customer should contact their bank for more information.";
+			break;
+		//case "stolen_card": bankDeclineReason = "The payment has been declined because the card is reported stolen	The specific reason for the decline should not be reported to the customer.Instead, it needs to be presented as a generic decline.";
+		//	break;
+		case "stop_payment_order": declineDetails = "The card has been declined for an unknown reason	The customer should contact their bank for more information.";
+			break;
+		case "testmode_decline": declineDetails = "A Stripe test card number was used	A genuine card must be used to make a payment.";
+			break;
+		case "transaction_not_allowed": declineDetails = "The card has been declined for an unknown reason	The customer needs to contact their bank for more information.";
+			break;
+		case "try_again_later": declineDetails = "The card has been declined for an unknown reason	Ask the customer to attempt the payment again.If subsequent payments are declined, the customer should contact their bank for more information.";
+			break;
+		case "withdrawal_count_limit_exceeded": declineDetails = "The customer has exceeded the balance or credit limit available on their card.The customer should use an alternative payment method.";
+			break;
+		case "lost_card":
+		case "stolen_card":
+		case "generic_decline":
+		default:
+			//in case lost or stolen, need to replace the decline code with "generic_decline"
+			toReturn[ "decline_code" ] = "generic_decline";
+			declineDetails = "The card has been declined for an unknown reason	The customer needs to contact their bank for more information.";
+			break;
+	}
+
+	toReturn.details += " " + declineDetails;
+
+	return toReturn;
+
 }
 
 /**
@@ -125,7 +290,7 @@ export interface ICard {
 }
 
 
-export interface IRefund {
+interface IRefund {
 	id: string;
 
 	/**
@@ -176,7 +341,7 @@ export interface IRefund {
  * evidence that shows the charge is legitimate. You can find more information about the dispute process 
  * in our disputes FAQ: https://stripe.com/help/disputes
  */
-export interface IDispute {
+interface IDispute {
 	/**
 	 * Valud is 'dispute'
 	 */
@@ -263,7 +428,7 @@ export interface IDispute {
 	metadata: IMetadata;
 }
 
-export interface IDisputeEvidence {
+interface IDisputeEvidence {
 	/**
 	 * Any server or activity logs showing proof that the customer accessed or downloaded the purchased 
 	 * digital product. This information should include IP addresses, corresponding timestamps, and any 
@@ -412,7 +577,7 @@ export interface IDisputeEvidence {
 }
 
 
-export interface IShippingInformation {
+interface IShippingInformation {
 	/**
 	 * Shipping address.
 	 */
@@ -472,7 +637,7 @@ export interface IShippingInformation {
 
 
 
-export interface IBalanceTransaction {
+interface IBalanceTransaction {
 	id: string;
 
 	/**
@@ -545,7 +710,7 @@ export interface IBalanceTransaction {
 }
 
 
-export interface IReversal {
+interface IReversal {
 	id: string;
 
 	/**
@@ -575,7 +740,7 @@ export interface IReversal {
 	 */
 	transfer: string;
 }
-export interface ITransfer {
+interface ITransfer {
 	id: string;
 	object: string;
 	livemode: boolean;
@@ -798,7 +963,7 @@ export interface ICharge {
 	shipping?: IShippingInformation;
 }
 
-export interface IChargeCreateOptions {
+interface IChargeCreateOptions {
 	/**
 	 * A positive integer in the smallest currency unit (e.g 100 cents to charge $1.00, or 1 to charge ¥1, a 0-decimal currency) 
 	 * representing how much to charge the card. The minimum amount is $0.50 (or equivalent in charge currency).
@@ -937,7 +1102,7 @@ export interface IPlan {
   * A discount represents the actual application of a coupon to a particular customer. It contains information 
   * about when the discount began and when it will end.
   */
-export interface IDiscount {
+interface IDiscount {
 	/**
 	 * Value is 'discount'
 	 */
@@ -970,7 +1135,7 @@ export interface IDiscount {
  * A coupon contains information about a percent-off or amount-off discount you might want to apply to a customer. 
  * Coupons only apply to invoices; they do not apply to one-off charges.
  */
-export interface ICoupon {
+interface ICoupon {
 	id: string;
 
 	/**
@@ -1130,7 +1295,7 @@ export interface IBitcoinReceiver {
 	used_for_payment: boolean;
 }
 
-export interface IBitcoinTransaction {
+interface IBitcoinTransaction {
 	id: string;
 
 	/**
@@ -1289,7 +1454,7 @@ True if you can create multiple payments using this account. If the account is r
 Whether this Alipay account object has ever been used for a payment.*/
 	used: boolean;
 	/** The username for the Alipay account.*/
-	username:string;
+	username;
 
 }
 
@@ -1385,7 +1550,7 @@ Hash describing the bank account, i supposed used when type=bank_account */
 }
 
 
-export interface IInvoiceLineItem {
+interface IInvoiceLineItem {
 	/**
 	 * The ID of the source of this line item, either an invoice item or a subscription
 	 */
@@ -1476,7 +1641,7 @@ export interface IInvoiceLineItem {
  * not include unpaid invoices; it only includes balances that need to be taken into account when calculating 
  * the amount due for the next invoice.
  */
-export interface IInvoice {
+interface IInvoice {
 	id: string;
 
 	/**
@@ -1632,22 +1797,22 @@ export interface IInvoice {
 
 export interface StripeInstance {
 	/** When we make backwards-incompatible changes to the API, we release new, dated versions. example version is "2016-02-03" */
-	setApiVersion(versionDate: string):void;
+	setApiVersion( versionDate: string );
 	/** To charge a credit or a debit card, you create a charge object. You can retrieve and refund individual charges as well as list all charges. Charges are identified by a unique random ID.*/
 	charges: {
 		/** To charge a credit card, you create a charge object. If your API key is in test mode, the supplied payment source (e.g., card or Bitcoin receiver) won't actually be charged, though everything else will occur as if in live mode. (Stripe assumes that the charge would have completed successfully).*/
-		create(options: IChargeCreateOptions): PromiseLike<ICharge>;
+		create( options: IChargeCreateOptions ): Promise<ICharge>;
 		/** Retrieves the details of a charge that has previously been created. Supply the unique charge ID that was returned from your previous request, and Stripe will return the corresponding charge information. The same information is returned when creating or refunding the charge.*/
-		retrieve(/** The identifier of the charge to be retrieved.*/charge: string): PromiseLike<ICharge>;
-		update(charge: string, options: any): PromiseLike<ICharge>;
-		capture(charge: string): PromiseLike<ICharge>;
+		retrieve(/** The identifier of the charge to be retrieved.*/charge: string ): Promise<ICharge>;
+		update( charge: string, options: any ): Promise<ICharge>;
+		capture( charge: string ): Promise<ICharge>;
 		/** List all charges
 Returns a list of charges you’ve previously created. The charges are returned in sorted order, with the most recent charges appearing first.
 		Returns
 A object with a data property that contains an array of up to limit charges, starting after charge starting_after. Each entry in the array is a separate charge object. If no more charges are available, the resulting array will be empty. If you provide a non-existent customer ID, this call throws an error.
 You can optionally request that the response include the total count of all charges that match your filters. To do so, specify include[]=total_count in your request.
 		*/
-		list(options: {
+		list( options: {
 			/**A filter on the list based on the object created field. The value can be a string with an integer Unix timestamp, or it can be a dictionary with the following options:
  child arguments
 */
@@ -1666,28 +1831,28 @@ A filter on the list based on the source of the charge. The value can be a dicti
 A cursor for use in pagination. starting_after is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include starting_after=obj_foo in order to fetch the next page of the list.*/
 			starting_after?: any;
 
-		}): PromiseLike<IList<ICharge>>;
+		} ): Promise<IList<ICharge>>;
 
 
 	};
 	/** You can create plans easily via the plan management page of the Stripe dashboard. Plan creation is also accessible via the API if you need to create plans on the fly. */
 	plans: {
 		/** todo: document*/
-		create(...args: any[]): PromiseLike<IPlan>;
+		create( ...args: any[] );
 		/** Retrieves the plan with the given ID. */
 		retrieve(
 			/** The ID of the desired plan. */
-			plan: string): PromiseLike<IPlan>;
+			plan: string ): Promise<IPlan>;
 		/** todo: document*/
-		update(...args: any[]): PromiseLike<IPlan>;
+		update( ...args: any[] );
 		/** todo: document*/
-		del(...args: any[]): PromiseLike<any>;
+		del( ...args: any[] );
 		/** Returns a list of your plans. 
 		
 		Returns
 		A object with a data property that contains an array of up to limit plans, starting after plan starting_after. Each entry in the array is a separate plan object. If no more plans are available, the resulting array will be empty. This request should never throw an error.
 		You can optionally request that the response include the total count of all plans that match your filters. To do so, specify include[]=total_count in your request.*/
-		list(options: {
+		list( options: {
 			/** optional object
 			A filter on the list based on the object created field. The value can be a string with an integer Unix timestamp, or it can be a dictionary with the following options:
 			child arguments
@@ -1716,7 +1881,7 @@ A cursor for use in pagination. starting_after is an object ID that defines your
 			A cursor for use in pagination. starting_after is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include starting_after=obj_foo in order to fetch the next page of the list.*/
 			starting_after?: any;
 
-		}): PromiseLike<IList<IPlan>>;
+		} ): Promise<IList<IPlan>>;
 
 	};
 	/** Customer objects allow you to perform recurring charges and track multiple charges that are associated with the same customer. The API allows you to create, delete, and update your customers. You can retrieve individual customers as well as a list of all your customers.*/
@@ -1724,7 +1889,7 @@ A cursor for use in pagination. starting_after is an object ID that defines your
 		/** Returns
 		Returns a customer object if the call succeeded. The returned object will have information about subscriptions, discount, and payment sources, if that information has been provided. If an invoice payment is due and a source is not provided, the call will throw an error. If a non-existent plan or a non-existent or expired coupon is provided, the call will throw an error.
 		If a source has been attached to the customer, the returned customer object will have a default_source attribute, which is an ID that can be expanded into the full source details when retrieving the customer.*/
-		create(options: {
+		create( options: {
 			/** optional
 			An integer amount in cents that is the starting account balance for your customer. A negative amount represents a credit that will be used before attempting any charges to the customer’s card; a positive amount will be added to the next invoice.*/
 			account_balance?: number;
@@ -1758,47 +1923,47 @@ A cursor for use in pagination. starting_after is an object ID that defines your
 			Unix timestamp representing the end of the trial period the customer will get before being charged. If set, trial_end will override the default trial period of the plan the customer is being subscribed to. The special value now can be provided to end the customer’s trial immediately. Only applies when the plan parameter is also provided.*/
 			trial_end?: number;
 
-		}): PromiseLike<ICustomer>;
+		} ): Promise<ICustomer>;
 		/** Retrieves the details of an existing customer. You need only supply the unique customer identifier that was returned upon customer creation.
 		Returns
 		Returns a customer object if a valid identifier was provided. When requesting the ID of a customer that has been deleted, a subset of the customer’s information will be returned, including a deleted property, which will be true.*/
-		retrieve(customerId: string): PromiseLike<ICustomer>;
+		retrieve( customerId: string ): Promise<ICustomer>;
 		/** Updates the specified customer by setting the values of the parameters passed. Any parameters not provided will be left unchanged. For example, if you pass the source parameter, that becomes the customer's active source (e.g., a card) to be used for all charges in the future. When you update a customer to a new valid source: for each of the customer's current subscriptions, if the subscription is in the past_due state, then the latest unpaid, unclosed invoice for the subscription will be retried (note that this retry will not count as an automatic retry, and will not affect the next regularly scheduled payment for the invoice). (Note also that no invoices pertaining to subscriptions in the unpaid state, or invoices pertaining to canceled subscriptions, will be retried as a result of updating the customer's source.)
 This request accepts mostly the same arguments as the customer creation call.
 		Returns
 Returns the customer object if the update succeeded. Throws an error if update parameters are invalid (e.g. specifying an invalid coupon or an invalid source).*/
-		update(stripeCustomerId:string,
+		update( stripeCustomerId: string,
 			options: {
 
 				/**optional
 				An integer amount in cents that represents the account balance for your customer.Account balances only affect invoices.A negative amount represents a credit that decreases the amount due on an invoice; a positive amount increases the amount due on an invoice.
 							*/
-				account_balance?:number;
+				account_balance?: number;
 				/**
 			optional
 			If you provide a coupon code, the customer will have a discount applied on all recurring charges.Charges you create through the API will not have the discount.
 						*/
-				coupon?:string;
+				coupon?: string;
 				/*
 			optional
 			ID of source to make the customer’s new default for invoice payments*/
-				default_source?:string;
+				default_source?: string;
 				/*
 			   optional
 			   An arbitrary string that you can attach to a customer object.It is displayed alongside the customer in the dashboard.This can be unset by updating the value to null and then saving.*/
-				description?:string;
+				description?: string;
 				/*
 			optional
 			Customer’s email address.It’s displayed alongside the customer in your dashboard and can be useful for searching and tracking.This can be unset by updating the value to null and then saving.*/
-				email?:string;
+				email?: string;
 
 				/*optional
 				A set of key/ value pairs that you can attach to a customer object.It can be useful for storing additional information about the customer in a structured format.This can be unset by updating the value to null and then saving*/
-				metadata?:IMetadata;
+				metadata?: IMetadata;
 
 				/*optional object
 				child arguments*/
-				shipping?:IShippingInformation;
+				shipping?: IShippingInformation;
 
 
 				/*optional object
@@ -1807,28 +1972,28 @@ Returns the customer object if the update succeeded. Throws an error if update p
 				If you want to add additional sources instead of replacing the existing default, use the card creation API.
 				Whenever you attach a card to a customer, Stripe will automatically validate the card.
 				child arguments*/
-				source?:string|ICard;
+				source?: string | ICard;
 
-			}):PromiseLike<ICustomer>
+			} ): Promise<ICustomer>
 		/** Delete a card
 		You can delete cards from a customer, recipient, or managed account.
 		For customers: if you delete a card that is currently the default source, then the most recently added source will become the new default. If you delete a card that is the last remaining source on the customer then the default_source attribute will become null.
 		For recipients: if you delete the default card, then the most recently added card will become the new default. If you delete the last remaining card on a recipient, then the default_card attribute will become null.
 		For accounts: if a card's default_for_currency property is true, it can only be deleted if it is the only external account for its currency, and the currency is not the Stripe account's default currency. Otherwise, before deleting the card, you must set another external account to be the default for the currency.
 		Note that for cards belonging to customers, you may want to prevent customers on paid subscriptions from deleting all cards on file so that there is at least one default card for the next invoice payment attempt.*/
-		deleteCard(customerId: string, cardId: string): PromiseLike<{ deleted: boolean; id: string }>;
+		deleteCard( customerId: string, cardId: string ): Promise<{ deleted: boolean; id: string }>;
 		/** Create a card
 		When you create a new credit card, you must specify a customer, recipient, or managed account to create it on.
 		If the card's owner has no default card, then the new card will become the default. However, if the owner already has a default then it will not change. To change the default, you should either update the customer to have a new default_source, update the recipient to have a new default_card, or set default_for_currency to true when creating a card for a managed account. */
-		createSource(customerId: string, options: {/** token from stripe checkout */source: string }): PromiseLike<ICard | IAlipayAccount>;
-		createSource(customerId: string, options: {/** token from stripe checkout */source: string }, /** optional A set of key/value pairs that you can attach to a card object. It can be useful for storing additional information about the card in a structured format. */ metadata: IMetadata): PromiseLike<ICard | IAlipayAccount | IBitcoinReceiver>;
+		createSource( customerId: string, options: {/** token from stripe checkout */source: string } ): Promise<ICard | IAlipayAccount>;
+		createSource( customerId: string, options: {/** token from stripe checkout */source: string }, /** optional A set of key/value pairs that you can attach to a card object. It can be useful for storing additional information about the card in a structured format. */ metadata: IMetadata ): Promise<ICard | IAlipayAccount | IBitcoinReceiver>;
 
 
 		/** Cancels a customer’s subscription. If you set the at_period_end parameter to true, the subscription will remain active until the end of the period, at which point it will be canceled and not renewed. By default, the subscription is terminated immediately. In either case, the customer will not be charged again for the subscription. Note, however, that any pending invoice items that you’ve created will still be charged for at the end of the period unless manually deleted. If you’ve set the subscription to cancel at period end, any pending prorations will also be left in place and collected at the end of the period, but if the subscription is set to cancel immediately, pending prorations will be removed.
 		By default, all unpaid invoices for the customer will be closed upon subscription cancellation. We do this in order to prevent unexpected payment retries once the customer has canceled a subscription. However, you can reopen the invoices manually after subscription cancellation to have us proceed with automatic retries, or you could even re-attempt payment yourself on all unpaid invoices before allowing the customer to cancel the subscription at all.*/
-		cancelSubscription(customerId: string, subscriptionId: string, options: { at_period_end?: boolean }): PromiseLike<ISubscription>;
+		cancelSubscription( customerId: string, subscriptionId: string, options: { at_period_end?: boolean } ): Promise<ISubscription>;
 		/** Creates a new subscription on an existing customer.*/
-		createSubscription(customerId: string, options: {
+		createSubscription( customerId: string, options: {
 			/** REQUIRED
 			The identifier of the plan to subscribe the customer to.*/
 			plan: string;
@@ -1855,7 +2020,7 @@ Returns the customer object if the update succeeded. Throws an error if update p
 			trial_end?: number;
 
 
-		}): PromiseLike<ISubscription>;
+		} ): Promise<ISubscription>;
 
 		/** Updates an existing subscription on a customer to match the specified parameters. When changing plans or quantities, we will optionally prorate the price we charge next month to make up for any price changes. To preview how the proration will be calculated, use the upcoming invoice endpoint.
 		By default, we prorate subscription changes. For example, if a customer signs up on May 1 for a $10 plan, she'll be billed $10 immediately. If she then switches to a $20 plan on May 15, on June 1 she'll be billed $25 ($20 for a renewal of her subscription and a $5 prorating adjustment for the previous month). Similarly, a downgrade will generate a credit to be applied to the next invoice. We also prorate when you make quantity changes. Switching plans does not change the billing date or generate an immediate charge unless you're switching between different intervals (e.g. monthly to yearly), in which case we apply a credit for the time unused on the old plan and charge for the new plan starting right away, resetting the billing date. (Note that if we charge for the new plan, and that payment fails, the plan change will not go into effect).
@@ -1865,7 +2030,7 @@ Returns
 The newly updated subscription object if the call succeeded.
 If a charge is required for the update, and the charge fails, this call throws an error, and the subscription update does not go into effect.
 		*/
-		updateSubscription(customerId: string, subscriptionId: string, options: {
+		updateSubscription( customerId: string, subscriptionId: string, options: {
 			/** optional, default is null
 A positive decimal (with at most two decimal places) between 1 and 100 that represents the percentage of the subscription invoice amount due each billing period (including any bundled invoice items) that will be transferred to the application owner’s Stripe account. The request must be made with an OAuth key in order to set an application fee percentage . For more information, see the application fees documentation.*/
 			application_fee_percent?: number;
@@ -1901,7 +2066,7 @@ Unix timestamp representing the end of the trial period the customer will get be
 
 
 
-		}): PromiseLike<ISubscription>;
+		} ): Promise<ISubscription>;
 
 	}
 
@@ -1912,11 +2077,11 @@ Returns an invoice object if a valid invoice ID was provided. Throws an error ot
 The invoice object contains a lines hash that contains information about the subscriptions and invoice items that have been applied to the invoice, as well as any prorations that Stripe has automatically calculated. Each line on the invoice has an amount attribute that represents the amount actually contributed to the invoice’s total. For invoice items and prorations, the amount attribute is the same as for the invoice item or proration respectively. For subscriptions, the amount may be different from the plan’s regular price depending on whether the invoice covers a trial period or the invoice period differs from the plan’s usual interval.
 The invoice object has both a subtotal and a total. The subtotal represents the total before any discounts, while the total is the final amount to be charged to the customer after all coupons have been applied.
 The invoice also has a next_payment_attempt attribute that tells you the next time (as a Unix timestamp) payment for the invoice will be automatically attempted. For invoices that have been closed or that have reached the maximum number of retries (specified in your retry settings), the next_payment_attempt will be null.*/
-		retrieve(invoice: string): PromiseLike<IInvoice>;
+		retrieve( invoice: string ): Promise<IInvoice>;
 		/** When retrieving an invoice, you'll get a lines property containing the total count of line items and the first handful of those items. There is also a URL where you can retrieve the full (paginated) list of line items.
 		FULL DEFINITION NOT IMPLEMENTED.  
 		*/
-		retrieveLines(invoice: string, options: {
+		retrieveLines( invoice: string, options: {
 			/**In the case of upcoming invoices, the customer of the upcoming invoice is required. In other cases it is ignored.*/
 			customer?: string;
 			ending_before?: string;
@@ -1925,9 +2090,9 @@ The invoice also has a next_payment_attempt attribute that tells you the next ti
 			/** In the case of upcoming invoices, the subscription of the upcoming invoice is optional. In other cases it is ignored.*/
 			subscription?: string;
 			subscription_plan?: string;
-		}, callback: (err: Error, lines: IList<IInvoiceLineItem>) => void): void;
+		}, callback: ( err: Error, lines: IList<IInvoiceLineItem> ) => void ): void;
 		/** You can list all invoices, or list the invoices for a specific customer. The invoices are returned sorted by creation date, with the most recently created invoices appearing first.*/
-		list(options: {
+		list( options: {
 			/** The identifier of the customer whose invoices to return. If none is provided, all invoices will be returned.*/
 			customer?: string;
 			/** A filter on the list based on the object date field. The value can be a string with an integer Unix timestamp, or it can be a dictionary with the following options:*/
@@ -1935,7 +2100,7 @@ The invoice also has a next_payment_attempt attribute that tells you the next ti
 			/** optional, default is 10
 A limit on the number of objects to be returned. Limit can range between 1 and 100 items.*/
 			limit?: number;
-		}): PromiseLike<IList<IInvoice>>;
+		} ): Promise<IList<IInvoice>>;
 	}
 
 }
