@@ -224,7 +224,7 @@ export class AsyncReaderWriterLock<TValue=void> {
 
         try {
             //log.assert( thisWrite._tags.writeId === writeId, "writeId mismatch" );
-            if ( valueOrWritePromise instanceof bb || ( _.isObject( valueOrWritePromise ) && _.isFunction( ( valueOrWritePromise as any as Promise<any> ).then ) ) ) {
+            if ( valueOrWritePromise instanceof bb || ( _.isObject( valueOrWritePromise ) && _.isFunction( ( valueOrWritePromise as any as bb<any> ).then ) ) ) {
                 this._value = await bb.resolve( valueOrWritePromise );
             } else {
                 this._value = valueOrWritePromise as any;
@@ -269,3 +269,4 @@ export class AsyncReaderWriterLock<TValue=void> {
 
 
 }
+

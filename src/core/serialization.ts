@@ -6,7 +6,7 @@ import * as ex from "./exception";
 
 import * as json5 from "json5";
 import * as stringHelper from "./stringhelper";
-import * as Promise from "bluebird";
+import * as bb from "bluebird";
 import * as moment from "moment";
 import * as _ from "lodash";
 

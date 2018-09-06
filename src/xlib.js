@@ -1,4 +1,5 @@
 "use strict";
+/// <reference path="./types/xlib-globals/index.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 var jsShims = require("./core/jsshims");
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */

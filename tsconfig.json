@@ -12,7 +12,7 @@
     "newLine": "LF",
     "pretty": true,
     "stripInternal": true,
-    "diagnostics": true,
+    "diagnostics": false,
     "target": "es6",
     "watch": false,
     "moduleResolution": "node",
@@ -33,7 +33,13 @@
     //   "es2015",
     //   "dom",
     //   "es5",
-    // ]
+    // ],
+    "typeRoots": [
+      "./src/types",
+    ],
+    "types": [
+      "xlib-globals",
+    ],
   },
   "exclude": [
     "node_modules",
@@ -49,7 +55,7 @@
     "excludeNotExported": true,
     "excludeExternals": false,
     "excludeProtected": true,
-    "target": "ES6",
+    //"target": "ES3",
     "moduleResolution": "node",
     "preserveConstEnums": true,
     "stripInternal": true,

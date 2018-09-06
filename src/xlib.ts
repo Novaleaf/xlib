@@ -1,5 +1,8 @@
+/// <reference path="./types/xlib-globals/index.d.ts" />
 
 var jsShims = require( "./core/jsshims" );
+
+
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 import mockMocha = require( "./core/diagnostics/mockmocha" );
