@@ -12,8 +12,8 @@
 While you can use ```npm install xlib``` to use this in just about any javascript project or environment, here are what we test with:
 
 - vscode v.latest
-- ts v3.x
-- node v8.x
+- ts v.latest (3.0.1 or higher suggested)
+- node v8.x (6.x or higher suggested)
 
 
 
