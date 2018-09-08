@@ -7,9 +7,10 @@
     "sourceMap": true,
     "inlineSources": false,
     "inlineSourceMap": false,
-    "composite": false, /////////  really buggy in ts 3.0.3
-    "declaration": false,
-    "declarationMap": false, /////////  change for vNext
+    "composite": true, /////////  really buggy in ts 3.0.3
+    "declaration": true,
+    "declarationMap": true, /////////  change for vNext
+    "noEmitOnError": true,
     "jsx": "react",
     "newLine": "LF",
     "pretty": true,

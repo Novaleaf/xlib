@@ -11,8 +11,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /** allows internal xlib modules to hook the xlib.initialize() method */
 const promise = require("./core/promise");
 var bb = promise.bluebird;
+function isInitializeStarted() {
+    return isStarted;
+}
+exports.isInitializeStarted = isInitializeStarted;
 let isStarted = false;
-const finishedPromise = promise.CreateExposedPromise();
+let finishedPromise;
 const initWorkArray = [];
 function initialize(args) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -21,6 +25,7 @@ function initialize(args) {
             throw new Error("initialize already started and trying to start it again");
         }
         isStarted = true;
+        finishedPromise = promise.CreateExposedPromise();
         for (let i = 0; i < initWorkArray.length; i++) {
             const initWork = initWorkArray[i];
             if (typeof initWork === "function") {

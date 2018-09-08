@@ -1,9 +1,22 @@
 /// <reference path="./types/xlib-globals/index.d.ts" />
 
-
+//////////////////////  initialization section
 import init = require( "./init" );
-import { initialize } from "./init";
-export {/** init */ initialize };
+/** need to do init work serially, at least until after promise initializtaion, so taht bluebird can initialize properly  (it can't initialize once a promise has been created) */
+const serialInits: Array<( ( args: init.IInitArgs ) => void )> = [];
+let isInitializeStarted = false;
+export async function initialize( args?: init.IInitArgs ) {
+    args = { ...args };
+
+    if ( isInitializeStarted === true ) {
+        log.warn( "xlib.initialize() already called, we are ignoring further calls" );
+        return;
+    }
+    isInitializeStarted = true;
+    serialInits.forEach( ( initWork ) => initWork( args ) );
+    return init.initialize( args );
+
+}
 
 setTimeout( () => {
     if ( init.isInitializeStarted() !== true ) {
@@ -12,33 +25,31 @@ setTimeout( () => {
 }, 10000 )
 
 
+export import lodash = require( "lodash" );
+///** low-level javascript helpers, to smooth over warts in the language */
+export import jsHelper = require( "./core/jshelper" );
 
 import jsShims = require( "./core/jsshims" );
-init.onInitialize( jsShims.initialize );
+serialInits.push( jsShims.initialize );
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 import mockMocha = require( "./core/diagnostics/mockmocha" );
-init.onInitialize( mockMocha.initialize );
+serialInits.push( mockMocha.initialize );
 
 
 export import environment = require( "./core/environment" );
-init.onInitialize( environment.initialize );
+serialInits.push( environment.initialize );
 
 
 export import promise = require( "./core/promise" );
-init.onInitialize( promise.initialize );
+serialInits.push( promise.initialize );
 
-export import __ = require( "./core/lolo" );
-
-
-
-
-///** low-level javascript helpers, to smooth over warts in the language */
-export import jsHelper = require( "./core/jshelper" );
-//jsHelper.initialize();
+export import lolo = require( "./core/lolo" );
 export import arrayHelper = require( "./core/arrayhelper" );
 export import ClassBase = require( "./core/classbase" );
 export import diagnostics = require( "./core/diagnostics" );
+import diagnostics2 = require( "./core/diagnostics" );
+const log = new diagnostics2.logging.Logger( __filename );
 export import exception = require( "./core/exception" );
 export import collections = require( "./core/collections" );
 
@@ -46,11 +57,6 @@ export import collections = require( "./core/collections" );
 export import numHelper = require( "./core/numhelper" );
 export import stringHelper = require( "./core/stringhelper" );
 export import reflection = require( "./core/reflection" );
-export import lodash = require( "lodash" );
-
-
-//set bluebird as our global promise handler
-
 
 
 export import dateTime = require( "./core/datetime" );
@@ -151,7 +157,9 @@ export import string_decoder = require( "string_decoder" );
 export import url = require( "url" );
 
 export import definitions = require( "./definitions/definitions" );
-import { __, jsHelper } from "..";
+import { resolve } from "bluebird";
+import { diagnostics } from "..";
+
 
 
 /**
@@ -205,17 +213,19 @@ export abstract class PayloadTemplate<TThis>{
 }
 
 
-init.onInitialize( () => {
+serialInits.push( ( args: init.IInitArgs ) => {
 
     mockMocha.initialize();
 
 
-    if ( __.env.isDebug === true || __.env.isDev === true ) {
+    if ( lolo.env.isDebug === true || lolo.env.isDev === true ) {
         //try {
         ///** https://www.npmjs.com/package/source-map-support
         // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
         //  */
-        console.log( "loading sourcemap support (in logLevel.DEBUG or envLevel.DEV)" );
+        if ( args.suppressStartupMessage !== true ) {
+            console.log( "loading sourcemap support (in logLevel.DEBUG or envLevel.DEV)" );
+        }
         var source_map_support = require( "source-map-support" );
         source_map_support.install( { handleUncaughtExceptions: false } );
         //} catch (ex) {

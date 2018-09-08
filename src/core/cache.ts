@@ -54,7 +54,7 @@ export class Cache {
      * @param key
      * @param fetchFunction
      */
-    public read<TValue>( key: string, fetchFunction: () => bb<TValue>,
+    public async read<TValue>( key: string, fetchFunction: () => Promise<TValue>,
 
         options?: {
             /**if we need to fetch, how long the new value will be valid for.  default 10 minutes. */
@@ -75,7 +75,7 @@ export class Cache {
             /** multipler for how long the cache item should be kept after the fetchExpires threshhold is exceeded.    default is 3x (so a total of 4x from when the request was made)*/
             gcAfterMultipler?: number;
         }
-    ): bb<TValue> {
+    ): Promise<TValue> {
 
 
 
@@ -152,7 +152,7 @@ export class Cache {
 
 
         //need to fetch a new value, so start refetching new
-        cacheItem.currentFetch = fetchFunction();
+        cacheItem.currentFetch = bb.resolve( fetchFunction() );
 
 
         //ASYNC:  after the fetch completes, update our cacheItem

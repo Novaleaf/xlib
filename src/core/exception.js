@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 //import * as environment from "./environment";
 const environment = require("./environment");
 const _ = require("lodash");
-const microclib_1 = require("../microclib");
+const jsHelper = require("./jshelper");
 /** get a stack trace*/
 function getStackTrace(/**
     * regexp choosing the frame you wish to start after.  or number of frames to remove from the front
@@ -92,7 +92,7 @@ class Exception extends Error {
     constructor(message, options) {
         super(message);
         this.message = message;
-        microclib_1.jsHelper.setPrototypeOf(this, new.target.prototype); //fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
+        jsHelper.setPrototypeOf(this, new.target.prototype); //fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
         options = Object.assign({ stackFramesToTruncate: 0 }, options);
         this.innerException = options.innerException;
         this.data = options.data;

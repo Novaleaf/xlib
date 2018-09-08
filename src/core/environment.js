@@ -183,13 +183,28 @@ _internalInitWork.push((args) => {
         }
     }
 });
-///** if mocha tests are enabled.  this is set to true if the "describe" global object is found. */
-//export var isTest: boolean;
-//if (typeof (getGlobal()["describe"]) !== "undefined") {
-//	isTest = true;
-//} else {
-//	isTest = false;
-//}
+exports.env = {
+    /**
+        *  current envLevel (real or fake data) shortcut for ```environment.envLevel <= environment.EnvLevel.DEV```
+        */
+    get isDev() { return exports.envLevel <= EnvLevel.DEV; },
+    /**
+        *  current testLevel (if tests are enabled or not) shortcut for ```environment.envLevel >= environment.EnvLevel.FULL```
+        */
+    get isTest() { return exports.testLevel === TestLevel.FULL; },
+    /**
+        *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.TRACE```
+        */
+    get isTrace() { return exports.logLevel <= LogLevel.TRACE; },
+    /**
+        *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
+        */
+    get isDebug() { return exports.logLevel <= LogLevel.DEBUG; },
+    /**
+        *  current envLevel (real or fake data)  shortcut for ```environment.envLevel === environment.EnvLevel.PROD```
+        */
+    get isProd() { return exports.envLevel === EnvLevel.PROD; },
+};
 /** no op the input function if not running LogLevel <= DEBUG.
   * for uglify / closure-compiler dead-code optimization (minification)
   */

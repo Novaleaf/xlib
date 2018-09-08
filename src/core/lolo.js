@@ -51,28 +51,29 @@ const xlib_1 = require("../xlib");
 // public get value() : string {
 //     return 
 // }
-exports.env = {
-    /**
-     *  current envLevel (real or fake data) shortcut for ```environment.envLevel <= environment.EnvLevel.DEV```
-     */
-    get isDev() { return environment.envLevel <= environment.EnvLevel.DEV; },
-    /**
-     *  current testLevel (if tests are enabled or not) shortcut for ```environment.envLevel >= environment.EnvLevel.FULL```
-     */
-    get isTest() { return environment.testLevel === environment.TestLevel.FULL; },
-    /**
-     *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.TRACE```
-     */
-    get isTrace() { return environment.logLevel <= environment.LogLevel.TRACE; },
-    /**
-     *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
-     */
-    get isDebug() { return environment.logLevel <= environment.LogLevel.DEBUG; },
-    /**
-     *  current envLevel (real or fake data)  shortcut for ```environment.envLevel === environment.EnvLevel.PROD```
-     */
-    get isProd() { return environment.envLevel === environment.EnvLevel.PROD; },
-};
+exports.env = environment.env;
+// {
+//     /**
+//      *  current envLevel (real or fake data) shortcut for ```environment.envLevel <= environment.EnvLevel.DEV```
+//      */
+//     get isDev() { return environment.envLevel <= environment.EnvLevel.DEV; },
+//     /**
+//      *  current testLevel (if tests are enabled or not) shortcut for ```environment.envLevel >= environment.EnvLevel.FULL```
+//      */
+//     get isTest() { return environment.testLevel === environment.TestLevel.FULL; },
+//     /**
+//      *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.TRACE```
+//      */
+//     get isTrace() { return environment.logLevel <= environment.LogLevel.TRACE; },
+//     /**
+//      *  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
+//      */
+//     get isDebug() { return environment.logLevel <= environment.LogLevel.DEBUG; },
+//     /**
+//      *  current envLevel (real or fake data)  shortcut for ```environment.envLevel === environment.EnvLevel.PROD```
+//      */
+//     get isProd() { return environment.envLevel === environment.EnvLevel.PROD; },
+// }
 exports.format = _numHelper.format;
 //with the key+value for primitive properties, key+[Array:len] for arrays, and key+[typeName] for objects 
 /** debug inspection helper. outputs JSON  */

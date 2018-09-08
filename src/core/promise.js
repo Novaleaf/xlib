@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
-const __ = require("./lolo");
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance
  * global.Promise is aliased to this.
  */
 exports.bluebird = require("bluebird");
 const bb = require("bluebird");
+const environment = require("./environment");
 //bluebird.longStackTraces();
 /** binds bluebird as global promise and other various init */
 function initialize() {
-    if (__.env.isDebug || __.env.isDev || __.env.isTest) {
+    if (environment.env.isDebug || environment.env.isDev || environment.env.isTest) {
         //http://bluebirdjs.com/docs/api/promise.config.html
         exports.bluebird["config"]({
             // Enable warnings

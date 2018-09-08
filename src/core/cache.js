@@ -1,4 +1,12 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const bb = require("bluebird");
 const _ = require("lodash");
@@ -25,93 +33,95 @@ class Cache {
      * @param fetchFunction
      */
     read(key, fetchFunction, options) {
-        if (options == null) {
-            options = {};
-        }
-        if (options.fetchExpiresAmount == null) {
-            options.fetchExpiresAmount = 10;
-        }
-        if (options.fetchExpiresUnits == null) {
-            options.fetchExpiresUnits = "minutes";
-        }
-        if (options.gcAfterMultipler == null) {
-            options.gcAfterMultipler = 3;
-        }
-        let fetchExpiresDuration = moment.duration(options.fetchExpiresAmount, options.fetchExpiresUnits);
-        function returnOrClone(potentialValue) {
-            let toReturn;
-            if (options.noClone) {
-                //use newValue directly
-                toReturn = potentialValue;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (options == null) {
+                options = {};
             }
-            else if (options.shallowClone === true) {
-                toReturn = _.clone(potentialValue);
+            if (options.fetchExpiresAmount == null) {
+                options.fetchExpiresAmount = 10;
             }
-            else {
-                toReturn = _.cloneDeep(potentialValue);
+            if (options.fetchExpiresUnits == null) {
+                options.fetchExpiresUnits = "minutes";
             }
-            return toReturn;
-        }
-        let now = moment();
-        if (options.fetchExpiresAmount <= 0) {
-            throw new exception.CorelibException("Cache: item to insert is alreadey expired (fetchExpiresAmount less than or equal to zero)");
-        }
-        // do a garbage collection pass (one item checked per read call) 
-        this._tryGCOne(now);
-        let cacheItem = this._storage[key];
-        if (cacheItem == null) {
-            cacheItem = {
-                value: undefined,
-                currentFetch: null,
-                expires: moment(0),
-                gcAfter: now.clone().add(fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds"),
-            };
-            this._storage[key] = cacheItem;
-        }
-        if (cacheItem.value !== undefined && cacheItem.expires > now) {
-            //stored is valid
-            return bb.resolve(returnOrClone(cacheItem.value));
-        }
-        if (cacheItem.currentFetch != null) {
-            //already a fetch in progress, so we should not kick off another
-            if (options.awaitNewOnExpired === true //expired                    
-                || cacheItem.value === undefined //no value                    
-                || (options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.clone().add(options.awaitNewOnExpiredThreshhold).isBefore(moment())) //threshhold exceeded
-            ) {
-                //await currentFetch
-                return cacheItem.currentFetch;
+            if (options.gcAfterMultipler == null) {
+                options.gcAfterMultipler = 3;
             }
-            else {
-                //return cached value
+            let fetchExpiresDuration = moment.duration(options.fetchExpiresAmount, options.fetchExpiresUnits);
+            function returnOrClone(potentialValue) {
+                let toReturn;
+                if (options.noClone) {
+                    //use newValue directly
+                    toReturn = potentialValue;
+                }
+                else if (options.shallowClone === true) {
+                    toReturn = _.clone(potentialValue);
+                }
+                else {
+                    toReturn = _.cloneDeep(potentialValue);
+                }
+                return toReturn;
+            }
+            let now = moment();
+            if (options.fetchExpiresAmount <= 0) {
+                throw new exception.CorelibException("Cache: item to insert is alreadey expired (fetchExpiresAmount less than or equal to zero)");
+            }
+            // do a garbage collection pass (one item checked per read call) 
+            this._tryGCOne(now);
+            let cacheItem = this._storage[key];
+            if (cacheItem == null) {
+                cacheItem = {
+                    value: undefined,
+                    currentFetch: null,
+                    expires: moment(0),
+                    gcAfter: now.clone().add(fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds"),
+                };
+                this._storage[key] = cacheItem;
+            }
+            if (cacheItem.value !== undefined && cacheItem.expires > now) {
+                //stored is valid
                 return bb.resolve(returnOrClone(cacheItem.value));
             }
-        }
-        //need to fetch a new value, so start refetching new
-        cacheItem.currentFetch = fetchFunction();
-        //ASYNC:  after the fetch completes, update our cacheItem
-        cacheItem.currentFetch.then((newValue) => {
-            let now = moment();
-            this._storage[key] = cacheItem; //in case gc deleted it
-            cacheItem.value = newValue;
-            cacheItem.expires = now.clone().add(fetchExpiresDuration);
-            cacheItem.gcAfter = cacheItem.expires.clone().add(fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds");
-            //we might want to clone the resule
+            if (cacheItem.currentFetch != null) {
+                //already a fetch in progress, so we should not kick off another
+                if (options.awaitNewOnExpired === true //expired                    
+                    || cacheItem.value === undefined //no value                    
+                    || (options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.clone().add(options.awaitNewOnExpiredThreshhold).isBefore(moment())) //threshhold exceeded
+                ) {
+                    //await currentFetch
+                    return cacheItem.currentFetch;
+                }
+                else {
+                    //return cached value
+                    return bb.resolve(returnOrClone(cacheItem.value));
+                }
+            }
+            //need to fetch a new value, so start refetching new
+            cacheItem.currentFetch = bb.resolve(fetchFunction());
+            //ASYNC:  after the fetch completes, update our cacheItem
+            cacheItem.currentFetch.then((newValue) => {
+                let now = moment();
+                this._storage[key] = cacheItem; //in case gc deleted it
+                cacheItem.value = newValue;
+                cacheItem.expires = now.clone().add(fetchExpiresDuration);
+                cacheItem.gcAfter = cacheItem.expires.clone().add(fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds");
+                //we might want to clone the resule
+                return bb.resolve(returnOrClone(cacheItem.value));
+            });
+            if (cacheItem.value === undefined) {
+                //nothing cached at all, so await current fetch
+                return cacheItem.currentFetch;
+            }
+            //we have a cached value, but it is expired
+            //check if we force waiting for a new value, or are ok with returning an expired value while refetching.
+            if (options.awaitNewOnExpired === true //expired                    
+                || (options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.clone().add(options.awaitNewOnExpiredThreshhold).isBefore(moment())) //threshhold exceeded
+            ) {
+                //we don't accept an expired, await the refetch
+                return cacheItem.currentFetch;
+            }
+            //ok with the stale value
             return bb.resolve(returnOrClone(cacheItem.value));
         });
-        if (cacheItem.value === undefined) {
-            //nothing cached at all, so await current fetch
-            return cacheItem.currentFetch;
-        }
-        //we have a cached value, but it is expired
-        //check if we force waiting for a new value, or are ok with returning an expired value while refetching.
-        if (options.awaitNewOnExpired === true //expired                    
-            || (options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.clone().add(options.awaitNewOnExpiredThreshhold).isBefore(moment())) //threshhold exceeded
-        ) {
-            //we don't accept an expired, await the refetch
-            return cacheItem.currentFetch;
-        }
-        //ok with the stale value
-        return bb.resolve(returnOrClone(cacheItem.value));
     }
     /**
      *  force update/insert the cache.   to delete, set newCacheItem to null

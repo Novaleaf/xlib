@@ -7,7 +7,7 @@
 //import * as environment from "./environment";
 import * as environment from "./environment";
 import * as _ from "lodash";
-import { jsHelper } from "../microclib";
+import jsHelper = require( "./jshelper" );
 
 /** shape of errors */
 export interface IError {

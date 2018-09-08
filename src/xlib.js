@@ -1,33 +1,61 @@
 "use strict";
 /// <reference path="./types/xlib-globals/index.d.ts" />
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+//////////////////////  initialization section
 const init = require("./init");
-const init_1 = require("./init");
-exports.initialize = init_1.initialize;
-const jsShims = require("./core/jsshims");
-init.onInitialize(jsShims.initialize);
-///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
-const mockMocha = require("./core/diagnostics/mockmocha");
-init.onInitialize(mockMocha.initialize);
-exports.environment = require("./core/environment");
-init.onInitialize(exports.environment.initialize);
-exports.__ = require("./core/lolo");
-exports.promise = require("./core/promise");
-init.onInitialize(exports.promise.initialize);
+/** need to do init work serially, at least until after promise initializtaion, so taht bluebird can initialize properly  (it can't initialize once a promise has been created) */
+const serialInits = [];
+let isInitializeStarted = false;
+function initialize(args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        args = Object.assign({}, args);
+        if (isInitializeStarted === true) {
+            log.warn("xlib.initialize() already called, we are ignoring further calls");
+            return;
+        }
+        isInitializeStarted = true;
+        serialInits.forEach((initWork) => initWork(args));
+        return init.initialize(args);
+    });
+}
+exports.initialize = initialize;
+setTimeout(() => {
+    if (init.isInitializeStarted() !== true) {
+        throw new Error("xlib.initialize() was not called within 10 seconds of startup.   To use xlib we expect initialization logic to be performed. ");
+    }
+}, 10000);
+exports.lodash = require("lodash");
 ///** low-level javascript helpers, to smooth over warts in the language */
 exports.jsHelper = require("./core/jshelper");
-//jsHelper.initialize();
+const jsShims = require("./core/jsshims");
+serialInits.push(jsShims.initialize);
+///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
+const mockMocha = require("./core/diagnostics/mockmocha");
+serialInits.push(mockMocha.initialize);
+exports.environment = require("./core/environment");
+serialInits.push(exports.environment.initialize);
+exports.promise = require("./core/promise");
+serialInits.push(exports.promise.initialize);
+exports.lolo = require("./core/lolo");
 exports.arrayHelper = require("./core/arrayhelper");
 exports.ClassBase = require("./core/classbase");
 exports.diagnostics = require("./core/diagnostics");
+const diagnostics2 = require("./core/diagnostics");
+const log = new diagnostics2.logging.Logger(__filename);
 exports.exception = require("./core/exception");
 exports.collections = require("./core/collections");
 /** various math and numerical conversion/manipulation related helper functions */
 exports.numHelper = require("./core/numhelper");
 exports.stringHelper = require("./core/stringhelper");
 exports.reflection = require("./core/reflection");
-exports.lodash = require("lodash");
-//set bluebird as our global promise handler
 exports.dateTime = require("./core/datetime");
 exports.validation = require("./core/validation");
 exports.serialization = require("./core/serialization");
@@ -106,7 +134,6 @@ exports.string_decoder = require("string_decoder");
  */
 exports.url = require("url");
 exports.definitions = require("./definitions/definitions");
-const __1 = require("..");
 /**
  * allows describing user input as a Class instead of a POJO, and enforces conformance of the class via templates.
  */
@@ -137,14 +164,16 @@ class PayloadTemplate {
     }
 }
 exports.PayloadTemplate = PayloadTemplate;
-init.onInitialize(() => {
+serialInits.push((args) => {
     mockMocha.initialize();
-    if (__1.__.env.isDebug === true || __1.__.env.isDev === true) {
+    if (exports.lolo.env.isDebug === true || exports.lolo.env.isDev === true) {
         //try {
         ///** https://www.npmjs.com/package/source-map-support
         // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
         //  */
-        console.log("loading sourcemap support (in logLevel.DEBUG or envLevel.DEV)");
+        if (args.suppressStartupMessage !== true) {
+            console.log("loading sourcemap support (in logLevel.DEBUG or envLevel.DEV)");
+        }
         var source_map_support = require("source-map-support");
         source_map_support.install({ handleUncaughtExceptions: false });
         //} catch (ex) {

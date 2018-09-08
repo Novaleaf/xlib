@@ -17,7 +17,7 @@ export function isInitializeStarted() {
 }
 
 let isStarted = false;
-const finishedPromise: promise.IExposedPromise<IInitArgs> = promise.CreateExposedPromise<IInitArgs>();
+let finishedPromise: promise.IExposedPromise<IInitArgs>;
 
 const initWorkArray: Array<promise.IocCallback<IInitArgs, void>> = [];
 
@@ -28,6 +28,7 @@ export async function initialize( args?: IInitArgs ) {
         throw new Error( "initialize already started and trying to start it again" );
     }
     isStarted = true;
+    finishedPromise = promise.CreateExposedPromise<IInitArgs>();
 
 
     for ( let i = 0; i < initWorkArray.length; i++ ) {
@@ -42,7 +43,6 @@ export async function initialize( args?: IInitArgs ) {
 
     finishedPromise.fulfill( args );
 };
-
 
 
 
