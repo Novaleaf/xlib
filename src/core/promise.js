@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const arrayHelper = require("./arrayhelper");
 const _ = require("lodash");
 const __ = require("./lolo");
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance
@@ -9,28 +8,32 @@ const __ = require("./lolo");
 exports.bluebird = require("bluebird");
 const bb = require("bluebird");
 //bluebird.longStackTraces();
-if (__.isDebug == true) {
-    //http://bluebirdjs.com/docs/api/promise.config.html
-    exports.bluebird["config"]({
-        // Enable warnings
-        warnings: true,
-        // Enable long stack traces
-        longStackTraces: true,
-        // if you owan to allow cancelation, see: http://bluebirdjs.com/docs/api/cancellation.html
-        cancellation: false,
-        // Enable monitoring
-        monitoring: true
-    });
+/** binds bluebird as global promise and other various init */
+function initialize() {
+    if (__.env.isDebug || __.env.isDev || __.env.isTest) {
+        //http://bluebirdjs.com/docs/api/promise.config.html
+        exports.bluebird["config"]({
+            // Enable warnings
+            warnings: true,
+            // Enable long stack traces
+            longStackTraces: true,
+            // if you owan to allow cancelation, see: http://bluebirdjs.com/docs/api/cancellation.html
+            cancellation: false,
+            // Enable monitoring
+            monitoring: true
+        });
+    }
+    else {
+        //noop
+    }
+    if (typeof global != "undefined") {
+        global.Promise = exports.bluebird;
+    }
+    if (typeof window != "undefined") {
+        window["Promise"] = exports.bluebird;
+    }
 }
-else {
-    //
-}
-if (typeof global != "undefined") {
-    global.Promise = exports.bluebird;
-}
-if (typeof window != "undefined") {
-    window["Promise"] = exports.bluebird;
-}
+exports.initialize = initialize;
 // /** Reactive Extensions https://github.com/Reactive-Extensions/RxJS 
 // ...is a set of libraries to compose asynchronous and event-based programs using observable collections and Array#extras style composition in JavaScript
 //  * global.Rx is aliased to this.
@@ -88,7 +91,7 @@ function sequentializePromisedFunction(__this, func) {
         });
     }
     function __toReturn() {
-        var args = arrayHelper.copy(arguments);
+        var args = _.clone(arguments);
         __enqueuedCallArguments.push(args);
         if (__isExecuting === true) {
             return __batchPromise;

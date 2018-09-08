@@ -1,9 +1,6 @@
 "use strict";
 //#region re-exports
 Object.defineProperty(exports, "__esModule", { value: true });
-/** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
-const mockMocha = require("./diagnostics/mockmocha");
-mockMocha._initialize();
 exports.logging = require("./diagnostics/logging");
 ///** obtain a stack trace at the callsite */
 //export import stacktrace = require("./diagnostics/stacktrace");

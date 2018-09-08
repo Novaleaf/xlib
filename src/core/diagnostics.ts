@@ -3,9 +3,6 @@
 
 //#region re-exports
 
-/** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
-import mockMocha = require( "./diagnostics/mockmocha" );
-mockMocha._initialize();
 
 export import logging = require( "./diagnostics/logging" );
 

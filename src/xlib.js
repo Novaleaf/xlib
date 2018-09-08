@@ -1,23 +1,19 @@
 "use strict";
 /// <reference path="./types/xlib-globals/index.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
-var jsShims = require("./core/jsshims");
+const init = require("./init");
+const init_1 = require("./init");
+exports.initialize = init_1.initialize;
+const jsShims = require("./core/jsshims");
+init.onInitialize(jsShims.initialize);
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 const mockMocha = require("./core/diagnostics/mockmocha");
-mockMocha._initialize();
-exports.lolo = require("./core/lolo");
-if (exports.lolo.isDebug === true || exports.lolo.isDev === true) {
-    //try {
-    ///** https://www.npmjs.com/package/source-map-support
-    // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
-    //  */
-    console.log("loading sourcemap support (in logLevel.DEBUG or envLevel.DEV)");
-    var source_map_support = require("source-map-support");
-    source_map_support.install({ handleUncaughtExceptions: false });
-    //} catch (ex) {
-    //	console.log("eating sourcemap support call");
-    //}
-}
+init.onInitialize(mockMocha.initialize);
+exports.environment = require("./core/environment");
+init.onInitialize(exports.environment.initialize);
+exports.__ = require("./core/lolo");
+exports.promise = require("./core/promise");
+init.onInitialize(exports.promise.initialize);
 ///** low-level javascript helpers, to smooth over warts in the language */
 exports.jsHelper = require("./core/jshelper");
 //jsHelper.initialize();
@@ -30,19 +26,9 @@ exports.collections = require("./core/collections");
 exports.numHelper = require("./core/numhelper");
 exports.stringHelper = require("./core/stringhelper");
 exports.reflection = require("./core/reflection");
-exports.environment = require("./core/environment");
 exports.lodash = require("lodash");
-//set lodash as a global if it's not.
-if (exports.environment.getGlobal()["_"] == null) {
-    exports.environment.getGlobal()["_"] = exports.lodash;
-}
-exports.promise = require("./core/promise");
 //set bluebird as our global promise handler
 exports.dateTime = require("./core/datetime");
-if (exports.environment.getGlobal()["moment"] == null) {
-    //define momentStatic
-    exports.environment.getGlobal()["moment"] = exports.dateTime.moment;
-}
 exports.validation = require("./core/validation");
 exports.serialization = require("./core/serialization");
 //export import compression = require( "./core/compression" );
@@ -120,6 +106,7 @@ exports.string_decoder = require("string_decoder");
  */
 exports.url = require("url");
 exports.definitions = require("./definitions/definitions");
+const __1 = require("..");
 /**
  * allows describing user input as a Class instead of a POJO, and enforces conformance of the class via templates.
  */
@@ -150,4 +137,27 @@ class PayloadTemplate {
     }
 }
 exports.PayloadTemplate = PayloadTemplate;
+init.onInitialize(() => {
+    mockMocha.initialize();
+    if (__1.__.env.isDebug === true || __1.__.env.isDev === true) {
+        //try {
+        ///** https://www.npmjs.com/package/source-map-support
+        // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
+        //  */
+        console.log("loading sourcemap support (in logLevel.DEBUG or envLevel.DEV)");
+        var source_map_support = require("source-map-support");
+        source_map_support.install({ handleUncaughtExceptions: false });
+        //} catch (ex) {
+        //	console.log("eating sourcemap support call");
+        //}
+    }
+    //set lodash as a global if it's not.
+    if (exports.environment.getGlobal()["_"] == null) {
+        exports.environment.getGlobal()["_"] = exports.lodash;
+    }
+    if (exports.environment.getGlobal()["moment"] == null) {
+        //define momentStatic
+        exports.environment.getGlobal()["moment"] = exports.dateTime.moment;
+    }
+});
 //# sourceMappingURL=xlib.js.map

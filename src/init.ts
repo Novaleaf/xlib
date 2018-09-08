@@ -11,6 +11,16 @@ export type IInitArgs = {
     suppressStartupMessage?: boolean,
 };
 
+
+export function isInitializeStarted() {
+    return isStarted;
+}
+
+let isStarted = false;
+const finishedPromise: promise.IExposedPromise<IInitArgs> = promise.CreateExposedPromise<IInitArgs>();
+
+const initWorkArray: Array<promise.IocCallback<IInitArgs, void>> = [];
+
 export async function initialize( args?: IInitArgs ) {
     args = { ...args };
 
@@ -19,7 +29,16 @@ export async function initialize( args?: IInitArgs ) {
     }
     isStarted = true;
 
-    await bb.all( initWorkArray );
+
+    for ( let i = 0; i < initWorkArray.length; i++ ) {
+        const initWork = initWorkArray[ i ];
+        if ( typeof initWork === "function" ) {
+            await bb.method( initWork )( args );
+        } else {
+            await bb.resolve( initWork );
+        }
+    }
+
 
     finishedPromise.fulfill( args );
 };
@@ -27,31 +46,25 @@ export async function initialize( args?: IInitArgs ) {
 
 
 
-let isStarted = false;
-const finishedPromise: promise.IExposedPromise<IInitArgs> = promise.CreateExposedPromise<IInitArgs>();
-
-const initWorkArray: bb<void>[] = [];
 
 
 /** do work during the .initialize() call.   returning promise yields once all initialize work is complete. */
-export async function onInitialize( /**if your code needs to do asynchronous work during initialize, initialize won't finish until the promise is resolved. */  initWork?: Promise<void> | ( () => Promise<void> ) | ( () => void ) ) {
+export async function onInitialize( /**if your code needs to do asynchronous work during initialize, initialize won't finish until the promise is resolved. */  initWork?: promise.IocCallback<IInitArgs, void> ) {
 
     if ( isStarted ) {
         throw new Error( "initialize already started and you are trying to schedule init work" );
     }
 
     if ( initWork != null ) {
-
-        if ( typeof initWork === "function" ) {
-            initWorkArray.push( bb.try( initWork ) );
-        } else {
-            initWorkArray.push( bb.resolve( initWork ) );
-        }
+        initWorkArray.push( initWork );
+        // if ( typeof initWork === "function" ) {
+        //     initWorkArray.push( bb.try( initWork ) );
+        // } else {
+        //     initWorkArray.push( bb.resolve( initWork ) );
+        // }
     }
 
     return finishedPromise;
 
 
 }
-
-

@@ -1,38 +1,45 @@
 ﻿"use strict";
 
-import arrayHelper = require( "./arrayhelper" );
 import _ = require( "lodash" );
-import __ = require( "./lolo" );
 
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance 
  * global.Promise is aliased to this.
  */
 export import bluebird = require( "bluebird" );
 import * as bb from "bluebird";
+import environment = require( "./environment" )
 
 //bluebird.longStackTraces();
 
-if ( __.isDebug == true ) {
-	//http://bluebirdjs.com/docs/api/promise.config.html
-	bluebird[ "config" ]( {
-		// Enable warnings
-		warnings: true,
-		// Enable long stack traces
-		longStackTraces: true,
-		// if you owan to allow cancelation, see: http://bluebirdjs.com/docs/api/cancellation.html
-		cancellation: false,
-		// Enable monitoring
-		monitoring: true
-	} );
-} else {
-	//
+/** binds bluebird as global promise and other various init */
+export function initialize() {
+	if ( environment.env.isDebug || environment.env.isDev || environment.env.isTest ) {
+		//http://bluebirdjs.com/docs/api/promise.config.html
+		bluebird[ "config" ]( {
+			// Enable warnings
+			warnings: true,
+			// Enable long stack traces
+			longStackTraces: true,
+			// if you owan to allow cancelation, see: http://bluebirdjs.com/docs/api/cancellation.html
+			cancellation: false,
+			// Enable monitoring
+			monitoring: true
+		} );
+	} else {
+		//noop
+	}
+	if ( typeof global != "undefined" ) {
+		global.Promise = bluebird;
+	}
+	if ( typeof window != "undefined" ) {
+		window[ "Promise" ] = bluebird;
+	}
 }
-if ( typeof global != "undefined" ) {
-	global.Promise = bluebird;
-}
-if ( typeof window != "undefined" ) {
-	window[ "Promise" ] = bluebird;
-}
+
+
+/** inversion of control (IoC) to let the caller specify work that will be done by the async method.     values can be a promise, function (sync or async), or result */
+export type IocCallback<TArgs=void, TResults=any> = Promise<TResults> | ( ( args: TArgs ) => Promise<TResults> ) | ( ( args: TArgs ) => TResults ) | TResults;
+
 
 // /** Reactive Extensions https://github.com/Reactive-Extensions/RxJS 
 // ...is a set of libraries to compose asynchronous and event-based programs using observable collections and Array#extras style composition in JavaScript
@@ -77,7 +84,7 @@ export interface IExposedPromise<TReturn=void, TTags={}> extends bb<TReturn> {
 export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: any[] ) => bb<T> ): ( ...args: any[] ) => bb<T[]> {
 	//todo: error handling.
 
-	var __enqueuedCallArguments: any[] = [];
+	var __enqueuedCallArguments: IArguments[] = [];
 	var __isExecuting = false;
 	var __batchPromise: IExposedPromise<T[]> = CreateExposedPromise<T[]>();
 	var __batchResults: T[] = [];
@@ -116,7 +123,7 @@ export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: 
 
 	function __toReturn(): bb<T[]> {
 
-		var args: any[] = arrayHelper.copy( <any>arguments );
+		var args: IArguments = _.clone( arguments );
 
 		__enqueuedCallArguments.push( args );
 
