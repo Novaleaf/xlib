@@ -7,7 +7,8 @@
 import mockMocha = require( "./diagnostics/mockmocha" );
 mockMocha._initialize();
 
-import logging = require( "./diagnostics/logging" );
+export import logging = require( "./diagnostics/logging" );
+
 
 ///** obtain a stack trace at the callsite */
 //export import stacktrace = require("./diagnostics/stacktrace");

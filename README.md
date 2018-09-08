@@ -33,7 +33,7 @@ import * as xlib from "xlib";
 
 
 //log something
-let log = new xlib.logging.Logger(__filename);
+let log = new xlib.diagnostics.logging.Logger(__filename);
 log.info("hi",{some:"data"});
 
 ```

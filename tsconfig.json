@@ -1,6 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
+    "composite": true,
     "module": "commonjs",
     "removeComments": false,
     "preserveConstEnums": true,

@@ -95,7 +95,7 @@ export class EzEndpoint<TSubmitPayload, TRecievePayload>{
 		DEFAULT:  by default we will retry error 500 and above. */
 		public preRetryErrorIntercept: (
 			/** note: network issues are converted into err.response so you don't need to parse them differently.*/
-			err: _axiosDTs.AxiosErrorResponse<TRecievePayload> ) => bb<void> = ( err ) => {
+			err: _axiosDTs.AxiosErrorResponse<TRecievePayload> ) => Promise<void> = async ( err ) => {
 				if ( err.response != null && err.response.status <= 499 ) {
 					//console.assert(false, "err");					
 					return bb.reject( err );

@@ -7,7 +7,11 @@
 ///// <reference types="bluebird" />
 //import * as bluebird from "bluebird";
 
-
+// declare module bluebird {
+// 	declare class Bluebird {
+// 		readonly [ Symbol.toStringTag ]: 'Promise';
+// 	}
+// }
 
 /** used to inject custom type definitions in the global namespace */
 declare global {
