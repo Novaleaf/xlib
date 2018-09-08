@@ -1,3 +1,4 @@
+"use strict";
 /** various compatibilities for browsers with old versions of javascript */
 //declare class Buffer { };
 //vNEXT: disable for ts compile purposes

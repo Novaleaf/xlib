@@ -1,14 +1,15 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "composite": true,
     "module": "commonjs",
     "removeComments": false,
     "preserveConstEnums": true,
     "sourceMap": true,
     "inlineSources": false,
     "inlineSourceMap": false,
+    "composite": false, /////////  really buggy in ts 3.0.3
     "declaration": false,
+    "declarationMap": false, /////////  change for vNext
     "jsx": "react",
     "newLine": "LF",
     "pretty": true,
@@ -18,23 +19,38 @@
     "watch": false,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": false,
-    "noImplicitAny": false,
-    "noImplicitThis": false,
-    "noUnusedLocals": false,
+    "noImplicitReturns": false, /////////  change for vNext
+    "noImplicitAny": false, /////////  change for vNext
+    "noImplicitThis": false, /////////  change for vNext
+    "noUnusedLocals": false, /////////  change for vNext
     "noUnusedParameters": false,
-    "strictNullChecks": false,
-    "suppressExcessPropertyErrors": false,
-    "suppressImplicitAnyIndexErrors": false,
-    "noStrictGenericChecks": true,
-    "skipLibCheck": true,
-    //"strictFunctionTypes": false,
+    "strictNullChecks": false, /////////  change for vNext
+    "suppressExcessPropertyErrors": true, /////////  change for vNext
+    "suppressImplicitAnyIndexErrors": true, /////////  change for vNext
+    "noStrictGenericChecks": true, /////////  change for vNext
+    "skipLibCheck": false,
+    "alwaysStrict": true,
+    "allowJs": false,
+    "allowSyntheticDefaultImports": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": true,
+    //"baseUrl": null,
+    //"charset": null,
+    "checkJs": false,
     "downlevelIteration": true,
-    // "lib": [
-    //   "es2015",
-    //   "dom",
-    //   "es5",
-    // ],
+    "emitBOM": false,
+    "emitDeclarationOnly": false,
+    "disableSizeLimit": false,
+    "emitDecoratorMetadata": false, /////////  change for vNext
+    "esModuleInterop": false, /////////  change for vNext
+    "experimentalDecorators": false, /////////  change for vNext
+    "importHelpers": false, /////////  change for vNext
+    "keyofStringsOnly": true,
+    "noErrorTruncation": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": false, /////////  change for vNext    
     "typeRoots": [
       "./src/types",
     ],
