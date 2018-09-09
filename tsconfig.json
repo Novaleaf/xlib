@@ -7,15 +7,18 @@
     "sourceMap": true,
     "inlineSources": false,
     "inlineSourceMap": false,
-    "composite": true, /////////  really buggy in ts 3.0.3
+    "composite": true,
     "declaration": true,
-    "declarationMap": true, /////////  change for vNext
-    "noEmitOnError": true,
+    "declarationMap": true,
+    "strict": false, /////////  change for vNext    
+    "noEmitOnError": false,
     "jsx": "react",
     "newLine": "LF",
     "pretty": true,
     "stripInternal": true,
-    "diagnostics": false,
+    //"diagnostics": true, // verbose debug output of tsc build
+    //"listFiles": true, // verbose debug output of tsc build
+    //"listEmittedFiles": true, // verbose debug output of tsc build
     "target": "es6",
     "watch": false,
     "moduleResolution": "node",
@@ -51,17 +54,26 @@
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "strictFunctionTypes": true,
-    "strictPropertyInitialization": false, /////////  change for vNext    
+    "strictPropertyInitialization": false, /////////  change for vNext   
     "typeRoots": [
       "./src/types",
     ],
     "types": [
       "xlib-globals",
     ],
+    "outDir": "dist",
+    "rootDir": "src",
   },
+  // "typeAcquisition": { //not enabling to force explicit usage of new types
+  //   "enable": true,
+  // },
+  "include": [
+    "./src/**/*.ts",
+    "./src/.internal/**/*.ts",
+  ],
   "exclude": [
     "node_modules",
-    "src/graveyard",
+    "src/.graveyard",
   ],
   "typedocOptions": {
     "mode": "modules",

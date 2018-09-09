@@ -58,7 +58,7 @@ export const cache = _cache.defaultCache.read.bind( _cache.defaultCache ) as typ
 //export var htmlSanitize = _stringHelper.htmlSanitizeEscapedUserInput;
 
 import environment = require( "./environment" );
-import { stringHelper } from "../xlib";
+import stringHelper = require( "./stringhelper" );
 
 
 // public get value() : string {

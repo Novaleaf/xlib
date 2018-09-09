@@ -2,7 +2,8 @@
   "name": "xlib",
   "version": "10.1.0",
   "description": "A Cross Platform, Monolithic Core Library for Typescript.",
-  "main": "index.js",
+  "main": "./dist/_index.js",
+  "types": "./dist/_index.d.ts",
   "private": false,
   "author": "jason swearingen <jasons@novaleaf.com>",
   "dependencies": {

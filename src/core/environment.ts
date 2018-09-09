@@ -1,21 +1,16 @@
 "use strict";
 
-import nodeHelper = require( "../node/nodehelper" );
-import browserHelper = require( "../browser/browserhelper" );
+import nodeHelper = require( "../.internal/nodehelper" );
+import browserHelper = require( "../.internal/browserhelper" );
 //import ex = require("./exception");
-//import init = require( "../init" );
+import init = require( "../.internal/init" );
+import _ = require( "lodash" );
 
-export type IInitArgs = {
-	disableEnvAutoRead?: boolean,
-	logLevel?: LogLevel,
-	envLevel?: EnvLevel,
-	testLevel?: TestLevel,
-	suppressStartupMessage?: boolean,
-};
+
 
 
 /** allow splitting up our init work near where it's asssociated variables are.   all are run by the exported .initialize() method */
-const _internalInitWork: Array<( args: IInitArgs ) => void> = [];
+const _internalInitWork: Array<( args: init.IInitArgs ) => void> = [];
 
 
 export enum PlatformType {
@@ -115,17 +110,25 @@ export enum LogLevel {
   */
 export var logLevel: LogLevel;
 _internalInitWork.push( ( args ) => {
+	let _logLevel: LogLevel;
 	if ( args.logLevel != null ) {
-		logLevel = args.logLevel;
+		if ( typeof args.logLevel === "string" ) {
+			_logLevel = LogLevel[ args.logLevel ];  //convet string entry to enum
+		} else {
+			_logLevel = args.logLevel;
+		}
 	}
 	if ( args.disableEnvAutoRead !== true ) {
-		logLevel = LogLevel[ getEnvironmentVariable( "logLevel", null ) ] | logLevel;
+		let envLogLevel = getEnvironmentVariable( "logLevel", null );
+		if ( envLogLevel != null ) {
+			_logLevel = LogLevel[ envLogLevel ];
+		}
 	}
-	if ( logLevel == null ) {
-		logLevel = LogLevel.TRACE;
+	if ( _logLevel == null ) {
+		_logLevel = LogLevel.TRACE;
 		if ( args.suppressStartupMessage != true ) {
 			console.info( "logLevel varible is not set.  \n\tdefaulting to logLevel=TRACE." );
-			console.info( "\tPossible values are TRACE, DEBUG, INFO, WARN, ERROR, FATAL." );
+			console.info( `\tPossible values are ${ _.map( LogLevel ).join( ", " ) }` );
 			console.info( "\tHow to modify: " );
 			console.info( "\t\tnodejs: set by running 'node entrypoint.js logLevel=DEBUG' or by setting your systemenv var: logLevel=DEBUG" );
 			console.info( "\t\tbrowser: set by adding 'logLevel= DEBUG' in your querystring, add a cookie, or as a attribute of your html tag" );
@@ -134,9 +137,10 @@ _internalInitWork.push( ( args ) => {
 		}
 	} else {
 		if ( args.suppressStartupMessage != true ) {
-			console.info( "logLevel=" + LogLevel[ logLevel ] );
+			console.info( "logLevel=" + LogLevel[ _logLevel ] );
 		}
 	}
+	logLevel = _logLevel;
 } );
 
 
@@ -150,23 +154,30 @@ _internalInitWork.push( ( args ) => {
 
 export enum EnvLevel {
 	DEV = 10,
-	//TEST = 20,
-	//PREPROD = 30,
+	TEST = 20,
+	UAT = 30,
 	PROD = 40,
 }
 export var envLevel: EnvLevel;
 _internalInitWork.push( ( args ) => {
 	if ( args.envLevel != null ) {
-		envLevel = args.envLevel;
+		if ( typeof args.envLevel === "string" ) {
+			envLevel = EnvLevel[ args.envLevel ]; //convet string entry to enum
+		} else {
+			envLevel = args.envLevel;
+		}
 	}
 	if ( args.disableEnvAutoRead !== true ) {
-		envLevel = EnvLevel[ getEnvironmentVariable( "envLevel", null ) ] | envLevel;
+		let envEnvLevel = getEnvironmentVariable( "envLevel", null );
+		if ( envEnvLevel != null ) {
+			envLevel = EnvLevel[ envEnvLevel ];
+		}
 	}
 	if ( envLevel == null ) {
 		envLevel = EnvLevel.DEV;
 		if ( args.suppressStartupMessage != true ) {
 			console.info( "envLevel varible is not set.  \n\tdefaulting to envLevel=DEV." );
-			console.info( "\tPossible values are DEV, PROD." );
+			console.info( `\tPossible values are ${ _.map( EnvLevel ).join( ", " ) }.` );
 			console.info( "\tHow to modify: " );
 			console.info( "\t\tnodejs: set by running 'node entrypoint.js envLevel=PROD' or by setting your systemenv var: envLevel=PROD" );
 			console.info( "\t\tbrowser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag" );
@@ -180,26 +191,34 @@ _internalInitWork.push( ( args ) => {
 
 export enum TestLevel {
 	NONE = 0,
-	//TEST = 20,
-	//PREPROD = 30,
-	FULL = 40,
+	UNIT = 10,
+	INTEGRATION = 20,
+	SYSTEM = 30,
+	ACCEPTANCE = 40,
 }
 export var testLevel: TestLevel
 _internalInitWork.push( ( args ) => {
 	if ( args.testLevel != null ) {
-		testLevel = args.testLevel;
+		if ( typeof args.testLevel === "string" ) {
+			testLevel = TestLevel[ args.testLevel ]; //convet string entry to enum
+		} else {
+			testLevel = args.testLevel;
+		}
 	}
 	if ( args.disableEnvAutoRead !== true ) {
-		testLevel = TestLevel[ getEnvironmentVariable( "testLevel", null ) ] | testLevel;
+		let envTestLevel = getEnvironmentVariable( "testLevel", null );
+		if ( envTestLevel != null ) {
+			testLevel = TestLevel[ envTestLevel ];
+		}
 	}
 	if ( testLevel == null ) {
-		testLevel = TestLevel.FULL;
+		testLevel = TestLevel.ACCEPTANCE;
 		if ( args.suppressStartupMessage != true ) {
-			console.info( "testLevel varible is not set.  \n\tdefaulting to testLevel=FULL." );
-			console.info( "\tPossible values are NONE, FULL." );
+			console.info( "testLevel varible is not set.  \n\tdefaulting to testLevel=ACCEPTANCE." );
+			console.info( `\tPossible values are ${ _.map( TestLevel ).join( ", " ) }` );
 			console.info( "\tHow to modify: " );
-			console.info( "\t\tnodejs: set by running 'node entrypoint.js testLevel=FULL' or by setting your systemenv var: testLevel=FULL" );
-			console.info( "\t\tbrowser: set by adding 'testLevel=FULL' in your querystring, add a cookie, or as a attribute of your html tag" );
+			console.info( "\t\tnodejs: set by running 'node entrypoint.js testLevel=ACCEPTANCE' or by setting your systemenv var: testLevel=ACCEPTANCE" );
+			console.info( "\t\tbrowser: set by adding 'testLevel=ACCEPTANCE' in your querystring, add a cookie, or as a attribute of your html tag" );
 		}
 	} else {
 		if ( args.suppressStartupMessage != true ) {
@@ -209,33 +228,51 @@ _internalInitWork.push( ( args ) => {
 } );
 
 
-
-
 export const env = {
 
-	/**
-		*  current envLevel (real or fake data) shortcut for ```environment.envLevel <= environment.EnvLevel.DEV```
-		*/
-	get isDev() { return envLevel <= EnvLevel.DEV; },
+	/** returns true if the current envLevel==="PROD", otherwise false.  shortcut for ```environment.envLevel === environment.EnvLevel.PROD */
+	get isProd() {
+		return envLevel === EnvLevel.PROD;
+	},
 
 	/**
-		*  current testLevel (if tests are enabled or not) shortcut for ```environment.envLevel >= environment.EnvLevel.FULL```
+		*  returns true if the current logLevel is DEBUG or TRACE. shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
 		*/
-	get isTest() { return testLevel === TestLevel.FULL; },
-	/**
-		*  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.TRACE```
-		*/
-	get isTrace() { return logLevel <= LogLevel.TRACE; },
-	/**
-		*  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
-		*/
-	get isDebug() { return logLevel <= LogLevel.DEBUG; },
-	/**
-		*  current envLevel (real or fake data)  shortcut for ```environment.envLevel === environment.EnvLevel.PROD```
-		*/
-	get isProd() { return envLevel === EnvLevel.PROD; },
+	get isDebug() {
+		return logLevel <= LogLevel.DEBUG;
+	},
 
+	/**
+		*  returns true if the current testLevel is greater than NONE. shortcut for ```environment.testLevel > environment.TestLevel.NONE```
+		*/
+	get isTest() { return testLevel > TestLevel.NONE; },
 }
+
+// export const env = {
+
+// 	/**
+// 		*  if the current environment is set to DEV.  shortcut for ```environment.envLevel === environment.EnvLevel.DEV```
+// 		*/
+// 	get isDev() { return envLevel === EnvLevel.DEV; },
+
+// 	/**
+// 		*  current testLevel (if tests are enabled or not) shortcut for ```environment.envLevel >= environment.EnvLevel.FULL```
+// 		*/
+// 	get isTest() { return testLevel === TestLevel.FULL; },
+// 	/**
+// 		*  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.TRACE```
+// 		*/
+// 	get isTrace() { return logLevel <= LogLevel.TRACE; },
+// 	/**
+// 		*  current logLevel (details of debug info displayed) shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
+// 		*/
+// 	get isDebug() { return logLevel <= LogLevel.DEBUG; },
+// 	/**
+// 		*  current envLevel (real or fake data)  shortcut for ```environment.envLevel === environment.EnvLevel.PROD```
+// 		*/
+// 	get isProd() { return envLevel === EnvLevel.PROD; },
+
+// }
 
 
 /** no op the input function if not running LogLevel <= DEBUG.
@@ -253,19 +290,19 @@ export function _ifDebug( fcn: Function ): any {
 }
 
 
-/** no op the input function if not running in test mode.
-  * for uglify / closure-compiler dead-code optimization (minification)
-  */
-export function _ifTest( fcn: Function ): any {
-	if ( testLevel >= TestLevel.FULL ) {
-		return fcn;
-	} else {
-		//no op
-		/* tslint:disable */
-		return () => { };
-		/* tslint:enable */
-	}
-}
+// /** no op the input function if not running in test mode.
+//   * for uglify / closure-compiler dead-code optimization (minification)
+//   */
+// export function _ifTest( fcn: Function ): any {
+// 	if ( testLevel >= TestLevel.FULL ) {
+// 		return fcn;
+// 	} else {
+// 		//no op
+// 		/* tslint:disable */
+// 		return () => { };
+// 		/* tslint:enable */
+// 	}
+// }
 
 
 /** read an "environment variable".
@@ -326,6 +363,6 @@ export function getEnvironmentVariable( key: string, valueIfNullOrEmpty?: string
 
 
 /** reads in various environmental and process details and make it easily usable by devs */
-export function initialize( args: IInitArgs ) {
+export function initialize( args: init.IInitArgs ) {
 	_internalInitWork.forEach( ( fcn ) => { fcn( args ) } );
 }

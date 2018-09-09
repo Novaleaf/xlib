@@ -2,27 +2,22 @@
 
 
 
-
-export type IInitArgs = {} & environment.IInitArgs & diagnostics.logging.IInitArgs;
-
-
 /** need to do init work serially, at least until after promise initializtaion, so taht bluebird can initialize properly  (it can't initialize once a promise has been created) */
-const serialInits: Array<( ( args: IInitArgs ) => void )> = [];
+const serialInits: Array<( ( args: init.IInitArgs ) => void )> = [];
 
 import jsShims = require( "./core/jsshims" );
 serialInits.push( jsShims.initialize );
 
 export import environment = require( "./core/environment" );
-import __env = require( "./core/environment" );
-serialInits.push( __env.initialize );
+serialInits.push( environment.initialize );
 
 export import promise = require( "./core/promise" );
 serialInits.push( promise.initialize );
 
 //////////////////////  initialization section
-import init = require( "./init" );
+import init = require( "./.internal/init" );
 let isInitializeStarted = false;
-export async function initialize( args?: IInitArgs ) {
+export async function initialize( args?: init.IInitArgs ) {
     args = { ...args };
 
     if ( isInitializeStarted === true ) {
@@ -58,9 +53,7 @@ export import lolo = require( "./core/lolo" );
 export import arrayHelper = require( "./core/arrayhelper" );
 export import ClassBase = require( "./core/classbase" );
 export import diagnostics = require( "./core/diagnostics" );
-import __diag = require( "./core/diagnostics" );
-serialInits.push( __diag.logging.initialize );
-const log = new __diag.logging.Logger( __filename );
+const log = new diagnostics.logging.Logger( __filename );
 export import collections = require( "./core/collections" );
 
 /** various math and numerical conversion/manipulation related helper functions */
@@ -167,8 +160,6 @@ export import string_decoder = require( "string_decoder" );
 export import url = require( "url" );
 
 export import definitions = require( "./definitions/definitions" );
-import { resolve } from "bluebird";
-import { diagnostics, environment } from "..";
 
 
 
@@ -223,18 +214,18 @@ export abstract class PayloadTemplate<TThis>{
 }
 
 
-serialInits.push( ( args: IInitArgs ) => {
+serialInits.push( ( args: init.IInitArgs ) => {
 
     mockMocha.initialize();
 
 
-    if ( lolo.env.isDebug === true || lolo.env.isDev === true ) {
+    if ( lolo.env.isDebug === true ) {
         //try {
         ///** https://www.npmjs.com/package/source-map-support
         // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
         //  */
         if ( args.suppressStartupMessage !== true ) {
-            console.log( "loading sourcemap support (in logLevel.DEBUG or envLevel.DEV)" );
+            console.log( "loading sourcemap support (in logLevel.DEBUG or TRACE" );
         }
         var source_map_support = require( "source-map-support" );
         source_map_support.install( { handleUncaughtExceptions: false } );
@@ -245,13 +236,49 @@ serialInits.push( ( args: IInitArgs ) => {
 
 
     //set lodash as a global if it's not.
-    if ( __env.getGlobal()[ "_" ] == null ) {
-        __env.getGlobal()[ "_" ] = lodash;
+    if ( environment.getGlobal()[ "_" ] == null ) {
+        environment.getGlobal()[ "_" ] = lodash;
     }
 
 
-    if ( __env.getGlobal()[ "moment" ] == null ) {
+    if ( environment.getGlobal()[ "moment" ] == null ) {
         //define momentStatic
-        __env.getGlobal()[ "moment" ] = dateTime.moment;
+        environment.getGlobal()[ "moment" ] = dateTime.moment;
     }
+} );
+
+
+describe( __filename + " basic xlib unit tests", () => {
+
+    before( async () => {
+        await initialize();
+    } );
+
+
+
+
+
+    it( "logger basic console output", async () => {
+
+        const testLogger = new diagnostics.logging.Logger( "test logging" );
+
+        testLogger.trace( "traced" );
+        testLogger.info( "infoed" );
+        testLogger.warn( "warned" );
+        testLogger.error( "errored" );
+
+    } );
+
+    it( "should fail, test log.assert()", () => {
+        log.assert( false, "assert condition" );
+    } )
+
+
+    it( "read env", () => {
+
+        log.assert( environment.envLevel != null );
+
+    } );
+
+
 } );

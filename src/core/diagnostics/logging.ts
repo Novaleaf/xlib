@@ -13,6 +13,9 @@ import _ = require( "lodash" );
 import moment = require( "moment" );
 import assert = require( "assert" );
 import Exception = ex.Exception;
+
+import init = require( "../../.internal/init" );
+
 class LoggerFatalException extends Exception { }
 
 /** coloring for node console */
@@ -206,22 +209,19 @@ interface IReplacement extends IAnsiColor {
 //    }
 //}
 
-export type IInitArgs = {
-	logLevelOverrides?: { namePattern: RegExp, newLogLevel: environment.LogLevel }[],
-}
-/** @hidden */
-export function initialize( args: IInitArgs ) {
-	Logger.initialize();
-}
+init.onInitialize( ( args: init.IInitArgs ) => { Logger.initialize( args ); } )
+
 
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
 export class Logger {
 
 
 	/** @hidden */
-	public static initialize() {
+	public static initialize( args: init.IInitArgs ) {
 		Logger._overriddenStorage = Logger.__overridenStorageHelper_parseEnv();
 	}
+
+
 
 	/** override the loglevel for specific, focused debugging.   */
 	public static overrideLogLevel( namePattern: RegExp, newLogLevel: environment.LogLevel ) {
@@ -229,7 +229,7 @@ export class Logger {
 	}
 
 	/** helper for applying env.logLevelOverrides */
-	private static __overridenStorageHelper_parseEnv(): IInitArgs {
+	private static __overridenStorageHelper_parseEnv(): init.IInitArgs {
 		const envVar = environment.getEnvironmentVariable( "logLevelOverrides", null );
 		if ( envVar == null || envVar.length === 0 ) {
 			return { logLevelOverrides: [] };
@@ -251,7 +251,7 @@ export class Logger {
 	}
 
 	/** storage of  env.logLevelOverrides  for filtering log requests .  set by the .initialize() static method */
-	protected static _overriddenStorage: IInitArgs;
+	protected static _overriddenStorage: init.IInitArgs;
 
 	constructor( public name: string, public logLevel?: environment.LogLevel ) {
 	}
@@ -300,11 +300,15 @@ export class Logger {
 	 */
 	private _log( targetLogLevel: environment.LogLevel, args: any[] ): any[] {
 
-		let minimumLogLevel = this.logLevel | environment.logLevel;
+		let minimumLogLevel: environment.LogLevel = this.logLevel | environment.logLevel;
 		//allow runtime adjustment of loglevels (useful for focused debugging)
 		Logger._overriddenStorage.logLevelOverrides.forEach( ( pair ) => {
 			if ( pair.namePattern.test( this.name ) ) {
-				minimumLogLevel = pair.newLogLevel;
+				if ( typeof pair.newLogLevel === "string" ) {
+					minimumLogLevel = environment.LogLevel[ pair.newLogLevel ];
+				} else {
+					minimumLogLevel = pair.newLogLevel;
+				}
 			}
 		} );
 
