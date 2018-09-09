@@ -7,7 +7,7 @@ import _ = require( "lodash" );
  */
 export import bluebird = require( "bluebird" );
 import * as bb from "bluebird";
-import environment = require( "./environment" )
+import environment = require( "./environment" );
 
 //bluebird.longStackTraces();
 

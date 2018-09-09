@@ -45,7 +45,7 @@
     "emitDecoratorMetadata": false, /////////  change for vNext
     "esModuleInterop": false, /////////  change for vNext
     "experimentalDecorators": false, /////////  change for vNext
-    "importHelpers": false, /////////  change for vNext
+    "importHelpers": true, /////////  change for vNext
     "keyofStringsOnly": true,
     "noErrorTruncation": true,
     "noFallthroughCasesInSwitch": true,

@@ -95,8 +95,8 @@ _internalInitWork.push((args) => {
     if (args.logLevel != null) {
         exports.logLevel = args.logLevel;
     }
-    else {
-        exports.logLevel = LogLevel[getEnvironmentVariable("logLevel", null)];
+    if (args.disableEnvAutoRead !== true) {
+        exports.logLevel = LogLevel[getEnvironmentVariable("logLevel", null)] | exports.logLevel;
     }
     if (exports.logLevel == null) {
         exports.logLevel = LogLevel.TRACE;
@@ -134,8 +134,8 @@ _internalInitWork.push((args) => {
     if (args.envLevel != null) {
         exports.envLevel = args.envLevel;
     }
-    else {
-        exports.envLevel = EnvLevel[getEnvironmentVariable("envLevel", null)];
+    if (args.disableEnvAutoRead !== true) {
+        exports.envLevel = EnvLevel[getEnvironmentVariable("envLevel", null)] | exports.envLevel;
     }
     if (exports.envLevel == null) {
         exports.envLevel = EnvLevel.DEV;
@@ -164,8 +164,8 @@ _internalInitWork.push((args) => {
     if (args.testLevel != null) {
         exports.testLevel = args.testLevel;
     }
-    else {
-        exports.testLevel = TestLevel[getEnvironmentVariable("testLevel", null)];
+    if (args.disableEnvAutoRead !== true) {
+        exports.testLevel = TestLevel[getEnvironmentVariable("testLevel", null)] | exports.testLevel;
     }
     if (exports.testLevel == null) {
         exports.testLevel = TestLevel.FULL;

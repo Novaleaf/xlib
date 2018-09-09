@@ -28,6 +28,7 @@
     "sanitize-html": "^1.11.3",
     "source-map-support": "^0.3.3",
     "sprintf-js": "^1.0.3",
+    "tslib": "^1.9.3",
     "validator": "^4.2.1"
   },
   "devDependencies": {},

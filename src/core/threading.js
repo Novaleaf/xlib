@@ -1,13 +1,6 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
 const _ = require("lodash");
 const bb = require("bluebird");
 //declare var Promise: bb<any>;
@@ -145,7 +138,7 @@ class AsyncReaderWriterLock {
         return this.pendingWrites.length > 0;
     }
     readBegin() {
-        return __awaiter(this, void 0, void 0, function* () {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
             //let readToken = 
             if (this.pendingWrites.length > 0) {
                 //this.pendingReads.push(promise.CreateExposedPromise());
@@ -181,7 +174,7 @@ class AsyncReaderWriterLock {
         return true;
     }
     writeBegin() {
-        return __awaiter(this, void 0, void 0, function* () {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const writeId = this.writeCounter++;
             let thisWrite = promise.CreateExposedPromise(undefined, { writeId });
             this.pendingWrites.push(thisWrite);
@@ -200,7 +193,7 @@ class AsyncReaderWriterLock {
         });
     }
     writeEnd(/**write the data, or if a promise is passed, an exclusive write lock will be held until it exits*/ valueOrWritePromise) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
             try {
                 //log.assert( thisWrite._tags.writeId === writeId, "writeId mismatch" );
                 if (valueOrWritePromise instanceof bb || (_.isObject(valueOrWritePromise) && _.isFunction(valueOrWritePromise.then))) {
@@ -221,7 +214,7 @@ class AsyncReaderWriterLock {
     }
     /** hold a non-exclusive read lock for the duration of the promise. */
     read(/** until this promise returns, a non-exclusive read lock will be held*/ readFcn) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
             if (readFcn == null && this.currentWrite == null) {
                 //high performance scenario where we just return the value without doing awaits
                 return this._value;
@@ -240,7 +233,7 @@ class AsyncReaderWriterLock {
     }
     /** hold an exclusive write lock for the duration of the promise. */
     write(/**write the data, or if a promise is passed, an exclusive write lock will be held until it exits*/ valueOrWritePromise) {
-        return __awaiter(this, void 0, void 0, function* () {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
             let toWrite;
             yield this.writeBegin();
             return this.writeEnd(valueOrWritePromise);

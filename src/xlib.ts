@@ -1,11 +1,28 @@
 /// <reference path="./types/xlib-globals/index.d.ts" />
 
+
+
+
+export type IInitArgs = {} & environment.IInitArgs & diagnostics.logging.IInitArgs;
+
+
+/** need to do init work serially, at least until after promise initializtaion, so taht bluebird can initialize properly  (it can't initialize once a promise has been created) */
+const serialInits: Array<( ( args: IInitArgs ) => void )> = [];
+
+import jsShims = require( "./core/jsshims" );
+serialInits.push( jsShims.initialize );
+
+export import environment = require( "./core/environment" );
+import __env = require( "./core/environment" );
+serialInits.push( __env.initialize );
+
+export import promise = require( "./core/promise" );
+serialInits.push( promise.initialize );
+
 //////////////////////  initialization section
 import init = require( "./init" );
-/** need to do init work serially, at least until after promise initializtaion, so taht bluebird can initialize properly  (it can't initialize once a promise has been created) */
-const serialInits: Array<( ( args: init.IInitArgs ) => void )> = [];
 let isInitializeStarted = false;
-export async function initialize( args?: init.IInitArgs ) {
+export async function initialize( args?: IInitArgs ) {
     args = { ...args };
 
     if ( isInitializeStarted === true ) {
@@ -26,31 +43,24 @@ setTimeout( () => {
 
 
 export import lodash = require( "lodash" );
+
+export import exception = require( "./core/exception" );
+
 ///** low-level javascript helpers, to smooth over warts in the language */
 export import jsHelper = require( "./core/jshelper" );
 
-import jsShims = require( "./core/jsshims" );
-serialInits.push( jsShims.initialize );
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 import mockMocha = require( "./core/diagnostics/mockmocha" );
 serialInits.push( mockMocha.initialize );
 
-
-export import environment = require( "./core/environment" );
-serialInits.push( environment.initialize );
-
-
-export import promise = require( "./core/promise" );
-serialInits.push( promise.initialize );
-
 export import lolo = require( "./core/lolo" );
 export import arrayHelper = require( "./core/arrayhelper" );
 export import ClassBase = require( "./core/classbase" );
 export import diagnostics = require( "./core/diagnostics" );
-import diagnostics2 = require( "./core/diagnostics" );
-const log = new diagnostics2.logging.Logger( __filename );
-export import exception = require( "./core/exception" );
+import __diag = require( "./core/diagnostics" );
+serialInits.push( __diag.logging.initialize );
+const log = new __diag.logging.Logger( __filename );
 export import collections = require( "./core/collections" );
 
 /** various math and numerical conversion/manipulation related helper functions */
@@ -158,7 +168,7 @@ export import url = require( "url" );
 
 export import definitions = require( "./definitions/definitions" );
 import { resolve } from "bluebird";
-import { diagnostics } from "..";
+import { diagnostics, environment } from "..";
 
 
 
@@ -213,7 +223,7 @@ export abstract class PayloadTemplate<TThis>{
 }
 
 
-serialInits.push( ( args: init.IInitArgs ) => {
+serialInits.push( ( args: IInitArgs ) => {
 
     mockMocha.initialize();
 
@@ -235,13 +245,13 @@ serialInits.push( ( args: init.IInitArgs ) => {
 
 
     //set lodash as a global if it's not.
-    if ( environment.getGlobal()[ "_" ] == null ) {
-        environment.getGlobal()[ "_" ] = lodash;
+    if ( __env.getGlobal()[ "_" ] == null ) {
+        __env.getGlobal()[ "_" ] = lodash;
     }
 
 
-    if ( environment.getGlobal()[ "moment" ] == null ) {
+    if ( __env.getGlobal()[ "moment" ] == null ) {
         //define momentStatic
-        environment.getGlobal()[ "moment" ] = dateTime.moment;
+        __env.getGlobal()[ "moment" ] = dateTime.moment;
     }
 } );

@@ -30,7 +30,11 @@ You can check out the [PhantomJsCloud](https://www.npmjs.com/package/phantomjscl
 
 import * as xlib from "xlib";
 //override environment variables we otherwise read from the node.commandline, system.env, or browser.querystring
-
+xlib.initialize( {
+	envLevel: xlib.environment.EnvLevel.DEV,
+	logLevel: xlib.environment.LogLevel.INFO,
+	suppressStartupMessage: true,
+} );
 
 //log something
 let log = new xlib.diagnostics.logging.Logger(__filename);
@@ -71,25 +75,23 @@ a robust and configurable logger, with log-levels set via global environment var
 ***limitations***:  only logs to console for now.  A configurable listener would be preferable, if you want to send a pull request!
 
 #### Environmental/Startup Options
-by default, when you import ```xlib``` it will initialize it's ```xlib.environment``` variables with default values, and verbosely log its self-setting of defaults:
+When you import ```xlib``` you need to invoke it's ```xlib.initialize()``` method.  It has default values aimed at dev+debug builds, which can be adjusted easily:
 - ```logLevel``` defaults to ```TRACE```
-- ```envLevel``` defaults to ```PREPROD```
-- ```isTest``` defaults to ```FALSE```
-- ```isDev``` defaults to ```FALSE```
+- ```envLevel``` defaults to ```DEV```
+- ```testLevel``` defaults to ```NONE```
 
-if you don't want to set environmental or startup options, you can instead set a ```global._xlibConfigDefaults``` object.  This also silences the verbose console output.
+Also, you can silence startup console output by passing the ```suppressStartupMessage: true``` parameter.
 
 here's an example of how you can use it:
 ``` typescript
-//specify xlib config options, without requiring environmental config
-(global as any)._xlibConfigDefaults = {
-	logLevel: "ERROR",
-	envLevel: "PROD",
-	isTest: "FALSE",
-	isDev: "FALSE",
-	sourceMapSupport: true,
-} as typeof _xlibConfigDefaults;
 import xlib = require("xlib");
+xlib.initialize( {
+	envLevel: xlib.environment.EnvLevel.DEV,
+    logLevel: xlib.environment.LogLevel.INFO,
+    testLevel: xlib.environment.TestLevel.FULL,
+    disableEnvAutoRead: true, //won't read env vars from environment, which can override your passed in vars    
+	suppressStartupMessage: true,
+} );
 ```
  
 
@@ -101,16 +103,10 @@ import xlib = require("xlib");
 
 the 10.x  branch (and semver) is a restructure of this project to take advantage of the now fully mature typescript ecosystem.  Prior to 10.x, to publish a typescript project was a tedious process.
 
-## planned future work
+## planned future work (roadmap)
 
 ```xlib```'s core functionality has been used in production code since 2015.   While mostly stable since, here are the future plans:
 
-- **v.major,  explicit initialization**:   removal of all auto-initialization code (such as picking up environmental variables and configuring log levels)  and put them into options of an initialization function, something like: 
-
-	```typescript
-	import * as xlib from "xlib";
-	xlib.initialize({autoDetect:false,logLevel:"trace", env:"dev", tests:true});
-	```
 - **v.major, async**:  refactor to support async workflows by default
 
 --------

@@ -3,10 +3,19 @@
 import nodeHelper = require( "../node/nodehelper" );
 import browserHelper = require( "../browser/browserhelper" );
 //import ex = require("./exception");
-import init = require( "../init" );
+//import init = require( "../init" );
+
+export type IInitArgs = {
+	disableEnvAutoRead?: boolean,
+	logLevel?: LogLevel,
+	envLevel?: EnvLevel,
+	testLevel?: TestLevel,
+	suppressStartupMessage?: boolean,
+};
+
 
 /** allow splitting up our init work near where it's asssociated variables are.   all are run by the exported .initialize() method */
-const _internalInitWork: Array<( args: init.IInitArgs ) => void> = [];
+const _internalInitWork: Array<( args: IInitArgs ) => void> = [];
 
 
 export enum PlatformType {
@@ -108,8 +117,9 @@ export var logLevel: LogLevel;
 _internalInitWork.push( ( args ) => {
 	if ( args.logLevel != null ) {
 		logLevel = args.logLevel;
-	} else {
-		logLevel = LogLevel[ getEnvironmentVariable( "logLevel", null ) ];
+	}
+	if ( args.disableEnvAutoRead !== true ) {
+		logLevel = LogLevel[ getEnvironmentVariable( "logLevel", null ) ] | logLevel;
 	}
 	if ( logLevel == null ) {
 		logLevel = LogLevel.TRACE;
@@ -148,8 +158,9 @@ export var envLevel: EnvLevel;
 _internalInitWork.push( ( args ) => {
 	if ( args.envLevel != null ) {
 		envLevel = args.envLevel;
-	} else {
-		envLevel = EnvLevel[ getEnvironmentVariable( "envLevel", null ) ];
+	}
+	if ( args.disableEnvAutoRead !== true ) {
+		envLevel = EnvLevel[ getEnvironmentVariable( "envLevel", null ) ] | envLevel;
 	}
 	if ( envLevel == null ) {
 		envLevel = EnvLevel.DEV;
@@ -177,8 +188,9 @@ export var testLevel: TestLevel
 _internalInitWork.push( ( args ) => {
 	if ( args.testLevel != null ) {
 		testLevel = args.testLevel;
-	} else {
-		testLevel = TestLevel[ getEnvironmentVariable( "testLevel", null ) ];
+	}
+	if ( args.disableEnvAutoRead !== true ) {
+		testLevel = TestLevel[ getEnvironmentVariable( "testLevel", null ) ] | testLevel;
 	}
 	if ( testLevel == null ) {
 		testLevel = TestLevel.FULL;
@@ -314,6 +326,6 @@ export function getEnvironmentVariable( key: string, valueIfNullOrEmpty?: string
 
 
 /** reads in various environmental and process details and make it easily usable by devs */
-export function initialize( args: init.IInitArgs ) {
+export function initialize( args: IInitArgs ) {
 	_internalInitWork.forEach( ( fcn ) => { fcn( args ) } );
 }

@@ -1,16 +1,16 @@
 /// <reference path="types/xlib-globals/index.d.ts" />
 /// <reference types="node" />
-import init = require("./init");
-export declare function initialize(args?: init.IInitArgs): Promise<void>;
-export import lodash = require("lodash");
-export import jsHelper = require("./core/jshelper");
+export declare type IInitArgs = {} & environment.IInitArgs & diagnostics.logging.IInitArgs;
 export import environment = require("./core/environment");
 export import promise = require("./core/promise");
+export declare function initialize(args?: IInitArgs): Promise<void>;
+export import lodash = require("lodash");
+export import exception = require("./core/exception");
+export import jsHelper = require("./core/jshelper");
 export import lolo = require("./core/lolo");
 export import arrayHelper = require("./core/arrayhelper");
 export import ClassBase = require("./core/classbase");
 export import diagnostics = require("./core/diagnostics");
-export import exception = require("./core/exception");
 export import collections = require("./core/collections");
 /** various math and numerical conversion/manipulation related helper functions */
 export import numHelper = require("./core/numhelper");
@@ -89,6 +89,7 @@ export import string_decoder = require("string_decoder");
  */
 export import url = require("url");
 export import definitions = require("./definitions/definitions");
+import { diagnostics, environment } from "..";
 /**
  * allows describing user input as a Class instead of a POJO, and enforces conformance of the class via templates.
  */

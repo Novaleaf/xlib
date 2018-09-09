@@ -1,21 +1,21 @@
 "use strict";
 /// <reference path="./types/xlib-globals/index.d.ts" />
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-//////////////////////  initialization section
-const init = require("./init");
+const tslib_1 = require("tslib");
 /** need to do init work serially, at least until after promise initializtaion, so taht bluebird can initialize properly  (it can't initialize once a promise has been created) */
 const serialInits = [];
+const jsShims = require("./core/jsshims");
+serialInits.push(jsShims.initialize);
+exports.environment = require("./core/environment");
+const __env = require("./core/environment");
+serialInits.push(__env.initialize);
+exports.promise = require("./core/promise");
+serialInits.push(exports.promise.initialize);
+//////////////////////  initialization section
+const init = require("./init");
 let isInitializeStarted = false;
 function initialize(args) {
-    return __awaiter(this, void 0, void 0, function* () {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
         args = Object.assign({}, args);
         if (isInitializeStarted === true) {
             log.warn("xlib.initialize() already called, we are ignoring further calls");
@@ -33,24 +33,19 @@ setTimeout(() => {
     }
 }, 10000);
 exports.lodash = require("lodash");
+exports.exception = require("./core/exception");
 ///** low-level javascript helpers, to smooth over warts in the language */
 exports.jsHelper = require("./core/jshelper");
-const jsShims = require("./core/jsshims");
-serialInits.push(jsShims.initialize);
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 const mockMocha = require("./core/diagnostics/mockmocha");
 serialInits.push(mockMocha.initialize);
-exports.environment = require("./core/environment");
-serialInits.push(exports.environment.initialize);
-exports.promise = require("./core/promise");
-serialInits.push(exports.promise.initialize);
 exports.lolo = require("./core/lolo");
 exports.arrayHelper = require("./core/arrayhelper");
 exports.ClassBase = require("./core/classbase");
 exports.diagnostics = require("./core/diagnostics");
-const diagnostics2 = require("./core/diagnostics");
-const log = new diagnostics2.logging.Logger(__filename);
-exports.exception = require("./core/exception");
+const __diag = require("./core/diagnostics");
+serialInits.push(__diag.logging.initialize);
+const log = new __diag.logging.Logger(__filename);
 exports.collections = require("./core/collections");
 /** various math and numerical conversion/manipulation related helper functions */
 exports.numHelper = require("./core/numhelper");
@@ -181,12 +176,12 @@ serialInits.push((args) => {
         //}
     }
     //set lodash as a global if it's not.
-    if (exports.environment.getGlobal()["_"] == null) {
-        exports.environment.getGlobal()["_"] = exports.lodash;
+    if (__env.getGlobal()["_"] == null) {
+        __env.getGlobal()["_"] = exports.lodash;
     }
-    if (exports.environment.getGlobal()["moment"] == null) {
+    if (__env.getGlobal()["moment"] == null) {
         //define momentStatic
-        exports.environment.getGlobal()["moment"] = exports.dateTime.moment;
+        __env.getGlobal()["moment"] = exports.dateTime.moment;
     }
 });
 //# sourceMappingURL=xlib.js.map

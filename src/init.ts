@@ -3,32 +3,24 @@ import promise = require( "./core/promise" );
 import * as environment from './core/environment';
 import bb = promise.bluebird;
 
-export type IInitArgs = {
-    disableEnvAutoRead?: boolean,
-    logLevel?: environment.LogLevel,
-    envLevel?: environment.EnvLevel,
-    testLevel?: environment.TestLevel,
-    suppressStartupMessage?: boolean,
-};
-
 
 export function isInitializeStarted() {
     return isStarted;
 }
 
 let isStarted = false;
-let finishedPromise: promise.IExposedPromise<IInitArgs>;
+let finishedPromise: promise.IExposedPromise<any>;
 
-const initWorkArray: Array<promise.IocCallback<IInitArgs, void>> = [];
+const initWorkArray: Array<promise.IocCallback<any, void>> = [];
 
-export async function initialize( args?: IInitArgs ) {
+export async function initialize<TArgs>( args?: any ) {
     args = { ...args };
 
     if ( isStarted ) {
         throw new Error( "initialize already started and trying to start it again" );
     }
     isStarted = true;
-    finishedPromise = promise.CreateExposedPromise<IInitArgs>();
+    finishedPromise = promise.CreateExposedPromise<any>();
 
 
     for ( let i = 0; i < initWorkArray.length; i++ ) {
@@ -49,7 +41,7 @@ export async function initialize( args?: IInitArgs ) {
 
 
 /** do work during the .initialize() call.   returning promise yields once all initialize work is complete. */
-export async function onInitialize( /**if your code needs to do asynchronous work during initialize, initialize won't finish until the promise is resolved. */  initWork?: promise.IocCallback<IInitArgs, void> ) {
+export async function onInitialize<TArgs>( /**if your code needs to do asynchronous work during initialize, initialize won't finish until the promise is resolved. */  initWork?: promise.IocCallback<TArgs, void> ) {
 
     if ( isStarted ) {
         throw new Error( "initialize already started and you are trying to schedule init work" );

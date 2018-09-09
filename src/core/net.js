@@ -1,13 +1,6 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
 const promise = require("./promise");
 var bb = promise.bluebird;
 const _ = require("lodash");
@@ -70,7 +63,7 @@ class EzEndpoint {
     return a Promise.reject() to ABORT RETRY (stop immediately with the error passed to reject())
     return a Promise.resolve() to signal that the request should be retried.
     DEFAULT:  by default we will retry error 500 and above. */
-    preRetryErrorIntercept = (err) => __awaiter(this, void 0, void 0, function* () {
+    preRetryErrorIntercept = (err) => tslib_1.__awaiter(this, void 0, void 0, function* () {
         if (err.response != null && err.response.status <= 499) {
             //console.assert(false, "err");					
             return bb.reject(err);

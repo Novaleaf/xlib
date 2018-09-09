@@ -206,40 +206,54 @@ interface IReplacement extends IAnsiColor {
 //    }
 //}
 
+export type IInitArgs = {
+	logLevelOverrides?: { namePattern: RegExp, newLogLevel: environment.LogLevel }[],
+}
+/** @hidden */
+export function initialize( args: IInitArgs ) {
+	Logger.initialize();
+}
+
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
 export class Logger {
 
+
+	/** @hidden */
+	public static initialize() {
+		Logger._overriddenStorage = Logger.__overridenStorageHelper_parseEnv();
+	}
+
 	/** override the loglevel for specific, focused debugging.   */
 	public static overrideLogLevel( namePattern: RegExp, newLogLevel: environment.LogLevel ) {
-		Logger._overriddenStorage.push( { namePattern, newLogLevel } );
+		Logger._overriddenStorage.logLevelOverrides.push( { namePattern, newLogLevel } );
 	}
 
 	/** helper for applying env.logLevelOverrides */
-	private static __overridenStorageHelper_parseEnv() {
+	private static __overridenStorageHelper_parseEnv(): IInitArgs {
 		const envVar = environment.getEnvironmentVariable( "logLevelOverrides", null );
 		if ( envVar == null || envVar.length === 0 ) {
-			return [];
+			return { logLevelOverrides: [] };
 		}
 		try {
 			let parsedData: { [ key: string ]: string } = serialization.JSONX.parse( envVar );
 			if ( _.isPlainObject( parsedData ) === false ) {
 				throw new Error( `unable to parse.  must be in format ' { [ key: string ]: string }' ` );
 			}
-			let toReturn: { namePattern: RegExp, newLogLevel: environment.LogLevel }[] = [];
+			let logLevelOverrides: { namePattern: RegExp, newLogLevel: environment.LogLevel }[] = [];
 			_.forIn( parsedData, ( value, key ) => {
-				toReturn.push( { namePattern: new RegExp( key ), newLogLevel: environment.LogLevel[ value ] } );
+				logLevelOverrides.push( { namePattern: new RegExp( key ), newLogLevel: environment.LogLevel[ value ] } );
 			} );
-			return toReturn;
+			return { logLevelOverrides };
 
 		} catch ( _ex ) {
 			throw new ex.Exception( `unable to parse environment logLevelOverrides. you passed: ${ envVar }`, { innerException: ex.Exception.castErr( _ex ) } );
 		}
 	}
 
-	/** storage of  env.logLevelOverrides  for filtering log requests  */
-	private static _overriddenStorage: { namePattern: RegExp, newLogLevel: environment.LogLevel }[] = Logger.__overridenStorageHelper_parseEnv();
+	/** storage of  env.logLevelOverrides  for filtering log requests .  set by the .initialize() static method */
+	protected static _overriddenStorage: IInitArgs;
 
-	constructor( public name: string, public logLevel = environment.logLevel ) {
+	constructor( public name: string, public logLevel?: environment.LogLevel ) {
 	}
 	/** converts objects to strings, leaves primitive types intact */
 	private _normalizeArgs( args: any[] ) {
@@ -286,9 +300,9 @@ export class Logger {
 	 */
 	private _log( targetLogLevel: environment.LogLevel, args: any[] ): any[] {
 
-		let minimumLogLevel = this.logLevel;
+		let minimumLogLevel = this.logLevel | environment.logLevel;
 		//allow runtime adjustment of loglevels (useful for focused debugging)
-		Logger._overriddenStorage.forEach( ( pair ) => {
+		Logger._overriddenStorage.logLevelOverrides.forEach( ( pair ) => {
 			if ( pair.namePattern.test( this.name ) ) {
 				minimumLogLevel = pair.newLogLevel;
 			}

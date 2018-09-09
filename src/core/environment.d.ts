@@ -1,4 +1,10 @@
-import init = require("../init");
+export declare type IInitArgs = {
+    disableEnvAutoRead?: boolean;
+    logLevel?: LogLevel;
+    envLevel?: EnvLevel;
+    testLevel?: TestLevel;
+    suppressStartupMessage?: boolean;
+};
 export declare enum PlatformType {
     None = 0,
     Browser = 1,
@@ -85,5 +91,5 @@ browser:  reads from querystring (prefered), or cookie, or <html data-key> attri
  */
 export declare function getEnvironmentVariable(key: string, valueIfNullOrEmpty?: string): string;
 /** reads in various environmental and process details and make it easily usable by devs */
-export declare function initialize(args: init.IInitArgs): void;
+export declare function initialize(args: IInitArgs): void;
 //# sourceMappingURL=environment.d.ts.map
