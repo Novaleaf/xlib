@@ -46,14 +46,14 @@ export import jsHelper = require( "./core/jshelper" );
 
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
-import mockMocha = require( "./core/diagnostics/mockmocha" );
+import mockMocha = require( "./.internal/mockmocha" );
 serialInits.push( mockMocha.initialize );
 
 export import lolo = require( "./core/lolo" );
 export import arrayHelper = require( "./core/arrayhelper" );
 export import ClassBase = require( "./core/classbase" );
 export import diagnostics = require( "./core/diagnostics" );
-const log = new diagnostics.logging.Logger( __filename );
+const log = new diagnostics.Logger( __filename );
 export import collections = require( "./core/collections" );
 
 /** various math and numerical conversion/manipulation related helper functions */
@@ -260,7 +260,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
     it( "logger basic console output", async () => {
 
-        const testLogger = new diagnostics.logging.Logger( "test logging" );
+        const testLogger = new diagnostics.Logger( "test logging" );
 
         testLogger.trace( "traced" );
         testLogger.info( "infoed" );

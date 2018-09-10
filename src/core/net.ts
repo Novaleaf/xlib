@@ -5,8 +5,8 @@ import * as promise from "./promise";
 import bb = promise.bluebird;
 import * as _ from "lodash";
 
-import * as logging from "./diagnostics/logging";
-let log = new logging.Logger( __filename );
+import * as diagnostics from "./diagnostics";
+let log = new diagnostics.Logger( __filename );
 
 import * as serialization from "./serialization";
 import * as exception from "./exception";

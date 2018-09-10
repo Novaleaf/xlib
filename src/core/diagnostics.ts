@@ -4,7 +4,10 @@
 //#region re-exports
 
 
-export import logging = require( "./diagnostics/logging" );
+//export import logging = require( "./diagnostics/logging" );
+
+import { Logger } from "./.diagnostics/logging";
+export { Logger };
 
 
 ///** obtain a stack trace at the callsite */

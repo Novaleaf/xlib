@@ -104,9 +104,9 @@ import * as bb from "bluebird";
 // } = require( "rwlock" );
 
 import * as promise from "./promise";
-import * as logging from "./diagnostics/logging";
+import * as diagnostics from "./diagnostics";
 
-const log = new logging.Logger( __filename );
+const log = new diagnostics.Logger( __filename );
 
 /** an async+promise capable, readerwriter lock.
  * 
