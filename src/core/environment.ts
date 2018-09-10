@@ -189,43 +189,43 @@ _internalInitWork.push( ( args ) => {
 	}
 } );
 
-export enum TestLevel {
-	NONE = 0,
-	UNIT = 10,
-	INTEGRATION = 20,
-	SYSTEM = 30,
-	ACCEPTANCE = 40,
-}
-export var testLevel: TestLevel
-_internalInitWork.push( ( args ) => {
-	if ( args.testLevel != null ) {
-		if ( typeof args.testLevel === "string" ) {
-			testLevel = TestLevel[ args.testLevel ]; //convet string entry to enum
-		} else {
-			testLevel = args.testLevel;
-		}
-	}
-	if ( args.disableEnvAutoRead !== true ) {
-		let envTestLevel = getEnvironmentVariable( "testLevel", null );
-		if ( envTestLevel != null ) {
-			testLevel = TestLevel[ envTestLevel ];
-		}
-	}
-	if ( testLevel == null ) {
-		testLevel = TestLevel.ACCEPTANCE;
-		if ( args.suppressStartupMessage != true ) {
-			console.info( "testLevel varible is not set.  \n\tdefaulting to testLevel=ACCEPTANCE." );
-			console.info( `\tPossible values are ${ _.map( TestLevel ).join( ", " ) }` );
-			console.info( "\tHow to modify: " );
-			console.info( "\t\tnodejs: set by running 'node entrypoint.js testLevel=ACCEPTANCE' or by setting your systemenv var: testLevel=ACCEPTANCE" );
-			console.info( "\t\tbrowser: set by adding 'testLevel=ACCEPTANCE' in your querystring, add a cookie, or as a attribute of your html tag" );
-		}
-	} else {
-		if ( args.suppressStartupMessage != true ) {
-			console.info( "testLevel=" + TestLevel[ testLevel ] );
-		}
-	}
-} );
+// export enum TestLevel {
+// 	NONE = 0,
+// 	UNIT = 10,
+// 	INTEGRATION = 20,
+// 	SYSTEM = 30,
+// 	ACCEPTANCE = 40,
+// }
+// export var testLevel: TestLevel
+// _internalInitWork.push( ( args ) => {
+// 	if ( args.testLevel != null ) {
+// 		if ( typeof args.testLevel === "string" ) {
+// 			testLevel = TestLevel[ args.testLevel ]; //convet string entry to enum
+// 		} else {
+// 			testLevel = args.testLevel;
+// 		}
+// 	}
+// 	if ( args.disableEnvAutoRead !== true ) {
+// 		let envTestLevel = getEnvironmentVariable( "testLevel", null );
+// 		if ( envTestLevel != null ) {
+// 			testLevel = TestLevel[ envTestLevel ];
+// 		}
+// 	}
+// 	if ( testLevel == null ) {
+// 		testLevel = TestLevel.ACCEPTANCE;
+// 		if ( args.suppressStartupMessage != true ) {
+// 			console.info( "testLevel varible is not set.  \n\tdefaulting to testLevel=ACCEPTANCE." );
+// 			console.info( `\tPossible values are ${ _.map( TestLevel ).join( ", " ) }` );
+// 			console.info( "\tHow to modify: " );
+// 			console.info( "\t\tnodejs: set by running 'node entrypoint.js testLevel=ACCEPTANCE' or by setting your systemenv var: testLevel=ACCEPTANCE" );
+// 			console.info( "\t\tbrowser: set by adding 'testLevel=ACCEPTANCE' in your querystring, add a cookie, or as a attribute of your html tag" );
+// 		}
+// 	} else {
+// 		if ( args.suppressStartupMessage != true ) {
+// 			console.info( "testLevel=" + TestLevel[ testLevel ] );
+// 		}
+// 	}
+// } );
 
 
 export const env = {
@@ -242,10 +242,10 @@ export const env = {
 		return logLevel <= LogLevel.DEBUG;
 	},
 
-	/**
-		*  returns true if the current testLevel is greater than NONE. shortcut for ```environment.testLevel > environment.TestLevel.NONE```
-		*/
-	get isTest() { return testLevel > TestLevel.NONE; },
+	// /**
+	// 	*  returns true if the current testLevel is greater than NONE. shortcut for ```environment.testLevel > environment.TestLevel.NONE```
+	// 	*/
+	// get isTest() { return testLevel > TestLevel.NONE; },
 }
 
 // export const env = {

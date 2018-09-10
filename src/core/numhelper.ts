@@ -109,6 +109,7 @@ export interface IHashCode {
  */
 export function format( value: number,/** default=5 */significantDigits = 5, seperatorChar?: string ): string {
 
+    if ( isNaN( value ) ) { return "NaN"; }
     let digits = countDigits( value );
     let roundDigits = digits - significantDigits;
 
@@ -137,7 +138,7 @@ export function hash( input: number ): number {
  * @param x
  */
 export function isReal( x: number ): boolean {
-    if ( x == null || !isFinite( x ) ) { return false; }
+    if ( isNaN( x ) || !isFinite( x ) ) { return false; }
     return true;
 }
 
@@ -378,6 +379,8 @@ export function toStringDigitGroupings(
     seperatorChar = ",",
     /** if true, decimals will have digits grouped with a space.  default=false */
     groupDecimalsWithSpace = false ): string {
+
+    if ( isNaN( num ) ) { return "NaN"; }
     var str = num.toString().split( '.' );
     if ( str[ 0 ].length >= 5 ) {
         str[ 0 ] = str[ 0 ].replace( /(\d)(?=(\d{3})+$)/g, '$1' + seperatorChar );

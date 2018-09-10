@@ -9,7 +9,7 @@ export type IInitArgs = {
     disableEnvAutoRead?: boolean,
     logLevel?: environment.LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
     envLevel?: environment.EnvLevel | "DEV" | "TEST" | "UAT" | "PROD",
-    testLevel?: environment.TestLevel | "NONE" | "UNIT" | "INTEGRATION" | "SYSTEM" | "ACCEPTANCE",
+    //testLevel?: environment.TestLevel | "NONE" | "UNIT" | "INTEGRATION" | "SYSTEM" | "ACCEPTANCE",
     logLevelOverrides?: { namePattern: RegExp, newLogLevel: environment.LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" }[],
     suppressStartupMessage?: boolean,
 };
