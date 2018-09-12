@@ -6,7 +6,7 @@
 
 //export import logging = require( "./diagnostics/logging" );
 
-import { Logger } from "./.diagnostics/logging";
+import { Logger } from "./_diagnostics/logging";
 export { Logger };
 
 

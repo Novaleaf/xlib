@@ -14,7 +14,7 @@ import moment = require( "moment" );
 import assert = require( "assert" );
 import Exception = ex.Exception;
 
-import init = require( "../../.internal/init" );
+import init = require( "../../_internal/init" );
 
 class LoggerFatalException extends Exception { }
 

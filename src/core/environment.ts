@@ -1,9 +1,9 @@
 "use strict";
 
-import nodeHelper = require( "../.internal/nodehelper" );
-import browserHelper = require( "../.internal/browserhelper" );
+import nodeHelper = require( "../_internal/nodehelper" );
+import browserHelper = require( "../_internal/browserhelper" );
 //import ex = require("./exception");
-import init = require( "../.internal/init" );
+import init = require( "../_internal/init" );
 import _ = require( "lodash" );
 
 

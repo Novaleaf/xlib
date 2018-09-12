@@ -78,7 +78,6 @@ a robust and configurable logger, with log-levels set via global environment var
 When you import ```xlib``` you need to invoke it's ```xlib.initialize()``` method.  It has default values aimed at dev+debug builds, which can be adjusted easily:
 - ```logLevel``` defaults to ```TRACE```
 - ```envLevel``` defaults to ```DEV```
-- ```testLevel``` defaults to ```NONE```
 
 Also, you can silence startup console output by passing the ```suppressStartupMessage: true``` parameter.
 
@@ -88,7 +87,6 @@ import xlib = require("xlib");
 xlib.initialize( {
 	envLevel: xlib.environment.EnvLevel.DEV,
     logLevel: xlib.environment.LogLevel.INFO,
-    testLevel: xlib.environment.TestLevel.FULL,
     disableEnvAutoRead: true, //won't read env vars from environment, which can override your passed in vars    
 	suppressStartupMessage: true,
 } );
@@ -99,9 +97,6 @@ xlib.initialize( {
 # Versioning / Upgrading
 ```xlib``` follows [Semver](https://docs.npmjs.com/getting-started/semantic-versioning) versioning.  Thus any breaking change will be released under a major version, and new functionality will be released under minor versions.  
 
-## v10.x restructure
-
-the 10.x  branch (and semver) is a restructure of this project to take advantage of the now fully mature typescript ecosystem.  Prior to 10.x, to publish a typescript project was a tedious process.
 
 ## planned future work (roadmap)
 
@@ -113,3 +108,8 @@ the 10.x  branch (and semver) is a restructure of this project to take advantage
 # Why
 
 Since I started programming, I've a big fan of the .NET Framework.  Xlib is my attempt to bring that level of great features + (re)usability to the Typescript.  
+
+# Changelog
+
+- v11: remove testLevel as external testing frameworks like mocha set their testLevel in a different way.
+- v10: the 10.x  branch (and semver) is a restructure of this project to take advantage of the now fully mature typescript ecosystem.  Prior to 10.x, to publish a typescript project was a tedious process.

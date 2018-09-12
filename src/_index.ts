@@ -15,7 +15,7 @@ export import promise = require( "./core/promise" );
 serialInits.push( promise.initialize );
 
 //////////////////////  initialization section
-import init = require( "./.internal/init" );
+import init = require( "./_internal/init" );
 let isInitializeStarted = false;
 export async function initialize( args?: init.IInitArgs ) {
     args = { ...args };
@@ -46,7 +46,7 @@ export import jsHelper = require( "./core/jshelper" );
 
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
-import mockMocha = require( "./.internal/mockmocha" );
+import mockMocha = require( "./_internal/mockmocha" );
 serialInits.push( mockMocha.initialize );
 
 export import lolo = require( "./core/lolo" );

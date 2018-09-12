@@ -14,7 +14,6 @@
 			"args": [
 				"logLevel=TRACE",
 				"envLevel=DEV",
-				"testLevel=NONE",
 				"logLevelOverrides={'.*connection':'WARN', '.*xlib.dev.core.net.js':'INFO'}",
 			],
 			"name": "node-dev",
@@ -50,7 +49,6 @@
 			// "args": [
 			// 	"logLevel=TRACE",
 			// 	"envLevel=DEV",
-			// 	"testLevel=FULL",
 			// 	"logLevelOverrides={'.*connection':'WARN', '.*xlib.dev.core.net.js':'INFO'}",
 			// ],
 			"name": "mocha watch",
