@@ -137,7 +137,7 @@ function isPrivateIp( ipV4Address: string ) {
 		( ipParts[ 0 ] === 10 ) // single class A network
 		|| ( ipParts[ 0 ] === 172 && ipParts[ 1 ] >= 16 && ipParts[ 1 ] <= 31 ) // 16 contiguous class B network
 		|| ( ipParts[ 0 ] === 192 && ipParts[ 1 ] === 168 ) // 256 contiguous class C network
-		|| ( ipParts[ 0 ] === 169 && ipParts[ 1 ] === 254 ) // Link-local address also refered to as Automatic Private IP Addressing
+		|| ( ipParts[ 0 ] === 169 && ipParts[ 1 ] === 254 ) // Link-local address also referred to as Automatic Private IP Addressing
 		|| ( ipParts[ 0 ] === 127 ) // localhost
 	) {
 		return true;
@@ -283,7 +283,7 @@ export class Scrub<T>{
 	public failAssert(
 		/** if null, the default validation.logger will be used */
 		logger?: diagnostics.Logger,
-		/** if null, a generica failure string will be generated, outputting all messages found in this.errorMessages */
+		/** if null, a generic failure string will be generated, outputting all messages found in this.errorMessages */
 		format?: string, ...params: any[] ) {
 		if ( this.isValid === true ) {
 			return;

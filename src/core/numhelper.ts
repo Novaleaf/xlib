@@ -46,7 +46,7 @@ export module hashHelper {
     }
 
 	/** SNIPPET TAKEN FROM JSHELPER: disallow enumeration of a property
-	return true if succesfull false otherwise (such as if platform doesn't support it)*/
+	return true if successful false otherwise (such as if platform doesn't support it)*/
     function disablePropertyEnumeration( obj: any, propertyName: string ): boolean {
         try {
             if ( Object.defineProperty != null ) {
@@ -91,7 +91,7 @@ export module hashHelper {
         }
 
 
-        //define our injected hashcode as non-enumerable, doesn"t work on ie<9
+        //define our injected hashcode as non-enumerable, doesn't work on ie<9
         disablePropertyEnumeration( item, "__noenum_novaleaf_corelib_collections_hashCode" );
         //return new hashcode
         return item.__noenum_novaleaf_corelib_collections_hashCode;
@@ -107,7 +107,7 @@ export interface IHashCode {
  * formats values into strings using special heuristics to guess what is user friendly.
  * @param num
  */
-export function format( value: number,/** default=5 */significantDigits = 5, seperatorChar?: string ): string {
+export function format( value: number,/** default=5 */significantDigits = 5, separatorChar?: string ): string {
 
     if ( isNaN( value ) ) { return "NaN"; }
     let digits = countDigits( value );
@@ -115,7 +115,7 @@ export function format( value: number,/** default=5 */significantDigits = 5, sep
 
     value = round( value, roundDigits );
 
-    return toStringDigitGroupings( value, seperatorChar );
+    return toStringDigitGroupings( value, separatorChar );
 }
 
 var _aguid = require( "aguid" );
@@ -336,7 +336,7 @@ export function clamp( value: number, min_inc: number, max_inc: number, /** defa
 
 /** interpolate between values
 base implementation works for numbers.  override .update() to extend functionality to other types */
-export class Interpolater {
+export class Interpolator {
     public current;
     public startRate;
     private clampType: ClampType;
@@ -370,20 +370,20 @@ export function toInt( value: number ): number {
     return ~~value;
 }
 /**
- * a string with a seperator for every number digit group (more than 4 digits)
+ * a string with a separator for every number digit group (more than 4 digits)
  * @param num
  */
 export function toStringDigitGroupings(
     num: number,
     /** default comma */
-    seperatorChar = ",",
+    separatorChar = ",",
     /** if true, decimals will have digits grouped with a space.  default=false */
     groupDecimalsWithSpace = false ): string {
 
     if ( isNaN( num ) ) { return "NaN"; }
     var str = num.toString().split( '.' );
     if ( str[ 0 ].length >= 5 ) {
-        str[ 0 ] = str[ 0 ].replace( /(\d)(?=(\d{3})+$)/g, '$1' + seperatorChar );
+        str[ 0 ] = str[ 0 ].replace( /(\d)(?=(\d{3})+$)/g, '$1' + separatorChar );
     }
     if ( groupDecimalsWithSpace === true ) {
         if ( str[ 1 ] && str[ 1 ].length >= 5 ) {

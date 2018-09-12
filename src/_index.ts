@@ -1,12 +1,17 @@
 /// <reference path="./types/xlib-globals/index.d.ts" />
 
 
+import jsShims = require( "./core/jsshims" );
+jsShims.initialize();
+//serialInits.push( jsShims.initialize );
+
+///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
+import mockMocha = require( "./_internal/mockmocha" );
+mockMocha.initialize();
 
 /** need to do init work serially, at least until after promise initializtaion, so taht bluebird can initialize properly  (it can't initialize once a promise has been created) */
 const serialInits: Array<( ( args: init.IInitArgs ) => void )> = [];
 
-import jsShims = require( "./core/jsshims" );
-serialInits.push( jsShims.initialize );
 
 export import environment = require( "./core/environment" );
 serialInits.push( environment.initialize );
@@ -32,9 +37,9 @@ export async function initialize( args?: init.IInitArgs ) {
 
 setTimeout( () => {
     if ( init.isInitializeStarted() !== true ) {
-        throw new Error( "xlib.initialize() was not called within 10 seconds of startup.   To use xlib we expect initialization logic to be performed. " );
+        throw new Error( "xlib.initialize() was not called immediately after importing.   To use xlib we expect initialization logic to be performed. " );
     }
-}, 10000 )
+}, 0 )
 
 
 export import lodash = require( "lodash" );
@@ -45,9 +50,7 @@ export import exception = require( "./core/exception" );
 export import jsHelper = require( "./core/jshelper" );
 
 
-///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
-import mockMocha = require( "./_internal/mockmocha" );
-serialInits.push( mockMocha.initialize );
+//serialInits.push( mockMocha.initialize );
 
 export import lolo = require( "./core/lolo" );
 export import arrayHelper = require( "./core/arrayhelper" );
