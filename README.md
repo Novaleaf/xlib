@@ -44,7 +44,7 @@ log.info("hi",{some:"data"});
 
 ## Functionality
 
-see [the generated api docs here](./docs/index.html). though the doc generator (TypeDoc) is severely lacking, so best to use the intelisence of your favorite code editor.
+I haven't found a good documentation tool (TypeDoc sucks for libraries), if you know if one, let me know!   In the meantime, I suggest browsing via your code editor's Intelisense.
 
 
 The main functional areas ```xlib``` covers
@@ -63,34 +63,70 @@ The main functional areas ```xlib``` covers
 - Validation (user input scrubbing)
 - Utility (lodash, jsHelpers, Array/Number/String utils)
 
-#### Logging
+### Logging
 
 ```javascript
-let log = new xlib.logging.Logger(__filename);
-log.info("hi",{some:"data"});
+const log = xlib.diagnostics.log;
+log.info( "hi", { some: "data" } );
+
+const __ = xlib.lolo;
+log.info( "this 1000 character string gets auto-truncated nicely via __.inspect()", __.inspect( { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } ) );
+
 ```
 
-a robust and configurable logger, with log-levels set via global environment variables.
+a robust logger, with log-levels set via global environment variables.
 
 ***limitations***:  only logs to console for now.  A configurable listener would be preferable, if you want to send a pull request!
 
-#### Environmental/Startup Options
-When you import ```xlib``` you need to invoke it's ```xlib.initialize()``` method.  It has default values aimed at dev+debug builds, which can be adjusted easily:
+#### log filtering
+
+you can set a minimum log level per file or per ```RegExp``` so that you can toggle the verbosity of your files.  
+
+``` typescript
+// yourcode.ts
+log.info( "will show" );
+log._overrideLogLevel( "ERROR" ); //toggles logLevel for the current file (yourcode.ts).  you can also pass a RegExp that matches the callSite.
+log.info( "will not show" );
+log.warn( "will not show" );
+log.error( "will show" );
+```
+
+These filters can also be passed as xlib.initialization parameters, via the following choices:
+- envVar (commandLine, systemEnv, or QueryString):  pass the ```logLevelOverrides``` parameter.   Example: ```"logLevelOverrides={'.*connection':'WARN', '.*xlib.dev.core.net.js':'INFO'}"``` 
+- by code before importing ```xlib``` by setting the ```global.__xlibInitArgs.logLevelOverrides``` global.  Example: ```global.__xlibInitArgs = { logLevelOverrides: [{namePattern:/.*connection/,newLogLevel:"WARN"},{namePattern:/.*xlib.dev.core.net.js/,newLogLevel:"INFO"}]};```
+
+### Environmental/Startup Options
+```xlib``` is automatically initialized as soon as you import it for the first time.    It will read system environmental variables from the commandline, querystring, or systemEnv (in that order of priority).    Alternately, you ***may*** configure it's environment variables explicitly via code BEFORE you import ```xlib```.  Here's an example showing how you can explicitly set the initialization:
+
+``` typescript
+global.__xlibInitArgs = {
+    envLevel: "DEV",
+    logLevel: "ERROR",
+};
+import xlib = require("xlib");
+
+```
+
+as long as you have ```import xlib = require("xlib");``` in your file, you'll get proper intelisense for ```global.__xlibInitArgs```.
+
 - ```logLevel``` defaults to ```TRACE```
 - ```envLevel``` defaults to ```DEV```
 
-Also, you can silence startup console output by passing the ```suppressStartupMessage: true``` parameter.
-
-here's an example of how you can use it:
+If you are writing a library, here's how you can specify xlibInitArg ***defaults*** while still letting the consuming application override:
 ``` typescript
-import xlib = require("xlib");
-xlib.initialize( {
-	envLevel: xlib.environment.EnvLevel.DEV,
-    logLevel: xlib.environment.LogLevel.INFO,
-    disableEnvAutoRead: true, //won't read env vars from environment, which can override your passed in vars    
-	suppressStartupMessage: true,
-} );
+
+global.__xlibInitArgs = {
+    envLevel: "PROD",
+    logLevel: "INFO",
+    /** don't display startup console messages */
+    silentInit: true,
+    /** let any previously set args override these */
+    ...global.__xlibInitArgs
+};
+import xlib = require( "xlib" );
 ```
+
+
  
 
 --------

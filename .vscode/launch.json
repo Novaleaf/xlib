@@ -44,6 +44,7 @@
 			"runtimeArgs": [
 				"--inspect",
 				"--watch",
+				"./dist/**/*.test.js",
 				//"--trace-warnings",
 			],
 			// "args": [

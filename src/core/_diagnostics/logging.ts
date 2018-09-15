@@ -13,6 +13,7 @@ import _ = require( "lodash" );
 import moment = require( "moment" );
 import assert = require( "assert" );
 import Exception = ex.Exception;
+import * as diagnostics from "../diagnostics";
 
 import init = require( "../../_internal/init" );
 
@@ -218,18 +219,20 @@ export class Logger {
 
 	/** @hidden */
 	public static initialize( args: init.IInitArgs ) {
-		Logger._overriddenStorage = Logger.__overridenStorageHelper_parseEnv();
+		let initOverrides = Logger.__overridenStorageHelper_parseEnv();
+		Logger._logLevelOverrides.push( ...initOverrides.logLevelOverrides );
 	}
 
 
 
 	/** override the loglevel for specific, focused debugging.   */
 	public static overrideLogLevel( namePattern: RegExp, newLogLevel: environment.LogLevel ) {
-		Logger._overriddenStorage.logLevelOverrides.push( { namePattern, newLogLevel } );
+
+		Logger._logLevelOverrides.push( { namePattern, newLogLevel } );
 	}
 
 	/** helper for applying env.logLevelOverrides */
-	private static __overridenStorageHelper_parseEnv(): init.IInitArgs {
+	private static __overridenStorageHelper_parseEnv() {
 		const envVar = environment.getEnvironmentVariable( "logLevelOverrides", null );
 		if ( envVar == null || envVar.length === 0 ) {
 			return { logLevelOverrides: [] };
@@ -250,10 +253,26 @@ export class Logger {
 		}
 	}
 
-	/** storage of  env.logLevelOverrides  for filtering log requests .  set by the .initialize() static method */
-	protected static _overriddenStorage: init.IInitArgs;
+	/** storage of  env.logLevelOverrides  for filtering log requests .  added to  by the .initialize() static method and log._overrideLogLevel() method */
+	protected static _logLevelOverrides: { namePattern: RegExp, newLogLevel: environment.LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" }[] = [];
 
-	constructor( public name: string, public logLevel?: environment.LogLevel ) {
+	/** invoke this to set a global override for the minimum log level for a given callsite.*/
+	public _overrideLogLevel( minLogLevel: environment.LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
+		/** a RegExp that matches a part of the log callSite.  (the part of the console message in Magenta color)
+			* if ommitted, will match the caller's fileName  */
+		callSiteRegEx?: string | RegExp, ) {
+		if ( callSiteRegEx == null ) {
+			let callFile = diagnostics.computeCallFile( 1 );
+			callSiteRegEx = new RegExp( `.*${ stringHelper.escapeRegExp( callFile ) }.*` );
+		}
+		if ( typeof ( callSiteRegEx ) === "string" ) {
+			callSiteRegEx = new RegExp( callSiteRegEx );
+		}
+		Logger._logLevelOverrides.push( { namePattern: callSiteRegEx, newLogLevel: minLogLevel } );
+
+	}
+
+	constructor() {
 	}
 	/** converts objects to strings, leaves primitive types intact */
 	private _normalizeArgs( args: any[] ) {
@@ -300,10 +319,12 @@ export class Logger {
 	 */
 	private _log( targetLogLevel: environment.LogLevel, args: any[] ): any[] {
 
-		let minimumLogLevel: environment.LogLevel = this.logLevel | environment.logLevel;
+		const callSite = diagnostics.computeStackTrace( 2, 1 )[ 0 ];
+
+		let minimumLogLevel: environment.LogLevel = environment.logLevel;
 		//allow runtime adjustment of loglevels (useful for focused debugging)
-		Logger._overriddenStorage.logLevelOverrides.forEach( ( pair ) => {
-			if ( pair.namePattern.test( this.name ) ) {
+		Logger._logLevelOverrides.forEach( ( pair ) => {
+			if ( pair.namePattern.test( callSite ) ) {
 				if ( typeof pair.newLogLevel === "string" ) {
 					minimumLogLevel = environment.LogLevel[ pair.newLogLevel ];
 				} else {
@@ -315,11 +336,11 @@ export class Logger {
 		if ( targetLogLevel < minimumLogLevel ) {
 			return;
 		}
-		return this._doLog( targetLogLevel, args );// this._doLog.apply( this, arguments );
+		return this._doLog( callSite, targetLogLevel, args );// this._doLog.apply( this, arguments );
 
 	}
 
-	private _doLog( targetLogLevel: environment.LogLevel, args: any[] ) {
+	private _doLog( callSite: string, targetLogLevel: environment.LogLevel, args: any[] ) {
 
 		/** cleaned up args, passed to "finalArgs" */
 		let normalizedArgs: any[];
@@ -361,35 +382,38 @@ export class Logger {
 			//break;
 		}
 
-		//find line number
-		let lineNumberToReport: string = "";
-		let nameToReport = this.name;
-		try {
-			let nameNoPrefix = stringHelper.removeBefore( nameToReport, "\\", false, true );
-			nameNoPrefix = stringHelper.removeBefore( nameNoPrefix, "/", false, true );
-			nameNoPrefix = stringHelper.removeAfter( nameNoPrefix, ".", false, true );
-			let stack = ex.getStackTrace( `.*${ nameNoPrefix }\.`, 1, true );
-			if ( stack.length > 0 ) {
-				let extAndLineNumber = stringHelper.removeBefore( stack[ 0 ], ".", true, true );
-				extAndLineNumber = stringHelper.removeAfter( extAndLineNumber, ")" );
+		//pretty trace callsite
+		const nameToReport = Chalk.magenta( callSite );
+		// //find line number
+		// let lineNumberToReport: string = "";
 
-				//try to inject our line number into name
-				if ( extAndLineNumber.length > 0 && extAndLineNumber.indexOf( "." ) === 0 && nameToReport.indexOf( "." ) > 0 ) {
-					nameToReport = stringHelper.removeAfter( nameToReport, ".", false, true );
-					nameToReport = Chalk.magenta( `${ nameToReport }${ extAndLineNumber }` ) as any;
-				} else {
-					nameToReport = Chalk.cyan( nameToReport ) as any;
-					lineNumberToReport = Chalk.magenta( `(${ extAndLineNumber })` ) as any;
-				}
+		// let nameToReport = this.name;
+		// try {
+		// 	let nameNoPrefix = stringHelper.removeBefore( nameToReport, "\\", false, true );
+		// 	nameNoPrefix = stringHelper.removeBefore( nameNoPrefix, "/", false, true );
+		// 	nameNoPrefix = stringHelper.removeAfter( nameNoPrefix, ".", false, true );
+		// 	let stack = ex.getStackTrace( `.*${ nameNoPrefix }\.`, 1, true );
+		// 	if ( stack.length > 0 ) {
+		// 		let extAndLineNumber = stringHelper.removeBefore( stack[ 0 ], ".", true, true );
+		// 		extAndLineNumber = stringHelper.removeAfter( extAndLineNumber, ")" );
 
-			}
-		} catch ( ex ) {
-			console.error( "error when finding line number of log entry.  aborting attempt to instrument log.", ex );
-		}
+		// 		//try to inject our line number into name
+		// 		if ( extAndLineNumber.length > 0 && extAndLineNumber.indexOf( "." ) === 0 && nameToReport.indexOf( "." ) > 0 ) {
+		// 			nameToReport = stringHelper.removeAfter( nameToReport, ".", false, true );
+		// 			nameToReport = Chalk.magenta( `${ nameToReport }${ extAndLineNumber }` ) as any;
+		// 		} else {
+		// 			nameToReport = Chalk.cyan( nameToReport ) as any;
+		// 			lineNumberToReport = Chalk.magenta( `(${ extAndLineNumber })` ) as any;
+		// 		}
+
+		// 	}
+		// } catch ( ex ) {
+		// 	console.error( "error when finding line number of log entry.  aborting attempt to instrument log.", ex );
+		// }
 
 		/** add "header" info to the log data */
 		finalArgs.unshift( logLevelColor( environment.LogLevel[ targetLogLevel ] ) );
-		finalArgs.unshift( lineNumberToReport );
+		//finalArgs.unshift( lineNumberToReport );
 		finalArgs.unshift( nameToReport );
 		finalArgs.unshift( Chalk.gray( moment().toISOString() ) );
 
@@ -529,9 +553,10 @@ export class Logger {
 				break;
 		}
 
+		const callSite = diagnostics.computeStackTrace( 1, 1 )[ 0 ];
 
 		finalArgs.unshift( Chalk.bgYellow( "ASSERT" ) );
-		finalArgs.unshift( Chalk.cyan( this.name ) );
+		finalArgs.unshift( Chalk.magenta( callSite ) );
 		finalArgs.unshift( Chalk.gray( moment().toISOString() ) );
 		//finalArgs.unshift(false);
 
@@ -589,48 +614,48 @@ export class Logger {
 }
 
 
-var __isUnhandledHooked = false;
-let _unhandledDefaultLogger = new Logger( "logging.logPromiseUnhandledRejections" );
-export function logPromiseUnhandledRejections( logger = _unhandledDefaultLogger ) {
-	if ( __isUnhandledHooked === true ) {
-		return;
-	}
-	__isUnhandledHooked = true;
-	logger.debug( "exec xlib.diagnostics.logger.logPromiseUnhandledRejections()" );
-	switch ( environment.platformType ) {
-		case environment.PlatformType.Browser:
-			window.addEventListener( "unhandledrejection", ( e: any ) => {
-				var reason = e.detail.reason;
-				var promise = e.detail.promise;
+// var __isUnhandledHooked = false;
+// let _unhandledDefaultLogger = new Logger( "logging.logPromiseUnhandledRejections" );
+// export function logPromiseUnhandledRejections( logger = _unhandledDefaultLogger ) {
+// 	if ( __isUnhandledHooked === true ) {
+// 		return;
+// 	}
+// 	__isUnhandledHooked = true;
+// 	logger.debug( "exec xlib.diagnostics.logger.logPromiseUnhandledRejections()" );
+// 	switch ( environment.platformType ) {
+// 		case environment.PlatformType.Browser:
+// 			window.addEventListener( "unhandledrejection", ( e: any ) => {
+// 				var reason = e.detail.reason;
+// 				var promise = e.detail.promise;
 
-				logger.error( reason, promise );
+// 				logger.error( reason, promise );
 
-				throw e;
-			} );
-			break;
-		case environment.PlatformType.NodeJs:
-			process.on( "unhandledRejection", function ( reason, promise ) {
-				try {
-					//console.log("unhandled");
-					//console.log("xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection " + JSON.stringify({ arguments }));
-					// See Promise.onPossiblyUnhandledRejection for parameter documentation
-					logger.error( "xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection", reason, { promise: JSON.parse( JSON.stringify( promise ) ) } );
-					//logger.error(reason, promise);
-				} catch ( ex ) {
-					//try {
-					//	logger.error("xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection TRY2", JSON.stringify({ reason, promise }));
-					//} catch (ex) {
-					console.log( "xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection try 2 failed!" );
-					//}
-				}
-				throw reason;
+// 				throw e;
+// 			} );
+// 			break;
+// 		case environment.PlatformType.NodeJs:
+// 			process.on( "unhandledRejection", function ( reason, promise ) {
+// 				try {
+// 					//console.log("unhandled");
+// 					//console.log("xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection " + JSON.stringify({ arguments }));
+// 					// See Promise.onPossiblyUnhandledRejection for parameter documentation
+// 					logger.error( "xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection", reason, { promise: JSON.parse( JSON.stringify( promise ) ) } );
+// 					//logger.error(reason, promise);
+// 				} catch ( ex ) {
+// 					//try {
+// 					//	logger.error("xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection TRY2", JSON.stringify({ reason, promise }));
+// 					//} catch (ex) {
+// 					console.log( "xlib.diagnostics.logging.logPromiseUnhandledRejections()=>unhandledRejection try 2 failed!" );
+// 					//}
+// 				}
+// 				throw reason;
 
-			} );
-			break;
-	}
+// 			} );
+// 			break;
+// 	}
 
 
-}
+// }
 
 ///////** wrapper over bunyan logger, includes extra diagnostics helpers such as .assert(), and will pretty output to console if no listener is attached.*/
 //////export class _Logger {

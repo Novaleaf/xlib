@@ -19,7 +19,7 @@ import diagnostics = require( "./diagnostics" )
 
 import { URL } from "url";
 
-var log = new diagnostics.Logger( __filename );
+const log = diagnostics.log; // var log = new diagnostics.Logger( __filename );
 
 export class UrlValidator {
 
@@ -282,7 +282,7 @@ export class Scrub<T>{
 	/** if invalid, will assert*/
 	public failAssert(
 		/** if null, the default validation.logger will be used */
-		logger?: diagnostics.Logger,
+		logger = log,
 		/** if null, a generic failure string will be generated, outputting all messages found in this.errorMessages */
 		format?: string, ...params: any[] ) {
 		if ( this.isValid === true ) {

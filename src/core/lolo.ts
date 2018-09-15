@@ -61,10 +61,12 @@ import environment = require( "./environment" );
 import stringHelper = require( "./stringhelper" );
 
 
+import { log } from "./diagnostics";
+export { log };
+
 // public get value() : string {
 //     return 
 // }
-
 
 export import env = environment.env;
 // {

@@ -8,7 +8,7 @@
 import * as environment from "./environment";
 import * as _ from "lodash";
 import jsHelper = require( "./jshelper" );
-
+import * as stringHelper from "./stringhelper";
 /** shape of errors */
 export interface IError {
 	name: string;
@@ -24,79 +24,6 @@ export interface IErrorJson {
 	innerException?: any;
 }
 
-/** get a stack trace*/
-export function getStackTrace(/**
-	* regexp choosing the frame you wish to start after.  or number of frames to remove from the front
-	*/ startingFrameExclusive?: RegExp | number | string,
-	/** max frames to return */ maxFrames?: number,
-	keepStartingFrame = false,
-): string[] {
-
-	let tempError = new Error();
-	if ( tempError.stack == null ) {
-		return [];
-	}
-	let splitStack = tempError.stack.split( "\n" );
-
-	if ( startingFrameExclusive != null ) {
-		let lastRemovedFrame: string;
-		if ( typeof startingFrameExclusive === "string" ) {
-			startingFrameExclusive = new RegExp( startingFrameExclusive );
-		}
-		if ( startingFrameExclusive instanceof RegExp ) {
-			let shouldStop = false;
-			while ( shouldStop === false ) {
-				lastRemovedFrame = splitStack.shift();
-				//only stop if our just removed frame matches and next frame doesn't
-				shouldStop = ( ( startingFrameExclusive.test( lastRemovedFrame ) === true ) && ( startingFrameExclusive.test( splitStack[ 0 ] ) === false ) );
-				if ( splitStack.length === 0 ) {
-					shouldStop = true;
-				}
-			}
-		} else if ( typeof ( startingFrameExclusive ) === "number" && startingFrameExclusive > 0 ) {
-			for ( var i = 0; i < startingFrameExclusive; i++ ) {
-				lastRemovedFrame = splitStack.shift();
-			}
-		}
-
-		if ( keepStartingFrame === true && lastRemovedFrame != null ) {
-			splitStack.unshift( lastRemovedFrame );
-		}
-	}
-	if ( maxFrames != null && splitStack.length > maxFrames ) {
-		splitStack.length = maxFrames;
-	}
-	return splitStack;
-}
-
-/** extract stack frames.   note that the first frame contains the message, so if you don't want that, pass the optional ```startingFrame``` parameter */
-export function extractStackFrames(/** error or stack string */ error: IError | string,/** @default undefined (all frames)*/ frames?: number,/** @default 0 */ startingFrame?: number ) {
-	let stack: string;
-	let stackArray: string[];
-	if ( typeof ( error ) === "string" ) {
-		stack = error;
-	} else {
-		stack = error.stack;
-	}
-	if ( typeof ( stack as any ) === "string" ) {
-		stackArray = stack.split( "\n" );
-	} else if ( _.isArray( stack as any ) ) {
-		stackArray = stack as any;
-	} else {
-		//unknown
-		return [];
-	}
-	if ( startingFrame != null ) {
-		for ( let i = 0; i < startingFrame; i++ ) {
-			stackArray.shift();
-		}
-	}
-	if ( frames != null && stackArray.length > frames ) {
-		stackArray.length = frames;
-	}
-
-	return stackArray;
-}
 
 export interface IExceptionOptions {
 	innerException?: Error;

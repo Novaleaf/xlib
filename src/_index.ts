@@ -2,47 +2,66 @@
 
 
 import jsShims = require( "./core/jsshims" );
+
+/** 
+ * ! initialization of xlib:  some "preinit" has to be done as soon as a submodule is imported, 
+ * ! so it can be properly used by other xlib submodules, so we do that manually inline.
+ * ! however we do other init via an IoC pattern via the _internal/init.ts module.  the init submodule is invoked at the very end of this file.
+ */
 jsShims.initialize();
 //serialInits.push( jsShims.initialize );
+
+let _initArgs: init.IInitArgs;
+if ( typeof global !== "undefined" && global.__xlibInitArgs ) {
+    _initArgs = global.__xlibInitArgs;
+} else if ( typeof window !== "undefined" && window.__xlibInitArgs ) {
+    _initArgs = window.__xlibInitArgs;
+}
+
+if ( _initArgs == null || lodash.isEmpty( _initArgs ) ) {
+    console.log( `XLIB INFO:  no "global.__xlibInit" object detected.  we will use the default values.  To hide this message, you must set it.  For example:  global.__xlibInit={logLevel:"WARN", envLevel:"PROD",silentInit:true}` );
+    _initArgs = {};
+}
+
+
+
+export import environment = require( "./core/environment" );
+environment.initialize( _initArgs );
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 import mockMocha = require( "./_internal/mockmocha" );
 mockMocha.initialize();
 
-/** need to do init work serially, at least until after promise initializtaion, so taht bluebird can initialize properly  (it can't initialize once a promise has been created) */
-const serialInits: Array<( ( args: init.IInitArgs ) => void )> = [];
 
-
-export import environment = require( "./core/environment" );
-serialInits.push( environment.initialize );
-
-export import promise = require( "./core/promise" );
-serialInits.push( promise.initialize );
-
-//////////////////////  initialization section
-import init = require( "./_internal/init" );
-let isInitializeStarted = false;
-export async function initialize( args?: init.IInitArgs ) {
-    args = { ...args };
-
-    if ( isInitializeStarted === true ) {
-        log.warn( "xlib.initialize() already called, we are ignoring further calls" );
-        return;
+if ( environment.env.isDebug === true ) {
+    //try {
+    ///** https://www.npmjs.com/package/source-map-support
+    // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
+    //  */
+    if ( _initArgs.silentInit !== true ) {
+        console.log( "loading sourcemap support (in logLevel.DEBUG or TRACE" );
     }
-    isInitializeStarted = true;
-    serialInits.forEach( ( initWork ) => initWork( args ) );
-    return init.initialize( args );
-
+    var source_map_support = require( "source-map-support" );
+    source_map_support.install( { handleUncaughtExceptions: false } );
+    //} catch (ex) {
+    //	console.log("eating sourcemap support call");
+    //}
 }
 
-setTimeout( () => {
-    if ( init.isInitializeStarted() !== true ) {
-        throw new Error( "xlib.initialize() was not called immediately after importing.   To use xlib we expect initialization logic to be performed. " );
-    }
-}, 0 )
+
+
+
+export import promise = require( "./core/promise" );
+promise.initialize();
+
 
 
 export import lodash = require( "lodash" );
+//set lodash as a global if it's not.
+if ( environment.getGlobal()[ "_" ] == null ) {
+    environment.getGlobal()[ "_" ] = lodash;
+}
+
 
 export import exception = require( "./core/exception" );
 
@@ -56,7 +75,7 @@ export import lolo = require( "./core/lolo" );
 export import arrayHelper = require( "./core/arrayhelper" );
 export import ClassBase = require( "./core/classbase" );
 export import diagnostics = require( "./core/diagnostics" );
-const log = new diagnostics.Logger( __filename );
+const log = diagnostics.log; // new diagnostics.Logger( __filename );
 export import collections = require( "./core/collections" );
 
 /** various math and numerical conversion/manipulation related helper functions */
@@ -65,7 +84,12 @@ export import stringHelper = require( "./core/stringhelper" );
 export import reflection = require( "./core/reflection" );
 
 
+
 export import dateTime = require( "./core/datetime" );
+if ( environment.getGlobal()[ "moment" ] == null ) {
+    //define momentStatic
+    environment.getGlobal()[ "moment" ] = dateTime.moment;
+}
 
 export import validation = require( "./core/validation" );
 export import serialization = require( "./core/serialization" );
@@ -217,71 +241,18 @@ export abstract class PayloadTemplate<TThis>{
 }
 
 
-serialInits.push( ( args: init.IInitArgs ) => {
-
-    mockMocha.initialize();
-
-
-    if ( lolo.env.isDebug === true ) {
-        //try {
-        ///** https://www.npmjs.com/package/source-map-support
-        // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
-        //  */
-        if ( args.suppressStartupMessage !== true ) {
-            console.log( "loading sourcemap support (in logLevel.DEBUG or TRACE" );
-        }
-        var source_map_support = require( "source-map-support" );
-        source_map_support.install( { handleUncaughtExceptions: false } );
-        //} catch (ex) {
-        //	console.log("eating sourcemap support call");
-        //}
-    }
+//////////////////////  initialization section
+import init = require( "./_internal/init" );
+async function _initialize( args?: init.IInitArgs ) {
+    args = { ...args };
+    return init.initialize( args );
+}
+_initialize( _initArgs );
 
 
-    //set lodash as a global if it's not.
-    if ( environment.getGlobal()[ "_" ] == null ) {
-        environment.getGlobal()[ "_" ] = lodash;
-    }
+// setTimeout( () => {
+//     if ( init.isInitializeStarted() !== true ) {
+//         throw new Error( "xlib.initialize() was not called immediately after importing.   To use xlib we expect initialization logic to be performed. " );
+//     }
+// }, 0 )
 
-
-    if ( environment.getGlobal()[ "moment" ] == null ) {
-        //define momentStatic
-        environment.getGlobal()[ "moment" ] = dateTime.moment;
-    }
-} );
-
-
-describe( __filename + " basic xlib unit tests", () => {
-
-    before( async () => {
-        await initialize();
-    } );
-
-
-
-
-
-    it( "logger basic console output", async () => {
-
-        const testLogger = new diagnostics.Logger( "test logging" );
-
-        testLogger.trace( "traced" );
-        testLogger.info( "infoed" );
-        testLogger.warn( "warned" );
-        testLogger.error( "errored" );
-
-    } );
-
-    it( "should fail, test log.assert()", () => {
-        log.assert( false, "assert condition" );
-    } )
-
-
-    it( "read env", () => {
-
-        log.assert( environment.envLevel != null );
-
-    } );
-
-
-} );

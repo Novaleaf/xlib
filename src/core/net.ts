@@ -6,7 +6,8 @@ import bb = promise.bluebird;
 import * as _ from "lodash";
 
 import * as diagnostics from "./diagnostics";
-let log = new diagnostics.Logger( __filename );
+const log = diagnostics.log; // new diagnostics.Logger( __filename );
+log._overrideLogLevel( "WARN" );
 
 import * as serialization from "./serialization";
 import * as exception from "./exception";

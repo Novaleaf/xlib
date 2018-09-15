@@ -126,7 +126,7 @@ _internalInitWork.push( ( args ) => {
 	}
 	if ( _logLevel == null ) {
 		_logLevel = LogLevel.TRACE;
-		if ( args.suppressStartupMessage != true ) {
+		if ( args.silentInit != true ) {
 			console.info( "logLevel varible is not set.  \n\tdefaulting to logLevel=TRACE." );
 			console.info( `\tPossible values are ${ _.map( LogLevel ).join( ", " ) }` );
 			console.info( "\tHow to modify: " );
@@ -136,7 +136,7 @@ _internalInitWork.push( ( args ) => {
 			console.info( "\tpass the 'logLevelOverrides' envVar, for example: logLevelOverrides=[{'.*connection':'WARN'} " );
 		}
 	} else {
-		if ( args.suppressStartupMessage != true ) {
+		if ( args.silentInit != true ) {
 			console.info( "logLevel=" + LogLevel[ _logLevel ] );
 		}
 	}
@@ -175,7 +175,7 @@ _internalInitWork.push( ( args ) => {
 	}
 	if ( envLevel == null ) {
 		envLevel = EnvLevel.DEV;
-		if ( args.suppressStartupMessage != true ) {
+		if ( args.silentInit != true ) {
 			console.info( "envLevel varible is not set.  \n\tdefaulting to envLevel=DEV." );
 			console.info( `\tPossible values are ${ _.map( EnvLevel ).join( ", " ) }.` );
 			console.info( "\tHow to modify: " );
@@ -183,7 +183,7 @@ _internalInitWork.push( ( args ) => {
 			console.info( "\t\tbrowser: set by adding 'envLevel=PROD' in your querystring, add a cookie, or as a attribute of your html tag" );
 		}
 	} else {
-		if ( args.suppressStartupMessage != true ) {
+		if ( args.silentInit != true ) {
 			console.info( "envLevel=" + EnvLevel[ envLevel ] );
 		}
 	}
@@ -363,6 +363,6 @@ export function getEnvironmentVariable( key: string, valueIfNullOrEmpty?: string
 
 
 /** reads in various environmental and process details and make it easily usable by devs */
-export function initialize( args: init.IInitArgs ) {
+export function initialize( args: init.IInitArgs = {} ) {
 	_internalInitWork.forEach( ( fcn ) => { fcn( args ) } );
 }

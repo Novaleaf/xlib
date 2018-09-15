@@ -15,7 +15,7 @@ import exception = require( "./exception" );
 import reflection = require( "./reflection" );
 
 import diagnostics = require( "./diagnostics" );
-var log = new diagnostics.Logger( __filename );
+const log = diagnostics.log; // new diagnostics.Logger( __filename );
 
 interface ICacheItem<TValue> {
     /** if UNDEFINED the cache is invalid.   Important note:  NULL is a valid cached value.*/

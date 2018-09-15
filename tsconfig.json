@@ -67,13 +67,14 @@
   // "typeAcquisition": { //not enabling to force explicit usage of new types
   //   "enable": true,
   // },
-  "include": [
-    "./src/**/*.ts",
-    "./src/_internal/**/*.ts",
-  ],
+  // "include": [
+  //   "./src/**/*.ts",
+  //   "./src/_internal/**/*.ts",
+  // ],
   "exclude": [
     "node_modules",
-    "src/.graveyard",
+    "src/_graveyard",
+    "dist",
   ],
   "typedocOptions": {
     "mode": "modules",

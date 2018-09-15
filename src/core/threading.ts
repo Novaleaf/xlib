@@ -106,7 +106,7 @@ import * as bb from "bluebird";
 import * as promise from "./promise";
 import * as diagnostics from "./diagnostics";
 
-const log = new diagnostics.Logger( __filename );
+const log = diagnostics.log; // const log = new diagnostics.Logger( __filename );
 
 /** an async+promise capable, readerwriter lock.
  * 

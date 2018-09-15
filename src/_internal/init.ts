@@ -7,19 +7,23 @@ import bb = promise.bluebird;
 export type IInitArgs = {
     /** if true, disables overriding settings from the commandline, envVars, or querystring */
     disableEnvAutoRead?: boolean,
-    logLevel?: environment.LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
-    envLevel?: environment.EnvLevel | "DEV" | "TEST" | "UAT" | "PROD",
+    logLevel?: "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
+    envLevel?: "DEV" | "TEST" | "UAT" | "PROD",
     //testLevel?: environment.TestLevel | "NONE" | "UNIT" | "INTEGRATION" | "SYSTEM" | "ACCEPTANCE",
-    logLevelOverrides?: { namePattern: RegExp, newLogLevel: environment.LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" }[],
-    suppressStartupMessage?: boolean,
+    logLevelOverrides?: { namePattern: RegExp, newLogLevel: "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" }[],
+    /** set to true to not log startup initialization details */
+    silentInit?: boolean,
 };
+
 
 export function isInitializeStarted() {
     return isStarted;
 }
 
 let isStarted = false;
-let finishedPromise: promise.IExposedPromise<IInitArgs>;
+
+/** resolves when xlib is fully initialized */
+export const finishedPromise: promise.IExposedPromise<IInitArgs> = promise.CreateExposedPromise<IInitArgs>();
 
 const initWorkArray: Array<promise.IocCallback<IInitArgs, void>> = [];
 
@@ -30,7 +34,6 @@ export async function initialize<TArgs>( args?: IInitArgs ) {
         throw new Error( "initialize already started and trying to start it again" );
     }
     isStarted = true;
-    finishedPromise = promise.CreateExposedPromise<IInitArgs>();
 
 
     for ( let i = 0; i < initWorkArray.length; i++ ) {
