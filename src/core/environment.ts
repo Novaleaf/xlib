@@ -309,7 +309,7 @@ export function _ifDebug( fcn: Function ): any {
 nodejs / phantomjs: reads from commandline switches (prefered) or system environment variables.
 browser:  reads from querystring (prefered), or cookie, or <html data-key> attribute (least prefered).
  */
-export function getEnvironmentVariable( key: string, valueIfNullOrEmpty?: string ) {
+export function getEnvironmentVariable( key: string,/** by default, when the envVar doesn't exist we'll return undefined*/ valueIfNullOrEmpty?: string ) {
 	var result: string;
 	switch ( platformType ) {
 		case PlatformType.Browser:

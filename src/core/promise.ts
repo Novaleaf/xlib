@@ -159,64 +159,65 @@ export function forEach<TIn, TOut>( array: TIn[], callback: ( value: TIn ) => TO
 }
 
 
-export module _BluebirdRetryInternals {
-	export interface IOptions {
-		/**  initial wait time between attempts in milliseconds(default 1000)*/
-		interval?: number;
-		/**  if specified, increase interval by this factor between attempts*/
-		backoff?: number;
-		/** if specified, maximum amount that interval can increase to*/
-		max_interval?: number;
-		/** total time to wait for the operation to succeed in milliseconds*/
-		timeout?: number;
-		/** maximum number of attempts to try the operation*/
-		max_tries?: number;
-	}
-	/**
-	 *  Stopping
-The library also supports stopping the retry loop before the timeout occurs by throwing a new instance of retry.StopError from within the called function.
 
-For example:
+// export module _BluebirdRetryInternals {
+// 	export interface IOptions {
+// 		/**  initial wait time between attempts in milliseconds(default 1000)*/
+// 		interval?: number;
+// 		/**  if specified, increase interval by this factor between attempts*/
+// 		backoff?: number;
+// 		/** if specified, maximum amount that interval can increase to*/
+// 		max_interval?: number;
+// 		/** total time to wait for the operation to succeed in milliseconds*/
+// 		timeout?: number;
+// 		/** maximum number of attempts to try the operation*/
+// 		max_tries?: number;
+// 	}
+// 	/**
+// 	 *  Stopping
+// The library also supports stopping the retry loop before the timeout occurs by throwing a new instance of retry.StopError from within the called function.
 
-var retry = require('bluebird-retry');
-var i = 0;
-var err;
-var swing = function() {
-    i++;
-    console.log('strike ' + i);
-    if (i == 3) {
-        throw new retry.StopError('yer out');
-    }
-    throw new Error('still up at bat');
-};
+// For example:
 
-retry(swing, {timeout: 10000})
-.catch(function(e) {
-    console.log(e.message)
-});
-Will display:
+// var retry = require('bluebird-retry');
+// var i = 0;
+// var err;
+// var swing = function() {
+//     i++;
+//     console.log('strike ' + i);
+//     if (i == 3) {
+//         throw new retry.StopError('yer out');
+//     }
+//     throw new Error('still up at bat');
+// };
 
-strike 1
-strike 2
-strike 3
-yer out
-The StopError constructor accepts one argument. If it is invoked with an instance of Error, then the promise is rejected with that error argument. Otherwise the promise is rejected with the StopError itself.*
+// retry(swing, {timeout: 10000})
+// .catch(function(e) {
+//     console.log(e.message)
+// });
+// Will display:
 
-	 */
-	export declare class StopError {
-		constructor(
-			/** The StopError constructor accepts one argument. If it is invoked with an instance of Error, then the promise is rejected with that error argument. Otherwise the promise is rejected with the StopError itself.*/
-			message?: string | Error );
-	}
+// strike 1
+// strike 2
+// strike 3
+// yer out
+// The StopError constructor accepts one argument. If it is invoked with an instance of Error, then the promise is rejected with that error argument. Otherwise the promise is rejected with the StopError itself.*
 
-	export interface IRetryStatic {
-		<TValue>( fn: () => PromiseLike<TValue>, options?: IOptions ): bb<TValue>;
-		/** Stopping
-The library also supports stopping the retry loop before the timeout occurs by throwing a new instance of retry.StopError from within the called function.
-		The StopError constructor accepts one argument. If it is invoked with an instance of Error, then the promise is rejected with that error argument. Otherwise the promise is rejected with the StopError itself.*/
-		StopError: typeof StopError;
-	}
-}
+// 	 */
+// 	export declare class StopError {
+// 		constructor(
+// 			/** The StopError constructor accepts one argument. If it is invoked with an instance of Error, then the promise is rejected with that error argument. Otherwise the promise is rejected with the StopError itself.*/
+// 			message?: string | Error );
+// 	}
+
+// 	export interface IRetryStatic {
+// 		<TValue>( fn: () => PromiseLike<TValue>, options?: IOptions ): bb<TValue>;
+// 		/** Stopping
+// The library also supports stopping the retry loop before the timeout occurs by throwing a new instance of retry.StopError from within the called function.
+// 		The StopError constructor accepts one argument. If it is invoked with an instance of Error, then the promise is rejected with that error argument. Otherwise the promise is rejected with the StopError itself.*/
+// 		StopError: typeof StopError;
+// 	}
+// }
 /**
  *  The ```bluebird-retry``` module:  https://www.npmjs.com/package/bluebird-retry
 utility for retrying a bluebird promise until it succeeds

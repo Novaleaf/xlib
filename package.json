@@ -14,7 +14,7 @@
     "@types/moment": "^2.13.0",
     "@types/node": "^10.9.4",
     "aguid": "^1.0.4",
-    "axios": "^0.15.3",
+    "axios": "^0.18.0",
     "base64url": "^1.0.5",
     "bluebird": "^3.5.2",
     "bluebird-retry": "^0.11.0",

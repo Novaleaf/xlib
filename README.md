@@ -42,7 +42,7 @@ log.info("hi",{some:"data"});
 
 ```
 
-## Functionality
+# Functionality
 
 I haven't found a good documentation tool (TypeDoc sucks for libraries), if you know if one, let me know!   In the meantime, I suggest browsing via your code editor's Intelisense.
 
@@ -63,7 +63,7 @@ The main functional areas ```xlib``` covers
 - Validation (user input scrubbing)
 - Utility (lodash, jsHelpers, Array/Number/String utils)
 
-### Logging
+## Logging
 
 ```javascript
 const log = xlib.diagnostics.log;
@@ -78,7 +78,7 @@ a robust logger, with log-levels set via global environment variables.
 
 ***limitations***:  only logs to console for now.  A configurable listener would be preferable, if you want to send a pull request!
 
-#### log filtering
+### log filtering
 
 you can set a minimum log level per file or per ```RegExp``` so that you can toggle the verbosity of your files.  
 
@@ -95,7 +95,7 @@ These filters can also be passed as xlib.initialization parameters, via the foll
 - envVar (commandLine, systemEnv, or QueryString):  pass the ```logLevelOverrides``` parameter.   Example: ```"logLevelOverrides={'.*connection':'WARN', '.*xlib.dev.core.net.js':'INFO'}"``` 
 - by code before importing ```xlib``` by setting the ```global.__xlibInitArgs.logLevelOverrides``` global.  Example: ```global.__xlibInitArgs = { logLevelOverrides: [{namePattern:/.*connection/,newLogLevel:"WARN"},{namePattern:/.*xlib.dev.core.net.js/,newLogLevel:"INFO"}]};```
 
-### Environmental/Startup Options
+## Environmental/Startup Options
 ```xlib``` is automatically initialized as soon as you import it for the first time.    It will read system environmental variables from the commandline, querystring, or systemEnv (in that order of priority).    Alternately, you ***may*** configure it's environment variables explicitly via code BEFORE you import ```xlib```.  Here's an example showing how you can explicitly set the initialization:
 
 ``` typescript
@@ -126,6 +126,32 @@ global.__xlibInitArgs = {
 import xlib = require( "xlib" );
 ```
 
+### Reading custom envVars
+
+Environmental variables can be detected from numerous sources, in the following order of priority (lower the number, the more important)
+
+#### NodeJs
+1. CommandLine Args
+2. System Environment Variables
+
+#### Browser
+1. Querystring variables
+2. cookies
+3. dom attribute "data-KEY" in a node
+4. dom attribute "KEY" in a node
+
+Example Usage:
+
+```in your code```
+``` typescript
+const apiKey = xlib.environment.getEnvironmentVariable("apikey");
+```
+
+```from the commandline```
+``` bash
+node . apikey="your-secret-key";
+```
+
 
  
 
@@ -146,6 +172,6 @@ import xlib = require( "xlib" );
 Since I started programming, I've a big fan of the .NET Framework.  Xlib is my attempt to bring that level of great features + (re)usability to the Typescript.  
 
 # Changelog
-
+- v12: reconfig initialization arguments to be passed prior to import of xlib (IE: specify a ```global.__xlibInitArgs```) . also change logger to be a singleton, and allow better log filtering via log.
 - v11: remove testLevel as external testing frameworks like mocha set their testLevel in a different way.
 - v10: the 10.x  branch (and semver) is a restructure of this project to take advantage of the now fully mature typescript ecosystem.  Prior to 10.x, to publish a typescript project was a tedious process.
