@@ -95,6 +95,11 @@ export import env = environment.env;
 
 // }
 
+
+
+//export function defaultsDeep()
+
+/** helper for formatting numbers sanely */
 export const format = _numHelper.format;
 
 //with the key+value for primitive properties, key+[Array:len] for arrays, and key+[typeName] for objects 
@@ -107,6 +112,7 @@ export function inspect( obj: any,
     maxDepth--;
 
     if ( maxDepth < 0 || _.isObject( obj ) === false ) {
+        //at max depth or at a primitive.  output this node's value
         try {
             let value = obj;
             let str: string;

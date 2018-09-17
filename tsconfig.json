@@ -63,6 +63,11 @@
     ],
     "outDir": "dist",
     "rootDir": "src",
+    // "lib": [
+    //   "es2015",
+    //   "dom",
+    // ],
+    //"noLib": true,
   },
   // "typeAcquisition": { //not enabling to force explicit usage of new types
   //   "enable": true,

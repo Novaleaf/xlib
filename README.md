@@ -152,7 +152,19 @@ const apiKey = xlib.environment.getEnvironmentVariable("apikey");
 node . apikey="your-secret-key";
 ```
 
+## network code:  ```RemoteHttpEndpoint```
 
+you can easily construct a remote endpoint for reuse:
+
+```typescript
+const remoteEndpoint = new xlib.net.RemoteHttpEndpoint<void, string>( {
+	endpoint: { origin: "http://example.com" },
+	retryOptions: { backoff: 2, interval: 100, max_interval: 5000, max_tries: 10 },
+} );
+let __ = xlib.lolo;
+let response = await remoteEndpoint.get();
+__.log.info( `got response`, __.inspect( response ) );
+```
  
 
 --------

@@ -6,7 +6,6 @@ import * as _ from "lodash";
 
 /** low-level javascript helpers for use in the browser. graceful fallbacks if not a browser*/
 
-
 declare var phantom: any; //global var if we are running under phantomjs
 /** DEPRECATED:  use jsHelper.platformType instead.   
 determine if running in a browser (if false, most likely running in node.js) */

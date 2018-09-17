@@ -54,8 +54,26 @@ describe( __filename + " basic xlib unit tests", () => {
 		log.info( "should not show" );
 		log.warn( "should not show" );
 		log.error( "should show" );
-
+		//reset loglevel
+		log._overrideLogLevel( xlib.environment.logLevel );
 	} );
 
+	it( "testing basic net.RemoteHttpEndpoint functionality: read from example.com", async () => {
+
+		const remoteEndpoint = new xlib.net.RemoteHttpEndpoint<void, string>( {
+			endpoint: { origin: "http://example.com" },
+			retryOptions: { backoff: 2, interval: 100, max_interval: 5000, max_tries: 10 },
+		} );
+
+		let response = await remoteEndpoint.get();
+
+
+		log.assert( response.status === 200, "invalid status response" );
+		log.info( `got response`, xlib.lolo.inspect( response ) );
+		log.assert( response.data.indexOf( "Example Domain" ) >= 0, "Example Domain text not found" )
+
+		//log.info( response );
+
+	} )
 
 } );
