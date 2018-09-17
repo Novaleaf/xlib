@@ -17,8 +17,8 @@ import jsHelper = require( "./jshelper" );
 import * as axios from "axios";
 export { /** the raw axios library used for http calls */ axios };
 
-import { RemoteHttpEndpoint, IEndpointOptions } from "./_net/remote-http-endpoint";
-export { RemoteHttpEndpoint, IEndpointOptions };
+import { RemoteHttpEndpoint, IRemoteHttpEndpointOverrideOptions, IRemoteHttpEndpointOptions } from "./_net/remote-http-endpoint";
+export { RemoteHttpEndpoint, IRemoteHttpEndpointOverrideOptions, IRemoteHttpEndpointOptions };
 
 
 

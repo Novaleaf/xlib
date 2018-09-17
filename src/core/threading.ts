@@ -270,3 +270,163 @@ export class AsyncReaderWriterLock<TValue=void> {
 
 }
 
+/** required arguments when constructing a new autoscaler */
+
+export interface IAutoscalerOptions {
+	/** minimum parallel requests you allow, regardless of how long the autoscaler has been idle.  should be 1 or more.  
+	*/
+    minParallel: number,
+	/** optional.  set a max to number of parallel requests no matter how active the calls 
+		* @default undefined (no limit)
+	*/
+    maxParallel?: number,
+    /** if we get a "BACKOFF" rejection (from the ```failureListener```), how long we should wait before trying to expand again. */
+    backoffDelayMs: number,
+    /** when we are at max parallel and still able to successfully submit requests (not getting "BACKOFF" errors), how long to delay before increasing our parallel count by 1. */
+    growDelayMs: number,
+    /** when we are under our max parallel, how long before our max should decrease by 1 */
+    decayDelayMs: number,
+	/** optional.  when we get a backoff rejection, we will reduce maxActive by this amount.
+		* @default 1
+	 */
+    backoffPenaltyCount?: number,
+};
+
+
+/** while this is probably only useful+used by the ```net.RemoteHttpEndpoint``` class, this is a generic autoscaler implementation, 
+	* meaning that it will scale requests to a ```backendWorker``` function, gradually increasing activeParallel requests over time.   Requests exceeding activeParallel will be queued in a FIFO fashion.
+	* 
+	the only requirement is that the target ```backendWorker``` function  return a promise, 
+    * and you specify a ```failureListener``` function that can tell the difference between a failure and a need for backing off.
+    */
+export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<TResult>, TResult, TError extends Error>{
+
+    constructor(
+        private options: IAutoscalerOptions,
+        private backendWorker: TWorkerFunc,
+        /** will be used to intercept failures (promise rejections) from the ```backendWorker``` function.  should return "FAIL" if it's a normal failure (to be returned to the caller) or "BACKOFF" if the request should be retried  */
+        private failureListener: ( ( err: TError ) => "FAIL" | "BACKOFF" ),
+    ) {
+
+        //apply defaults
+        this.options = { backoffPenaltyCount: 1, ...options };
+
+        if ( this.options.minParallel < 1 ) {
+            throw new Error( "minParallel needs to be 1 or more" );
+        }
+
+        this.metrics = { activeCount: 0, lastBackoff: new Date( 0 ), lastGrow: new Date( 0 ), lastMax: new Date( 0 ), maxActive: 0 };
+
+
+
+    }
+
+    private metrics: {
+        maxActive: number,
+        lastBackoff: Date,
+        activeCount: number,
+        /** the last time we grew our maxActive count  */
+        lastGrow: Date,
+        /** the last time we were at our maxActive count */
+        lastMax: Date,
+    };
+
+    private pendingCalls: { args: any[], requesterPromise: promise.IExposedPromise<TResult> }[] = [];
+
+    private activeCalls: { args: any[], requesterPromise: promise.IExposedPromise<TResult>, activeMonitorPromise: bb<any> }[] = [];
+
+    public toJson() {
+        return { pendingCalls: this.pendingCalls.length, activeCalls: this.activeCalls.length, metrics: this.metrics, options: this.options };
+    }
+
+    public submitRequest: TWorkerFunc = ( async ( ...args: any[] ): Promise<TResult> => {
+        const requesterPromise = promise.CreateExposedPromise<TResult>();
+        this.pendingCalls.push( { args, requesterPromise } );
+        this._tryCallBackend();
+        return requesterPromise;
+    } ) as any;
+
+    private _tryCallBackend() {
+        while ( true ) {
+
+            // ! /////////////  do housekeeping ///////////////////
+
+            //check if we have to abort for various reasons
+            if ( this.pendingCalls.length === 0 ) {
+                //nothing to do
+                return;
+            }
+            if ( this.metrics.activeCount >= this.metrics.maxActive ) {
+                //make note that we are at our limit of requests
+                this.metrics.lastMax = new Date();
+            }
+            if ( this.options.maxParallel != null && this.metrics.activeCount >= this.options.maxParallel ) {
+                //at our hard limit of parallel requests
+                return;
+            }
+            if ( this.metrics.activeCount >= this.metrics.maxActive //we are at our max...
+                && ( this.metrics.lastGrow.getTime() + this.options.growDelayMs < Date.now() ) //we haven't grew recently...
+                && ( this.metrics.lastBackoff.getTime() + this.options.backoffDelayMs < Date.now() ) //we haven't recieved a "BACKOFF" rejection recently...
+            ) {
+                //time to grow
+                this.metrics.maxActive++;
+                this.metrics.lastGrow = new Date();
+            }
+            if ( this.options.decayDelayMs != null && this.metrics.activeCount < this.metrics.maxActive && this.metrics.lastMax.getTime() + this.options.decayDelayMs < Date.now() ) {
+                //time to reduce our maxActive
+                const reduceCount = Math.round( ( Date.now() - this.metrics.lastMax.getTime() ) / this.options.decayDelayMs );//accumulating decays in case the autoScaler has been idle
+                log.assert( reduceCount >= 0 );
+                this.metrics.maxActive = Math.max( this.options.minParallel, this.metrics.maxActive - reduceCount );
+                //pretend we are at max, to properly delay decaying.
+                this.metrics.lastMax = new Date();
+            }
+
+            if ( this.metrics.activeCount >= this.metrics.maxActive ) {
+                //we are at our maxActive, wait for a free slot
+                return;
+            }
+
+            // ! ////////// Done with housekeeping and didn't early abort.   time to call the backend  /////////////////
+
+            const { args, requesterPromise } = this.pendingCalls.shift();
+            const activeMonitorPromise = bb.resolve( this.backendWorker( ...args ) )
+                .then( ( result ) => {
+                    requesterPromise.fulfill( result );
+                }, ( _err ) => {
+                    //failure, see what to do about it
+                    let verdict = this.failureListener( _err );
+                    switch ( verdict ) {
+                        case "FAIL":
+                            requesterPromise.reject( _err );
+                            break;
+                        case "BACKOFF":
+                            //apply special backoffPenaltyCount options, if they exist
+                            if ( this.options.backoffPenaltyCount != null && this.metrics.lastBackoff.getTime() + this.options.backoffDelayMs < Date.now() ) {
+                                //this is a "fresh" backoff.
+                                //we have exceeded backend capacity and been notified with a "BACKOFF" failure.  reduce our maxParallel according to the options.backoffPenaltyCount
+                                this.metrics.maxActive = Math.max( this.options.minParallel, this.metrics.maxActive - this.options.backoffPenaltyCount );
+                            }
+                            //set our backoff time
+                            this.metrics.lastBackoff = new Date();
+                            //put request in front to try again
+                            this.pendingCalls.unshift( { args, requesterPromise } );
+                            break;
+                    }
+                } )
+                .finally( () => {
+                    //remove this from actives array
+                    this.metrics.activeCount--;
+                    _.remove( this.activeCalls, ( activeCall ) => activeCall.requesterPromise === requesterPromise );
+                    //try another pass
+                    this._tryCallBackend();
+                } );
+
+            this.metrics.activeCount++;
+            this.activeCalls.push( { args, requesterPromise, activeMonitorPromise } );
+        }
+
+    }
+
+
+
+}

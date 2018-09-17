@@ -74,6 +74,38 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		//log.info( response );
 
-	} )
+	} );
+
+	// it( "testing autoscaler functionality: request from phantomjscloud.com", async () => {
+
+	// 	const __ = xlib.lolo;
+
+	// 	/** POST request data you submit to the server
+	// 		* 
+	// 		real request data can be more elaborate:  see ```IPageRequest``` in https://phantomjscloud.com/docs/http-api/
+	// 		*/
+	// 	type IPjscPostData = { url: string, renderType: "png" | "html" | "pdf" | "jpeg" };
+	// 	/** response data you will get back from the server.
+	// 		* 
+	// 	real response data is more elaborate:  see ```IUserResponse``` in https://phantomjscloud.com/docs/http-api/
+	// 	 */
+	// 	type IPjscUserResponse = { content: { name: string, data: string, encoding: string } };
+
+	// 	const options: xlib.net.IRemoteHttpEndpointOptions = {
+	// 		endpoint: { origin: "https://phantomjscloud.com", path: "/api/browser/v2/a-demo-key-with-low-quota-per-ip-address/" },
+	// 		autoscalerOptions: {minParallel:4, backoffDelayMs:30000,growDelayMs:5000, decayDelayMs:5000},
+	// 	};
+	// 	const phantomJsCloudEndpoint = new xlib.net.RemoteHttpEndpoint<IPjscPostData, IPjscUserResponse>( options );
+
+	// 	try {
+	// 		const httpResponse = await phantomJsCloudEndpoint.post( { url: "https://example.com", renderType: "pdf" } );
+	// 	} catch ( _err ) {
+	// 		if ( xlib.reflection.getTypeName( _err ) === "AxiosError" ) {
+	// 			const axiosError: xlib.net.axios.AxiosError = _err;
+	// 			__.log.error("request failed", __.inspect())
+	// 		}
+	// 	}
+
+	// } );
 
 } );

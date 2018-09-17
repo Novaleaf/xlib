@@ -7,6 +7,14 @@
 **```xlib```** is a monolitic core/utilities library.  It's designed to be a one-stop-shop for professional developers who need functionality that will work across Browser or Server.  
 
 
+# WORK IN PROGRESS
+
+- ***new changes*** under ```xlib@next``` : currently under very active development. Instead of publishing a new .major version every day or two, instead I'll be publishing to ```xlib@next``` for the near term.   
+- ***browser currently unsupported***:    while ```xlib``` is designed for brower support, it's not currently being tested and might be superficially broken.  Previously, in v9.x ```WebPack``` was tested and supported.   
+
+
+
+
 # expected setup
 
 While you can use ```npm install xlib``` to use this in just about any javascript project or environment, here are what we test with:
@@ -154,19 +162,40 @@ node . apikey="your-secret-key";
 
 ## network code:  ```RemoteHttpEndpoint```
 
-you can easily construct a remote endpoint for reuse:
+you can easily construct a request from a webserver: 
 
 ```typescript
 const remoteEndpoint = new xlib.net.RemoteHttpEndpoint<void, string>( {
-	endpoint: { origin: "http://example.com" },
-	retryOptions: { backoff: 2, interval: 100, max_interval: 5000, max_tries: 10 },
+    endpoint: { origin: "http://example.com" },
+    retryOptions: { backoff: 2, interval: 100, max_interval: 5000, max_tries: 10 },
 } );
+
+let response = await remoteEndpoint.get();
 let __ = xlib.lolo;
 let response = await remoteEndpoint.get();
 __.log.info( `got response`, __.inspect( response ) );
 ```
- 
 
+and can use it to create an autoscaler endpoint for a web API:
+```typescript
+
+```
+
+ 
+## threading
+
+#### ```AsyncReaderWriterLock```
+```typescript
+/** an async+promise capable, readerwriter lock.
+ * 
+ * allows multiple readers (non-exclusive read lock) and single-writers (exclusive write lock)
+ * 
+ * additionally, allows storage of a value that is atomically written (a helper shortcut for common use: using this value is not required) 
+ * 
+ * when a race occurs, writes take precidence
+ */
+export class AsyncReaderWriterLock<TValue=void>
+```
 --------
 # Versioning / Upgrading
 ```xlib``` follows [Semver](https://docs.npmjs.com/getting-started/semantic-versioning) versioning.  Thus any breaking change will be released under a major version, and new functionality will be released under minor versions.  
