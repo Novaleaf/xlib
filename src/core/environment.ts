@@ -103,6 +103,7 @@ export enum LogLevel {
 	WARN = 40,
 	ERROR = 50,
 	FATAL = 60,
+	ASSERT = 70,
 }
 /** the logLevel of your environment.  used as the default when constructing a logging.Logger()
  * nodejs: set by running "node entrypoint.js logLevel=DEBUG" or by setting your systemenv var: logLevel=DEBUG

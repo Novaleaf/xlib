@@ -1,6 +1,6 @@
 "use strict";
 
-import ex = require("./exception");
+import ex = require( "./exception" );
 
 /** root class, includes the following functionality:
 typeName, toString, dispose, assertIsAlive, hashCode */
@@ -14,10 +14,10 @@ class ClassBase {
 
 	/** the name of the class this object is an instance of */
 	public getTypeName(): string {
-		if (this._typeName == null) {
+		if ( this._typeName == null ) {
 			var funcNameRegex = /function (.{1,})\(/;
-			var results = (funcNameRegex).exec((<any>this).constructor.toString());
-			this._typeName = (results && results.length > 1) ? results[1] : "";
+			var results = ( funcNameRegex ).exec( ( <any>this ).constructor.toString() );
+			this._typeName = ( results && results.length > 1 ) ? results[ 1 ] : "";
 		}
 		return this._typeName;
 	}
@@ -32,16 +32,16 @@ class ClassBase {
 	/** dispose this object if not already disposed.
 returns:  true == we just disposed.   false==already disposed so we do nothing */
 	public tryDispose(): boolean {
-		if (this._isDisposed) { return false; }
+		if ( this._isDisposed ) { return false; }
 		this.dispose();
 		return true;
 	}
 	/** dispose this object.   asserts if already disposed */
 	public dispose() {
-		if (this._isDisposed) {
-			throw new ex.CorelibException("already disposed.  class= " + this.getTypeName());
+		if ( this._isDisposed ) {
+			throw new ex.XlibException( "already disposed.  class= " + this.getTypeName() );
 		}
-		if (!this._isDisposed) {
+		if ( !this._isDisposed ) {
 			this._isDisposed = true;
 			this._disposing();
 		}
@@ -53,11 +53,11 @@ returns:  true == we just disposed.   false==already disposed so we do nothing *
 	/* tslint:enable */
 
 	public _assertIsAlive() {
-		if (this._debugIsBaseCtorCalled !== true) {
-			throw new ex.CorelibException("assertIsAlive failed.  you forgot to call the super() from your constructor class= " + this.getTypeName());
+		if ( this._debugIsBaseCtorCalled !== true ) {
+			throw new ex.XlibException( "assertIsAlive failed.  you forgot to call the super() from your constructor class= " + this.getTypeName() );
 		}
-		if (this.getIsDisposed() === true) {
-			throw new ex.CorelibException("assertIsAlive failed.  already disposed.  class= " + this.getTypeName());
+		if ( this.getIsDisposed() === true ) {
+			throw new ex.XlibException( "assertIsAlive failed.  already disposed.  class= " + this.getTypeName() );
 		}
 	}
 
@@ -67,7 +67,7 @@ returns:  true == we just disposed.   false==already disposed so we do nothing *
 	/** returns a string uniquely identifying this object instance.
 	override to provide your own hashing function */
 	public getHashCode(): string {
-		if (this._hashCode == null) {
+		if ( this._hashCode == null ) {
 			this._hashCode = ClassBase._hashPrefix + ClassBase._hashId.toString(); //collections.hashHelper.createUniqueCodeInternal();
 			ClassBase._hashId++;
 		}

@@ -2,6 +2,8 @@
 
 import _ = require( "lodash" );
 
+export import Chalk = require( "chalk" );
+export import stripAnsi = require( "strip-ansi" );
 
 
 import _sanitizeHtml = require( "sanitize-html" );

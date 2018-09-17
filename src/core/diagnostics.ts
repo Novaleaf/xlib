@@ -137,7 +137,7 @@ export function extractStackFrames(/** error or stack string */ error: exception
 
 
 /** thrown on race-check failures */
-export class RaceCheckException extends exception.CorelibException { }
+export class RaceCheckException extends exception.XlibException { }
 
 /** DEBUG ONLY!  noops self if environment.logLevel is greater than DEBUG helper to check for algorithm race conditions (example: removing from a collection while enumerating) */
 export class DebugRaceCheck {

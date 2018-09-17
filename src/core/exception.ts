@@ -296,8 +296,8 @@ export class Exception extends Error {
 
 }
 
-/** all errors thrown by corelib extend this error type */
-export class CorelibException extends Exception { }
+/** all errors thrown by xlib extend this error type */
+export class XlibException extends Exception { }
 
 /**
  * an exception that includes a statusCode for returning via http requests

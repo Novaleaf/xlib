@@ -7,7 +7,7 @@ import _ = require( "lodash" );
 import serialization = require( "./serialization" );
 import reflection = require( "./reflection" );
 
-class ScrubFailureException extends ex.CorelibException {
+class ScrubFailureException extends ex.XlibException {
 
 }
 
@@ -238,7 +238,8 @@ export class Scrub<T>{
 	private _appendErrorMessage( errorMessage: string, printInvalidValues: boolean, invalidValues?: {} ): string {
 
 		if ( printInvalidValues ) {
-			errorMessage += stringHelper.format( "  %i invalid/missing values. The following required keys+types were invalid: %s", Object.keys( invalidValues ).length, serialization.JSONX.inspectStringify( invalidValues, -1, true, false, true, null, "" ) );
+			errorMessage += stringHelper.format( "  %i invalid/missing values. The following required keys+types were invalid: %s",
+				Object.keys( invalidValues ).length, serialization.jsonX.inspectStringify( invalidValues ) );
 		}
 		this.errorMessages.push( errorMessage );
 		return errorMessage;
@@ -289,7 +290,7 @@ export class Scrub<T>{
 			return;
 		}
 		if ( format == null ) {
-			format = stringHelper.format( "Validation failed due to %s reasons: %s", this.errorMessages.length, serialization.JSONX.stringifyX( this.errorMessages ) );
+			format = stringHelper.format( "Validation failed due to %s reasons: %s", this.errorMessages.length, serialization.jsonX.inspectStringify( this.errorMessages ) );
 		}
 		if ( logger == null ) {
 			logger = log;
@@ -305,7 +306,7 @@ export class Scrub<T>{
 	}
 
 	/** if a scrub failure is detected, will throw an exception. */
-	public failThrow( exceptionMessage = stringHelper.format( "Validation failed due to %s reasons: %s", this.errorMessages.length, serialization.JSONX.stringifyX( this.errorMessages ) ) ) {
+	public failThrow( exceptionMessage = stringHelper.format( "Validation failed due to %s reasons: %s", this.errorMessages.length, serialization.jsonX.inspectStringify( this.errorMessages ) ) ) {
 		if ( this.isValid ) {
 			return;
 		}
@@ -446,7 +447,7 @@ export class Scrub<T>{
 			}
 			var templateValueType = reflection.getTypeName( templateValue );
 			if ( templateValueType === "object" ) {
-				throw new ex.CorelibException( "template is a complex JSON object.   template currently only works for first-order children right now" );
+				throw new ex.XlibException( "template is a complex JSON object.   template currently only works for first-order children right now" );
 			}
 			if ( this.valid[ key ] == null ) {
 				invalid[ key ] = <any>templateValueType;

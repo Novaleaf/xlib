@@ -40,7 +40,7 @@ export class BitFlags {
 		if ( index < BitFlags.MAXFLAGS && index >= 0 ) {
 			return;
 		}
-		throw new ex.CorelibException( stringHelper.format( "index out of bounds.  You supplied %s while expected range is 0 to %i", index, BitFlags.MAXFLAGS - 1 ) );
+		throw new ex.XlibException( stringHelper.format( "index out of bounds.  You supplied %s while expected range is 0 to %i", index, BitFlags.MAXFLAGS - 1 ) );
 
 	}
 	/** return the value of a certain flag */

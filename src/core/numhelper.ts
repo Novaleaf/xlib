@@ -74,7 +74,7 @@ export module hashHelper {
                 item.__noenum_novaleaf_corelib_collections_hashCode = item.__noenum_novaleaf_corelib_collections_hashCode.toString();
             }
             if ( typeof ( item.__noenum_novaleaf_corelib_collections_hashCode ) !== "string" ) {
-                throw new ex.CorelibException( "hash error:  your value.hashCode property did not return a string" );
+                throw new ex.XlibException( "hash error:  your value.hashCode property did not return a string" );
             }
         } else if ( item.getHashCode != null ) {
             //if object has a hashcode already defined.... use it
@@ -83,7 +83,7 @@ export module hashHelper {
                 item.__noenum_novaleaf_corelib_collections_hashCode = item.__noenum_novaleaf_corelib_collections_hashCode.toString();
             }
             if ( typeof ( item.__noenum_novaleaf_corelib_collections_hashCode ) !== "string" ) {
-                throw new ex.CorelibException( "hash error:  your value.getHashCode() method did not return a string" );
+                throw new ex.XlibException( "hash error:  your value.getHashCode() method did not return a string" );
             }
         } else {
             //define our own
@@ -129,7 +129,7 @@ export function guid(/** if input is supplied, output is deterministic. */ input
 /** fast hash a int32, not very great spread */
 export function hash( input: number ): number {
     //from http://stackoverflow.com/questions/9624963/java-simplest-integer-hash
-    if ( !( input <= INT32_MAX && input % 1 === 0 ) ) { throw new ex.CorelibException( "must supply integer" ); }
+    if ( !( input <= INT32_MAX && input % 1 === 0 ) ) { throw new ex.XlibException( "must supply integer" ); }
     input ^= ( input >>> 20 ) ^ ( input >>> 12 );
     return input ^ ( input >>> 7 ) ^ ( input >>> 4 );
 }
@@ -330,7 +330,7 @@ export function clamp( value: number, min_inc: number, max_inc: number, /** defa
             return max_inc - modRemainder;
 
         default:
-            throw new ex.CorelibException( "unknown ClampType: " + ClampType );
+            throw new ex.XlibException( "unknown ClampType: " + ClampType );
     }
 }
 
@@ -439,7 +439,7 @@ export function parseBoolean( toParse: string | number, invalidResult = false, t
                 return false;
             default:
                 if ( throwOnInvalid === true ) {
-                    throw new ex.CorelibException( "unable to parseBoolean on input value= " + toParse );
+                    throw new ex.XlibException( "unable to parseBoolean on input value= " + toParse );
                 }
                 return invalidResult;
         }
@@ -448,7 +448,7 @@ export function parseBoolean( toParse: string | number, invalidResult = false, t
         return toParse !== 0;
     }
     if ( throwOnInvalid === true ) {
-        throw new ex.CorelibException( "unable to parseBoolean on input value= " + toParse );
+        throw new ex.XlibException( "unable to parseBoolean on input value= " + toParse );
     }
     return invalidResult;
 }

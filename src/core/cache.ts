@@ -110,7 +110,7 @@ export class Cache {
 
         let now = moment();
         if ( options.fetchExpiresAmount <= 0 ) {
-            throw new exception.CorelibException( "Cache: item to insert is alreadey expired (fetchExpiresAmount less than or equal to zero)" );
+            throw new exception.XlibException( "Cache: item to insert is alreadey expired (fetchExpiresAmount less than or equal to zero)" );
         }
         // do a garbage collection pass (one item checked per read call) 
         this._tryGCOne( now );

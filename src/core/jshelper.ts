@@ -97,7 +97,7 @@ this is useful if you wish to add/remove from the original collection while enum
 	): boolean {
 	if ( !collection ) { return; }
 	if ( collection[ "length" ] == null ) {
-		throw new ex.CorelibException( "should have length property" );
+		throw new ex.XlibException( "should have length property" );
 	}
 
 	if ( enumerateCopy ) {
@@ -134,7 +134,7 @@ this is useful if you wish to add/remove from the original collection while enum
 	): boolean {
 	if ( !collection ) { return; }
 	if ( !( length in collection ) ) {
-		throw new ex.CorelibException( "should have length property" );
+		throw new ex.XlibException( "should have length property" );
 	}
 
 	if ( enumerateCopy ) {

@@ -88,14 +88,14 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
             if ( suppressThrowOnBadInput === true ) {
                 return "";
             }
-            throw new exception.CorelibException( "nlib.cryptography.humanReadableKey(): parseUserInput too long" );
+            throw new exception.XlibException( "nlib.cryptography.humanReadableKey(): parseUserInput too long" );
         }
         if ( userInputToParse.length < digits ) {
 
             if ( suppressThrowOnBadInput === true ) {
                 return "";
             }
-            throw new exception.CorelibException( "nlib.cryptography.humanReadableKey(): parseUserInput too short." );
+            throw new exception.XlibException( "nlib.cryptography.humanReadableKey(): parseUserInput too short." );
         }
 
         userInputToParse = decodeURIComponent( userInputToParse );
@@ -106,7 +106,7 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
             if ( suppressThrowOnBadInput === true ) {
                 return "";
             }
-            throw new exception.CorelibException( "nlib.cryptography.humanReadableKey(): parseUserInput length wrong." );
+            throw new exception.XlibException( "nlib.cryptography.humanReadableKey(): parseUserInput length wrong." );
         }
 
     } else {

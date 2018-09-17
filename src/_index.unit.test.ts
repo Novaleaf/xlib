@@ -27,7 +27,11 @@ describe( __filename + " basic xlib unit tests", () => {
 	} );
 
 	// it( "should fail, test log.assert()", () => {
-	// 				log.assert( false, "assert condition" );
+	// 	log.assert( false, "assert condition", xlib.lolo );
+	// 	let x = 0;
+	// 	log.assert( x === x );
+
+
 	// } )
 
 
@@ -42,24 +46,34 @@ describe( __filename + " basic xlib unit tests", () => {
 		log.info( "hi", { some: "data" } );
 
 		const __ = xlib.lolo;
-		log.info( "this 1000 character string gets auto-truncated nicely via __.inspect()", __.inspect( { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } ) );
+		log.info( "this 1000 character string gets auto-truncated nicely and automatically.   to output everything, use log.infoFull", { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } );
 
 	} );
 
 	it( "log overrides test", () => {
-
-		log._overrideLogLevel( "ERROR" );
-		log.trace( "should not show" );
-		log.debug( "should not show" );
-		log.info( "should not show" );
-		log.warn( "should not show" );
-		log.error( "should show" );
-		//reset loglevel
-		log._overrideLogLevel( xlib.environment.logLevel );
+		try {
+			let result = log.info( "should show" );
+			log.assert( result != null );
+			log._overrideLogLevel( "ERROR" );
+			result = log.trace( "should not show" );
+			log.assert( result == null );
+			result = log.debug( "should not show" );
+			log.assert( result == null );
+			result = log.info( "should not show" );
+			log.assert( result == null );
+			result = log.warn( "should not show" );
+			log.assert( result == null );
+			result = log.error( "should show" );
+			log.assert( result != null );
+		} finally {
+			//reset loglevel
+			log._overrideLogLevel( xlib.environment.logLevel );
+		}
 	} );
 
 	it( "testing basic net.RemoteHttpEndpoint functionality: read from example.com", async () => {
 
+		const __ = xlib.lolo;
 		const remoteEndpoint = new xlib.net.RemoteHttpEndpoint<void, string>( {
 			endpoint: { origin: "http://example.com" },
 			retryOptions: { backoff: 2, interval: 100, max_interval: 5000, max_tries: 10 },
@@ -68,9 +82,9 @@ describe( __filename + " basic xlib unit tests", () => {
 		let response = await remoteEndpoint.get();
 
 
-		log.assert( response.status === 200, "invalid status response" );
-		log.info( `got response`, xlib.lolo.inspect( response ) );
-		log.assert( response.data.indexOf( "Example Domain" ) >= 0, "Example Domain text not found" )
+		log.assert( response.status === 200, "invalid status response", response );
+		log.info( `got response`, response );
+		log.assert( response.data.indexOf( "Example Domain" ) >= 0, "Example Domain text not found" );
 
 		//log.info( response );
 
