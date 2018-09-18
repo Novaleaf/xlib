@@ -56,21 +56,21 @@ log.info("hi",{some:"data"});
 
 I haven't found a good documentation tool (TypeDoc sucks for libraries), if you know if one, let me know!   In the meantime, I suggest browsing via your code editor's Intelisense.
 
-There's a lot of features in ```xlib```, which generally fall into the following:
-- Cache (collection with expiring values)
-- Collection (utilities for collections)
-- DateTime (moment and moment utils)
-- Environment (cross-platform environment variables and platform detection)
-- Exception (improved exception base class)
-- Logging (robust, configurable logging)
-- Net (axios and http utils)
-- Promise (bluebird and bluebird helpers)
-- Reflection (hight quality runtime type detection and utils)
-- Security (crypto utils)
-- Serialization (robust and user friendly JSON (de)serialization)
-- Threading (read/write lock)
-- Validation (user input scrubbing)
-- Utility (lodash, jsHelpers, Array/Number/String utils)
+There's a lot of commonly used features in ```xlib```:
+- **DateTime**:  a chainable datetime lib. *(```luxon```,  by one of the maintainers of ```moment```)*
+- **Environment**:  Cross-platform environment variables and platform detection.  *(Custom)*
+- **Exception**:  An Improved and extensible exception base class.  *(Custom)*
+- **Logging**:  A robust, configurable, and source-map aware console logger. *(Custom)*
+- **Net**:  An easy to use RemoteHTTPEndpoint class for calling web apis, and generic http request handlers.  *(```axios``` and custom)*
+- **Promise**: Various features for Promise and async/await workflows. *(```bluebird``` and custom)*
+- **Reflection**: High quality runtime type detection.
+- **Security**:  Various crypto workflows *(```crypto```, ```jsonwebtoken``` and custom)*
+- **Serialization**: High quality json manipulation and other import/export features. *(```d3-dsv```, ```json5```, and custom)*
+- **Threading**: An async/await focused ReaderWriterLock implementation and autoscaler. *(Custom)*
+- **Validation**: User input sanitization.  *(```sanitize-html```, ```validator```, and custom)*
+- **Utils**: Array, String, and Number helpers, and pollyfills for downlevel support. *(Custom)*
+
+Hopefully you agree with my (opinionated) choices.   If you disagree, let me know in the Issues section.
 
 Below are intro docs for big impacting features:
 
@@ -264,21 +264,6 @@ try {
 }
 ```
 
-## collections
-
-
-```typescript
-/** up to 32 true/false values stored in 32bits (a bitmask) */
-export class BitFlags{...}
-
-
-/**
- *  a dictionary that deletes items when they expire
- */
-export class ExpiresDictionary<TValue> {...}
-
-
-```
  
 ## threading
 
@@ -294,6 +279,29 @@ export class ExpiresDictionary<TValue> {...}
  */
 export class AsyncReaderWriterLock<TValue=void>
 ```
+
+
+
+## old features
+
+### _obsolete
+
+A lot of "scenario" focused features are obsolete given advances in Typescript and Javascript.   they are still published under the ```/dist/_obsolete/``` folder in case you need them.
+
+they include:
+
+- Cache: collection with expiring values.
+- Collection: utilities for collections.  includes a BitFlags implementation.
+- ClassBase: base class for OOP workflows.  includes initialization and disposal support.
+- Stripe.d.ts:  type definitions for an old version of the Stripe api.  
+
+
+### _graveyard
+Features that used to be in ```xlib``` but are thrown away can be found in the ```/dist/_graveyard/``` folder, but those may not build or work anymore.
+
+
+
+
 --------
 # Versioning / Upgrading
 ```xlib``` follows [Semver](https://docs.npmjs.com/getting-started/semantic-versioning) versioning.  Thus any breaking change will be released under a major version, and new functionality will be released under minor versions.  
