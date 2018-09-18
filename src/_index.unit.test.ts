@@ -121,7 +121,7 @@ describe( __filename + " basic xlib unit tests", () => {
 		const apiKey = xlib.environment.getEnvironmentVariable( "phantomjscloud_apikey", "a-demo-key-with-low-quota-per-ip-address" );
 		const options: xlib.net.IRemoteHttpEndpointOptions = {
 			endpoint: { origin: "https://phantomjscloud.com", path: `/api/browser/v2/${ apiKey }/` },
-			autoscalerOptions: { minParallel: 4, backoffDelayMs: 30000, growDelayMs: 5000, decayDelayMs: 5000 },
+			autoscalerOptions: { minParallel: 4, busyWaitMs: 30000, growDelayMs: 5000, decayDelayMs: 5000 },
 		};
 
 
