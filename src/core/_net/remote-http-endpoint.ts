@@ -118,7 +118,7 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 						switch ( err.response.status ) {
 							case 503:
 							case 429:
-								return "BACKOFF";
+								return "TOO_BUSY";
 						}
 					}
 					return "FAIL"
