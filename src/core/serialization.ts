@@ -12,11 +12,6 @@ import * as _ from "lodash";
 
 
 import * as d3Dsv from "d3-dsv";
-
-
-
-
-
 /** parse comma or tab seperated values.   see https://www.npmjs.com/package/d3-dsv
 	* 
 	This module provides a parser and formatter for delimiter-separated values, most commonly comma- (CSV) or tab-separated values (TSV). These tabular formats are popular with spreadsheet programs such as Microsoft Excel, and are often more space-efficient than JSON. This implementation is based on RFC 4180.
@@ -43,8 +38,6 @@ export const dsv = d3Dsv;
 
 
 import * as json5 from "json5";
-/** provides circularRef handling in .stringify) */
-import * as json5_gerhobbelt from "@gerhobbelt/json5";
 
 /** awesome json parse and stringify capabilities */
 export namespace jsonX {
@@ -58,40 +51,39 @@ export namespace jsonX {
 							*/
 	export const parse: ( text: string, reviver?: ( key: any, value: any ) => any ) => any = json5.parse.bind( json5 );
 	/**
-			* Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
-			* @param value A JavaScript value, usually an object or array, to be converted.
-			* @param replacer An array of strings and numbers that acts as a approved list for selecting the object properties that will be stringified, or A function that transforms the results.
-			* @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
+			* Converts a JavaScript value to a JSON5 string, optionally replacing values if a replacer function is specified, or optionally including only the specified properties if a replacer array is specified.
+			* @param value The value to convert to a JSON5 string.
+			* @param replacer A function that alters the behavior of the stringification process, or an array of String and Number objects that serve as a whitelist for selecting/filtering the properties of the value object to be included in the JSON5 string. If this value is null or not provided, all properties of the object are included in the resulting JSON5 string.
+			* @param space A String or Number object that's used to insert white space into the output JSON5 string for readability purposes. If this is a Number, it indicates the number of space characters to use as white space; this number is capped at 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used. If this is a String, the string (or the first 10 characters of the string, if it's longer than that) is used as white space. If this parameter is not provided (or is null), no white space is used. If white space is used, trailing commas will be used in objects and arrays.  @default "\t"
+		 * @param quote  A String representing the quote character to use when serializing strings.
 			*/
 	export function stringify( value: any,
-		replacer?: ( number | string )[] | null | ( ( key: string, value: any ) => any ),
+		replacer?: ( key: string, value: any ) => any | ( number | string )[],
 		space?: string | number,
-		/** handle circular references.   see: https://www.npmjs.com/package/@gerhobbelt/json5
-			* 
-			```JSONX DEFAULT```:  if ommitted, we pass a handler which will output a string describing the circular reference, letting you otherwise stringify normally. 
-		
-			* circularRefHandler: A callback function which is invoked for every element which would otherwise cause JSON5.stringify() to throw a "converting circular structure to JSON5" TypeError exception.
-		
-		The callback returns the value to stringify in its stead. When this value happens to contain circular references itself, then these will be detected by JSON%.stringify() as encoded as '[!circular ref inside circularRefHandler!]' string values instead. */
-		circularRefHandler?: ( (
-			/** The circular reference value.*/
-			value: any,
-			/** Index into the stack[] and keyStack[] arrays, indicating the parent object which is referenced by the value circular reference value.*/
-			circusPos: number,
-			/** The stack of parents (objects, arrays) for this value. The first entry (index 0) is the root value. The array is a snapshot (shallow clone) to ensure user code can simply store this reference value directly without risking JSON5-internal closure problems which would ensue when we wouldn't have provided you with a snapshot/clone.*/
-			stack: any[],
-			/** The stack of keys, one for each parent, which describe the path to the offending circular reference value for the root value down. The first entry (index 0) is the root value. Useful when you wish to display a diagnostic which lists the traversal path through the object hierarchy in the root value towards the circular reference value at hand, for instance.
-The array is a snapshot (shallow clone) to ensure user code can simply store this reference value directly without risking JSON5-internal closure problems which would ensue when we wouldn't have provided you with a snapshot/clone.*/
-			keyStack: any[],
-			/** Direct parent key of the current value. Same as keyStack[keyStack.length - 1]*/
-			key: string,
-			/** The TypeError produced by JSON5.stringify(): provided here so your user-defined callback code can deside to throw that circular reference error anyway.*/
-			err: Error ) => any )
-	): string {
-		if ( circularRefHandler == null ) {
-			circularRefHandler = ( _value, circusPos, stack, keyStack, key, err ) => { return `[CIRCULAR_REFERENCE message=${ err.message }]` };
+		quote?: string,
+	): string;
+	export function stringify( value: any, options?: {
+		replacer?: ( key: string, value: any ) => any | ( number | string )[],
+		space?: string | number,
+		quote?: string,
+	} );
+	export function stringify( value: any, ...args: any[] ) {
+		let options: {
+			replacer?: ( key: string, value: any ) => any | ( number | string )[],
+			space?: string | number,
+			quote?: string;
+		};
+
+		if ( reflection.getType( args[ 0 ] ) === reflection.Type.object ) {
+			options = args[ 0 ];
+		} else {
+			options = {
+				replacer: args[ 0 ],
+				space: _.defaultTo( args[ 1 ], "\t" ),
+				quote: args[ 2 ],
+			};
 		}
-		return ( json5_gerhobbelt.stringify )( value, replacer, space, circularRefHandler );
+		return json5.stringify( value, options );
 	}
 
 

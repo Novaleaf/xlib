@@ -25,13 +25,13 @@ export interface IErrorJson {
 }
 
 
-export interface IExceptionOptions {
+export interface IExceptionOptions<TData> {
 	innerException?: Error;
 	/** truncate extra stack frames from the stack that's attached to this, 
 	 * a good way to remove logging/util functions from the trace */
 	stackFramesToTruncate?: number;
 	/** extra data you want logged. */
-	data?: any;
+	data?: TData;
 	/** number of stack frames to support (excludes first "message" line) */
 	maxStackFrames?: number;
 }
@@ -42,16 +42,16 @@ export interface IExceptionOptions {
 usage example:  class MyException extends base.Exception{}  throw new MyException("boo");
 from https://stackoverflow.com/questions/12915412/how-do-i-extend-a-host-object-e-g-error-in-typescript
 */
-export class Exception extends Error {
+export class Exception<TData=void> extends Error {
 
 	public stack: string;
 	//public options: IExceptionOptions;
 	private static _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
 
 	public innerException: Error;
-	public data: any;
+	public data: TData;
 
-	constructor( public message: string, options?: IExceptionOptions ) {
+	constructor( public message: string, options?: IExceptionOptions<TData> ) {
 
 		super( message );
 		jsHelper.setPrototypeOf( this, new.target.prototype ); //fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
