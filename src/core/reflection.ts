@@ -80,7 +80,7 @@ export function getType( obj ): Type {
 
 /** get the name of an object's type. better than using 'typeof()' because this handles array and null.*/
 export function getTypeName( obj ): string {
-	var type = getType( obj );
+	let type = getType( obj );
 	switch ( type ) {
 		case Type.object:
 		case Type.Error: {
@@ -90,8 +90,8 @@ export function getTypeName( obj ): string {
 					//es6
 					name = obj.constructor.name;
 				} else if ( obj.constructor.toString ) {
-					var _getTypeNameOrFuncNameRegex = /\s*function\s*(\S{1,})\s*\(/;
-					var results = ( _getTypeNameOrFuncNameRegex ).exec( ( obj ).constructor.toString() );
+					let _getTypeNameOrFuncNameRegex = /\s*function\s*(\S{1,})\s*\(/;
+					let results = ( _getTypeNameOrFuncNameRegex ).exec( ( obj ).constructor.toString() );
 					name = ( results && results.length > 1 ) ? results[ 1 ] : typeof ( obj );
 				} else {
 					name = typeof ( obj );
@@ -100,8 +100,8 @@ export function getTypeName( obj ): string {
 				name = typeof ( obj );
 			}
 			return name;
-			// var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
-			// var results = ( _getTypeNameOrFuncNameRegex ).exec( ( obj ).constructor.toString() );
+			// let _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
+			// let results = ( _getTypeNameOrFuncNameRegex ).exec( ( obj ).constructor.toString() );
 			// return ( results && results.length > 1 ) ? results[ 1 ] : "";
 		}
 		case Type.classCtor:
@@ -121,9 +121,10 @@ export function getTypeName( obj ): string {
 				return name;
 			}
 		default:
-			var str = Type[ type ]; //type.toString();
-			return str;
-
+			{
+				const str = Type[ type ]; //type.toString();
+				return str;
+			}
 	}
 }
 
@@ -133,7 +134,7 @@ export function getTypeName( obj ): string {
 // * good for debug purposes
 //  */
 //export function propertiesToString(obj: any): string[] {
-//	var output: string[] = [];
+//	let output: string[] = [];
 //	runtime.jsHelper.forEachProperty(obj, (value, key) => { output.push(__.format("{\"{0}\":\"{1}\"}", key, value ? value : "NULL")); });
 //	return output;
 //}
@@ -142,16 +143,16 @@ export function getTypeName( obj ): string {
 export function getArgumentNames( args: IArguments ): string[];
 export function getArgumentNames( func: Function ): string[];
 export function getArgumentNames( argsOrFunction: any ): string[] {
-	var func: Function;
+	let func: Function;
 	if ( typeof ( argsOrFunction ) === "function" ) {
 		func = argsOrFunction;
 	} else {
-		var args: IArguments = argsOrFunction;
+		let args: IArguments = argsOrFunction;
 		func = args.callee;
 	}
-	var reg = /\(([\s\S]*?)\)/;
-	var params = reg.exec( func.toString() );
-	var paramNames;
+	let reg = /\(([\s\S]*?)\)/;
+	let params = reg.exec( func.toString() );
+	let paramNames;
 	if ( params ) {
 		paramNames = params[ 1 ].split( "," );
 	} else {
@@ -165,26 +166,26 @@ export function getArgumentNames( argsOrFunction: any ): string[] {
  * useful for debugging/logging parameters */
 export function mapArgumentsValues( args: IArguments, argumentNames?: string[] ): { [ argName: string ]: any } {
 	if ( argumentNames == null ) {
-		var caller = args.callee;
+		let caller = args.callee;
 		argumentNames = getArgumentNames( caller );
 	}
-	var toReturn: { [ argName: string ]: any } = {};
-	for ( var i = 0; i < args.length; i++ ) {
+	let toReturn: { [ argName: string ]: any } = {};
+	for ( let i = 0; i < args.length; i++ ) {
 		toReturn[ argumentNames[ i ] ] = args[ i ];
 	}
 	return toReturn;
 }
 
 //export function _nameArgs(argumentNames: string[], args: IArguments): any {
-//	var toReturn = {};
-//	for (var i = 0; i < args.length; i++) {
+//	let toReturn = {};
+//	for (let i = 0; i < args.length; i++) {
 //		toReturn[argumentNames[i]] = args[i];
 //	}
 //	return toReturn;
 //}
 //export function nameArguments(args: IArguments) {
-//	var caller = args.callee;
-//	var names = getArgumentNames(caller);
+//	let caller = args.callee;
+//	let names = getArgumentNames(caller);
 //	return _nameArgs(names, args);
 //}
 

@@ -1,6 +1,5 @@
 import xlib = require( "./_index" );
 
-const log = xlib.diagnostics.log;
 
 
 describe( __filename + " basic xlib unit tests", () => {
@@ -36,6 +35,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 
 	it( "read env", () => {
+		const log = xlib.diagnostics.log;
 		xlib.diagnostics.log.assert( xlib.environment.envLevel != null );
 		log.info( { envLevel: xlib.environment.envLevel } );
 	} );
@@ -45,16 +45,16 @@ describe( __filename + " basic xlib unit tests", () => {
 		const log = xlib.diagnostics.log;
 		log.info( "hi", { some: "data" } );
 
-		const __ = xlib.lolo;
-		log.info( "this 1000 character string gets auto-truncated nicely and automatically.   to output everything, use log.infoFull", { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } );
-
+		log.info( "this 10000 character string gets auto-truncated nicely via __.inspect()", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) } );
+		log.warnFull( "this 10000 character screen doesn't get truncated because it's logged via the Full method ", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) } );
 	} );
 
 	it( "log overrides test", () => {
+		const log = xlib.diagnostics.log;
 		try {
 			let result = log.info( "should show" );
 			log.assert( result != null );
-			log._overrideLogLevel( "ERROR" );
+			log.overrideLogLevel( "ERROR" );
 			result = log.trace( "should not show" );
 			log.assert( result == null );
 			result = log.debug( "should not show" );
@@ -67,13 +67,13 @@ describe( __filename + " basic xlib unit tests", () => {
 			log.assert( result != null );
 		} finally {
 			//reset loglevel
-			log._overrideLogLevel( xlib.environment.logLevel );
+			log.overrideLogLevel( xlib.environment.logLevel );
 		}
 	} );
 
 	it( "testing basic net.RemoteHttpEndpoint functionality: read from example.com", async () => {
 
-		const __ = xlib.lolo;
+		const log = xlib.diagnostics.log;
 		const remoteEndpoint = new xlib.net.RemoteHttpEndpoint<void, string>( {
 			endpoint: { origin: "http://example.com" },
 			retryOptions: { backoff: 2, interval: 100, max_interval: 5000, max_tries: 10 },
@@ -81,13 +81,26 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		let response = await remoteEndpoint.get();
 
-
 		log.assert( response.status === 200, "invalid status response", response );
-		log.info( `got response`, response );
+		//log.info( `got response`, response );
 		log.assert( response.data.indexOf( "Example Domain" ) >= 0, "Example Domain text not found" );
 
 		//log.info( response );
 
+	} );
+
+	it( "testing reflection", () => {
+		const log = xlib.diagnostics.log;
+		const reflection = xlib.reflection;
+		const Type = reflection.Type;
+		class MyClass { x = 0; };
+		log.assert( reflection.getType( MyClass ) === Type.classCtor );
+		log.assert( reflection.getTypeName( MyClass ) === "MyClass" );
+		let myInstance = new MyClass();
+		log.assert( reflection.getType( myInstance ) === Type.object );
+		log.assert( reflection.getTypeName( myInstance ) === "MyClass" );
+		log.assert( reflection.getType( reflection.getType ) === Type.function );
+		log.assert( reflection.getType( xlib ) === Type.object );
 	} );
 
 	// it( "testing autoscaler functionality: request from phantomjscloud.com", async () => {

@@ -7,20 +7,19 @@ import bb = promise.bluebird;
 export type IInitArgs = {
     /** if true, disables overriding settings from the commandline, envVars, or querystring */
     disableEnvAutoRead?: boolean,
-    logLevel?: "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
+    logLevel?: "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT",
     envLevel?: "DEV" | "TEST" | "UAT" | "PROD",
-    //testLevel?: environment.TestLevel | "NONE" | "UNIT" | "INTEGRATION" | "SYSTEM" | "ACCEPTANCE",
-    logLevelOverrides?: { namePattern: RegExp, newLogLevel: "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" }[],
+    logLevelOverrides?: { callSiteMatch: RegExp, minLevel: "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT" }[],
     /** set to true to not log startup initialization details */
     silentInit?: boolean,
 };
 
 
+
+let isStarted = false;
 export function isInitializeStarted() {
     return isStarted;
 }
-
-let isStarted = false;
 
 /** resolves when xlib is fully initialized */
 export const finishedPromise: promise.IExposedPromise<IInitArgs> = promise.CreateExposedPromise<IInitArgs>();

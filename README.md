@@ -4,7 +4,9 @@
 --------
 # Abstract
 
-**```xlib```** is a monolitic core/utilities library.  It's designed to be a one-stop-shop for professional developers who need functionality that will work across Browser or Server.  
+**```xlib```** is a monolitic core/utilities library.  It's designed to be a one-stop-shop for professional developers who need functionality that will work across Browser or Server. 
+
+Generally, the aim is to have ```xlib``` contain 80% of the functionality you'll need from ```npm``` modules.
 
 
 # WORK IN PROGRESS
@@ -31,7 +33,7 @@ You can check out the [PhantomJsCloud](https://www.npmjs.com/package/phantomjscl
 --------
 # Usage
 
-```xlib``` is transpiled to ```es5``` compatable javascript using ```commonjs``` module format.   Thus you can consume it as you would any other NPM module:
+```xlib``` is transpiled to ```es6``` compatable javascript using ```commonjs``` module format.   Thus you can consume it as you would any other NPM module:
 
 ```javascript
 //typescript 3.0 /es6 example:
@@ -54,8 +56,7 @@ log.info("hi",{some:"data"});
 
 I haven't found a good documentation tool (TypeDoc sucks for libraries), if you know if one, let me know!   In the meantime, I suggest browsing via your code editor's Intelisense.
 
-
-The main functional areas ```xlib``` covers
+There's a lot of features in ```xlib```, which generally fall into the following:
 - Cache (collection with expiring values)
 - Collection (utilities for collections)
 - DateTime (moment and moment utils)
@@ -71,20 +72,32 @@ The main functional areas ```xlib``` covers
 - Validation (user input scrubbing)
 - Utility (lodash, jsHelpers, Array/Number/String utils)
 
+Below are intro docs for big impacting features:
+
 ## Logging
-
-```javascript
-const log = xlib.diagnostics.log;
-log.info( "hi", { some: "data" } );
-
-const __ = xlib.lolo;
-log.info( "this 1000 character string gets auto-truncated nicely via __.inspect()", __.inspect( { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } ) );
-
-```
 
 a robust logger, with log-levels set via global environment variables.
 
 ***limitations***:  only logs to console for now.  A configurable listener would be preferable, if you want to send a pull request!
+
+### Basic Logging
+```javascript
+const log = xlib.diagnostics.log;
+log.info( "hi", { some: "data" } );
+
+log.info( "this 10000 character string gets auto-truncated nicely via __.inspect()", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) }  );
+log.warnFull("this 10000 character screen doesn't get truncated because it's logged via the Full method ", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) } );
+
+```
+
+The output is nicely colored, formatted, with timestamps, and source location+line numbers **properly sourcemapped back to your typescript code**
+
+```typescript
+log.info( "hi", { some: "data" } );
+> 2018-09-17T22:17:04.553Z     at Context.it (C:\repos\stage5\xlib\src\_index.unit.test.ts:46:7) INFO 'hi' { some: 'data' }
+```
+
+
 
 ### log filtering
 
@@ -93,15 +106,26 @@ you can set a minimum log level per file or per ```RegExp``` so that you can tog
 ``` typescript
 // yourcode.ts
 log.info( "will show" );
-log._overrideLogLevel( "ERROR" ); //toggles logLevel for the current file (yourcode.ts).  you can also pass a RegExp that matches the callSite.
+log.overrideLogLevel( "ERROR" ); //toggles logLevel for the current file (yourcode.ts).  you can also pass a RegExp that matches the callSite.
 log.info( "will not show" );
 log.warn( "will not show" );
 log.error( "will show" );
+//reset loglevel to normal
+log.overrideLogLevel( xlib.environment.logLevel );
 ```
 
 These filters can also be passed as xlib.initialization parameters, via the following choices:
-- envVar (commandLine, systemEnv, or QueryString):  pass the ```logLevelOverrides``` parameter.   Example: ```"logLevelOverrides={'.*connection':'WARN', '.*xlib.dev.core.net.js':'INFO'}"``` 
-- by code before importing ```xlib``` by setting the ```global.__xlibInitArgs.logLevelOverrides``` global.  Example: ```global.__xlibInitArgs = { logLevelOverrides: [{namePattern:/.*connection/,newLogLevel:"WARN"},{namePattern:/.*xlib.dev.core.net.js/,newLogLevel:"INFO"}]};```
+- envVar (commandLine, systemEnv, or QueryString):  pass the ```logLevelOverrides``` parameter.   Example: 
+```bash
+node . logLevelOverrides="{'.*connection':'WARN', '.*xlib.dev.core.net.js':'INFO'}"
+``` 
+- by code ***before*** importing ```xlib``` by setting the ```global.__xlibInitArgs.logLevelOverrides``` global.  Example: 
+```typescript
+global.__xlibInitArgs = { logLevelOverrides: [
+    {callSiteMatch:/.*connection/,minLevel:"WARN"},
+    {callSiteMatch:/.*xlib.dev.core.net.ts/,minLevel:"INFO"}
+    ]};
+```
 
 ## Environmental/Startup Options
 ```xlib``` is automatically initialized as soon as you import it for the first time.    It will read system environmental variables from the commandline, querystring, or systemEnv (in that order of priority).    Alternately, you ***may*** configure it's environment variables explicitly via code BEFORE you import ```xlib```.  Here's an example showing how you can explicitly set the initialization:
@@ -138,29 +162,55 @@ import xlib = require( "xlib" );
 
 Environmental variables can be detected from numerous sources, in the following order of priority (lower the number, the more important)
 
-#### NodeJs
-1. CommandLine Args
-2. System Environment Variables
-
-#### Browser
-1. Querystring variables
-2. cookies
-3. dom attribute "data-KEY" in a node
-4. dom attribute "KEY" in a node
-
-Example Usage:
-
 ```in your code```
 ``` typescript
 const apiKey = xlib.environment.getEnvironmentVariable("apikey");
 ```
 
-```from the commandline```
-``` bash
-node . apikey="your-secret-key";
+### NodeJs
+1. CommandLine Args
+    ``` bash
+    node . apikey="your-secret-key";
+    ```
+2. System Environment Variables
+    ``` bash
+    set apikey="your-secret-key"
+    ```
+
+### Browser
+1. Querystring variables 
+    ```
+    http://www.yourserver.com/yourpage?apikey=your-secret-key
+    ```
+2. cookies
+3. dom attribute "data-KEY" in a node
+4. dom attribute "KEY" in a node
+
+
+## reflection
+
+```typescript
+import * as xlib from "xlib";
+const log = xlib.diagnostics.log;
+const reflection = xlib.reflection;
+const Type = reflection.Type;
+class MyClass { };
+log.assert( reflection.getType( MyClass ) === Type.classCtor );
+log.assert( reflection.getTypeName( MyClass ) === "MyClass" );
+let myInstance = new MyClass();
+log.assert( reflection.getType( myInstance ) === Type.object );
+log.assert( reflection.getTypeName( myInstance ) === "MyClass" );
+log.assert( reflection.getType( reflection.getType ) === Type.function );
+log.assert( reflection.getType( xlib ) === Type.object );
 ```
 
-## network code:  ```RemoteHttpEndpoint```
+
+
+
+## network code
+
+
+### ```RemoteHttpEndpoint```
 
 you can easily construct a request from a webserver: 
 
@@ -170,10 +220,9 @@ const remoteEndpoint = new xlib.net.RemoteHttpEndpoint<void, string>( {
     retryOptions: { backoff: 2, interval: 100, max_interval: 5000, max_tries: 10 },
 } );
 
+const log = xlib.diagnostics.log;
 let response = await remoteEndpoint.get();
-let __ = xlib.lolo;
-let response = await remoteEndpoint.get();
-__.log.info( `got response`, __.inspect( response ) );
+log.info( `got response`,response );
 ```
 
 and can use it to create an autoscaler endpoint for a web API:
@@ -181,6 +230,21 @@ and can use it to create an autoscaler endpoint for a web API:
 
 ```
 
+## collections
+
+
+```typescript
+/** up to 32 true/false values stored in 32bits (a bitmask) */
+export class BitFlags{...}
+
+
+/**
+ *  a dictionary that deletes items when they expire
+ */
+export class ExpiresDictionary<TValue> {...}
+
+
+```
  
 ## threading
 

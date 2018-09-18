@@ -1,4 +1,5 @@
-﻿/** bootstraps various compatibilities for browsers with old versions of javascript */
+﻿// tslint:disable
+/** bootstraps various compatibilities for browsers with old versions of javascript */
 
 export function initialize() {
 

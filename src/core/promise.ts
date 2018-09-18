@@ -54,10 +54,10 @@ export function CreateExposedPromise<TReturn=void, TTags = undefined>(
 	callback?: ( fulfill: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void, reject: ( error: any ) => void ) => void,
 	tags?: TTags ): IExposedPromise<TReturn, TTags> {
 
-	var fulfiller: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void;
-	var rejector: ( error: any ) => void;
+	let fulfiller: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void;
+	let rejector: ( error: any ) => void;
 
-	var toReturn: IExposedPromise<TReturn, TTags> = <any>new bb<TReturn>( function ( fulfill, reject ) {
+	let toReturn: IExposedPromise<TReturn, TTags> = <any>new bb<TReturn>( function ( fulfill, reject ) {
 		fulfiller = fulfill;
 		rejector = reject;
 		if ( callback != null ) {
@@ -84,10 +84,10 @@ export interface IExposedPromise<TReturn=void, TTags={}> extends bb<TReturn> {
 export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: any[] ) => bb<T> ): ( ...args: any[] ) => bb<T[]> {
 	//todo: error handling.
 
-	var __enqueuedCallArguments: IArguments[] = [];
-	var __isExecuting = false;
-	var __batchPromise: IExposedPromise<T[]> = CreateExposedPromise<T[]>();
-	var __batchResults: T[] = [];
+	let __enqueuedCallArguments: IArguments[] = [];
+	let __isExecuting = false;
+	let __batchPromise: IExposedPromise<T[]> = CreateExposedPromise<T[]>();
+	let __batchResults: T[] = [];
 
 	function __resetVariables() {
 		__isExecuting = false;
@@ -98,22 +98,22 @@ export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: 
 
 		if ( __enqueuedCallArguments.length == 0 ) {
 			//no more enqueued, so resolve our batch Promise and clear things out incase there are future calls to the facade.
-			var tempData = __batchResults;
-			var tempPromise = __batchPromise;
+			let tempData = __batchResults;
+			let tempPromise = __batchPromise;
 			__resetVariables();
 
 			tempPromise.fulfill( tempData );
 
 		}
 		//get the next call to process
-		var args = __enqueuedCallArguments.shift();
+		let args = __enqueuedCallArguments.shift();
 
-		var currentPromise: bb<T> = func.apply( __this, args );
+		let currentPromise: bb<T> = func.apply( __this, args );
 		currentPromise.then( ( currentValue ) => {
 			__batchResults.push( currentValue );
 			__doNext();
 		}, ( error ) => {
-			var tempPromise = __batchPromise;
+			let tempPromise = __batchPromise;
 			__resetVariables();
 			tempPromise.reject( error );
 		} );
@@ -123,7 +123,7 @@ export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: 
 
 	function __toReturn(): bb<T[]> {
 
-		var args: IArguments = _.clone( arguments );
+		let args: IArguments = _.clone( arguments );
 
 		__enqueuedCallArguments.push( args );
 
@@ -146,9 +146,9 @@ export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: 
 NOTE: executes all asynchronously.  if you need to only execute + complete one promise at a time, use Promise.each() instead. */
 export function forEach<TIn, TOut>( array: TIn[], callback: ( value: TIn ) => TOut | bb<TOut> ): bb<TOut[]> {
 	try {
-		var results: bb<TOut>[] = [];
+		let results: bb<TOut>[] = [];
 		_.forEach( array, ( value ) => {
-			var resultPromise = callback( value );
+			let resultPromise = callback( value );
 			results.push( <any>resultPromise );
 		} );
 
@@ -179,10 +179,10 @@ export function forEach<TIn, TOut>( array: TIn[], callback: ( value: TIn ) => TO
 
 // For example:
 
-// var retry = require('bluebird-retry');
-// var i = 0;
-// var err;
-// var swing = function() {
+// let retry = require('bluebird-retry');
+// let i = 0;
+// let err;
+// let swing = function() {
 //     i++;
 //     console.log('strike ' + i);
 //     if (i == 3) {
@@ -228,10 +228,10 @@ It supports regular intervals and exponential backoff with a configurable limit,
 The bluebird library supplies the promise implementation.
 
 Basic Usage
-var Promise = require('bluebird');
-var retry = require('bluebird-retry');
+let Promise = require('bluebird');
+let retry = require('bluebird-retry');
 
-var count = 0;
+let count = 0;
 function myfunc() {
     console.log('myfunc called ' + (++count) + ' times');
     if (count < 3) {
@@ -245,7 +245,7 @@ retry(myfunc).done(function(result) {
     console.log(result);
 });
  */
-//export var retry: _BluebirdRetryInternals.IRetryStatic = require( "bluebird-retry" );
+//export let retry: _BluebirdRetryInternals.IRetryStatic = require( "bluebird-retry" );
 import * as retry from "bluebird-retry";
 export { retry };
 

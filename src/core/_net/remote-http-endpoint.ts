@@ -4,7 +4,7 @@ import * as _ from "lodash";
 import * as __ from "../lolo";
 import * as diagnostics from "../diagnostics";
 const log = diagnostics.log; // new diagnostics.Logger( __filename );
-log._overrideLogLevel( "WARN" );
+log.overrideLogLevel( "WARN" );
 
 import * as serialization from "../serialization";
 import * as exception from "../exception";
@@ -16,7 +16,6 @@ import jsHelper = require( "../jshelper" );
 
 //export import axios = require("axios");
 import * as axios from "axios";
-
 
 export type IRemoteHttpEndpointOptions = IRemoteHttpEndpointOverrideOptions & {
 	/** by default, all HTTP requests are made as soon as they are requested.  pass autoscaler options if your endpoint supports autoscaling.
@@ -113,7 +112,7 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 		if ( this.defaultOptions.autoscalerOptions != null ) {
 			this.autoscaler = new Autoscaler(
 				this.defaultOptions.autoscalerOptions,
-				this._doRequest_send,
+				this._doRequest_send.bind( this ),
 				( err: axios.AxiosError ) => {
 					if ( err.response != null ) {
 						switch ( err.response.status ) {

@@ -1,4 +1,5 @@
-"use strict";
+// tslint:disable
+
 //import jsHelper = require("../core/jshelper");
 //import ex = require("../core/exception");
 
@@ -18,12 +19,14 @@ export var ieVersion: number = ( function () {
 	if ( typeof ( document ) === "undefined" ) {
 		return null;
 	}
+	// tslint:disable-next-line:one-variable-per-declaration
 	var undef,
 		v = 3,
 		div = document.createElement( "div" ),
 		all = div.getElementsByTagName( "i" );
 
 	while (
+		// tslint:disable-next-line:no-conditional-assignment ban-comma-operator
 		div.innerHTML = "<!--[if gt IE " + ( ++v ) + "]><i></i><![endif]-->",
 		all[ 0 ]
 	) {
@@ -52,7 +55,9 @@ export function onLoad( domElement: any, callback: any ): void {
 	}
 	var done = false;
 	domElement.onload = domElement.onreadystatechange = function ( ev: Event ) {
+		// tslint:disable-next-line:no-invalid-this
 		if ( !done && ( !this.readyState ||
+			// tslint:disable-next-line:no-invalid-this
 			this.readyState === "loaded" || this.readyState === "complete" ) ) {
 			done = true;
 			//jQuery.handleSuccess(s, xhr, status, data);
@@ -174,6 +179,7 @@ export var getCookies = ( () => {
 						value = raw;
 					} else if ( splitLocation === 0 ) {
 						//throw new Error("invalid cookie format.  cookie= " + raw);
+						// tslint:disable-next-line:no-console
 						console.error( "invalid cookie format.  cookie= " + raw );
 						continue;
 					} else {

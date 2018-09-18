@@ -167,7 +167,7 @@ export class AsyncReaderWriterLock<TValue=void> {
             //this.pendingReads.push(promise.CreateExposedPromise());
             this.pendingReadCount++;
             while ( this.pendingWrites.length > 0 ) {
-                await bb.all( this.pendingWrites );
+                await Promise.all( this.pendingWrites );
             }
             this.pendingReadCount--;
         }

@@ -51,7 +51,7 @@ export namespace jsonX {
 							* @param reviver A function that transforms the results. This function is called for each member of the object.
 							* If a member contains nested objects, the nested objects are transformed before the parent object is.
 							*/
-	export const parse: ( text: string, reviver?: ( key: any, value: any ) => any ) => any = json5.parse;
+	export const parse: ( text: string, reviver?: ( key: any, value: any ) => any ) => any = json5.parse.bind( json5 );
 	/**
 			* Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
 			* @param value A JavaScript value, usually an object or array, to be converted.
@@ -84,7 +84,7 @@ The array is a snapshot (shallow clone) to ensure user code can simply store thi
 			err: Error ) => any )
 	): string {
 		if ( circularRefHandler == null ) {
-			circularRefHandler = ( value, circusPos, stack, keyStack, key, err ) => { return `[CIRCULAR_REFERENCE message=${ err.message }]` };
+			circularRefHandler = ( _value, circusPos, stack, keyStack, key, err ) => { return `[CIRCULAR_REFERENCE message=${ err.message }]` };
 		}
 		return ( json5_gerhobbelt.stringify )( value, replacer, space, circularRefHandler );
 	}

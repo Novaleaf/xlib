@@ -1,5 +1,4 @@
-///// <reference path="../../../typings/all.d.ts" />
-"use strict";
+// tslint:disable:no-console
 
 //export import bunyan = require("bunyan");
 import exception = require( "../exception" );
@@ -100,9 +99,6 @@ function colorCodeToString( input: string, currentColor?: IAnsiColor ): IAnsiCol
 			case 40:
 				result.background = "black";
 				break;
-			case 40:
-				result.background = "black";
-				break;
 			case 41:
 				result.background = "darkred";
 				break;
@@ -190,34 +186,6 @@ interface IReplacement extends IAnsiColor {
 }
 interface ILogLevelOverride { callSiteMatch: RegExp, minLevel: LogLevel };
 
-/** initialzie upon import */
-function _self_initialize() {
-
-	/** helper for applying env.logLevelOverrides */
-	function _populateLogLevelOverridesFromEnvVars() {
-		const envVar = environment.getEnvironmentVariable( "logLevelOverrides", null );
-		if ( envVar == null || envVar.length === 0 ) {
-			return [];
-		}
-		try {
-			let parsedData: { [ key: string ]: string } = serialization.jsonX.parse( envVar );
-			if ( _.isPlainObject( parsedData ) === false ) {
-				throw new Error( `unable to parse.  must be in format ' { [ key: string ]: string }' ` );
-			}
-			_.forIn( parsedData, ( value, key ) => {
-				const callSiteMatch = new RegExp( key );
-				const minLevel = value;
-				Logger.overrideLogLevel( callSiteMatch, minLevel as any );
-			} );
-		} catch ( _ex ) {
-			throw new exception.Exception( `unable to parse environment logLevelOverrides. you passed: ${ envVar }`, { innerException: exception.Exception.castErr( _ex ) } );
-		}
-	}
-	_populateLogLevelOverridesFromEnvVars()
-
-
-}
-_self_initialize();
 
 
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
@@ -241,7 +209,7 @@ export class Logger {
 	protected static _overrides: ILogLevelOverride[] = [];
 
 	/** invoke this to set a global override for the minimum log level for a given callsite.*/
-	public _overrideLogLevel( minLevel: LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
+	public overrideLogLevel( minLevel: LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
 		/** a RegExp that matches a part of the log callSite.  (the part of the console message in Magenta color)
 			* if ommitted, will match the caller's fileName  */
 		callSiteMatch?: string | RegExp, ) {
@@ -262,34 +230,68 @@ export class Logger {
 	/** storage of errors encountered, for diagnostics reporting */
 	public static errorHistory: any[] = [];
 
+	/** log a message, output will not be auto-truncated to decrease verbosity */
+	public traceFull( ...args: any[] ) {
+		return this._tryLog( LogLevel.TRACE, args, true );
+	}
 
+	/** log a message, output will not be auto-truncated to decrease verbosity */
+	public debugFull( ...args: any[] ) {
+		return this._tryLog( LogLevel.DEBUG, args, true );
+	}
+
+	/** log a message, output will not be auto-truncated to decrease verbosity */
+	public infoFull( ...args: any[] ) {
+		return this._tryLog( LogLevel.INFO, args, true );
+	}
+
+	/** log a message, output will not be auto-truncated to decrease verbosity */
+	public warnFull( ...args: any[] ) {
+		return this._tryLog( LogLevel.WARN, args, true );
+	}
+
+	/** log a message, output will not be auto-truncated to decrease verbosity */
+	public errorFull( ...args: any[] ) {
+		return this._tryLog( LogLevel.ERROR, args, true );
+	}
+
+	/** log a message, output will be auto truncated in a smart way to decrease verbosity */
 	public trace( ...args: any[] ) {
 		return this._tryLog( LogLevel.TRACE, args, false );
 	}
+
+	/** log a message, output will be auto truncated in a smart way to decrease verbosity */
 	public debug( ...args: any[] ) {
 		return this._tryLog( LogLevel.DEBUG, args, false );
 	}
+
+	/** log a message, output will be auto truncated in a smart way to decrease verbosity */
 	public info( ...args: any[] ) {
 		return this._tryLog( LogLevel.INFO, args, false );
 	}
+
+	/** log a message, output will be auto truncated in a smart way to decrease verbosity */
 	public warn( ...args: any[] ) {
 		return this._tryLog( LogLevel.WARN, args, false );
 	}
 
+	/** log a message, output will be auto truncated in a smart way to decrease verbosity */
 	public error( ...args: any[] ) {
 		return this._tryLog( LogLevel.ERROR, args, false );
 	}
+	/** log a fatal error that is about to crash your application.   the output of this is never truncated.  (it's always full verbosity) */
 	public fatal( ...args: any[] ) {
 		return this._tryLog( LogLevel.FATAL, args, false );
 	}
 
-	/** for now, same as log.error().   later will notify via email. */
+	/** for now, same as log.errorFull().   later will notify via email. */
 	public hackAttempt( ...args: any[] ) {
-		this.error( ...args );
+		this.errorFull( "hack attempt", ...args );
 	}
 
 
 
+	/** log a bug that's going to trigger a debug.assert.   the output of this is never truncated.  (it's always full verbosity) */
 	assert( testCondition: boolean, ...args: any[] ): void {
 		if ( testCondition === true ) {
 			return;
@@ -298,7 +300,7 @@ export class Logger {
 			throw new exception.XlibException( "first parameter must be a boolean (to assert must evaluate to true or false)" );
 		}
 
-		let finalArgs = this._tryLog( LogLevel.ASSERT, args, false );
+		let finalArgs = this._tryLog( LogLevel.ASSERT, args, true );
 
 		//on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
 		switch ( environment.platformType ) {
@@ -497,4 +499,34 @@ export class Logger {
 
 
 }
+
+
+/** initialzie upon import */
+function _self_initialize() {
+
+	/** helper for applying env.logLevelOverrides */
+	function _populateLogLevelOverridesFromEnvVars() {
+		const envVar = environment.getEnvironmentVariable( "logLevelOverrides", null );
+		if ( envVar == null || envVar.length === 0 ) {
+			return [];
+		}
+		try {
+			let parsedData: { [ key: string ]: string } = serialization.jsonX.parse( envVar );
+			if ( _.isPlainObject( parsedData ) === false ) {
+				throw new Error( `unable to parse.  must be in format ' { [ key: string ]: string }' ` );
+			}
+			_.forIn( parsedData, ( value, key ) => {
+				const callSiteMatch = new RegExp( key );
+				const minLevel = value;
+				Logger.overrideLogLevel( callSiteMatch, minLevel as any );
+			} );
+		} catch ( _ex ) {
+			throw new exception.Exception( `unable to parse environment logLevelOverrides. you passed: ${ envVar }`, { innerException: exception.Exception.castErr( _ex ) } );
+		}
+	}
+	_populateLogLevelOverridesFromEnvVars()
+
+
+}
+_self_initialize();
 

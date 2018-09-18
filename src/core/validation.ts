@@ -295,7 +295,8 @@ export class Scrub<T>{
 		if ( logger == null ) {
 			logger = log;
 		}
-		jsHelper.apply( logger.assert, logger, params, [ false, format ] );
+		logger.assert( false, format, ...params );
+		//jsHelper.apply( logger.assert, logger, params, [ false, format ] );
 	}
 	/** perform an action when a scrub failure is detected.  if isValid, nothing will be triggered.   */
 	public failAction<TActionReturn>( action?: () => TActionReturn ): TActionReturn {

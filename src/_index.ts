@@ -18,7 +18,9 @@ if ( typeof global !== "undefined" && global.__xlibInitArgs ) {
     _initArgs = window.__xlibInitArgs;
 }
 
+export import lodash = require( "lodash" );
 if ( _initArgs == null || lodash.isEmpty( _initArgs ) ) {
+    // tslint:disable-next-line:no-console
     console.log( `XLIB INFO:  no "global.__xlibInit" object detected.  we will use the default values.  To hide this message, you must set it.  For example:  global.__xlibInit={logLevel:"WARN", envLevel:"PROD",silentInit:true}` );
     _initArgs = {};
 }
@@ -27,6 +29,11 @@ if ( _initArgs == null || lodash.isEmpty( _initArgs ) ) {
 
 export import environment = require( "./core/environment" );
 environment.initialize( _initArgs );
+//set lodash as a global if it's not.
+if ( environment.getGlobal()[ "_" ] == null ) {
+    environment.getGlobal()[ "_" ] = lodash;
+}
+
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
 import mockMocha = require( "./_internal/mockmocha" );
@@ -39,6 +46,7 @@ if ( environment.env.isDebug === true ) {
     // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
     //  */
     if ( _initArgs.silentInit !== true ) {
+        // tslint:disable-next-line:no-console
         console.log( "loading sourcemap support (in logLevel.DEBUG or TRACE" );
     }
     var source_map_support = require( "source-map-support" );
@@ -55,12 +63,6 @@ export import promise = require( "./core/promise" );
 promise.initialize();
 
 
-
-export import lodash = require( "lodash" );
-//set lodash as a global if it's not.
-if ( environment.getGlobal()[ "_" ] == null ) {
-    environment.getGlobal()[ "_" ] = lodash;
-}
 
 
 export import exception = require( "./core/exception" );
@@ -247,7 +249,7 @@ async function _initialize( args?: init.IInitArgs ) {
     args = { ...args };
     return init.initialize( args );
 }
-_initialize( _initArgs );
+let floatingPromise = _initialize( _initArgs );
 
 
 // setTimeout( () => {

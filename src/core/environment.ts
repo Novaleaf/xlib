@@ -1,4 +1,4 @@
-"use strict";
+// tslint:disable:no-console
 
 import nodeHelper = require( "../_internal/nodehelper" );
 import browserHelper = require( "../_internal/browserhelper" );
@@ -105,6 +105,7 @@ export enum LogLevel {
 	FATAL = 60,
 	ASSERT = 70,
 }
+
 /** the logLevel of your environment.  used as the default when constructing a logging.Logger()
  * nodejs: set by running "node entrypoint.js logLevel=DEBUG" or by setting your systemenv var: logLevel=DEBUG
  * browser: set by adding "logLevel=DEBUG" in your querystring, add a cookie, or as a attribute of your html tag

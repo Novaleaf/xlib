@@ -22,10 +22,9 @@
 interface XlibInitArgs {
 	/** if true, disables overriding settings from the commandline, envVars, or querystring */
 	disableEnvAutoRead?: boolean,
-	logLevel?: "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
+	logLevel?: "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT",
 	envLevel?: "DEV" | "TEST" | "UAT" | "PROD",
-	//testLevel?: environment.TestLevel | "NONE" | "UNIT" | "INTEGRATION" | "SYSTEM" | "ACCEPTANCE",
-	logLevelOverrides?: { namePattern: RegExp, newLogLevel: "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" }[],
+	logLevelOverrides?: { callSiteMatch: RegExp, minLevel: "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT" }[],
 	/** set to true to not log startup initialization details */
 	silentInit?: boolean,
 }

@@ -1,4 +1,4 @@
-"use strict";
+// tslint:disable
 
 import _ = require( "lodash" );
 
@@ -250,62 +250,62 @@ from http://stackoverflow.com/questions/3362471/how-can-i-call-a-javascript-cons
 
 
 
-/** same as function.apply, but allows prepending arguments in front of an array of arguments */
-//export function apply<TReturn>(targetFcn: (arg1: any, ...anyArgs: any[]) => TReturn, thisObj: any, argArray: any[], ...argsToPrepend: any[]): TReturn
-export function apply<TReturn>( targetFcn: ( ...args: any[] ) => TReturn, thisObj: any, argArray: any[], argsToPrepend: any[] = [], argsToPostpend: any[] = [] ): TReturn {
-	//in case this is IArguments or something of the sort, make a new array
-	if ( argArray.unshift == null ) {
-		var tmp = [];
-		for ( var i = 0; i < argArray.length; i++ ) {
-			tmp.push( argArray[ i ] );
-		}
-		argArray = tmp;
-	} else {
-		//make a copy to not modify original args passed in
-		argArray = argArray.slice();
-	}
-	argArray.unshift.apply( argArray, argsToPrepend );
-	argArray = argArray.concat( argsToPostpend );
+// /** same as function.apply, but allows prepending arguments in front of an array of arguments */
+// //export function apply<TReturn>(targetFcn: (arg1: any, ...anyArgs: any[]) => TReturn, thisObj: any, argArray: any[], ...argsToPrepend: any[]): TReturn
+// export function apply<TReturn>( targetFcn: ( ...args: any[] ) => TReturn, thisObj: any, argArray: any[], argsToPrepend: any[] = [], argsToPostpend: any[] = [] ): TReturn {
+// 	//in case this is IArguments or something of the sort, make a new array
+// 	if ( argArray.unshift == null ) {
+// 		var tmp = [];
+// 		for ( var i = 0; i < argArray.length; i++ ) {
+// 			tmp.push( argArray[ i ] );
+// 		}
+// 		argArray = tmp;
+// 	} else {
+// 		//make a copy to not modify original args passed in
+// 		argArray = argArray.slice();
+// 	}
+// 	argArray.unshift.apply( argArray, argsToPrepend );
+// 	argArray = argArray.concat( argsToPostpend );
 
-	//for (var i = argsToPrepend.length-1; i >= 0; i--)
-	//{
-	//	argArray.unshift(argsToPrepend[i]);
-	//}
+// 	//for (var i = argsToPrepend.length-1; i >= 0; i--)
+// 	//{
+// 	//	argArray.unshift(argsToPrepend[i]);
+// 	//}
 
-	return targetFcn.apply( thisObj, argArray );
-}
-/** if the targetFcn is null, silently ignore (no errors) */
-export function applyOrNoop( targetFcn: Function, thisObj: any, argArray: any[], ...argsToPrepend: any[] ): any {
-	if ( targetFcn == null ) {
-		return;
-	}
-	//in case this is IArguments or something of the sort, make a new array
-	if ( argArray.unshift == null ) {
-		var tmp = [];
-		for ( var i = 0; i < argArray.length; i++ ) {
-			tmp.push( argArray[ i ] );
-		}
-		argArray = tmp;
-	} else {
-		//make a copy to not modify original args passed in
-		argArray = argArray.slice();
-	}
-	argArray.unshift.apply( argArray, argsToPrepend );
+// 	return targetFcn.apply( thisObj, argArray );
+// }
+// /** if the targetFcn is null, silently ignore (no errors) */
+// export function applyOrNoop( targetFcn: Function, thisObj: any, argArray: any[], ...argsToPrepend: any[] ): any {
+// 	if ( targetFcn == null ) {
+// 		return;
+// 	}
+// 	//in case this is IArguments or something of the sort, make a new array
+// 	if ( argArray.unshift == null ) {
+// 		var tmp = [];
+// 		for ( var i = 0; i < argArray.length; i++ ) {
+// 			tmp.push( argArray[ i ] );
+// 		}
+// 		argArray = tmp;
+// 	} else {
+// 		//make a copy to not modify original args passed in
+// 		argArray = argArray.slice();
+// 	}
+// 	argArray.unshift.apply( argArray, argsToPrepend );
 
-	//for (var i = argsToPrepend.length-1; i >= 0; i--)
-	//{
-	//	argArray.unshift(argsToPrepend[i]);
-	//}
+// 	//for (var i = argsToPrepend.length-1; i >= 0; i--)
+// 	//{
+// 	//	argArray.unshift(argsToPrepend[i]);
+// 	//}
 
-	return targetFcn.apply( thisObj, argArray );
-}
+// 	return targetFcn.apply( thisObj, argArray );
+// }
 
-/** make a copy of a function (doesn"t copy properties) */
-export function clone( fn: Function, targetThis: any = {} ) {
-	// Workaround for commander.js issue.
-	// http://stackoverflow.com/a/6772648
-	return fn.bind( targetThis );
-}
+// /** make a copy of a function (doesn"t copy properties) */
+// export function clone( fn: Function, targetThis: any = {} ) {
+// 	// Workaround for commander.js issue.
+// 	// http://stackoverflow.com/a/6772648
+// 	return fn.bind( targetThis );
+// }
 
 
 

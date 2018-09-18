@@ -414,8 +414,8 @@ export module base64 {
         var isStr = _.isString( input );
         if ( isStr !== true || ( typeof ( btoa ) === "undefined" && Buffer != undefined ) ) {
             if ( isStr ) {
-                //nodejs does not define bota or atob
-                return new Buffer( input as string, "utf8" ).toString( "base64" );
+                //nodejs does not define bota or atob                
+                return Buffer.from( input as string, "utf8" ).toString( "base64" );
             } else {
                 return ( input as Buffer ).toString( "base64" );
             }
@@ -425,13 +425,13 @@ export module base64 {
     export function decode( base64Encoded: string, encoding?: string ): string {
         if ( typeof ( atob ) === "undefined" && Buffer != undefined ) {
             //nodejs does not define bota or atob
-            return new Buffer( base64Encoded, "base64" ).toString( "utf8" );
+            return Buffer.from( base64Encoded, "base64" ).toString( "utf8" );
         }
         return atob( base64Encoded );
     }
 
     export function toBuffer( base64Encoded: string ): Buffer {
-        return new Buffer( base64Encoded, "base64" );
+        return Buffer.from( base64Encoded, "base64" );
     }
 }
 
