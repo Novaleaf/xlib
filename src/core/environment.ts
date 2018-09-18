@@ -230,25 +230,7 @@ _internalInitWork.push( ( args ) => {
 // } );
 
 
-export const env = {
 
-	/** returns true if the current envLevel==="PROD", otherwise false.  shortcut for ```environment.envLevel === environment.EnvLevel.PROD */
-	get isProd() {
-		return envLevel === EnvLevel.PROD;
-	},
-
-	/**
-		*  returns true if the current logLevel is DEBUG or TRACE. shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
-		*/
-	get isDebug() {
-		return logLevel <= LogLevel.DEBUG;
-	},
-
-	// /**
-	// 	*  returns true if the current testLevel is greater than NONE. shortcut for ```environment.testLevel > environment.TestLevel.NONE```
-	// 	*/
-	// get isTest() { return testLevel > TestLevel.NONE; },
-}
 
 // export const env = {
 
@@ -277,20 +259,32 @@ export const env = {
 // }
 
 
-/** no op the input function if not running LogLevel <= DEBUG.
-  * for uglify / closure-compiler dead-code optimization (minification)
-  */
-export function _ifDebug( fcn: Function ): any {
-	if ( logLevel <= LogLevel.DEBUG ) {
-		return fcn;
-	} else {
-		//no op
-		/* tslint:disable */
-		return () => { };
-		/* tslint:enable */
-	}
-}
+// /** no op the input function if not running LogLevel <= DEBUG.
+//   * for uglify / closure-compiler dead-code optimization (minification)
+//   */
+// export function _ifDebug( fcn: Function ): any {
+// 	if ( logLevel <= LogLevel.DEBUG ) {
+// 		return fcn;
+// 	} else {
+// 		//no op
+// 		/* tslint:disable */
+// 		return () => { };
+// 		/* tslint:enable */
+// 	}
+// }
 
+
+/** returns true if the current envLevel==="PROD", otherwise false.  shortcut for ```environment.envLevel === environment.EnvLevel.PROD */
+export function isProd() {
+	return envLevel === EnvLevel.PROD;
+};
+
+/**
+	*  returns true if the current logLevel is DEBUG or TRACE. shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
+	*/
+export function isDebug() {
+	return logLevel <= LogLevel.DEBUG;
+};
 
 // /** no op the input function if not running in test mode.
 //   * for uglify / closure-compiler dead-code optimization (minification)

@@ -10,7 +10,6 @@ import * as serialization from "../serialization";
 import * as exception from "../exception";
 import * as stringHelper from "../stringhelper";
 import { Autoscaler, IAutoscalerOptions } from "../threading";
-import jsHelper = require( "../jshelper" );
 
 //import compression = require("./compression");
 

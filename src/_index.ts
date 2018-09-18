@@ -40,7 +40,7 @@ import mockMocha = require( "./_internal/mockmocha" );
 mockMocha.initialize();
 
 
-if ( environment.env.isDebug === true ) {
+if ( environment.isDebug() === true ) {
     //try {
     ///** https://www.npmjs.com/package/source-map-support
     // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
@@ -70,7 +70,12 @@ export import exception = require( "./core/exception" );
 
 
 //serialInits.push( mockMocha.initialize );
-
+/** contains shortcuts to commonly used xlib modules and objects. 
+ * example usage: 
+ * @example 
+ * import __ = xlib.lolo;
+ * __.log.info("hi there");
+ */
 export import lolo = require( "./core/lolo" );
 export import arrayHelper = require( "./core/arrayhelper" );
 export import ClassBase = require( "./_obsolete/classbase" );

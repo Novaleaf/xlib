@@ -7,6 +7,8 @@
 //export import logging = require( "./diagnostics/logging" );
 
 import { Logger } from "./_diagnostics/logging";
+
+/** A high quality console logger. . */
 export const log = new Logger();
 //export { Logger };
 
@@ -193,7 +195,7 @@ export class DebugRaceCheck {
 	}
 }
 
-if ( !environment.env.isDebug ) {
+if ( !environment.isDebug() ) {
 	//noop racecheck functions
 	DebugRaceCheck.prototype.edit = () => { };
 	DebugRaceCheck.prototype.enter = () => { };

@@ -13,7 +13,7 @@ import environment = require( "./environment" );
 
 /** binds bluebird as global promise and other various init */
 export function initialize() {
-	if ( environment.env.isDebug ) {
+	if ( environment.isDebug() ) {
 		//http://bluebirdjs.com/docs/api/promise.config.html
 		bluebird[ "config" ]( {
 			// Enable warnings

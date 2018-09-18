@@ -1,12 +1,10 @@
 ///// <reference path="../../../typings/all.d.ts" />
 
-import * as jsHelper from "./jshelper";
 import * as reflection from "./reflection";
 import * as ex from "./exception";
 
 import * as stringHelper from "./stringhelper";
 import * as bb from "bluebird";
-import * as moment from "moment";
 import * as _ from "lodash";
 
 

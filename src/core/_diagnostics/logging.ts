@@ -7,7 +7,8 @@ import stringHelper = require( "../stringhelper" );
 import serialization = require( "../serialization" );
 import reflection = require( "../reflection" );
 import _ = require( "lodash" );
-import moment = require( "moment" );
+//import moment = require( "moment" );
+//import * as luxon from "luxon";
 import * as diagnostics from "../diagnostics";
 
 import { LogLevel } from "../environment";
@@ -440,7 +441,7 @@ export class Logger {
 		finalArgs.unshift( logLevelColor( LogLevel[ targetLogLevel ] ) );
 		//finalArgs.unshift( lineNumberToReport );
 		finalArgs.unshift( nameToReport );
-		finalArgs.unshift( Chalk.gray( moment().toISOString() ) );
+		finalArgs.unshift( Chalk.gray( new Date().toISOString() ) );
 
 		//on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
 		switch ( environment.platformType ) {

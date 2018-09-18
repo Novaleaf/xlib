@@ -111,7 +111,7 @@ describe( __filename + " basic xlib unit tests", () => {
 			* 
 			real request data can be more elaborate:  see ```IPageRequest``` in https://phantomjscloud.com/docs/http-api/
 			*/
-		type IPjscPostData = { url: string, renderType: "png" | "html" | "pdf" | "jpeg", outputAsJson?: boolean };
+		type IPjscPostData = { url: string, renderType: "png" | "html" | "pdf" | "jpeg" | "plainText", outputAsJson?: boolean };
 		/** response data you will get back from the server.
 			* 
 		real response data is more elaborate:  see ```IUserResponse``` in https://phantomjscloud.com/docs/http-api/
@@ -128,11 +128,12 @@ describe( __filename + " basic xlib unit tests", () => {
 		const phantomJsCloudEndpoint = new xlib.net.RemoteHttpEndpoint<IPjscPostData, IPjscUserResponse>( options );
 
 		try {
-			const httpResponse = await phantomJsCloudEndpoint.post( { url: "https://example.com", renderType: "pdf", outputAsJson: true } );
+			const httpResponse = await phantomJsCloudEndpoint.post( { url: "https://example.com", renderType: "plainText", outputAsJson: true } );
 			log.assert( httpResponse.status === 200 );
 			const userResponse = httpResponse.data;
-			log.assert( userResponse.content.encoding === "base64" );
+			log.assert( userResponse.content.encoding === "utf8" );
 			log.assert( userResponse.content.data.length > 0 );
+			log.assert( userResponse.content.data.indexOf( "Example Domain" ) >= 0 );
 
 		} catch ( _err ) {
 			if ( xlib.reflection.getTypeName( _err ) === "AxiosError" ) {
@@ -142,5 +143,16 @@ describe( __filename + " basic xlib unit tests", () => {
 		}
 
 	} );
+
+	// it( "basic e2e of cache", async () => { 
+
+	// 	const __ = xlib.lolo;
+
+	// 	__.cache.read( "hotdog" );
+
+	// 	__.cache.write( "hotdog", {})
+
+
+	// } );
 
 } );

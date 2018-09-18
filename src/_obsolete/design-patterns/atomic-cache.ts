@@ -1,5 +1,6 @@
 
-import * as moment from "moment";
+//import * as moment from "moment";
+import * as luxon from "luxon";
 import * as bb from "bluebird";
 
 /**
@@ -7,9 +8,9 @@ import * as bb from "bluebird";
  */
 export abstract class AtomicCacheItem<TValue, TModifyParams>{
 	/** the last time this was synced with the datastore  max sync time is set by serverConfig.balance, and is 1 min. */
-	private _lastSyncTime: moment.Moment;
+	private _lastSyncTime: luxon.DateTime;
 	/** the last time this was used.  older than max sync time (1 minute) and we dispose */
-	private _lastUsedTime: moment.Moment;
+	private _lastUsedTime: luxon.DateTime;
 
 	private _syncPending: bb<any> = bb.resolve();
 
@@ -24,17 +25,17 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 
 	constructor( public key: string,
 		/** max amount of time between uses of the cacheItem before we dispose it */
-		protected _maxUnusedDuration: moment.Duration,
+		protected _maxUnusedDuration: luxon.Duration,
 		/** max amount of time between sync's */
-		protected _maxDesyncedDuration: moment.Duration,
+		protected _maxDesyncedDuration: luxon.Duration,
 		/** if set, and the first sync (during initialization) fails, all future .get() calls within the given duration will return rejected with the same error originally returned from sync.  
 		This is useful if for example, the user requests a key that does not exist.
 		If you use this, be sure you put retry logic into your doSyncWithMaster functions.
 		*/
-		protected _blacklistIfFirstSyncFailsDuration: moment.Duration = null ) {
+		protected _blacklistIfFirstSyncFailsDuration: luxon.Duration = null ) {
 
 
-		this._lastUsedTime = moment();
+		this._lastUsedTime = luxon.DateTime.utc();
 
 		this._trySyncWithMaster();
 	}
@@ -43,9 +44,9 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 	 *  if it's time to resync
 	 */
 	protected isTimeToResync(): boolean {
-		let now = moment();
+		let now = luxon.DateTime.utc();
 
-		if ( this._lastSyncTime.clone().add( this._maxDesyncedDuration ) <= now ) {
+		if ( this._lastSyncTime.plus( this._maxDesyncedDuration ) <= now ) {
 			//out of sync
 			return true;
 		}
@@ -66,7 +67,7 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 	 */
 	protected abstract calculateCurrentValue(): TValue;
 
-	protected _blacklistIfFirstSyncFails_Timeout: moment.Moment;
+	protected _blacklistIfFirstSyncFails_Timeout: luxon.DateTime;
 	protected _blacklistIfFirstSyncFails_InitError: Error;
 	/**
 	 *  attempts to sync with master, if there is any sync work to be done
@@ -85,7 +86,7 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 				.catch( ( initError ) => {
 					//handle _blacklistIfFirstSyncFails logic if set (via ctor)
 					if ( this._blacklistIfFirstSyncFailsDuration != null ) {
-						this._blacklistIfFirstSyncFails_Timeout = moment().add( this._blacklistIfFirstSyncFailsDuration );
+						this._blacklistIfFirstSyncFails_Timeout = luxon.DateTime.utc().plus( this._blacklistIfFirstSyncFailsDuration );
 						this._blacklistIfFirstSyncFails_InitError = initError;
 					}
 
@@ -93,11 +94,11 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 				} )
 				.then( ( readSyncResults ) => {
 					this._isInitialized = true;
-					this._lastSyncTime = moment();
+					this._lastSyncTime = luxon.DateTime.utc();
 					if ( this.hasDataToWrite() === true ) {
 						//async update a full sync
 						this.doSyncWithMaster_Helper_Full().then( () => {
-							this._lastSyncTime = moment();
+							this._lastSyncTime = luxon.DateTime.utc();
 						} );
 					}
 					return bb.resolve( readSyncResults );
@@ -111,7 +112,7 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 				//time to sync and have data to write, so need to do full sync
 				this._syncPending = this.doSyncWithMaster_Helper_Full()
 					.then( ( fullResults ) => {
-						this._lastSyncTime = moment();
+						this._lastSyncTime = luxon.DateTime.utc();
 						return bb.resolve( fullResults );
 					} );
 				return this._syncPending;
@@ -119,7 +120,7 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 				//time to sync and have NO data to write, so just read
 				this._syncPending = this.doSyncWithMaster_Helper_Read()
 					.then( ( fullResults ) => {
-						this._lastSyncTime = moment();
+						this._lastSyncTime = luxon.DateTime.utc();
 						return bb.resolve( fullResults );
 					} );
 				return this._syncPending;
@@ -147,10 +148,10 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 			if ( this._isDisposed === true ) {
 				throw new Error( "already disposed" );
 			}
-			this._lastUsedTime = moment();
+			this._lastUsedTime = luxon.DateTime.utc();
 
 			if ( this._blacklistIfFirstSyncFails_InitError != null ) {
-				if ( this._blacklistIfFirstSyncFails_Timeout < moment() ) {
+				if ( this._blacklistIfFirstSyncFails_Timeout < luxon.DateTime.utc() ) {
 					return bb.reject( this._blacklistIfFirstSyncFails_InitError );
 				} else {
 					//clear out the error
@@ -182,9 +183,9 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 		if ( this._isDisposed === true ) {
 			throw new Error( "already disposed" );
 		}
-		this._lastUsedTime = moment();
+		this._lastUsedTime = luxon.DateTime.utc();
 		if ( this._blacklistIfFirstSyncFails_InitError != null ) {
-			if ( this._blacklistIfFirstSyncFails_Timeout < moment() ) {
+			if ( this._blacklistIfFirstSyncFails_Timeout < luxon.DateTime.utc() ) {
 				return bb.reject( this._blacklistIfFirstSyncFails_InitError );
 			} else {
 				//clear out the error
@@ -201,12 +202,12 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 		if ( this._isDisposed === true ) {
 			throw new Error( "already disposed" );
 		}
-		this._lastUsedTime = moment();
+		this._lastUsedTime = luxon.DateTime.utc();
 
 		this.cacheModificationsLocally( params );
 
 		if ( this._blacklistIfFirstSyncFails_InitError != null ) {
-			if ( this._blacklistIfFirstSyncFails_Timeout < moment() ) {
+			if ( this._blacklistIfFirstSyncFails_Timeout < luxon.DateTime.utc() ) {
 				return;
 			} else {
 				//clear out the error
@@ -231,8 +232,8 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 			this._dispose();
 			return true;
 		}
-		let disposeAfter = this._lastUsedTime.clone().add( this._maxUnusedDuration );
-		if ( disposeAfter >= moment() ) {
+		let disposeAfter = this._lastUsedTime.plus( this._maxUnusedDuration );
+		if ( disposeAfter >= luxon.DateTime.utc() ) {
 			return false;
 		}
 		//dispose
@@ -269,10 +270,10 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 export class AtomicCache<CacheItem extends AtomicCacheItem<any, any>, TValue, TModifyParams> {
 
 
-	constructor( private _cacheItemCtor: ( key: string ) => CacheItem, private _autoTryCleanupInterval: moment.Duration ) {
+	constructor( private _cacheItemCtor: ( key: string ) => CacheItem, private _autoTryCleanupInterval: luxon.Duration ) {
 		setInterval( () => {
 			this._tryCleanupOne();
-		}, this._autoTryCleanupInterval.asMilliseconds() );
+		}, this._autoTryCleanupInterval.as( "millisecond" ) );
 	}
 
 	private _storage: { [ key: string ]: CacheItem } = {};

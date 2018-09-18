@@ -9,7 +9,6 @@ import * as serialization from "./serialization";
 import * as exception from "./exception";
 import * as stringHelper from "./stringhelper";
 
-import jsHelper = require( "./jshelper" );
 
 //import compression = require("./compression");
 
