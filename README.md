@@ -227,7 +227,41 @@ log.info( `got response`,response );
 
 and can use it to create an autoscaler endpoint for a web API:
 ```typescript
+const log = xlib.diagnostics.log;
 
+/** POST request data you submit to the server
+    * 
+    real request data can be more elaborate:  see ```IPageRequest``` in https://phantomjscloud.com/docs/http-api/
+    */
+type IPjscPostData = { url: string, renderType: "png" | "html" | "pdf" | "jpeg", outputAsJson?: boolean };
+/** response data you will get back from the server.
+    * 
+real response data is more elaborate:  see ```IUserResponse``` in https://phantomjscloud.com/docs/http-api/
+    */
+type IPjscUserResponse = { content: { name: string, data: string, encoding: string } };
+
+const apiKey = xlib.environment.getEnvironmentVariable( "phantomjscloud_apikey", "a-demo-key-with-low-quota-per-ip-address" );
+const options: xlib.net.IRemoteHttpEndpointOptions = {
+    endpoint: { origin: "https://phantomjscloud.com", path: `/api/browser/v2/${ apiKey }/` },
+    autoscalerOptions: { minParallel: 4, backoffDelayMs: 30000, growDelayMs: 5000, decayDelayMs: 5000 },
+};
+
+
+const phantomJsCloudEndpoint = new xlib.net.RemoteHttpEndpoint<IPjscPostData, IPjscUserResponse>( options );
+
+try {
+    const httpResponse = await phantomJsCloudEndpoint.post( { url: "https://example.com", renderType: "pdf", outputAsJson: true } );
+    log.assert( httpResponse.status === 200 );
+    const userResponse = httpResponse.data;
+    log.assert( userResponse.content.encoding === "base64" );
+    log.assert( userResponse.content.data.length > 0 );
+
+} catch ( _err ) {
+    if ( xlib.reflection.getTypeName( _err ) === "AxiosError" ) {
+        const axiosError: xlib.net.axios.AxiosError = _err;
+    }
+    log.assert( false, "request failed", _err );
+}
 ```
 
 ## collections

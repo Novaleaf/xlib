@@ -157,11 +157,11 @@ export class Cache {
 
         //ASYNC:  after the fetch completes, update our cacheItem
         cacheItem.currentFetch.then( ( newValue ) => {
-            let now = moment();
+            let _now = moment();
             this._storage[ key ] = cacheItem; //in case gc deleted it
 
             cacheItem.value = newValue;
-            cacheItem.expires = now.clone().add( fetchExpiresDuration );
+            cacheItem.expires = _now.clone().add( fetchExpiresDuration );
             cacheItem.gcAfter = cacheItem.expires.clone().add( fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds" );
 
             //we might want to clone the resule
