@@ -1,13 +1,13 @@
 "use strict";
 
-import stringHelper = require( "./stringhelper" );
+import stringHelper = require( "../core/stringhelper" );
 //import arrayHelper = require("./arrayhelper");
-import numHelper = require( "./numhelper" );
-import ex = require( "./exception" )
+import numHelper = require( "../core/numhelper" );
+import ex = require( "../core/exception" )
 //import runtime = require("./runtime");
 //import diagnostics = require("./diagnostics");
 import * as bb from "bluebird";
-import * as moment from "moment";
+//import * as moment from "moment";
 
 /** up to 32 true/false values stored in 32bits (a bitmask) */
 export class BitFlags {
@@ -40,7 +40,7 @@ export class BitFlags {
 		if ( index < BitFlags.MAXFLAGS && index >= 0 ) {
 			return;
 		}
-		throw new ex.XlibException( stringHelper.format( "index out of bounds.  You supplied %s while expected range is 0 to %i", index, BitFlags.MAXFLAGS - 1 ) );
+		throw new ex.XlibException( `index out of bounds.  You supplied ${ index } while expected range is 0 to ${ BitFlags.MAXFLAGS - 1 }` );
 
 	}
 	/** return the value of a certain flag */

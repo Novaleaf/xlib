@@ -5,75 +5,6 @@
 /** helpers for backend node.js stuff  NODE.JS ONLY!!! */
 
 
-//declare var require: any;
-//declare var process: any;
-/** get a list of all ip addresses of this server.  after generating the ip's, will cache results for next time you call this method */
-export var getNetworkIPs = (function () {
-	if (typeof (require) === "undefined" || typeof (process) === "undefined") {
-		return;
-	}
-	var ignoreRE = /^(127\.0\.0\.1|::1|fe80(:1)?::1(%.*)?)$/i;
-
-	var exec = require("child_process").exec;
-	var cachedV4: string[];
-	var cachedV6: string[];
-	var command: string;
-	var filter4RE: RegExp;
-	var filter6RE: RegExp;
-
-	switch (process.platform) {
-		case "win32":
-			//case 'win64': // TODO: test
-			command = "ipconfig";
-			filter4RE = /\bIPv[4][^:\r\n]+:\s*([^\s]+)/g;
-			filter6RE = /\bIPv[6][^:\r\n]+:\s*([^\s]+)/g;
-			break;
-		case "darwin":
-			command = "ipconfig";
-			filter4RE = /\binet\s+([^\s]+)/g;
-			filter6RE = /\binet6\s+([^\s]+)/g; // IPv6
-			break;
-		default:
-			command = "ipconfig";
-			filter4RE = /\binet\b[^:]+:\s*([^\s]+)/g;
-			filter6RE = /\binet6[^:]+:\s*([^\s]+)/g; // IPv6
-			break;
-	}
-
-	return function (callback: (error: any, ipV4Addresses: string[], ipV6Addresses: string[]) => void, bypassCache?: boolean) {
-		if (cachedV4 && !bypassCache) {
-			callback(null, cachedV4, cachedV6);
-			return;
-		}
-		// system call
-		exec(command, function (error, stdout, sterr) {
-			cachedV4 = [];
-			cachedV6 = [];
-			var ip;
-			var i: number;
-			//if (!error) {
-			//ipv4
-			var matches4 = stdout.match(filter4RE) || [];
-			for (i = 0; i < matches4.length; i++) {
-				ip = matches4[i].replace(filter4RE, "$1");
-				if (!ignoreRE.test(ip)) {
-					cachedV4.push(ip);
-				}
-			}
-
-			//ipv6
-			var matches6 = stdout.match(filter6RE) || [];
-			for (i = 0; i < matches6.length; i++) {
-				ip = matches6[i].replace(filter6RE, "$1");
-				if (!ignoreRE.test(ip)) {
-					cachedV6.push(ip);
-				}
-			}
-			//}
-			callback(error, cachedV4, cachedV6);
-		});
-	};
-})();
 
 //var cachedServerDomain: string;
 ///** if on windows, always returns "localhost".
@@ -113,29 +44,29 @@ export var getNetworkIPs = (function () {
  * example:  "myKey=myValue" will return, but "someValue" will not.
  * if you need single value args, access process.argv directly.
  */
-export var getCommandlineArgs = (() => {
+export var getCommandlineArgs = ( () => {
 	/** cached query so we only get args once per js load*/
-	var parsedCommandlineArgs: { [key: string]: string };
+	var parsedCommandlineArgs: { [ key: string ]: string };
 
 	function _getCommandlineArgs() {
-		if (parsedCommandlineArgs == null) {
-			if (typeof (process) === "undefined") {
-				throw new Error("process (base object) is missing.  this function is meant for nodejs use.  are you running in a browser?");
+		if ( parsedCommandlineArgs == null ) {
+			if ( typeof ( process ) === "undefined" ) {
+				throw new Error( "process (base object) is missing.  this function is meant for nodejs use.  are you running in a browser?" );
 			} else {
 				//declare require: any;
 				//var process = require("process");
 
 				var rawVars = process.argv;
 				parsedCommandlineArgs = {};
-				for (var i = rawVars.length - 1; i >= 0; i--) {
-					var pair = rawVars[i].split("=");
-					if (pair.length !== 2) {
+				for ( var i = rawVars.length - 1; i >= 0; i-- ) {
+					var pair = rawVars[ i ].split( "=" );
+					if ( pair.length !== 2 ) {
 						//skip
 						continue;
 					}
-					var key = pair[0];
-					var value = pair[1];
-					parsedCommandlineArgs[key] = value;
+					var key = pair[ 0 ];
+					var value = pair[ 1 ];
+					parsedCommandlineArgs[ key ] = value;
 				}
 			}
 		}
@@ -143,20 +74,20 @@ export var getCommandlineArgs = (() => {
 	}
 
 	return _getCommandlineArgs;
-})();
+} )();
 
 
 /** return a key-value argument passed tothe commandline (does not return single-value arguments) 
  * example:  "myKey=myValue" will return, but "someValue" will not.
  * if you need single value args, access process.argv directly.
  */
-export function getCommandlineArg(key: string, valueIfNullOrEmpty?: string): string {
+export function getCommandlineArg( key: string, valueIfNullOrEmpty?: string ): string {
 
 	var parsedArgs = getCommandlineArgs();
 
-	var result = parsedArgs[key];
-	if (valueIfNullOrEmpty != null) {
-		if (result == null || result.length === 0) {
+	var result = parsedArgs[ key ];
+	if ( valueIfNullOrEmpty != null ) {
+		if ( result == null || result.length === 0 ) {
 			return valueIfNullOrEmpty;
 		}
 	}

@@ -1,15 +1,31 @@
 ///// <reference path="../../typings/all.d.ts" />
-"use strict";
+// "use strict";
 
-/** a high-quality date-time library: http://momentjs.com/ Also includes the moment-timezone extension*/
-export import moment = require("moment-timezone");
 
-export function getDateFromIsoString(isoDateTimeString: string) {
-	if (isoDateTimeString == null) {
-		return null;
-	}
-	return isoDateTimeString.substring(0, isoDateTimeString.lastIndexOf("T"));
-}
+import * as _luxon from "luxon";
+/** Luxon is a library for working with dates and times in Javascript.
+```
+DateTime.local().setZone('America/New_York').minus({ weeks: 1 }).endOf('day').toISO();
+```
+Features
+DateTime, Duration, and Interval types.
+Immutable, chainable, unambiguous API.
+Parsing and formatting for common and custom formats.
+Native time zone and Intl support (no locale or tz files).
+
+see https://www.npmjs.com/package/luxon  */
+const luxon = _luxon;
+export { luxon };
+
+// /** a high-quality date-time library: http://momentjs.com/ Also includes the moment-timezone extension*/
+// export import moment = require("moment-timezone");
+
+// export function getDateFromIsoString(isoDateTimeString: string) {
+// 	if (isoDateTimeString == null) {
+// 		return null;
+// 	}
+// 	return isoDateTimeString.substring(0, isoDateTimeString.lastIndexOf("T"));
+// }
 //export class DateTime {
 
 //	protected _instance: moment.Moment;

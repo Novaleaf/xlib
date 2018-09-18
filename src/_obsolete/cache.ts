@@ -2,19 +2,20 @@
 
 import * as bb from "bluebird";
 
-import stringHelper = require( "./stringhelper" );
+import stringHelper = require( "../core/stringhelper" );
 
 import _ = require( "lodash" );
 
-import jsHelper = require( "./jshelper" );
+import luxon = require( "luxon" );
 
-import moment = require( "moment" );
 
-import exception = require( "./exception" );
+//import moment = require( "moment" );
 
-import reflection = require( "./reflection" );
+import exception = require( "../core/exception" );
 
-import diagnostics = require( "./diagnostics" );
+import reflection = require( "../core/reflection" );
+
+import diagnostics = require( "../core/diagnostics" );
 const log = diagnostics.log; // new diagnostics.Logger( __filename );
 
 interface ICacheItem<TValue> {

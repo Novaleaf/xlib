@@ -1,19 +1,16 @@
 "use strict";
 import stringHelper = require( "./stringhelper" );
 import numHelper = require( "./numhelper" );
-import jsHelper = require( "./jshelper" );
 import ex = require( "./exception" );
 import _ = require( "lodash" );
 import serialization = require( "./serialization" );
 import reflection = require( "./reflection" );
 
-class ScrubFailureException extends ex.XlibException {
-
-}
-
 
 /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
 export import validator = require( "validator" );
+
+export import sanitizeHtml = require( "sanitize-html" );
 
 import diagnostics = require( "./diagnostics" )
 
@@ -127,8 +124,10 @@ export class UrlValidator {
 
 
 }
+
+
 /** from  https://stackoverflow.com/questions/8113546/how-to-determine-whether-an-ip-address-in-private*/
-function isPrivateIp( ipV4Address: string ) {
+export function isPrivateIp( ipV4Address: string ) {
 	const ipParts = ipV4Address.trim().split( "." ).map( ( str ) => numHelper.parseInt( str ) );
 	if ( ipParts.length !== 4 ) {
 		return false;
@@ -168,6 +167,15 @@ function isAscii(
 }
 
 
+
+
+/** @deprecated needs refactoring */
+class ScrubFailureException extends ex.XlibException {
+
+}
+
+
+/** @deprecated needs refactoring */
 export class Scrub<T>{
 
 	public isValid = true;
@@ -238,8 +246,7 @@ export class Scrub<T>{
 	private _appendErrorMessage( errorMessage: string, printInvalidValues: boolean, invalidValues?: {} ): string {
 
 		if ( printInvalidValues ) {
-			errorMessage += stringHelper.format( "  %i invalid/missing values. The following required keys+types were invalid: %s",
-				Object.keys( invalidValues ).length, serialization.jsonX.inspectStringify( invalidValues ) );
+			errorMessage += `${ Object.keys( invalidValues ).length } invalid/missing values. The following required keys+types were invalid: ${ serialization.jsonX.inspectStringify( invalidValues ) }`;
 		}
 		this.errorMessages.push( errorMessage );
 		return errorMessage;
@@ -290,7 +297,7 @@ export class Scrub<T>{
 			return;
 		}
 		if ( format == null ) {
-			format = stringHelper.format( "Validation failed due to %s reasons: %s", this.errorMessages.length, serialization.jsonX.inspectStringify( this.errorMessages ) );
+			format = `Validation failed due to ${ this.errorMessages.length } reasons: ${ serialization.jsonX.inspectStringify( this.errorMessages ) }`;
 		}
 		if ( logger == null ) {
 			logger = log;
@@ -307,7 +314,7 @@ export class Scrub<T>{
 	}
 
 	/** if a scrub failure is detected, will throw an exception. */
-	public failThrow( exceptionMessage = stringHelper.format( "Validation failed due to %s reasons: %s", this.errorMessages.length, serialization.jsonX.inspectStringify( this.errorMessages ) ) ) {
+	public failThrow( exceptionMessage = `Validation failed due to ${ this.errorMessages.length } reasons: ${ serialization.jsonX.inspectStringify( this.errorMessages ) }` ) {
 		if ( this.isValid ) {
 			return;
 		}
@@ -497,7 +504,7 @@ export class Scrub<T>{
 		return valueIfInvalid;
 	}
 }
-
+/** @deprecated needs refactoring */
 export function scrub( values: _.Dictionary<any> | {}, clone = false, deepClone = false ): Scrub<any> {
 	return new Scrub( <any>values, clone, deepClone );
 }

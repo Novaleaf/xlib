@@ -341,7 +341,7 @@ export class Logger {
 
 
 	deprecated( message?: string ) {
-		this.assert( false, "implement deprecated" );
+		this.assert( false, "implement deprecated", message );
 	}
 	/** note to redo this before shipping (any time not in #DEBUG mode) */
 	refactor( ...args: any[] ) {

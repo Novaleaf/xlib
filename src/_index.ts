@@ -67,18 +67,16 @@ promise.initialize();
 
 export import exception = require( "./core/exception" );
 
-///** low-level javascript helpers, to smooth over warts in the language */
-export import jsHelper = require( "./core/jshelper" );
 
 
 //serialInits.push( mockMocha.initialize );
 
 export import lolo = require( "./core/lolo" );
 export import arrayHelper = require( "./core/arrayhelper" );
-export import ClassBase = require( "./core/classbase" );
+export import ClassBase = require( "./_obsolete/classbase" );
 export import diagnostics = require( "./core/diagnostics" );
 const log = diagnostics.log; // new diagnostics.Logger( __filename );
-export import collections = require( "./core/collections" );
+export import collections = require( "./_obsolete/collections" );
 
 /** various math and numerical conversion/manipulation related helper functions */
 export import numHelper = require( "./core/numhelper" );
@@ -88,10 +86,10 @@ export import reflection = require( "./core/reflection" );
 
 
 export import dateTime = require( "./core/datetime" );
-if ( environment.getGlobal()[ "moment" ] == null ) {
-    //define momentStatic
-    environment.getGlobal()[ "moment" ] = dateTime.moment;
-}
+// if ( environment.getGlobal()[ "moment" ] == null ) {
+//     //define momentStatic
+//     environment.getGlobal()[ "moment" ] = dateTime.moment;
+// }
 
 export import validation = require( "./core/validation" );
 export import serialization = require( "./core/serialization" );
@@ -103,7 +101,7 @@ export import threading = require( "./core/threading" );
 
 export import net = require( "./core/net" );
 
-export import cache = require( "./core/cache" );
+export import cache = require( "./_obsolete/cache" );
 
 /** templates for various design patterns */
 export import designPatterns = require( "./core/design-patterns/design-patterns" );

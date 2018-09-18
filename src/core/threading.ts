@@ -273,23 +273,24 @@ export class AsyncReaderWriterLock<TValue=void> {
 /** required arguments when constructing a new autoscaler */
 
 export interface IAutoscalerOptions {
-	/** minimum parallel requests you allow, regardless of how long the autoscaler has been idle.  should be 1 or more.  
+	/** minimum parallel requests (maxActive) you allow, regardless of how long the autoscaler has been idle.  should be 1 or more.  
 	*/
     minParallel: number,
-	/** optional.  set a max to number of parallel requests no matter how active the calls 
+	/** optional.  set a max to number of parallel requests (maxActive) no matter how active the calls 
 		* @default undefined (no limit)
 	*/
     maxParallel?: number,
-    /** if we get a "TOO_BUSY" rejection (from the ```failureListener```), how long we should wait before trying to expand our parallelCount again. */
-    busyWaitMs: number,
-    /** when we are at max parallel and still able to successfully submit requests (not getting "TOO_BUSY" errors), how long to delay before increasing our parallelCount by 1. */
+    /** if we get a "TOO_BUSY" rejection (from the ```failureListener```), how long we should wait before trying to expand our maxActive again. */
+    busyGrowDelayMs: number,
+    /** when we are at max parallel and still able to successfully submit requests (not getting "TOO_BUSY" errors), how long to delay before increasing our maxActive by 1. */
     growDelayMs: number,
-    /** when we are under our max parallel, how long before our max should decrease by 1 .   Also, when we are consistently getting "TOO_BUSY" rejections, we will decrease our parallelCount this often.  pass null to never decay.*/
+    /** when we are under our max parallel, how long before our max should decrease by 1 .   Also, when we are consistently getting "TOO_BUSY" rejections, we will decrease our maxActive by 1 this often.  pass null to never decay (not recomended).*/
     decayDelayMs: number,
-	/** optional.  when we get a new backoff rejection, we will reduce maxActive by this amount.
+	/** optional.  when we first get a "TOO_BUSY" rejection, we will reduce maxActive by this amount.  interval to check if we should penalize resets after ```busyWaitMs```
+     * Note: when too busy, we also reduce maxActive via the ```decayDelayMs``` parameter
 		* @default 1
 	 */
-    backoffPenaltyCount?: number,
+    busyPenalty?: number,
 };
 
 
@@ -309,7 +310,7 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<TResul
     ) {
 
         //apply defaults
-        this.options = { backoffPenaltyCount: 1, ...options };
+        this.options = { busyPenalty: 1, ...options };
 
         if ( this.options.minParallel < 1 ) {
             throw new Error( "minParallel needs to be 1 or more" );
@@ -373,7 +374,7 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<TResul
             }
             if ( this.metrics.activeCount >= this.metrics.maxActive //we are at our max...
                 && ( this.metrics.lastGrow.getTime() + this.options.growDelayMs < Date.now() ) //we haven't grew recently...
-                && ( this.metrics.tooBusyWaitStart.getTime() + this.options.busyWaitMs < Date.now() ) //we are not in a options.busyWaitMs interval (haven't recieved a "TOO_BUSY" rejection recently...)
+                && ( this.metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < Date.now() ) //we are not in a options.busyWaitMs interval (haven't recieved a "TOO_BUSY" rejection recently...)
             ) {
                 //time to grow
                 this.metrics.maxActive++;
@@ -416,10 +417,10 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<TResul
                         case "TOO_BUSY":
                             this.metrics.lastTooBusy = new Date();
                             //apply special backoffPenaltyCount options, if they exist
-                            if ( this.options.backoffPenaltyCount != null && this.metrics.tooBusyWaitStart.getTime() + this.options.busyWaitMs < Date.now() ) {
+                            if ( this.options.busyPenalty != null && this.metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < Date.now() ) {
                                 //this is a "fresh" backoff.
                                 //we have exceeded backend capacity and been notified with a "TOO_BUSY" failure.  reduce our maxParallel according to the options.backoffPenaltyCount
-                                this.metrics.maxActive = Math.max( this.options.minParallel, this.metrics.maxActive - this.options.backoffPenaltyCount );
+                                this.metrics.maxActive = Math.max( this.options.minParallel, this.metrics.maxActive - this.options.busyPenalty );
 
                                 //set our "fresh" tooBusy time
                                 this.metrics.tooBusyWaitStart = new Date();

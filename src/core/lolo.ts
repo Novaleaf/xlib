@@ -4,7 +4,6 @@ import * as _ from "lodash";
 import _stringHelper = require( "./stringhelper" );
 import _numHelper = require( "./numhelper" );
 import _arrayHelper = require( "./arrayhelper" );
-import _jsHelper = require( "./jshelper" );
 
 import serialization = require( "./serialization" );
 
@@ -13,7 +12,6 @@ export const scrub = validation.scrub;
 
 
 
-export var defaultIfNull = _jsHelper.defaultIfNull;
 
 import _exception = require( "./exception" );
 export const Exception = _exception.Exception;

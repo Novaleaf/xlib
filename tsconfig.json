@@ -25,12 +25,12 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": false, /////////  change for vNext
     "noImplicitAny": false, /////////  change for vNext
-    "noImplicitThis": false, /////////  change for vNext
+    "noImplicitThis": true, // ! strict for vNext
     "noUnusedLocals": false, /////////  change for vNext
     "noUnusedParameters": false,
     "strictNullChecks": false, /////////  change for vNext
-    "suppressExcessPropertyErrors": true, /////////  change for vNext
-    "suppressImplicitAnyIndexErrors": true, /////////  change for vNext
+    "suppressExcessPropertyErrors": false, // ! strict for vNext
+    "suppressImplicitAnyIndexErrors": false, // ! strict for vNext
     "noStrictGenericChecks": true, /////////  change for vNext
     "skipLibCheck": false,
     "alwaysStrict": true,

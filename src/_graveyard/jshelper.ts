@@ -3,7 +3,7 @@
 import _ = require( "lodash" );
 
 
-import ex = require( "./exception" );
+import ex = require( "../core/exception" );
 
 /** low-level javascript helpers, to smooth over warts in the language */
 
@@ -25,25 +25,25 @@ import ex = require( "./exception" );
 //    return <any>callback;
 //}
 
-/**
- * if value is null, returns the default value
- * @param value
- * @param defaultValue
- */
-export function defaultIfNull<T, TDefault extends T>( value: T, defaultValue: TDefault ): T {
-	return value == null ? defaultValue : value;
-}
+// /**
+//  * if value is null, returns the default value
+//  * @param value
+//  * @param defaultValue
+//  */
+// export function defaultIfNull<T, TDefault extends T>( value: T, defaultValue: TDefault ): T {
+// 	return value == null ? defaultValue : value;
+// }
 
 
-/** invokes the native es6 Object.setPrototypeOf() if it exists.  if not, calls a pollyfill.  Note: pollyfill works on old Chrome/Firefox, NOT IE10 or below. */
-export function setPrototypeOf<T>( obj, newPrototype: T ): T {
-	if ( ( Object as any ).setPrototypeOf != null ) {
-		return ( Object as any ).setPrototypeOf( obj, newPrototype );
-	} else {
-		obj.__proto__ = newPrototype;
-		return obj;
-	}
-}
+// /** invokes the native es6 Object.setPrototypeOf() if it exists.  if not, calls a pollyfill.  Note: pollyfill works on old Chrome/Firefox, NOT IE10 or below. */
+// export function setPrototypeOf<T>( obj, newPrototype: T ): T {
+// 	if ( ( Object as any ).setPrototypeOf != null ) {
+// 		return ( Object as any ).setPrototypeOf( obj, newPrototype );
+// 	} else {
+// 		obj.__proto__ = newPrototype;
+// 		return obj;
+// 	}
+// }
 
 /**
 * Helper function for iterating over values in the array. If the func returns
@@ -193,34 +193,34 @@ export const forEachProperty = _.forOwn;
 // 	return true;
 // }
 
-///** creates and returns a rate-limited facade over the input function.    
-// * this lets you invoke the facade and the underlying function will execute at maximum once per rateLimit period.  
-// * any additional calls are enqueued and triggered in a FIFO order.
-// * You can abort remaining */
-//export function rateLimitFacade<T>(
+// ///** creates and returns a rate-limited facade over the input function.    
+// // * this lets you invoke the facade and the underlying function will execute at maximum once per rateLimit period.  
+// // * any additional calls are enqueued and triggered in a FIFO order.
+// // * You can abort remaining */
+// //export function rateLimitFacade<T>(
 
-/** simple ratelimiter, executes at most N times per second.  rate limit is shared by all calls to this method, even for dissimilar functions.*/
-export function rateLimit( perSecondLimit, fn ) {
-	var callsInLastSecond = 0;
-	var queue = [];
-	return function limited() {
-		if ( callsInLastSecond >= perSecondLimit ) {
-			queue.push( [ this, arguments ] );
-			return;
-		}
+// /** simple ratelimiter, executes at most N times per second.  rate limit is shared by all calls to this method, even for dissimilar functions.*/
+// export function rateLimit( perSecondLimit, fn ) {
+// 	var callsInLastSecond = 0;
+// 	var queue = [];
+// 	return function limited() {
+// 		if ( callsInLastSecond >= perSecondLimit ) {
+// 			queue.push( [ this, arguments ] );
+// 			return;
+// 		}
 
-		callsInLastSecond++;
-		setTimeout( function () {
-			callsInLastSecond--;
-			var parms;
-			if ( parms = queue.shift() ) {
-				limited.apply( parms[ 0 ], parms[ 1 ] );
-			}
-		}, 1010 );
+// 		callsInLastSecond++;
+// 		setTimeout( function () {
+// 			callsInLastSecond--;
+// 			var parms;
+// 			if ( parms = queue.shift() ) {
+// 				limited.apply( parms[ 0 ], parms[ 1 ] );
+// 			}
+// 		}, 1010 );
 
-		fn.apply( this, arguments );
-	};
-}
+// 		fn.apply( this, arguments );
+// 	};
+// }
 
 /** call a constructor procedurally,
 from http://stackoverflow.com/questions/3362471/how-can-i-call-a-javascript-constructor-using-call-or-apply */

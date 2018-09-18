@@ -51,6 +51,7 @@ export function sha512(
 export import jwt = require( "jsonwebtoken" );  //good intro to JWT: https://stormpath.com/blog/token-auth-spa/
 
 
+
 /**
  * returns a user-friendly alpha-numeric key.  By Default, constructs a cryptographically secure random one, or parses and normalizes one provided by userInput.
  * The key comprises the characters 0-9 and a-z, but not the characters o,i,l,u to avoid human transcription errors.

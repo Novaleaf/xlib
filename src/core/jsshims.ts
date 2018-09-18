@@ -55,6 +55,12 @@ export function initialize() {
 			};
 		} )();
 
+		if ( Object.setPrototypeOf === undefined ) {
+			Object.setPrototypeOf = function ( target: any, prototype: any ) {
+				target.__proto__ = prototype;
+				return target;
+			}
+		}
 
 		if ( Object.create === undefined ) {
 			Object.create = function ( o ) {
@@ -94,17 +100,17 @@ export function initialize() {
 			////configure fallbacks for old browsers
 			if ( typeof window.console === "undefined" ) {
 				( window as any ).console = <any>{
-					assert: ( test: boolean, message?: any ) => {
+					assert: ( test: boolean ) => {
 						if ( test ) {
 							return;
 						}
 						eval( "debugger" );
 					},
 
-					error: ( message: any ) => {
+					error: () => {
 						eval( "debugger" );
 					},
-					log: ( message?: any ) => {
+					log: () => {
 					}
 				};
 			}

@@ -26,7 +26,7 @@ export const finishedPromise: promise.IExposedPromise<IInitArgs> = promise.Creat
 
 const initWorkArray: Array<promise.IocCallback<IInitArgs, void>> = [];
 
-export async function initialize<TArgs>( args?: IInitArgs ) {
+export async function initialize( args?: IInitArgs ) {
     args = { ...args };
 
     if ( isStarted ) {

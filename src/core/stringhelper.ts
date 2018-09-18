@@ -422,7 +422,7 @@ export module base64 {
         }
         return btoa( input as string );
     }
-    export function decode( base64Encoded: string, encoding?: string ): string {
+    export function decode( base64Encoded: string ): string {
         if ( typeof ( atob ) === "undefined" && Buffer != undefined ) {
             //nodejs does not define bota or atob
             return Buffer.from( base64Encoded, "base64" ).toString( "utf8" );
@@ -463,9 +463,9 @@ export function hash( input: string ): number {
     return hash;
 }
 
-import _sprintf = require( "sprintf-js" );
-export var format = _sprintf.sprintf;
-export var format2 = _sprintf.vsprintf;
+// import _sprintf = require( "sprintf-js" );
+// export var format = _sprintf.sprintf;
+// export var format2 = _sprintf.vsprintf;
 
 
 ///** string.format, supports the following style:  formatAlt(" hello {0}!","world")
