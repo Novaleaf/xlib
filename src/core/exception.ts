@@ -7,7 +7,6 @@
 //import * as environment from "./environment";
 import * as environment from "./environment";
 import * as _ from "lodash";
-import jsHelper = require( "./jshelper" );
 import * as stringHelper from "./stringhelper";
 /** shape of errors */
 export interface IError {
@@ -54,7 +53,8 @@ export class Exception<TData=void> extends Error {
 	constructor( public message: string, options?: IExceptionOptions<TData> ) {
 
 		super( message );
-		jsHelper.setPrototypeOf( this, new.target.prototype ); //fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
+		Object.setPrototypeOf( this, new.target.prototype );//fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
+		//jsHelper.setPrototypeOf( this, new.target.prototype ); 
 
 		options = {
 			stackFramesToTruncate: 0,

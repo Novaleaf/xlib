@@ -25,19 +25,19 @@ export const wrapErr = _exception.Exception.wrapErr.bind( _exception.Exception )
 */
 export const castErr = _exception.Exception.castErr.bind( _exception.Exception );
 
-export import moment = require( "moment" );
+//export import moment = require( "moment" );
 
-export function utcNow(): Date {
-    return moment.utc().toDate();
-}
-export function utcNowMoment() {
-    return moment.utc();
-}
+// export function utcNow(): Date {
+//     return moment.utc().toDate();
+// }
+// export function utcNowMoment() {
+//     return moment.utc();
+// }
 
-export function utcNowTimestamp(): number {
-    return moment.utc().toDate().getTime();
-}
-import _cache = require( "./cache" );
+// export function utcNowTimestamp(): number {
+//     return moment.utc().toDate().getTime();
+// }
+import _cache = require( "../_obsolete/cache" );
 /**
  * read method from the defaultCache object (xlib.cache.defaultCache.read).
  * for your own namespace, instantiate a new xlib.cache.Cache class instance instead.

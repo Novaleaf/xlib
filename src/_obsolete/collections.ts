@@ -8,6 +8,7 @@ import ex = require( "../core/exception" )
 //import diagnostics = require("./diagnostics");
 import * as bb from "bluebird";
 //import * as moment from "moment";
+import * as luxon from "luxon";
 
 /** up to 32 true/false values stored in 32bits (a bitmask) */
 export class BitFlags {
@@ -263,10 +264,10 @@ export class ExpiresDictionary<TValue> {
 	/** estimates the non-expired items contained (this is an upper-bound).   increased by setting (new items created), decreased by garbage cleanup. */
 	public _allocatedItemSlots: number = 0;
 
-	constructor( public autoTryCleanupInterval: moment.Duration, public defaultLifetime: moment.Duration ) {
+	constructor( public autoTryCleanupInterval: luxon.Duration, public defaultLifetime: luxon.Duration ) {
 		setInterval( () => {
 			this._tryCleanupOne();
-		}, this.autoTryCleanupInterval.asMilliseconds() );
+		}, this.autoTryCleanupInterval.as("millisecond") );
 	}
 
 	private _tryCleanupOne() {
@@ -286,7 +287,7 @@ export class ExpiresDictionary<TValue> {
 		let key = this._inspectKeys[ currentIndex ];
 		let item = this._storage[ key ]
 
-		if ( item != null && item.expires < moment() ) {
+		if ( item != null && item.expires < luxon.DateTime.utc() ) {
 			//console.log("ExpiresDictionary auto.cleanup", key);
 			delete this._storage[ key ];
 			this._allocatedItemSlots--;
@@ -304,7 +305,7 @@ export class ExpiresDictionary<TValue> {
 		if ( item === undefined ) {
 			return defaultIfUndefined;
 		}
-		if ( item.expires < moment() ) {
+		if ( item.expires < luxon.DateTime.utc() ) {
 			//console.log("ExpiresDictionary get.cleanup", key);
 			delete this._storage[ key ];
 			this._allocatedItemSlots--;
@@ -313,11 +314,11 @@ export class ExpiresDictionary<TValue> {
 		return item.value;
 	}
 
-	public set( key: string, value: TValue, customLifetime: moment.Duration = this.defaultLifetime ) {
+	public set( key: string, value: TValue, customLifetime: luxon.Duration = this.defaultLifetime ) {
 		if ( this._storage[ key ] === undefined ) {
 			this._allocatedItemSlots++;
 		}
-		this._storage[ key ] = { value: value, expires: moment().add( customLifetime ) };
+		this._storage[ key ] = { value: value, expires: luxon.DateTime.utc().plus( customLifetime ) };
 	}
 
 	public delete( key: string ) {
@@ -328,7 +329,7 @@ export class ExpiresDictionary<TValue> {
 
 interface IExpiresDictionaryItem<TValue> {
 	value: TValue;
-	expires: moment.Moment;
+	expires: luxon.DateTime;
 }
 
 /**

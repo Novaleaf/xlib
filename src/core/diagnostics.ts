@@ -145,7 +145,7 @@ export class DebugRaceCheck {
 	private _lockVersion = 0;
 	constructor( public debugText = "" ) { }
 
-	public enter: () => void = environment._ifDebug( function () {
+	public enter() {
 		if ( this._lockVersion !== 0 ) {
 			//set lock version to -1 to cause the other thread caller to assert also
 			this._lockVersion = -1;
@@ -153,9 +153,9 @@ export class DebugRaceCheck {
 		}
 		this._lockVersion = this._version;
 		this._version++;
-	} );
+	}
 
-	public exit: () => void = environment._ifDebug( function () {
+	public exit() {
 		if ( this._lockVersion !== this._version - 1 ) {
 			if ( this._lockVersion === 0 ) {
 				throw new RaceCheckException( "DebugRaceCheck.Exit() failed!  Already unlocked and we are calling unlock again!  Additional Info=" + String( this.debugText ) );
@@ -167,21 +167,21 @@ export class DebugRaceCheck {
 		}
 
 		this._lockVersion = 0;
-	} );
+	}
 
 	/** quickly locks and unlocks */
-	public edit: () => void = environment._ifDebug( function () {
+	public edit() {
 		this.enter();
 		this.exit();
-	} );
+	}
 
 	/** ensures that this raceCheck is not currently locked */
-	public poke: () => void = environment._ifDebug( function () {
+	public poke() {
 		this._version++;
 		if ( this._lockVersion !== 0 ) {
 			throw new RaceCheckException( "DebugRaceCheck.Exit() failed!internal state is corrupted, moste likely from multithreading  Additional Info=" + String( this.debugText ) );
 		}
-	} );
+	}
 
 	public toString(): string {
 		if ( environment.logLevel <= environment.LogLevel.DEBUG ) {
@@ -191,4 +191,12 @@ export class DebugRaceCheck {
 			return "DebugRaceCheck is DISABLED when baselib.environment.logLevel > EnvLevel.DEBUG.  use baselib.concurrency.Lock if you need something in production";
 		}
 	}
+}
+
+if ( !environment.env.isDebug ) {
+	//noop racecheck functions
+	DebugRaceCheck.prototype.edit = () => { };
+	DebugRaceCheck.prototype.enter = () => { };
+	DebugRaceCheck.prototype.exit = () => { };
+	DebugRaceCheck.prototype.poke = () => { };
 }

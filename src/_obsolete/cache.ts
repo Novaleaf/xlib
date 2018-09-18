@@ -21,16 +21,16 @@ const log = diagnostics.log; // new diagnostics.Logger( __filename );
 interface ICacheItem<TValue> {
     /** if UNDEFINED the cache is invalid.   Important note:  NULL is a valid cached value.*/
     value: TValue;
-    expires: moment.Moment;
+    expires: luxon.DateTime;
     ///** if false (the default), we will return the old value and fetch the new value to revalidate the cache with.
     //* optionally you could return a duration in which the old value would still be returnable.   if beyond expires+duration then the value would be considered too old to return.
     //*/
-    //awaitNewOnExpired?: boolean | moment.Duration;
+    //awaitNewOnExpired?: boolean | luxon.Duration;
     /** set if a fetch is occuring.  if true, we will not kick off another fetch, but (if awaitNewOnExpired) will await the currentFetch results */
     currentFetch?: bb<TValue>;
 
     /** specifies when this can be collected by the GC (when cache item is not used) */
-    gcAfter: moment.Moment;
+    gcAfter: luxon.DateTime;
 }
 
 
@@ -59,15 +59,13 @@ export class Cache {
 
         options?: {
             /**if we need to fetch, how long the new value will be valid for.  default 10 minutes. */
-            fetchExpiresAmount?: number;
-            /** default "minutes" */
-            fetchExpiresUnits?: moment.DurationInputArg2;
+            fetchExpiresDuration?: luxon.Duration;
 
             /** if true, doesn't return the currently cached value, (if any).  If false (the default), will ignore any errors from the fetchFunction(), returning the last known good value instead.            */
             awaitNewOnExpired?: boolean;
 
             /** optionally you could return a duration in which the old value would still be returnable.   if beyond expires+duration then the value would be considered too old to return.*/
-            awaitNewOnExpiredThreshhold?: moment.Duration;
+            awaitNewOnExpiredThreshhold?: luxon.Duration;
 
             /** if true, returns the cached item directly.  the default (false) is to always return a copy of the value to avoid side-effects. */
             noClone?: boolean;
@@ -84,17 +82,14 @@ export class Cache {
         if ( options == null ) {
             options = {};
         }
-        if ( options.fetchExpiresAmount == null ) {
-            options.fetchExpiresAmount = 10;
-        }
-        if ( options.fetchExpiresUnits == null ) {
-            options.fetchExpiresUnits = "minutes";
+        if ( options.fetchExpiresDuration == null ) {
+
+            options.fetchExpiresDuration = luxon.Duration.fromObject( { minutes: 10 } );
         }
         if ( options.gcAfterMultipler == null ) {
             options.gcAfterMultipler = 3;
         }
 
-        let fetchExpiresDuration = moment.duration( options.fetchExpiresAmount, options.fetchExpiresUnits );
 
         function returnOrClone( potentialValue: TValue ): TValue {
             let toReturn: TValue
@@ -109,20 +104,22 @@ export class Cache {
             return toReturn;
         }
 
-        let now = moment();
-        if ( options.fetchExpiresAmount <= 0 ) {
+        let now = luxon.DateTime.utc();
+        if ( options.fetchExpiresDuration.valueOf() <= 0 ) {
             throw new exception.XlibException( "Cache: item to insert is alreadey expired (fetchExpiresAmount less than or equal to zero)" );
         }
         // do a garbage collection pass (one item checked per read call) 
         this._tryGCOne( now );
+
+
 
         let cacheItem = this._storage[ key ];
         if ( cacheItem == null ) {
             cacheItem = {
                 value: undefined,
                 currentFetch: null,
-                expires: moment( 0 ),
-                gcAfter: now.clone().add( fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds" ),
+                expires: luxon.DateTime.fromMillis( 0 ),
+                gcAfter: now.plus( luxon.Duration.fromObject( { seconds: options.fetchExpiresDuration.as( "seconds" ) * options.gcAfterMultipler } ) ) //now.plus( fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds" ),
             };
             this._storage[ key ] = cacheItem;
         }
@@ -138,7 +135,7 @@ export class Cache {
             if (
                 options.awaitNewOnExpired === true //expired                    
                 || cacheItem.value === undefined //no value                    
-                || ( options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.clone().add( options.awaitNewOnExpiredThreshhold ).isBefore( moment() ) ) //threshhold exceeded
+                || ( options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.plus( options.awaitNewOnExpiredThreshhold ) < ( luxon.DateTime.utc() ) ) //threshhold exceeded
             ) {
 
                 //await currentFetch
@@ -158,12 +155,12 @@ export class Cache {
 
         //ASYNC:  after the fetch completes, update our cacheItem
         cacheItem.currentFetch.then( ( newValue ) => {
-            let _now = moment();
+            let _now = luxon.DateTime.utc();
             this._storage[ key ] = cacheItem; //in case gc deleted it
 
             cacheItem.value = newValue;
-            cacheItem.expires = _now.clone().add( fetchExpiresDuration );
-            cacheItem.gcAfter = cacheItem.expires.clone().add( fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds" );
+            cacheItem.expires = _now.plus( options.fetchExpiresDuration );
+            cacheItem.gcAfter = now.plus( luxon.Duration.fromObject( { seconds: options.fetchExpiresDuration.as( "seconds" ) * options.gcAfterMultipler } ) ) //cacheItem.expires.plus( options.fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds" );
 
             //we might want to clone the resule
             return bb.resolve( returnOrClone( cacheItem.value ) );
@@ -180,7 +177,7 @@ export class Cache {
 
         //check if we force waiting for a new value, or are ok with returning an expired value while refetching.
         if ( options.awaitNewOnExpired === true //expired                    
-            || ( options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.clone().add( options.awaitNewOnExpiredThreshhold ).isBefore( moment() ) ) //threshhold exceeded
+            || ( options.awaitNewOnExpiredThreshhold != null && cacheItem.expires.plus( options.awaitNewOnExpiredThreshhold ) < ( luxon.DateTime.utc() ) ) //threshhold exceeded
         ) {
             //we don't accept an expired, await the refetch
             return cacheItem.currentFetch;
@@ -208,7 +205,7 @@ export class Cache {
      *  lazy "garbage collector", every .get() call we will walk one item in our cache to see if it's expired.   if so, we remove it.
      * @param now
      */
-    private _tryGCOne( now: moment.Moment ) {
+    private _tryGCOne( now: luxon.DateTime ) {
 
         if ( this._cleanupNextPosition >= this._cleanupKeys.length ) {
             this._cleanupKeys = Object.keys( this._storage );

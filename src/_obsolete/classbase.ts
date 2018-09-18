@@ -1,6 +1,6 @@
 "use strict";
 
-import ex = require( "./exception" );
+import ex = require( "../core/exception" );
 
 /** root class, includes the following functionality:
 typeName, toString, dispose, assertIsAlive, hashCode */

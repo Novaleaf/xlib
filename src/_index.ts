@@ -103,8 +103,6 @@ export import net = require( "./core/net" );
 
 export import cache = require( "./_obsolete/cache" );
 
-/** templates for various design patterns */
-export import designPatterns = require( "./core/design-patterns/design-patterns" );
 
 /** security and cryptographic helpers.   (cross-platform)
  *  note:  our ```KDF``` is nodejs only, and can be found in the ```nlib.security``` module.
@@ -186,7 +184,7 @@ export import string_decoder = require( "string_decoder" );
  */
 export import url = require( "url" );
 
-export import definitions = require( "./definitions/definitions" );
+//export import definitions = require( "./definitions/definitions" );
 
 
 
