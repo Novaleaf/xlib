@@ -8,7 +8,6 @@
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": [
-				"--inspect",
 				//"--trace-warnings",
 			],
 			"args": [
@@ -42,19 +41,18 @@
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": [
-				"--inspect",
 				"--watch",
-				"./dist/**/*.test.js",
 				//"--trace-warnings",
 			],
-			// "args": [
-			// 	"logLevel=TRACE",
-			// 	"envLevel=DEV",
-			// 	"logLevelOverrides={'.*connection':'WARN', '.*xlib.dev.core.net.js':'INFO'}",
-			// ],
-			"name": "mocha watch",
+			"args": [
+				// 	"logLevel=TRACE",
+				// 	"envLevel=DEV",
+				// 	"logLevelOverrides={'.*connection':'WARN', '.*xlib.dev.core.net.js':'INFO'}",			
+				"./dist/**/*.test.js",
+			],
+			"name": "mocha watch ./dist/**/*.test.js",
 			"runtimeExecutable": "mocha",
-			"program": "${workspaceFolder}/dist/_index.js",
+			//"program": "${workspaceFolder}/dist/_index.js",
 			"restart": true,
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen",

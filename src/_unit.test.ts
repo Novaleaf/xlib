@@ -164,7 +164,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 
 
-	} )
+	} );
 	// it( "basic e2e of cache", async () => { 
 
 	// 	const __ = xlib.lolo;

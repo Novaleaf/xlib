@@ -36,11 +36,13 @@ if ( typeof window != "undefined" ) {
 }
 //}
 
-/** helper to avoid throws in your code (so in dev time, avoid triggering "break on all exceptions").
+/** helper to avoid throws in your code (so in dev time, avoid triggering "break on all exceptions").  
+	* **VERY** useful in codepaths that reject during normal operation, but not very useful otherwise.
 	* 
 	* will await the promise to fulfill/reject, then return a resolved bluebird promise so you can inspect the error or obtain the results.
 	@example  
-	const {toInspect} = await xlib.promise.awaitInspect(yourClass.asyncMethod());
+	const awaitInspect = xlib.promise.awaitInspect;
+	const {toInspect} = await awaitInspect(yourClass.asyncMethod());
 if(toInspect.isFulfilled()){
 	const value = toInspect.value();
 	//do stuff with value
@@ -55,6 +57,14 @@ export async function awaitInspect<T>( promise: PromiseLike<T> ): Promise<{ toIn
 	let toInspect = bb.resolve( promise );
 
 	let results = { toInspect };
+
+
+	// let tryToReturn = {
+
+	// 	the
+
+	// };
+
 
 	let toReturn = CreateExposedPromise<{ toInspect: bb<T> }>();
 
@@ -71,8 +81,6 @@ export async function awaitInspect<T>( promise: PromiseLike<T> ): Promise<{ toIn
 	return toReturn;
 
 }
-
-
 
 
 

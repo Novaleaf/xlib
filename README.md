@@ -72,7 +72,9 @@ There's a lot of commonly used features in ```xlib```:
 
 Hopefully you agree with my (opinionated) choices.   If you disagree, let me know in the Issues section.
 
-Below are intro docs for big impacting features:
+> **A Note on Code Examples**: most of the examples in this doc come from ```/src/_unit.test.ts``` so consider looking in that file for more details.
+
+Below are intro docs for big impacting features. 
 
 ## Logging
 
