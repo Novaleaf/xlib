@@ -144,6 +144,27 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} );
 
+	it( "test exceptions", () => {
+		const log = xlib.diagnostics.log;
+		class MyException extends xlib.exception.Exception { };
+
+		try {
+			try {
+				throw new MyException( "first" );
+			} catch ( _err ) {
+				throw new MyException( "second", { innerException: _err } );
+			}
+		} catch ( _err ) {
+			log.assert( _err instanceof Error );
+			log.assert( _err instanceof MyException );
+			const err = _err as MyException;
+			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
+			log.assert( err.innerException.message === "first" );
+		}
+
+
+
+	} )
 	// it( "basic e2e of cache", async () => { 
 
 	// 	const __ = xlib.lolo;

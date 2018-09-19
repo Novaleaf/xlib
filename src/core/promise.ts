@@ -12,29 +12,68 @@ import environment = require( "./environment" );
 //bluebird.longStackTraces();
 
 /** binds bluebird as global promise and other various init */
-export function initialize() {
-	if ( environment.isDebug() ) {
-		//http://bluebirdjs.com/docs/api/promise.config.html
-		bluebird[ "config" ]( {
-			// Enable warnings
-			warnings: true,
-			// Enable long stack traces
-			longStackTraces: true,
-			// if you owan to allow cancelation, see: http://bluebirdjs.com/docs/api/cancellation.html
-			cancellation: false,
-			// Enable monitoring
-			monitoring: true
-		} );
-	} else {
-		//noop
-	}
-	if ( typeof global != "undefined" ) {
-		global.Promise = bluebird;
-	}
-	if ( typeof window != "undefined" ) {
-		window[ "Promise" ] = bluebird;
-	}
+//export function initialize() {
+if ( environment.isDebug() ) {
+	//http://bluebirdjs.com/docs/api/promise.config.html
+	bluebird[ "config" ]( {
+		// Enable warnings
+		warnings: true,
+		// Enable long stack traces
+		longStackTraces: true,
+		// if you owan to allow cancelation, see: http://bluebirdjs.com/docs/api/cancellation.html
+		cancellation: false,
+		// Enable monitoring
+		monitoring: true
+	} );
+} else {
+	//noop
 }
+if ( typeof global != "undefined" ) {
+	global.Promise = bluebird;
+}
+if ( typeof window != "undefined" ) {
+	window[ "Promise" ] = bluebird;
+}
+//}
+
+/** helper to avoid throws in your code (so in dev time, avoid triggering "break on all exceptions").
+	* 
+	* will await the promise to fulfill/reject, then return a resolved bluebird promise so you can inspect the error or obtain the results.
+	@example  
+	const {toInspect} = await xlib.promise.awaitInspect(yourClass.asyncMethod());
+if(toInspect.isFulfilled()){
+	const value = toInspect.value();
+	//do stuff with value
+}else{
+	const err = toInspect.reason();
+	//do stuff with err
+}
+ */
+
+export async function awaitInspect<T>( promise: PromiseLike<T> ): Promise<{ toInspect: bb<T> }> {
+
+	let toInspect = bb.resolve( promise );
+
+	let results = { toInspect };
+
+	let toReturn = CreateExposedPromise<{ toInspect: bb<T> }>();
+
+	toInspect.then( ( result ) => {
+		toReturn.fulfill( results );
+	}, ( err ) => {
+		toReturn.fulfill( results );
+	} );
+
+	// toInspect.finally( () => {
+	// 	toReturn.fulfill( results );
+	// } );
+
+	return toReturn;
+
+}
+
+
+
 
 
 /** inversion of control (IoC) to let the caller specify work that will be done by the async method.     values can be a promise, function (sync or async), or result */
@@ -79,85 +118,85 @@ export interface IExposedPromise<TReturn=void, TTags={}> extends bb<TReturn> {
 	tags?: TTags;
 }
 
+export namespace _obsolete {
+	/** for a given function signature which returns a promise, construct a facade that will fulfill once all outstanding calls finish, and each call will be executed sequentially (not in parallel!)*/
+	export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: any[] ) => bb<T> ): ( ...args: any[] ) => bb<T[]> {
+		//todo: error handling.
 
-/** for a given function signature which returns a promise, construct a facade that will fulfill once all outstanding calls finish, and each call will be executed sequentially (not in parallel!)*/
-export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: any[] ) => bb<T> ): ( ...args: any[] ) => bb<T[]> {
-	//todo: error handling.
+		let __enqueuedCallArguments: IArguments[] = [];
+		let __isExecuting = false;
+		let __batchPromise: IExposedPromise<T[]> = CreateExposedPromise<T[]>();
+		let __batchResults: T[] = [];
 
-	let __enqueuedCallArguments: IArguments[] = [];
-	let __isExecuting = false;
-	let __batchPromise: IExposedPromise<T[]> = CreateExposedPromise<T[]>();
-	let __batchResults: T[] = [];
-
-	function __resetVariables() {
-		__isExecuting = false;
-		__batchResults = [];
-		__batchPromise = CreateExposedPromise<T[]>();
-	}
-	function __doNext() {
-
-		if ( __enqueuedCallArguments.length == 0 ) {
-			//no more enqueued, so resolve our batch Promise and clear things out incase there are future calls to the facade.
-			let tempData = __batchResults;
-			let tempPromise = __batchPromise;
-			__resetVariables();
-
-			tempPromise.fulfill( tempData );
-
+		function __resetVariables() {
+			__isExecuting = false;
+			__batchResults = [];
+			__batchPromise = CreateExposedPromise<T[]>();
 		}
-		//get the next call to process
-		let args = __enqueuedCallArguments.shift();
+		function __doNext() {
 
-		let currentPromise: bb<T> = func.apply( __this, args );
-		currentPromise.then( ( currentValue ) => {
-			__batchResults.push( currentValue );
+			if ( __enqueuedCallArguments.length == 0 ) {
+				//no more enqueued, so resolve our batch Promise and clear things out incase there are future calls to the facade.
+				let tempData = __batchResults;
+				let tempPromise = __batchPromise;
+				__resetVariables();
+
+				tempPromise.fulfill( tempData );
+
+			}
+			//get the next call to process
+			let args = __enqueuedCallArguments.shift();
+
+			let currentPromise: bb<T> = func.apply( __this, args );
+			currentPromise.then( ( currentValue ) => {
+				__batchResults.push( currentValue );
+				__doNext();
+			}, ( error ) => {
+				let tempPromise = __batchPromise;
+				__resetVariables();
+				tempPromise.reject( error );
+			} );
+		}
+
+
+
+		function __toReturn(): bb<T[]> {
+
+			let args: IArguments = _.clone( arguments );
+
+			__enqueuedCallArguments.push( args );
+
+			if ( __isExecuting === true ) {
+				return __batchPromise;
+			}
+			__isExecuting = true;
 			__doNext();
-		}, ( error ) => {
-			let tempPromise = __batchPromise;
-			__resetVariables();
-			tempPromise.reject( error );
-		} );
-	}
 
-
-
-	function __toReturn(): bb<T[]> {
-
-		let args: IArguments = _.clone( arguments );
-
-		__enqueuedCallArguments.push( args );
-
-		if ( __isExecuting === true ) {
 			return __batchPromise;
 		}
-		__isExecuting = true;
-		__doNext();
 
-		return __batchPromise;
+
+
+
+		return __toReturn;
 	}
 
+	/** constructs a unified promise for your returned (callback function) promises.  wraps a lodash foreach, just adds Promise.all() glue code.
+	NOTE: executes all asynchronously.  if you need to only execute + complete one promise at a time, use Promise.each() instead. */
+	export function forEachParallel<TIn, TOut>( array: TIn[], callback: ( value: TIn ) => TOut | bb<TOut> ): bb<TOut[]> {
+		try {
+			let results: bb<TOut>[] = [];
+			_.forEach( array, ( value ) => {
+				let resultPromise = callback( value );
+				results.push( <any>resultPromise );
+			} );
 
-
-
-	return __toReturn;
-}
-
-/** constructs a unified promise for your returned (callback function) promises.  wraps a lodash foreach, just adds Promise.all() glue code.
-NOTE: executes all asynchronously.  if you need to only execute + complete one promise at a time, use Promise.each() instead. */
-export function forEach<TIn, TOut>( array: TIn[], callback: ( value: TIn ) => TOut | bb<TOut> ): bb<TOut[]> {
-	try {
-		let results: bb<TOut>[] = [];
-		_.forEach( array, ( value ) => {
-			let resultPromise = callback( value );
-			results.push( <any>resultPromise );
-		} );
-
-		return bb.all( results );
-	} catch ( ex ) {
-		return <any>bb.reject( ex );
+			return bb.all( results );
+		} catch ( ex ) {
+			return <any>bb.reject( ex );
+		}
 	}
 }
-
 
 
 // export module _BluebirdRetryInternals {

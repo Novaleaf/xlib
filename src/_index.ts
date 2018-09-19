@@ -60,7 +60,7 @@ if ( environment.isDebug() === true ) {
 
 
 export import promise = require( "./core/promise" );
-promise.initialize();
+
 
 
 

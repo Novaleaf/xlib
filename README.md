@@ -57,13 +57,13 @@ log.info("hi",{some:"data"});
 I haven't found a good documentation tool (TypeDoc sucks for libraries), if you know if one, let me know!   In the meantime, I suggest browsing via your code editor's Intelisense.
 
 There's a lot of commonly used features in ```xlib```:
-- **DateTime**:  a chainable datetime lib. *(```luxon```,  by one of the maintainers of ```moment```)*
+- **DateTime**:  a chainable datetime lib. *(```luxon```)*
 - **Environment**:  Cross-platform environment variables and platform detection.  *(Custom)*
 - **Exception**:  An Improved and extensible exception base class.  *(Custom)*
 - **Logging**:  A robust, configurable, and source-map aware console logger. *(Custom)*
 - **Net**:  An easy to use RemoteHTTPEndpoint class for calling web apis, and generic http request handlers.  *(```axios``` and custom)*
 - **Promise**: Various features for Promise and async/await workflows. *(```bluebird``` and custom)*
-- **Reflection**: High quality runtime type detection.
+- **Reflection**: High quality runtime type detection. *(Custom)*
 - **Security**:  Various crypto workflows *(```crypto```, ```jsonwebtoken``` and custom)*
 - **Serialization**: High quality json manipulation and other import/export features. *(```d3-dsv```, ```json5```, and custom)*
 - **Threading**: An async/await focused ReaderWriterLock implementation and autoscaler. *(Custom)*
@@ -264,6 +264,40 @@ try {
 }
 ```
 
+## exception
+
+make sure throws are actually errors:
+```typescript
+const __ = xlib.lolo;
+try{
+    throw "yes you can throw a string!";
+}catch(_err){
+    const err = __.castErr(_err);
+    __.log.assert(err.message==="yes you can throw a string!");
+}
+```
+
+derive from error:
+```typescript
+const log = xlib.diagnostics.log;
+class MyException extends xlib.exception.Exception { };
+
+try {
+    try {
+        throw new MyException( "first" );
+    } catch ( _err ) {
+        throw new MyException( "second", { innerException: _err } );
+    }
+} catch ( _err ) {
+    log.assert( _err instanceof Error );
+    log.assert( _err instanceof MyException );
+    const err = _err as MyException;
+    log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
+    log.assert( err.innerException.message === "first" );
+}
+
+```
+
  
 ## threading
 
@@ -319,6 +353,7 @@ Features that used to be in ```xlib``` but are thrown away can be found in the `
 Since I started programming, I've a big fan of the .NET Framework.  Xlib is my attempt to bring that level of great features + (re)usability to the Typescript.  
 
 # Changelog
+- v13: modernize.  upgrade all dependencies to latest, deprecate or remove obsolete features, ```xlib.net``` improvements, general cleanup, remove ```moment``` in favor of ```luxon```
 - v12: reconfig initialization arguments to be passed prior to import of xlib (IE: specify a ```global.__xlibInitArgs```) . also change logger to be a singleton, and allow better log filtering via log.
 - v11: remove testLevel as external testing frameworks like mocha set their testLevel in a different way.
 - v10: the 10.x  branch (and semver) is a restructure of this project to take advantage of the now fully mature typescript ecosystem.  Prior to 10.x, to publish a typescript project was a tedious process.
