@@ -7,9 +7,15 @@ import * as stringHelper from "./stringhelper";
 import * as bb from "bluebird";
 import * as _ from "lodash";
 
-
+import * as numHelper from "./numhelper";
 
 import * as d3Dsv from "d3-dsv";
+
+import * as time from "./time";
+
+
+
+
 /** parse comma or tab seperated values.   see https://www.npmjs.com/package/d3-dsv
 	* 
 	This module provides a parser and formatter for delimiter-separated values, most commonly comma- (CSV) or tab-separated values (TSV). These tabular formats are popular with spreadsheet programs such as Microsoft Excel, and are often more space-efficient than JSON. This implementation is based on RFC 4180.
@@ -137,7 +143,10 @@ export namespace jsonX {
 					return stringHelper.summarize( obj, myOptions.summarizeLength );
 				case Type.Date:
 					const asDate = obj as Date;
-					return asDate.toISOString();
+					const ago = time.luxon.DateTime.fromJSDate( asDate ).until( time.luxon.DateTime.utc() ).toDuration( undefined ).toFormat( "hh:mm:ss.SS" );
+					//numHelper.format((Date.now()-asDate.getTime())/1000)
+					return `${ asDate.toISOString() } (-${ ago })`;
+
 				case Type.Error:
 					const errOptions = { ...myOptions, maxDepth: myOptions.maxDepth + 1 };
 					return _inspectParse_internal( ex.Exception.exceptionToJsonObj( obj ), errOptions, seenObjects );

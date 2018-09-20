@@ -8,7 +8,7 @@ import * as bb from "bluebird";
  */
 export abstract class AtomicCacheItem<TValue, TModifyParams>{
 	/** the last time this was synced with the datastore  max sync time is set by serverConfig.balance, and is 1 min. */
-	private _lastSyncTime: luxon.DateTime;
+	private _lastSyncTime: luxon.DateTime | undefined;
 	/** the last time this was used.  older than max sync time (1 minute) and we dispose */
 	private _lastUsedTime: luxon.DateTime;
 

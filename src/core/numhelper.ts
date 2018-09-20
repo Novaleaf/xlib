@@ -31,7 +31,7 @@ export module hashHelper {
     }
 
     /** internal helper. if no hashcode, null is returned */
-    export function getHashCode( item ): string {
+    export function getHashCode( item ): string | null {
         if ( item.__noenum_novaleaf_corelib_collections_hashCode != null ) { return item.__noenum_novaleaf_corelib_collections_hashCode; }
         if ( item.hashCode != null ) {
             return item.hashCode.toString();

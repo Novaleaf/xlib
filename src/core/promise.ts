@@ -119,7 +119,7 @@ export function CreateExposedPromise<TReturn=void, TTags = undefined>(
 	return toReturn;
 }
 
-export interface IExposedPromise<TReturn=void, TTags={}> extends bb<TReturn> {
+export interface IExposedPromise<TReturn=void, TTags=undefined> extends bb<TReturn> {
 	fulfill: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void;
 	reject: ( error: Error ) => void;
 	/** custom data for tracking state you might need, such as informing if the promise is being executed */

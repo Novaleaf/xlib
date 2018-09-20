@@ -22,6 +22,7 @@
     "target": "es6",
     "watch": false,
     "moduleResolution": "node",
+    // * type strictness section
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": false, /////////  change for vNext
     "noImplicitAny": false, /////////  change for vNext
@@ -38,6 +39,8 @@
     "allowSyntheticDefaultImports": false,
     "allowUnreachableCode": false,
     "allowUnusedLabels": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": false, // ! strict for vNext
     //"baseUrl": null,
     //"charset": null,
     "checkJs": false,
@@ -53,8 +56,6 @@
     "noErrorTruncation": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
-    "strictFunctionTypes": true,
-    "strictPropertyInitialization": false, /////////  change for vNext   
     "typeRoots": [
       "./src/types",
     ],

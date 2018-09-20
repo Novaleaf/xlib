@@ -140,9 +140,9 @@ export class AsyncReaderWriterLock<TValue=void> {
 
     private pendingWrites: promise.IExposedPromise<void, { writeId: number }>[] = [];
 
-    private currentWrite: promise.IExposedPromise<void, { writeId: number }>;
+    private currentWrite: promise.IExposedPromise<void, { writeId: number }> | undefined;
 
-    private _value: TValue;
+    private _value: TValue | undefined;
     // /** if no writes are waiting, will quickly return. otherwise will do a normal blocking wait 
     //  * 
     //  * returns the 
@@ -160,7 +160,7 @@ export class AsyncReaderWriterLock<TValue=void> {
     }
 
 
-    public async readBegin(): Promise<TValue> {
+    public async readBegin(): Promise<TValue | undefined> {
         //let readToken = 
 
         if ( this.pendingWrites.length > 0 ) {
@@ -181,7 +181,10 @@ export class AsyncReaderWriterLock<TValue=void> {
     public readEnd() {
         log.assert( this.currentReads.length > 0, "out of current reads, over decremented?" );
         log.assert( this.currentWrite == null, "race, current write should not be possible while reading" );
-        this.currentReads.pop().fulfill();
+        let readToken = this.currentReads.pop();
+        if ( readToken ) {
+            readToken.fulfill();
+        }
     }
 
     /** returns true, if able to instantly obtain a write lock, false if any reads or writes are in progress */
@@ -285,12 +288,17 @@ export interface IAutoscalerOptions {
     /** when we are at max parallel and still able to successfully submit requests (not getting "TOO_BUSY" errors), how long to delay before increasing our maxActive by 1. */
     growDelayMs: number,
     /** when we are under our max parallel, how long before our max should decrease by 1 .   Also, when we are consistently getting "TOO_BUSY" rejections, we will decrease our maxActive by 1 this often.  pass null to never decay (not recomended).*/
-    decayDelayMs: number,
+    idleOrBusyDecreaseMs: number,
 	/** optional.  when we first get a "TOO_BUSY" rejection, we will reduce maxActive by this amount.  interval to check if we should penalize resets after ```busyWaitMs```
-     * Note: when too busy, we also reduce maxActive via the ```decayDelayMs``` parameter
+     * Note: when too busy, we also reduce maxActive via the ```decayDelayMs``` parameter every so often (as set by decayDelayMs)..   set to 0 to have no penalty except that set by decayDelayMs
 		* @default 1
 	 */
-    busyPenalty?: number,
+    busyExtraPenalty?: number,
+
+    // /** while there is pending work, how often to wakeup and see if we can submit more.  should be less than half of grow/decay delayMs
+    //  * @default 1/10th of the minimum of  grow/decay delayMs
+    //  */
+    // heartbeatMs?: number,
 };
 
 
@@ -310,13 +318,17 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<any>, 
     ) {
 
         //apply defaults
-        this.options = { busyPenalty: 1, ...options };
+        this.options = {
+            busyExtraPenalty: 1,
+            //heartbeatMs: Math.min( options.growDelayMs, options.idleOrBusyDecreaseMs ) / 10,
+            ...options
+        };
 
         if ( this.options.minParallel < 1 ) {
             throw new Error( "minParallel needs to be 1 or more" );
         }
 
-        this.metrics = { activeCount: 0, tooBusyWaitStart: new Date( 0 ), lastGrow: new Date( 0 ), lastMax: new Date( 0 ), maxActive: 0, lastDecay: new Date( 0 ), lastTooBusy: new Date( 0 ) };
+        this.metrics = { activeCount: 0, tooBusyWaitStart: new Date( 0 ), lastGrow: new Date( 0 ), lastMax: new Date( 0 ), maxActive: options.minParallel, lastDecay: new Date( 0 ), lastTooBusy: new Date( 0 ) };
 
 
 
@@ -356,98 +368,110 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<any>, 
             return requesterPromise;
         } ) as any;
 
+
+    private _lastTryCallTime = new Date();
     private _tryCallBackend() {
         const now = new Date();
-        while ( true ) {
+        try {
+            while ( true ) {
 
-            // ! /////////////  do housekeeping ///////////////////
+                // ! /////////////  do housekeeping ///////////////////
 
-            //check if we have to abort for various reasons
-            if ( this.pendingCalls.length === 0 ) {
-                //nothing to do
-                return;
-            }
-            if ( this.metrics.activeCount >= this.metrics.maxActive ) {
-                //make note that we are at our limit of requests
-                this.metrics.lastMax = now;
-            }
-            if ( this.options.maxParallel != null && this.metrics.activeCount >= this.options.maxParallel ) {
-                //at our hard limit of parallel requests
-                return;
-            }
-            if ( this.metrics.activeCount >= this.metrics.maxActive //we are at our max...
-                && ( this.metrics.lastGrow.getTime() + this.options.growDelayMs < now.getTime() ) //we haven't grew recently...
-                && ( this.metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < now.getTime() ) //we are not in a options.busyWaitMs interval (haven't recieved a "TOO_BUSY" rejection recently...)
-            ) {
-                //time to grow
-                this.metrics.maxActive++;
-                this.metrics.lastGrow = now;
-            }
-            if ( this.options.decayDelayMs != null
-                && this.metrics.lastDecay.getTime() + this.options.decayDelayMs < now.getTime() //havent decayed recently
-                && (
-                    this.metrics.lastMax.getTime() + this.options.decayDelayMs < now.getTime() //havent been at max recently
-                    || this.metrics.lastTooBusy.getTime() + this.options.decayDelayMs > now.getTime() //OR we have gotten "TOO_BUSY" rejections since our last decay, so backoff
-                )
-            ) {
-                //time to reduce our maxActive
-                const reduceCount = Math.round( ( now.getTime() - this.metrics.lastMax.getTime() ) / this.options.decayDelayMs );//accumulating decays in case the autoScaler has been idle
-                log.assert( reduceCount >= 0 );
-                this.metrics.maxActive = Math.max( this.options.minParallel, this.metrics.maxActive - reduceCount );
-                //pretend we are at max, to properly delay growing.
-                this.metrics.lastMax = now;
-                this.metrics.lastDecay = now;
-            }
-
-            if ( this.metrics.activeCount >= this.metrics.maxActive ) {
-                //we are at our maxActive, wait for a free slot
-                return;
-            }
-
-            // ! ////////// Done with housekeeping and didn't early abort.   time to call the backend  /////////////////
-
-            const { args, requesterPromise } = this.pendingCalls.shift();
-            const activeMonitorPromise = bb.resolve( this.backendWorker( ...args ) )
-                .then( ( result ) => {
-                    requesterPromise.fulfill( result );
-                }, ( _err ) => {
-                    //failure, see what to do about it
-                    let verdict = this.failureListener( _err );
-                    switch ( verdict ) {
-                        case "FAIL":
-                            requesterPromise.reject( _err );
-                            break;
-                        case "TOO_BUSY":
-                            const tooBusyNow = new Date();
-                            this.metrics.lastTooBusy = tooBusyNow;
-                            //apply special backoffPenaltyCount options, if they exist
-                            if ( this.options.busyPenalty != null && this.metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < tooBusyNow.getTime() ) {
-                                //this is a "fresh" backoff.
-                                //we have exceeded backend capacity and been notified with a "TOO_BUSY" failure.  reduce our maxParallel according to the options.backoffPenaltyCount
-                                this.metrics.maxActive = Math.max( this.options.minParallel, this.metrics.maxActive - this.options.busyPenalty );
-
-                                //set our "fresh" tooBusy time
-                                this.metrics.tooBusyWaitStart = tooBusyNow;
-                            }
-                            //put request in front to try again
-                            this.pendingCalls.unshift( { args, requesterPromise } );
-                            break;
+                //check if we have to abort for various reasons
+                if ( this.pendingCalls.length === 0 ) {
+                    //nothing to do
+                    return;
+                }
+                if ( this.metrics.activeCount >= this.metrics.maxActive ) {
+                    //make note that we are at our limit of requests
+                    this.metrics.lastMax = now;
+                }
+                if ( this.options.maxParallel != null && this.metrics.activeCount >= this.options.maxParallel ) {
+                    //at our hard limit of parallel requests
+                    return;
+                }
+                if ( this.metrics.activeCount >= this.metrics.maxActive //we are at our max...
+                    && ( this.metrics.lastGrow.getTime() + this.options.growDelayMs < now.getTime() ) //we haven't grew recently...
+                    && ( this.metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < now.getTime() ) //we are not in a options.busyWaitMs interval (haven't recieved a "TOO_BUSY" rejection recently...)
+                ) {
+                    //time to grow
+                    this.metrics.maxActive++;
+                    this.metrics.lastGrow = now;
+                }
+                const lastTryMsAgo = now.getTime() - this._lastTryCallTime.getTime();
+                if ( this.options.idleOrBusyDecreaseMs != null && this.metrics.lastDecay.getTime() + ( this.options.idleOrBusyDecreaseMs + lastTryMsAgo ) < now.getTime() ) {
+                    //havent decayed recently
+                    if (
+                        ( this.metrics.lastMax.getTime() + ( this.options.idleOrBusyDecreaseMs + lastTryMsAgo ) < now.getTime() ) //havent been at max recently
+                        || ( this.metrics.lastTooBusy.getTime() + this.options.idleOrBusyDecreaseMs > now.getTime() ) //OR we have gotten "TOO_BUSY" rejections since our last decay, so backoff
+                    ) {
+                        //time to reduce our maxActive
+                        const reduceCount = 1 + Math.round( ( now.getTime() - this.metrics.lastMax.getTime() ) / this.options.idleOrBusyDecreaseMs );//accumulating decays in case the autoScaler has been idle
+                        log.assert( reduceCount >= 0 );
+                        this.metrics.maxActive = Math.max( this.options.minParallel, this.metrics.maxActive - reduceCount );
+                        //pretend we are at max, to properly delay growing.
+                        this.metrics.lastMax = now;
+                        this.metrics.lastDecay = now;
                     }
-                } )
-                .finally( () => {
-                    //remove this from actives array
-                    this.metrics.activeCount--;
-                    _.remove( this.activeCalls, ( activeCall ) => activeCall.requesterPromise === requesterPromise );
-                    //try another pass
-                    this._tryCallBackend();
-                } );
 
-            this.metrics.activeCount++;
-            this.activeCalls.push( { args, requesterPromise, activeMonitorPromise } );
+                }
+
+                if ( this.metrics.activeCount >= this.metrics.maxActive ) {
+                    //we are at our maxActive, wait for a free slot
+                    return;
+                }
+
+                // ! ////////// Done with housekeeping and didn't early abort.   time to call the backend  /////////////////
+
+                const { args, requesterPromise } = this.pendingCalls.shift();
+                const activeMonitorPromise = bb.resolve( this.backendWorker( ...args ) )
+                    .then( ( result ) => {
+                        requesterPromise.fulfill( result );
+                    }, ( _err ) => {
+                        //failure, see what to do about it
+                        let verdict = this.failureListener( _err );
+                        switch ( verdict ) {
+                            case "FAIL":
+                                requesterPromise.reject( _err );
+                                break;
+                            case "TOO_BUSY":
+                                const tooBusyNow = new Date();
+                                this.metrics.lastTooBusy = tooBusyNow;
+                                //apply special backoffPenaltyCount options, if they exist
+                                if ( this.options.busyExtraPenalty != null && this.metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < tooBusyNow.getTime() ) {
+                                    //this is a "fresh" backoff.
+                                    //we have exceeded backend capacity and been notified with a "TOO_BUSY" failure.  reduce our maxParallel according to the options.backoffPenaltyCount
+                                    this.metrics.maxActive = Math.max( this.options.minParallel, this.metrics.maxActive - this.options.busyExtraPenalty );
+
+                                    //set our "fresh" tooBusy time
+                                    this.metrics.tooBusyWaitStart = tooBusyNow;
+                                }
+                                //put request in front to try again
+                                this.pendingCalls.unshift( { args, requesterPromise } );
+                                break;
+                        }
+                    } )
+                    .finally( () => {
+                        //remove this from actives array
+                        this.metrics.activeCount--;
+                        _.remove( this.activeCalls, ( activeCall ) => activeCall.requesterPromise === requesterPromise );
+                        //try another pass
+                        this._tryCallBackend();
+                    } );
+
+                this.metrics.activeCount++;
+                this.activeCalls.push( { args, requesterPromise, activeMonitorPromise } );
+            }
+
+
+        } finally {
+            this._lastTryCallTime = now;
+            if ( this.pendingCalls.length > 0 && this.metrics.activeCount >= this.metrics.maxActive ) {
+                //we have pending work, try again at minimum our next potential grow interval
+                clearTimeout( this._heartbeatHandle ); //only 1 pending callback, regardless of how many calls there were
+                this._heartbeatHandle = setTimeout( () => { this._tryCallBackend(); }, this.options.growDelayMs );
+            }
         }
-
     }
-
-
-
+    private _heartbeatHandle: any;
 }

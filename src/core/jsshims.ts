@@ -37,7 +37,7 @@ export function initialize() {
 				if ( typeof o !== "object" && typeof o !== "function" || o == null )
 					throw new TypeError( "Object.keys called on a non-object" );
 
-				var result = [];
+				var result: any[] = [];
 				for ( var name in o ) {
 					if ( o.hasOwnProperty( name ) ) {
 						result.push( name );

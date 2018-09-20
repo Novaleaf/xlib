@@ -6,7 +6,7 @@ import ex = require( "../core/exception" );
 typeName, toString, dispose, assertIsAlive, hashCode */
 class ClassBase {
 	private _debugIsBaseCtorCalled = false;
-	private _typeName: string;
+	private _typeName: string | undefined;
 	constructor() {
 		this._debugIsBaseCtorCalled = true;
 	}

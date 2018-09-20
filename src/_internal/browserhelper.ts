@@ -81,7 +81,7 @@ export function onLoad( domElement: any, callback: any ): void {
 example:
 var amdMain = getFirstAttribute("script","data-amd-main");
 */
-export function getDomAttribute( elementType: string, attribute: string, searchTopDown: boolean = false ): string {
+export function getDomAttribute( elementType: string, attribute: string, searchTopDown: boolean = false ): string | null {
 	if ( typeof ( document ) === "undefined" ) {
 		return null;
 	}
