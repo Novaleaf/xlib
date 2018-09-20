@@ -7,7 +7,6 @@
   "private": false,
   "author": "jason swearingen <jasons@novaleaf.com>",
   "dependencies": {
-    "@types/base64url": "^2.0.0",
     "@types/bluebird": "^3.5.24",
     "@types/bluebird-retry": "^0.11.2",
     "@types/d3-dsv": "^1.0.33",

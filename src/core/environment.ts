@@ -280,11 +280,11 @@ export function isProd() {
 };
 
 /**
-	*  returns true if the current logLevel is DEBUG or TRACE. shortcut for ```environment.logLevel <= environment.LogLevel.DEBUG```
+	*  returns true if the current envLevl is DEV, or  logLevel is DEBUG or lower (DEBUG or TRACE), . shortcut for ```logLevel <= LogLevel.DEBUG || envLevel === EnvLevel.DEV```
 	*/
-export function isDebug() {
-	return logLevel <= LogLevel.DEBUG;
-};
+export function isDevOrDebug() {
+	return logLevel <= LogLevel.DEBUG || envLevel === EnvLevel.DEV;
+}
 
 // /** no op the input function if not running in test mode.
 //   * for uglify / closure-compiler dead-code optimization (minification)

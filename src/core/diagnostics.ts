@@ -195,7 +195,7 @@ export class DebugRaceCheck {
 	}
 }
 
-if ( !environment.isDebug() ) {
+if ( !environment.isDevOrDebug() ) {
 	//noop racecheck functions
 	DebugRaceCheck.prototype.edit = () => { };
 	DebugRaceCheck.prototype.enter = () => { };

@@ -1,5 +1,5 @@
 
-//import * as _ from "lodash";
+import * as _ from "lodash";
 
 // import serialization = require( "./serialization" );
 
@@ -18,13 +18,18 @@ export const Exception = _exception.Exception;
  * 
  * shortcut to xlib.exception.Exception.wrapErr()
  */
-export const wrapErr = _exception.Exception.wrapErr.bind( _exception.Exception );
+export const wrapErr: typeof _exception.Exception.wrapErr = _exception.Exception.wrapErr.bind( _exception.Exception );
 /** convert a string to Error object, or return existing Error object. 
  * useful for ```try{}catch(ex){}``` statements
  * 
  * shortcut to xlib.exception.Exception.castErr()
 */
-export const castErr = _exception.Exception.castErr.bind( _exception.Exception );
+export const castErr: typeof _exception.Exception.castErr = _exception.Exception.castErr.bind( _exception.Exception );
+
+
+
+
+
 
 //export import moment = require( "moment" );
 
@@ -55,7 +60,10 @@ export const castErr = _exception.Exception.castErr.bind( _exception.Exception )
 //export var htmlSanitize = _stringHelper.htmlSanitizeEscapedUserInput;
 
 /** shortcut to xlib.environment */
-export import env = require( "./environment" );
+import { isDevOrDebug } from "./environment";
+export { isDevOrDebug };
+
+
 
 /** shortcut to xlib.stringhelper */
 export import str = require( "./stringhelper" );
@@ -74,3 +82,22 @@ export { log };
 
 import { jsonX } from "./serialization";
 export { jsonX };
+
+
+import * as luxon from "luxon";
+/** return time in utc.  this is the most common entrypoint into time usage via the ```luxon``` module.
+	* @example
+const start = __.utc();
+//....do stuff...
+const elapsed = start.until( __.utc() ).length( "millisecond" );
+*/
+export const utc = luxon.DateTime.utc;
+
+
+
+import { bluebird } from "./promise";
+// /** the ```bluebird``` library with some helpers injected , and rejection reasons restricted to Error*/
+export const bb = bluebird;
+
+
+// bb.

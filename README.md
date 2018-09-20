@@ -57,16 +57,18 @@ log.info("hi",{some:"data"});
 I haven't found a good documentation tool (TypeDoc sucks for libraries), if you know if one, let me know!   In the meantime, I suggest browsing via your code editor's Intelisense.
 
 There's a lot of commonly used features in ```xlib```:
-- **DateTime**:  a chainable datetime lib. *(```luxon```)*
+- **Diagnostics**: features that change functionaly based on the ```xlib.environment.logLevel``` or ```xlib.environment.envLevel```.  such as sourcemaps and stacktrace logging which are active when ```logLevel <= DEBUG``` or ```envLevel==="DEV"```. *(Custom)*
 - **Environment**:  Cross-platform environment variables and platform detection.  *(Custom)*
 - **Exception**:  An Improved and extensible exception base class.  *(Custom)*
 - **Logging**:  A robust, configurable, and source-map aware console logger. *(Custom)*
+- **LoLo**: A shortcut to commonly used xlib functions and modules. *(Custom)*
 - **Net**:  An easy to use RemoteHTTPEndpoint class for calling web apis, and generic http request handlers.  *(```axios``` and custom)*
 - **Promise**: Various features for Promise and async/await workflows. *(```bluebird``` and custom)*
 - **Reflection**: High quality runtime type detection. *(Custom)*
 - **Security**:  Various crypto workflows *(```crypto```, ```jsonwebtoken``` and custom)*
 - **Serialization**: High quality json manipulation and other import/export features. *(```d3-dsv```, ```json5```, and custom)*
 - **Threading**: An async/await focused ReaderWriterLock implementation and autoscaler. *(Custom)*
+- **time**:  a chainable datetime lib and helpers *(```luxon```)*
 - **Validation**: User input sanitization.  *(```sanitize-html```, ```validator```, and custom)*
 - **Utils**: Array, String, and Number helpers, and pollyfills for downlevel support. *(Custom)*
 
@@ -99,6 +101,11 @@ log.info( "hi", { some: "data" } );
 > 2018-09-17T22:17:04.553Z     at Context.it (C:\repos\stage5\xlib\src\_index.unit.test.ts:46:7) INFO 'hi' { some: 'data' }
 ```
 
+#### A note on sourcemaps:
+
+- Want proper sourcemapping in your typescript project?  Just put ```import xlib = require("xlib")``` at/near the top of your project's entrypoint, and everything loaded after will be sourcemapped.
+- For performance reasons, sourcemaps are only loaded when the ```envLevel``` is set to ```"DEBUG"``` (the default) or ```"TRACE"```.  
+
 
 
 ### log filtering
@@ -129,7 +136,9 @@ global.__xlibInitArgs = { logLevelOverrides: [
     ]};
 ```
 
-## Environmental/Startup Options
+## Environment
+
+### EnvVars Startup Options
 ```xlib``` is automatically initialized as soon as you import it for the first time.    It will read system environmental variables from the commandline, querystring, or systemEnv (in that order of priority).    Alternately, you ***may*** configure it's environment variables explicitly via code BEFORE you import ```xlib```.  Here's an example showing how you can explicitly set the initialization:
 
 ``` typescript
@@ -160,16 +169,18 @@ global.__xlibInitArgs = {
 import xlib = require( "xlib" );
 ```
 
-### Reading custom envVars
+### Reading/Writing custom envVars
 
 Environmental variables can be detected from numerous sources, in the following order of priority (lower the number, the more important)
 
-```in your code```
+#### read envVars in your code
 ``` typescript
 const apiKey = xlib.environment.getEnvironmentVariable("apikey");
 ```
 
-### NodeJs
+#### write envVars
+
+> #### NodeJs
 1. CommandLine Args
     ``` bash
     node . apikey="your-secret-key";
@@ -179,7 +190,7 @@ const apiKey = xlib.environment.getEnvironmentVariable("apikey");
     set apikey="your-secret-key"
     ```
 
-### Browser
+> #### Browser
 1. Querystring variables 
     ```
     http://www.yourserver.com/yourpage?apikey=your-secret-key
@@ -206,7 +217,14 @@ log.assert( reflection.getType( reflection.getType ) === Type.function );
 log.assert( reflection.getType( xlib ) === Type.object );
 ```
 
+## lolo
 
+lolo is inspired by ```lodash``` (but doesn't dupe functionality of it).
+
+```typescript
+const __ = xlib.lolo;
+__.log.info( `the current time is ${ __.utc().toISO() }`, {isDevOrDebug:__.isDevOrDebug()})
+```
 
 
 ## network code

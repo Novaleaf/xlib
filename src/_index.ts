@@ -9,7 +9,9 @@ import jsShims = require( "./core/jsshims" );
  * ! however we do other init via an IoC pattern via the _internal/init.ts module.  the init submodule is invoked at the very end of this file.
  */
 jsShims.initialize();
-//serialInits.push( jsShims.initialize );
+
+
+import source_map_support = require( "source-map-support" );
 
 let _initArgs: init.IInitArgs;
 if ( typeof global !== "undefined" && global.__xlibInitArgs ) {
@@ -40,17 +42,17 @@ import mockMocha = require( "./_internal/mockmocha" );
 mockMocha.initialize();
 
 
-if ( environment.isDebug() === true ) {
+if ( environment.isDevOrDebug() === true ) {
     //try {
     ///** https://www.npmjs.com/package/source-map-support
     // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
     //  */
     if ( _initArgs.silentInit !== true ) {
         // tslint:disable-next-line:no-console
-        console.log( "loading sourcemap support (in logLevel.DEBUG or TRACE" );
+        console.log( "loading sourcemap support (in isDevOrDebug()" );
     }
-    var source_map_support = require( "source-map-support" );
-    source_map_support.install( { handleUncaughtExceptions: false } );
+    let envName: "browser" | "node" = environment.platformType === environment.PlatformType.Browser ? "browser" : "node";
+    source_map_support.install( { handleUncaughtExceptions: false, environment: envName } );
     //} catch (ex) {
     //	console.log("eating sourcemap support call");
     //}
@@ -90,7 +92,7 @@ export import reflection = require( "./core/reflection" );
 
 
 
-export import dateTime = require( "./core/datetime" );
+export import time = require( "./core/time" );
 // if ( environment.getGlobal()[ "moment" ] == null ) {
 //     //define momentStatic
 //     environment.getGlobal()[ "moment" ] = dateTime.moment;
