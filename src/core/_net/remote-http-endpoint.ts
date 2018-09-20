@@ -117,6 +117,10 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 						switch ( err.response.status ) {
 							case 503:
 							case 429:
+								//notify listeners
+								if ( this._onTooBusy.length > 0 ) {
+									this._onTooBusy.forEach( ( fcn ) => { fcn( this ); } );
+								}
 								return "TOO_BUSY";
 						}
 					}
@@ -125,19 +129,20 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 		}
 
 	}//end .ctor()
+
+
+	public _onTooBusy: ( ( endpoint: RemoteHttpEndpoint<TSubmitPayload, TRecievePayload> ) => any )[] = [];
+
 	/** autoscaler created if the constructor is passed autoscaler options */
 	private autoscaler: Autoscaler<
 		//TWorkerFunc
 		( finalOptions: IRemoteHttpEndpointOverrideOptions, endpoint: string, protocol: "get" | "post", submitPayload: TSubmitPayload ) => Promise<axios.AxiosResponse<TRecievePayload>>,
-		//TResult
-		axios.AxiosResponse<TRecievePayload>,
-		// //TArgs
-		// [ IEndpointOptions, string, "get" | "post", TSubmitPayload ],
 		//TError
 		axios.AxiosError>;
 
 	public toJson() {
-		return this.defaultOptions;
+		return { options: this.defaultOptions, autoscaler: this.autoscaler ? this.autoscaler.toJson() : undefined };
+
 	}
 
 	public post(

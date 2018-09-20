@@ -144,36 +144,81 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} );
 
-	it( "test exceptions", () => {
+	it( "test exceptions: DISABLED (causes debugBreak on thrown exceptions when running test)", () => {
 		const log = xlib.diagnostics.log;
 		class MyException extends xlib.exception.Exception { };
 
-		try {
-			try {
-				throw new MyException( "first" );
-			} catch ( _err ) {
-				throw new MyException( "second", { innerException: _err } );
-			}
-		} catch ( _err ) {
-			log.assert( _err instanceof Error );
-			log.assert( _err instanceof MyException );
-			const err = _err as MyException;
-			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
-			log.assert( err.innerException.message === "first" );
-		}
+		// try {
+		// 	try {
+		// 		throw new MyException( "first" );
+		// 	} catch ( _err ) {
+		// 		throw new MyException( "second", { innerException: _err } );
+		// 	}
+		// } catch ( _err ) {
+		// 	log.assert( _err instanceof Error );
+		// 	log.assert( _err instanceof MyException );
+		// 	const err = _err as MyException;
+		// 	log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
+		// 	log.assert( err.innerException.message === "first" );
+		// }
 
 
 
 	} );
-	// it( "basic e2e of cache", async () => { 
 
-	// 	const __ = xlib.lolo;
+	it( "test lolo", () => {
 
-	// 	__.cache.read( "hotdog" );
+		const __ = xlib.lolo;
+		__.log.info( `the current time is ${ __.utc().toISO() }`, { isDevOrDebug: __.isDevOrDebug() } )
 
-	// 	__.cache.write( "hotdog", {})
+	} );
+
+	it( "test bluebird rejection", () => {
 
 
-	// } );
+		const __ = xlib.lolo;
+
+		const rejection = xlib.promise.bluebird.reject( "error string" );
+		__.log.assert( rejection.reason instanceof Error );
+		__.log.assert( ( rejection.reason() as Error ).message === "error string" );
+	} );
+
+
+	it( "autoscaler test", async () => {
+
+		const __ = xlib.lolo;
+
+		/** how often our backendWorker reports too busy */
+		let tooBusyFrequency: 0.3;
+
+
+		interface ITestAutoscaleOptions { chanceOfBusy: number };
+		class TestAutoScaleError extends xlib.exception.Exception<{ shouldRejectBusy: boolean }>{ }
+
+		let testScaler = new xlib.threading.Autoscaler( { busyGrowDelayMs: 1000, busyPenalty: 1, decayDelayMs: 100, growDelayMs: 10, minParallel: 1 },
+			async ( chanceOfBusy: number, chanceOfFail: number ) => {
+				const isBusy = __.num.randomBool( chanceOfBusy );
+				if ( isBusy ) {
+					return xlib.promise.bluebird.reject( new TestAutoScaleError( "busy", { data: { shouldRejectBusy: true } } ) );
+				}
+				return xlib.promise.bluebird.resolve( "OK" );
+			},
+			( ( err: TestAutoScaleError ) => {
+				if ( err.data.shouldRejectBusy === true ) {
+					return "TOO_BUSY";
+				}
+				return "FAIL"
+			} ) );
+
+
+
+
+
+
+
+
+	} );
 
 } );
+
+

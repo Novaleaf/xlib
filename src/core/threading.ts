@@ -300,7 +300,7 @@ export interface IAutoscalerOptions {
 	the only requirement is that the target ```backendWorker``` function  return a promise, 
     * and you specify a ```failureListener``` function that can tell the difference between a failure and a need for backing off.
     */
-export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<TResult>, TResult, TError extends Error>{
+export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<any>, TError extends Error>{
 
     constructor(
         private options: IAutoscalerOptions,
@@ -339,22 +339,25 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<TResul
         lastDecay: Date,
     };
 
-    private pendingCalls: { args: any[], requesterPromise: promise.IExposedPromise<TResult> }[] = [];
+    private pendingCalls: { args: any[], requesterPromise: promise.IExposedPromise<any> }[] = [];
 
-    private activeCalls: { args: any[], requesterPromise: promise.IExposedPromise<TResult>, activeMonitorPromise: bb<any> }[] = [];
+    private activeCalls: { args: any[], requesterPromise: promise.IExposedPromise<any>, activeMonitorPromise: bb<any> }[] = [];
 
     public toJson() {
         return { pendingCalls: this.pendingCalls.length, activeCalls: this.activeCalls.length, metrics: this.metrics, options: this.options };
     }
 
-    public submitRequest: TWorkerFunc = ( async ( ...args: any[] ): Promise<TResult> => {
-        const requesterPromise = promise.CreateExposedPromise<TResult>();
-        this.pendingCalls.push( { args, requesterPromise } );
-        this._tryCallBackend();
-        return requesterPromise;
-    } ) as any;
+    public submitRequest: TWorkerFunc =
+        //a worker with generic input/return args, cast to our specific worker function's sig
+        ( async ( ...args: any[] ): Promise<any> => {
+            const requesterPromise = promise.CreateExposedPromise<any>();
+            this.pendingCalls.push( { args, requesterPromise } );
+            this._tryCallBackend();
+            return requesterPromise;
+        } ) as any;
 
     private _tryCallBackend() {
+        const now = new Date();
         while ( true ) {
 
             // ! /////////////  do housekeeping ///////////////////
@@ -366,34 +369,34 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<TResul
             }
             if ( this.metrics.activeCount >= this.metrics.maxActive ) {
                 //make note that we are at our limit of requests
-                this.metrics.lastMax = new Date();
+                this.metrics.lastMax = now;
             }
             if ( this.options.maxParallel != null && this.metrics.activeCount >= this.options.maxParallel ) {
                 //at our hard limit of parallel requests
                 return;
             }
             if ( this.metrics.activeCount >= this.metrics.maxActive //we are at our max...
-                && ( this.metrics.lastGrow.getTime() + this.options.growDelayMs < Date.now() ) //we haven't grew recently...
-                && ( this.metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < Date.now() ) //we are not in a options.busyWaitMs interval (haven't recieved a "TOO_BUSY" rejection recently...)
+                && ( this.metrics.lastGrow.getTime() + this.options.growDelayMs < now.getTime() ) //we haven't grew recently...
+                && ( this.metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < now.getTime() ) //we are not in a options.busyWaitMs interval (haven't recieved a "TOO_BUSY" rejection recently...)
             ) {
                 //time to grow
                 this.metrics.maxActive++;
-                this.metrics.lastGrow = new Date();
+                this.metrics.lastGrow = now;
             }
             if ( this.options.decayDelayMs != null
-                && this.metrics.lastDecay.getTime() + this.options.decayDelayMs < Date.now() //havent decayed recently
+                && this.metrics.lastDecay.getTime() + this.options.decayDelayMs < now.getTime() //havent decayed recently
                 && (
-                    this.metrics.lastMax.getTime() + this.options.decayDelayMs < Date.now() //havent been at max recently
-                    || this.metrics.lastTooBusy.getTime() + this.options.decayDelayMs > Date.now() //OR we have gotten "TOO_BUSY" rejections since our last decay, so backoff
+                    this.metrics.lastMax.getTime() + this.options.decayDelayMs < now.getTime() //havent been at max recently
+                    || this.metrics.lastTooBusy.getTime() + this.options.decayDelayMs > now.getTime() //OR we have gotten "TOO_BUSY" rejections since our last decay, so backoff
                 )
             ) {
                 //time to reduce our maxActive
-                const reduceCount = Math.round( ( Date.now() - this.metrics.lastMax.getTime() ) / this.options.decayDelayMs );//accumulating decays in case the autoScaler has been idle
+                const reduceCount = Math.round( ( now.getTime() - this.metrics.lastMax.getTime() ) / this.options.decayDelayMs );//accumulating decays in case the autoScaler has been idle
                 log.assert( reduceCount >= 0 );
                 this.metrics.maxActive = Math.max( this.options.minParallel, this.metrics.maxActive - reduceCount );
                 //pretend we are at max, to properly delay growing.
-                this.metrics.lastMax = new Date();
-                this.metrics.lastDecay = new Date();
+                this.metrics.lastMax = now;
+                this.metrics.lastDecay = now;
             }
 
             if ( this.metrics.activeCount >= this.metrics.maxActive ) {
@@ -415,15 +418,16 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<TResul
                             requesterPromise.reject( _err );
                             break;
                         case "TOO_BUSY":
-                            this.metrics.lastTooBusy = new Date();
+                            const tooBusyNow = new Date();
+                            this.metrics.lastTooBusy = tooBusyNow;
                             //apply special backoffPenaltyCount options, if they exist
-                            if ( this.options.busyPenalty != null && this.metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < Date.now() ) {
+                            if ( this.options.busyPenalty != null && this.metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < tooBusyNow.getTime() ) {
                                 //this is a "fresh" backoff.
                                 //we have exceeded backend capacity and been notified with a "TOO_BUSY" failure.  reduce our maxParallel according to the options.backoffPenaltyCount
                                 this.metrics.maxActive = Math.max( this.options.minParallel, this.metrics.maxActive - this.options.busyPenalty );
 
                                 //set our "fresh" tooBusy time
-                                this.metrics.tooBusyWaitStart = new Date();
+                                this.metrics.tooBusyWaitStart = tooBusyNow;
                             }
                             //put request in front to try again
                             this.pendingCalls.unshift( { args, requesterPromise } );
