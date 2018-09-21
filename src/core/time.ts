@@ -2,7 +2,7 @@
 // "use strict";
 
 
-import * as _luxon from "luxon";
+//import * as _luxon from "luxon";
 /** Luxon is a library for working with dates and times in Javascript.
 ```
 DateTime.local().setZone('America/New_York').minus({ weeks: 1 }).endOf('day').toISO();
@@ -14,10 +14,7 @@ Parsing and formatting for common and custom formats.
 Native time zone and Intl support (no locale or tz files).
 
 see https://www.npmjs.com/package/luxon  */
-const luxon = _luxon;
-export { luxon };
-
-
+export import luxon = require( "luxon" );
 
 
 
@@ -32,7 +29,7 @@ export { luxon };
 // }
 //export class DateTime {
 
-//	protected _instance: moment.Moment;
+//	protected _instance: xlib.time.luxon.DateTime;
 
 //	/** To get the current date and time, just call moment() with no parameters.  This is essentially the same as calling moment(new Date()). */
 //	constructor();
@@ -101,7 +98,7 @@ export { luxon };
 //	constructor(date: string, formatsIncludingSpecial: any[], strict?: boolean);
 //	constructor(date: string, formatsIncludingSpecial: any[], language?: string, strict?: boolean);
 //	constructor(date: Date);
-//	constructor(date: moment.Moment);
+//	constructor(date: xlib.time.luxon.DateTime);
 //	constructor(date: Object);
 //	constructor(...args: any[]) {
 

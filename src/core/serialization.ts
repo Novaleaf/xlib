@@ -54,6 +54,35 @@ export namespace jsonX {
 							* If a member contains nested objects, the nested objects are transformed before the parent object is.
 							*/
 	export const parse: ( text: string, reviver?: ( key: any, value: any ) => any ) => any = json5.parse.bind( json5 );
+
+
+
+
+	/** parses your object using ```json5```, then attempts to parse string values in your object.  failed parse() calls will return the original string for that variable */
+	export function parseRecursive(
+		textOrObj: any,
+		reviver?: ( key: any, value: any ) => any
+	): any {
+
+
+		if ( typeof ( textOrObj ) === "string" ) {
+			try {
+				textOrObj = parse( textOrObj, reviver );
+			} catch ( ex ) {
+				return textOrObj;
+			}
+		}
+		_.forOwn( textOrObj, ( value, key, obj ) => {
+			if ( typeof ( value ) === "string" ) {
+				obj[ key ] = parseRecursive( value, reviver );
+			}
+		} );
+
+		return textOrObj;
+	}
+
+
+
 	/**
 			* Converts a JavaScript value to a JSON5 string, optionally replacing values if a replacer function is specified, or optionally including only the specified properties if a replacer array is specified.
 			* @param value The value to convert to a JSON5 string.
@@ -265,5 +294,69 @@ export namespace jsonX {
 
 
 
+	}  //end fcn
+
+
+	/** replace a branch of your JSON object.  good for pruning nested hiearchies, for example when wanting to decrease verbosity sent to user (before doing a JSON.stringify() )
+		* 
+		* works on array children too
+	*
+	* @example
+	let tree = { a:[{aa:0, ab:1}], b:{ ba:"hi", bb:"there"}};
+	replaceNodes(tree, ["a.aa", "b.ba"],"*REMOVED*");
+	// tree = {a[aa:"*REMOVED*",ab:1], b:{ ba:"*REMOVED", bb:"there"}};
+		*/
+	export function replaceNodes( targetObject: any,
+		/** example:  'a.b.c.d' will remove the d node, replacing it (with null by default, effectively deleting)*/
+		nodeHiearchyStrings: string[], replaceWith: any = null, replaceEmptyLeafNodes: boolean = false ) {
+
+		/** recursive helper for walking through the current hiearchy, replacing as it goes*/
+		function currentNodeProcessor( previousNode: any, nodeName: string, hiearchyIndex: number, hiearchy: string[] ) {
+
+			if ( previousNode == null || _.isString( previousNode ) ) {
+				//if our previous node is null (or a string), nothing to do.
+				return;
+			}
+
+
+			if ( hiearchyIndex === ( hiearchy.length - 1 ) ) {
+				//the node is the last node in our hiearchy, 
+				//so we are on the node to remove.remove it and we are done
+				if ( previousNode[ nodeName ] != null || replaceEmptyLeafNodes === true ) {
+					previousNode[ nodeName ] = replaceWith;
+				}
+				return;
+			}
+
+			//walk down the hiearchy
+			var thisNode = previousNode[ nodeName ];
+			var nextHiearchyIndex = hiearchyIndex + 1;
+			var nextNodeName = hiearchy[ nextHiearchyIndex ];
+			if ( _.isArray( thisNode ) === true && _.isString( thisNode ) === false ) {
+				//walk each element in the array automatically
+				_.forEach( thisNode, ( element ) => {
+					currentNodeProcessor( element, nextNodeName, nextHiearchyIndex, hiearchy );
+				} );
+				return;
+			} else {
+				currentNodeProcessor( thisNode, nextNodeName, nextHiearchyIndex, hiearchy );
+			}
+
+		}
+
+
+		//loop through all nodeHiearchyStrings to remove, removing the leaf.
+		_.forEach( nodeHiearchyStrings, ( hiearchyString ) => {
+
+
+			var hiearchy = hiearchyString.split( "." );
+
+			if ( hiearchy.length < 1 ) {
+				return;
+			}
+
+			currentNodeProcessor( targetObject, hiearchy[ 0 ], 0, hiearchy );
+
+		} );
 	}
 }

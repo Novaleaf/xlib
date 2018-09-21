@@ -42,14 +42,14 @@ import mockMocha = require( "./_internal/mockmocha" );
 mockMocha.initialize();
 
 
-if ( environment.isDevOrDebug() === true ) {
+if ( environment.envLevel < environment.EnvLevel.UAT || environment.logLevel < environment.LogLevel.INFO ) {
     //try {
     ///** https://www.npmjs.com/package/source-map-support
     // * This module provides source map support for stack traces in node via the V8 stack trace API. It uses the source-map module to replace the paths and line numbers of source-mapped files with their original paths and line numbers. The output mimics node's stack trace format with the goal of making every compile-to-JS language more of a first-class citizen. Source maps are completely general (not specific to any one language) so you can use source maps with multiple compile-to-JS languages in the same node process.
     //  */
     if ( _initArgs.silentInit !== true ) {
         // tslint:disable-next-line:no-console
-        console.log( "loading sourcemap support (in isDevOrDebug()" );
+        console.log( "loading sourcemap support (envLevel is DEV or TEST,  or if logLevel is TRACE or DEBUG" );
     }
     let envName: "browser" | "node" = environment.platformType === environment.PlatformType.Browser ? "browser" : "node";
     source_map_support.install( { handleUncaughtExceptions: false, environment: envName } );
@@ -245,6 +245,8 @@ export import url = require( "url" );
 
 // }
 
+import * as _obsolete from "./_obsolete/_index";
+export { _obsolete };
 
 //////////////////////  initialization section
 import init = require( "./_internal/init" );

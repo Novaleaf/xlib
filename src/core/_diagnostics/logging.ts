@@ -469,7 +469,7 @@ export class Logger {
 			default:
 				//node console needs help displaying nicely
 				if ( fullOutput ) {
-					finalArgs.push( ...args.map( ( arg ) => util.inspect( arg, { colors: true, showHidden: true, depth: Infinity, maxArrayLength: Infinity, breakLength: 300 } ) ) )
+					finalArgs.push( ...args.map( ( arg ) => util.inspect( serialization.jsonX.inspectParse( arg, { maxDepth: Infinity, aggrigateFunctions: true, summarizeLength: Infinity } ), { colors: true, showHidden: true, depth: Infinity, maxArrayLength: Infinity, breakLength: 300 } ) ) )
 				} else {
 					finalArgs.push( ...args.map( ( arg ) => util.inspect( serialization.jsonX.inspectParse( arg, { maxDepth: 2, aggrigateFunctions: true, summarizeLength: 300 } ), { colors: true, showHidden: true, depth: Infinity, maxArrayLength: Infinity, breakLength: 200 } ) ) );
 				}

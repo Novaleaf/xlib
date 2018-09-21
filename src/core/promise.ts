@@ -13,7 +13,7 @@ import environment = require( "./environment" );
 
 /** binds bluebird as global promise and other various init */
 //export function initialize() {
-if ( environment.isDevOrDebug() ) {
+if ( environment.isDebug() ) {
 	//http://bluebirdjs.com/docs/api/promise.config.html
 	bluebird[ "config" ]( {
 		// Enable warnings
@@ -97,10 +97,13 @@ export type IocCallback<TArgs=void, TResults=any> = Promise<TResults> | ( ( args
 // rx.config.Promise = bluebird;
 
 /** gets a promise which includes the "fulfill()" and "reject()" methods to allow external code to fullfill it.*/
-export function CreateExposedPromise<TReturn=void, TTags = undefined>(
+export function CreateExposedPromise<TReturn=void>(): IExposedPromise<TReturn, never>;
+export function CreateExposedPromise<TReturn=void, TTags = void>( tags: TTags,
 	callback?: ( fulfill: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void, reject: ( error: any ) => void ) => void,
-	tags?: TTags ): IExposedPromise<TReturn, TTags> {
-
+): IExposedPromise<TReturn, TTags>
+export function CreateExposedPromise<TReturn=void, TTags = void>( ...args: any[] ): IExposedPromise<TReturn, TTags> {
+	const tags = args[ 0 ] as TTags;
+	const callback = args[ 1 ];
 	let fulfiller: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void;
 	let rejector: ( error: any ) => void;
 
@@ -119,7 +122,7 @@ export function CreateExposedPromise<TReturn=void, TTags = undefined>(
 	return toReturn;
 }
 
-export interface IExposedPromise<TReturn=void, TTags=undefined> extends bb<TReturn> {
+export interface IExposedPromise<TReturn=void, TTags=never> extends bb<TReturn> {
 	fulfill: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void;
 	reject: ( error: Error ) => void;
 	/** custom data for tracking state you might need, such as informing if the promise is being executed */

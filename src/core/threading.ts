@@ -196,7 +196,7 @@ export class AsyncReaderWriterLock<TValue=void> {
         //do sync writeBegin        
         log.assert( this.currentWrite == null, "race, current write should not be possible while start writing (tryWriteBegin)" );
         const writeId = this.writeCounter++;
-        let thisWrite = promise.CreateExposedPromise( undefined, { writeId } );
+        let thisWrite = promise.CreateExposedPromise( { writeId } );
         this.pendingWrites.push( thisWrite );
         this.currentWrite = thisWrite;
         log.assert( this.currentWrite === this.pendingWrites[ 0 ], "current write should be at head of queue.  (tryWriteBegin)" );
@@ -206,7 +206,7 @@ export class AsyncReaderWriterLock<TValue=void> {
 
     public async writeBegin() {
         const writeId = this.writeCounter++;
-        let thisWrite = promise.CreateExposedPromise( undefined, { writeId } );
+        let thisWrite = promise.CreateExposedPromise( { writeId } );
         this.pendingWrites.push( thisWrite );
         //wait until it's this write's turn
         while ( this.pendingWrites[ 0 ].tags.writeId !== writeId ) {

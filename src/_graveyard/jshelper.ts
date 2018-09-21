@@ -397,60 +397,6 @@ export function mixin(
 
 
 
-/** replace a branch of your JSON object.  good for pruning nested hiearchies, for example when wanting to decrease verbosity sent to user (before doing a JSON.stringify() ) */
-export function replaceNodes( targetObject: any,
-	/** example:  'a.b.c.d' will remove the d node, replacing it (with null by default, effectively deleting)*/
-	nodeHiearchyStrings: string[], replaceWith: any = null, replaceEmptyLeafNodes: boolean = false ) {
-
-	/** recursive helper for walking through the current hiearchy, replacing as it goes*/
-	function currentNodeProcessor( previousNode: any, nodeName: string, hiearchyIndex: number, hiearchy: string[] ) {
-
-		if ( previousNode == null || _.isString( previousNode ) ) {
-			//if our previous node is null (or a string), nothing to do.
-			return;
-		}
-
-
-		if ( hiearchyIndex === ( hiearchy.length - 1 ) ) {
-			//the node is the last node in our hiearchy, 
-			//so we are on the node to remove.remove it and we are done
-			if ( previousNode[ nodeName ] != null || replaceEmptyLeafNodes === true ) {
-				previousNode[ nodeName ] = replaceWith;
-			}
-			return;
-		}
-
-		//walk down the hiearchy
-		var thisNode = previousNode[ nodeName ];
-		var nextHiearchyIndex = hiearchyIndex + 1;
-		var nextNodeName = hiearchy[ nextHiearchyIndex ];
-		if ( _.isArray( thisNode ) === true && _.isString( thisNode ) === false ) {
-			//walk each element in the array automatically
-			_.forEach( thisNode, ( element ) => {
-				currentNodeProcessor( element, nextNodeName, nextHiearchyIndex, hiearchy );
-			} );
-			return;
-		} else {
-			currentNodeProcessor( thisNode, nextNodeName, nextHiearchyIndex, hiearchy );
-		}
-
-	}
-
-
-	//loop through all nodeHiearchyStrings to remove, removing the leaf.
-	_.forEach( nodeHiearchyStrings, ( hiearchyString ) => {
-
-
-		var hiearchy = hiearchyString.split( "." );
-
-		if ( hiearchy.length < 1 ) {
-			return;
-		}
-
-		currentNodeProcessor( targetObject, hiearchy[ 0 ], 0, hiearchy );
-
-	} );
-}
 
 
 /** allows chaining callbacks (sequentially)

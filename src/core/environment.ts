@@ -274,16 +274,26 @@ _internalInitWork.push( ( args ) => {
 // }
 
 
-/** returns true if the current envLevel==="PROD", otherwise false.  shortcut for ```environment.envLevel === environment.EnvLevel.PROD */
-export function isProd() {
-	return envLevel === EnvLevel.PROD;
-};
+// /** returns true if the current envLevel==="PROD", otherwise false.  shortcut for ```environment.envLevel === environment.EnvLevel.PROD */
+// export function isProd() {
+// 	return envLevel === EnvLevel.PROD;
+// };
 
-/**
-	*  returns true if the current envLevl is DEV, or  logLevel is DEBUG or lower (DEBUG or TRACE), . shortcut for ```logLevel <= LogLevel.DEBUG || envLevel === EnvLevel.DEV```
-	*/
-export function isDevOrDebug() {
-	return logLevel <= LogLevel.DEBUG || envLevel === EnvLevel.DEV;
+// /**
+// 	*  returns true if the current envLevl is DEV, or  logLevel is DEBUG or lower (DEBUG or TRACE), . shortcut for ```logLevel <= LogLevel.DEBUG || envLevel === EnvLevel.DEV```
+// 	*/
+// export function isDevOrDebug() {
+// 	return logLevel <= LogLevel.DEBUG || envLevel === EnvLevel.DEV;
+// }
+
+/**  use to control systems complexity / footprint (dev time workflow vs test+prod time workflows).   true if env is DEV  shortcut for  ```envLevel === EnvLevel.DEV```*/
+export function isDev() {
+	return envLevel === EnvLevel.DEV;
+}
+/** use to control output verbosity */
+export function isDebug() {
+	return logLevel <= LogLevel.DEBUG;
+
 }
 
 // /** no op the input function if not running in test mode.

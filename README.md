@@ -104,7 +104,7 @@ log.info( "hi", { some: "data" } );
 #### A note on sourcemaps:
 
 - Want proper sourcemapping in your typescript project?  Just put ```import xlib = require("xlib")``` at/near the top of your project's entrypoint, and everything loaded after will be sourcemapped.
-- For performance reasons, sourcemaps are only loaded when the ```envLevel``` is set to ```"DEBUG"``` (the default) or ```"TRACE"```.  
+- For performance reasons, sourcemaps are only loaded when the ```envLevel``` is ```DEV```, or ```logLevel``` is set to ```"DEBUG"``` (the default) or ```"TRACE"```.  
 
 
 
@@ -351,7 +351,7 @@ they include:
 
 
 ### _graveyard
-Features that used to be in ```xlib``` but are thrown away can be found in the ```/dist/_graveyard/``` folder, but those may not build or work anymore.
+Features that used to be in ```xlib``` but are thrown away can be found in the ```/dist/_graveyard/``` folder, but due to dependencies on old ```xlib``` code, those may not build or work anymore.
 
 
 
@@ -365,7 +365,23 @@ Features that used to be in ```xlib``` but are thrown away can be found in the `
 
 ```xlib```'s core functionality has been used in production code since 2015.   While mostly stable since, here are the future plans:
 
-- **v.major, async**:  refactor to support async workflows by default
+- **improved diagnostics**: 
+    - chaos testing
+        - ability to randomly inject segfaults into child processes, and reject pending promise/async calls
+    - custom promise library wrapping ```bluebird```:
+        - stictly typed promise errors
+        - full es6 promise compliance
+        - querying of all pending promises (part of further integration with chaos testing)
+    - debug friendly dateTime wrapping ```luxon```
+        - simulate normal execution time while manually stepping code in a debugger, including instrumentation of ```setTimeout()```
+- **browser support**
+    - ensure all unit tests pass on chrome, firefox, edge, and IE11
+- **logging**
+    - log to a remote http endpoint or smtp email
+- **filesystem**
+    - add file system emulation to browsers (such as use ```browser-fs```)
+
+
 
 --------
 # Why

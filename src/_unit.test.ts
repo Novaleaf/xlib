@@ -169,7 +169,7 @@ describe( __filename + " basic xlib unit tests", () => {
 	it( "test lolo", () => {
 
 		const __ = xlib.lolo;
-		__.log.info( `the current time is ${ __.utc().toISO() }`, { isDevOrDebug: __.isDevOrDebug() } )
+		__.log.info( `the current time is ${ __.utc().toISO() }`, { isDebug: __.isDebug() } )
 
 	} );
 
@@ -188,62 +188,60 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	it( "autoscaler test NOOP as it's more a debugger than a test.", async () => {
 
-		//noop the test
-		return;
-		const __ = xlib.lolo;
+		// const __ = xlib.lolo;
 
-		/** how often our backendWorker reports too busy */
+		// /** how often our backendWorker reports too busy */
 
 
 
-		interface ITestAutoscaleOptions { chanceOfBusy: number };
-		class TestAutoScaleError extends xlib.exception.Exception<{ shouldRejectBusy: boolean }>{ }
+		// interface ITestAutoscaleOptions { chanceOfBusy: number };
+		// class TestAutoScaleError extends xlib.exception.Exception<{ shouldRejectBusy: boolean }>{ }
 
-		let testScaler = new xlib.threading.Autoscaler( { busyGrowDelayMs: 10000, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 3000, growDelayMs: 500, minParallel: 4 },
-			async ( chanceOfBusy: number, chanceOfFail: number, replyDelay: number, replyDelaySpread: number ) => {
+		// let testScaler = new xlib.threading.Autoscaler( { busyGrowDelayMs: 10000, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 3000, growDelayMs: 500, minParallel: 4 },
+		// 	async ( chanceOfBusy: number, chanceOfFail: number, replyDelay: number, replyDelaySpread: number ) => {
 
-				let delay = replyDelay + __.num.randomInt( 0, replyDelaySpread );
-				await __.bb.delay( replyDelay );
-				const isBusy = __.num.randomBool( chanceOfBusy );
-				if ( isBusy ) {
-					return xlib.promise.bluebird.reject( new TestAutoScaleError( "busy", { data: { shouldRejectBusy: true } } ) );
-				}
-				const isFail = __.num.randomBool( chanceOfFail );
-				if ( isFail ) {
-					return __.bb.reject( new TestAutoScaleError( "fail", { data: { shouldRejectBusy: false } } ) );
-				}
-				return xlib.promise.bluebird.resolve( "OK" );
-			},
-			( ( err: TestAutoScaleError ) => {
-				if ( err.data.shouldRejectBusy === true ) {
-					return "TOO_BUSY";
-				}
-				return "FAIL"
-			} ) );
-
-
-		let awaitsArray: Promise<string>[] = [];
-		for ( let i = 0; i < 10000; i++ ) {
-			const chanceOfBusy = 0.01;
-			const chanceOfFail = 0.0;
-			const replyDelay = 3000;
-			const replyDelaySpread = 3000;
+		// 		let delay = replyDelay + __.num.randomInt( 0, replyDelaySpread );
+		// 		await __.bb.delay( replyDelay );
+		// 		const isBusy = __.num.randomBool( chanceOfBusy );
+		// 		if ( isBusy ) {
+		// 			return xlib.promise.bluebird.reject( new TestAutoScaleError( "busy", { data: { shouldRejectBusy: true } } ) );
+		// 		}
+		// 		const isFail = __.num.randomBool( chanceOfFail );
+		// 		if ( isFail ) {
+		// 			return __.bb.reject( new TestAutoScaleError( "fail", { data: { shouldRejectBusy: false } } ) );
+		// 		}
+		// 		return xlib.promise.bluebird.resolve( "OK" );
+		// 	},
+		// 	( ( err: TestAutoScaleError ) => {
+		// 		if ( err.data.shouldRejectBusy === true ) {
+		// 			return "TOO_BUSY";
+		// 		}
+		// 		return "FAIL"
+		// 	} ) );
 
 
-			const toAwait = testScaler.submitRequest( chanceOfBusy, chanceOfFail, replyDelay, replyDelaySpread );
-			awaitsArray.push( toAwait );
+		// let awaitsArray: Promise<string>[] = [];
+		// for ( let i = 0; i < 10000; i++ ) {
+		// 	const chanceOfBusy = 0.01;
+		// 	const chanceOfFail = 0.0;
+		// 	const replyDelay = 3000;
+		// 	const replyDelaySpread = 3000;
 
-		}
 
-		let handle = setInterval( () => {
-			__.log.info( testScaler.toJson() );
-		}, 1000 );
+		// 	const toAwait = testScaler.submitRequest( chanceOfBusy, chanceOfFail, replyDelay, replyDelaySpread );
+		// 	awaitsArray.push( toAwait );
 
-		//wait for all
-		for ( const i in awaitsArray ) {
-			await xlib.promise.awaitInspect( awaitsArray[ i ] );
-		}
-		clearTimeout( handle );
+		// }
+
+		// let handle = setInterval( () => {
+		// 	__.log.info( testScaler.toJson() );
+		// }, 1000 );
+
+		// //wait for all
+		// for ( const i in awaitsArray ) {
+		// 	await xlib.promise.awaitInspect( awaitsArray[ i ] );
+		// }
+		// clearTimeout( handle );
 
 
 
@@ -252,8 +250,8 @@ describe( __filename + " basic xlib unit tests", () => {
 
 
 
-	} );
+	} );  //end it()
 
-} );
+} ); //end describe()
 
 

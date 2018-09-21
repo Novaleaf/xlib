@@ -6,10 +6,10 @@
 
 //export import logging = require( "./diagnostics/logging" );
 
-import { Logger } from "./_diagnostics/logging";
-
-/** A high quality console logger. . */
-export const log = new Logger();
+import * as _logging from "./_diagnostics/logging";
+export { _logging }
+/** A high quality console logger.  shortcut to diagnostics._logging.log. */
+export const log = new _logging.Logger();
 //export { Logger };
 
 
@@ -195,7 +195,7 @@ export class DebugRaceCheck {
 	}
 }
 
-if ( !environment.isDevOrDebug() ) {
+if ( !environment.isDebug() ) {
 	//noop racecheck functions
 	DebugRaceCheck.prototype.edit = () => { };
 	DebugRaceCheck.prototype.enter = () => { };

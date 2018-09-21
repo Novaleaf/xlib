@@ -60,8 +60,8 @@ export const castErr: typeof _exception.Exception.castErr = _exception.Exception
 //export var htmlSanitize = _stringHelper.htmlSanitizeEscapedUserInput;
 
 /** shortcut to xlib.environment */
-import { isDevOrDebug } from "./environment";
-export { isDevOrDebug };
+import { isDev, isDebug } from "./environment";
+export { isDev, isDebug };
 
 
 
