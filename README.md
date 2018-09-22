@@ -67,6 +67,7 @@ There's a lot of commonly used features in ```xlib```:
 - **Reflection**: High quality runtime type detection. *(Custom)*
 - **Security**:  Various crypto workflows *(```crypto```, ```jsonwebtoken``` and custom)*
 - **Serialization**: High quality json manipulation and other import/export features. *(```d3-dsv```, ```json5```, and custom)*
+- **Statistics**: A pretty comprehensive stats package, works on numbers and number[].  *(```simple-statistics```)*
 - **Threading**: An async/await focused ReaderWriterLock implementation and autoscaler. *(Custom)*
 - **time**:  a chainable datetime lib and helpers *(```luxon```)*
 - **Validation**: User input sanitization.  *(```sanitize-html```, ```validator```, and custom)*
@@ -334,7 +335,71 @@ try {
 export class AsyncReaderWriterLock<TValue=void>
 ```
 
+## time
 
+### PerfTimer
+
+a performance timer that allows taking multiple samples of multiple areas, and shows quartiles for 5%, 25%, 50%, 75%, 95% at configurable intervals.  Here's an example:
+
+```typescript
+const __ = xlib.lolo;
+    const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: 5000, autoLogLevel: xlib.environment.LogLevel.WARN } );
+    const outsideWatch = perfTimer.start( "outside" );
+    for ( let i = 0; i < 10; i++ ) {
+        const mainLoopWatch = perfTimer.start( "mainLoop" );
+        for ( let i = 0; i < 10; i++ ) {
+            const innerA = perfTimer.start( "innerA" );
+            for ( let i = 0; i < 10; i++ ) {
+                const innerAA = perfTimer.start( "innerAA" );
+
+                await __.bb.delay( 100 );
+                innerAA.stop();
+            }
+            await __.bb.delay( 100 );
+            innerA.stop();
+        }
+        for ( let i = 0; i < 10; i++ ) {
+            const innerB = perfTimer.start( "innerB" );
+
+            await __.bb.delay( 100 );
+            innerB.stop();
+        }
+        await __.bb.delay( 100 );
+        mainLoopWatch.stop();
+    }
+    outsideWatch.stop();
+    perfTimer.logNowAndClear();
+```
+
+You can either get the output of ```PerfTimer``` manually via the ```.done``` property, or you can choose to auto log the (via the constructor) which,
+in the case of the above code, will look like the following:
+
+```bash
+2018-09-22T04:32:53.983Z     at Object.<anonymous> (C:\repos\stage5\xlib\src\_unit.test.ts:207:32) WARN 'PerfTimer Logging' { logData:
+   [ { key: 'innerAA', runs: 35, total: '00:00:03.590', avg: '00:00:00.102', quartiles: [ 100, 101, 102, 102, 103, [length]: 5 ] },
+     { key: 'innerA', runs: 3, total: '00:00:03.412', avg: '00:00:01.137', quartiles: [ 1118, 1118, 1132, 1162, 1162, [length]: 5 ] },
+     { key: 'innerB', runs: 10, total: '00:00:01.13', avg: '00:00:00.101', quartiles: [ '[UNDEFINED]', 102, 101.5, 102, '[UNDEFINED]', [length]: 5 ] },
+     { key: 'mainLoop', runs: 1, total: '00:00:12.518', avg: '00:00:12.518', quartiles: [ 12518, 12518, 12518, 12518, 12518, [length]: 5 ] },
+     [length]: 4 ] }
+```
+
+
+### Stopwatch
+
+If you need something simpler than PerfTimer, there is ```StopWatch``
+
+```typescript
+const __ = xlib.lolo;
+const stopwatch = new xlib.time.Stopwatch( "unit test" );
+stopwatch.start();
+await xlib.promise.bluebird.delay( 2000 );
+stopwatch.stop();
+let elapsed = stopwatch.getElapsed();
+__.log.info( "stopwatch is", elapsed.valueOf() );
+__.log.assert( elapsed.valueOf() > 2000 );
+__.log.assert( elapsed.valueOf() < 2100 );
+
+```
 
 ## old features
 

@@ -357,13 +357,18 @@ export class Logger {
 
 
 	/**
-	 *  returns JSON representation of logged values.  null if not logged (such as if minLogLevel is greater than requested)
-	 * @param requestedLogLevel
-	 * @param args
+	 *  allows procedural calls to logging.
+		* 
+		* returns JSON representation of logged values.  null if not logged (such as if minLogLevel is greater than requested)
 	 */
-	private _tryLog( requestedLogLevel: LogLevel, args: any[], fullOutput: boolean ): any[] {
+	public _tryLog( requestedLogLevel: LogLevel, args: any[], fullOutput: boolean,
+		/** if not set, the function **two levels up*** is marked as the callsite.
+		if that's not what you want, you can create your callsite, example showing 3 levels up: ```callSite = diagnostics.computeStackTrace( 3, 1 )[ 0 ];``` */
+		callSite?: string, ): any[] {
 
-		const callSite = diagnostics.computeStackTrace( 2, 1 )[ 0 ];
+		if ( callSite == null ) {
+			callSite = diagnostics.computeStackTrace( 2, 1 )[ 0 ];
+		}
 
 		if ( typeof requestedLogLevel !== "string" ) {
 			let minLogLevel: LogLevel = environment.logLevel;
@@ -396,8 +401,11 @@ export class Logger {
 			}
 		}
 		return finalArgs;
-
 	}
+
+
+
+
 
 	private _doLog( callSite: string, targetLogLevel: LogLevel, args: any[], fullOutput: boolean ) {
 
@@ -469,7 +477,7 @@ export class Logger {
 			default:
 				//node console needs help displaying nicely
 				if ( fullOutput ) {
-					finalArgs.push( ...args.map( ( arg ) => util.inspect( serialization.jsonX.inspectParse( arg, { maxDepth: Infinity, aggrigateFunctions: true, summarizeLength: Infinity } ), { colors: true, showHidden: true, depth: Infinity, maxArrayLength: Infinity, breakLength: 300 } ) ) )
+					finalArgs.push( ...args.map( ( arg ) => util.inspect( serialization.jsonX.inspectParse( arg, { maxDepth: Infinity, aggrigateFunctions: true, summarizeLength: Infinity, maxArrayElements: Infinity } ), { colors: true, showHidden: true, depth: Infinity, maxArrayLength: Infinity, breakLength: 300 } ) ) )
 				} else {
 					finalArgs.push( ...args.map( ( arg ) => util.inspect( serialization.jsonX.inspectParse( arg, { maxDepth: 2, aggrigateFunctions: true, summarizeLength: 300 } ), { colors: true, showHidden: true, depth: Infinity, maxArrayLength: Infinity, breakLength: 200 } ) ) );
 				}

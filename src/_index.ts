@@ -23,7 +23,7 @@ if ( typeof global !== "undefined" && global.__xlibInitArgs ) {
 export import lodash = require( "lodash" );
 if ( _initArgs == null || lodash.isEmpty( _initArgs ) ) {
     // tslint:disable-next-line:no-console
-    console.log( `XLIB INFO:  no "global.__xlibInit" object detected.  we will use the default values.  To hide this message, you must set it.  For example:  global.__xlibInit={logLevel:"WARN", envLevel:"PROD",silentInit:true}` );
+    console.log( `XLIB INFO:  no "global.__xlibInit" object detected.  we will use the default values (or read them from the environment).  To hide this message, you must set it.  For example:  global.__xlibInit={logLevel:"WARN", envLevel:"PROD",silentInit:true}` );
     _initArgs = {};
 }
 
@@ -68,6 +68,9 @@ export import promise = require( "./core/promise" );
 
 
 export import exception = require( "./core/exception" );
+
+import * as statistics from "simple-statistics";
+export { statistics };
 
 
 

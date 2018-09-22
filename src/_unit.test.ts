@@ -173,6 +173,66 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} );
 
+	it( "test stopwatch", async () => {
+		const __ = xlib.lolo;
+		const stopwatch = new xlib.time.Stopwatch( "unit test" );
+		__.log.assert( stopwatch.getElapsed().valueOf() === 0 )
+		await xlib.promise.bluebird.delay( 200 );
+		__.log.assert( stopwatch.getElapsed().valueOf() === 0 )
+		stopwatch.start();
+		await xlib.promise.bluebird.delay( 2000 );
+		let elapsedMs = stopwatch.getElapsed().valueOf()
+		__.log.assert( elapsedMs > 0 );
+		stopwatch.stop();
+		let elapsed = stopwatch.getElapsed();
+		await xlib.promise.bluebird.delay( 200 );
+		__.log.assert( elapsed.valueOf() === stopwatch.getElapsed().valueOf() );
+		__.log.info( "stopwatch is", elapsed.valueOf() );
+		__.log.assert( elapsed.valueOf() > 2000 );
+		__.log.assert( elapsed.valueOf() < 2100 );
+
+	} );
+
+	it( "perf timer", async () => {
+
+
+		const __ = xlib.lolo;
+		const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: 5000, autoLogLevel: xlib.environment.LogLevel.WARN } );
+		const outsideWatch = perfTimer.start( "outside" );
+		for ( let i = 0; i < 10; i++ ) {
+			const mainLoopWatch = perfTimer.start( "mainLoop" );
+			for ( let i = 0; i < 10; i++ ) {
+				const innerA = perfTimer.start( "innerA" );
+				for ( let i = 0; i < 10; i++ ) {
+					const innerAA = perfTimer.start( "innerAA" );
+
+					await __.bb.delay( 100 );
+					innerAA.stop();
+				}
+				await __.bb.delay( 100 );
+				innerA.stop();
+			}
+			for ( let i = 0; i < 10; i++ ) {
+				const innerB = perfTimer.start( "innerB" );
+
+				await __.bb.delay( 100 );
+				innerB.stop();
+			}
+			await __.bb.delay( 100 );
+			mainLoopWatch.stop();
+		}
+		outsideWatch.stop();
+		perfTimer.logNowAndClear();
+
+
+
+		// 	const rejection = xlib.promise.bluebird.reject( "error string" );
+		// 	__.log.assert( rejection.reason instanceof Error );
+		// 	__.log.assert( ( rejection.reason() as Error ).message === "error string" );
+
+
+	} );
+
 	it( "test bluebird rejection", () => {
 
 
