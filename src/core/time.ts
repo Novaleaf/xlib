@@ -202,7 +202,7 @@ export class PerfTimer {
 
 
 
-	constructor( public options?: { autoLogIntervalMs?: number; /** default to TRACE */ autoLogLevel?: environment.LogLevel } ) {
+	constructor( public options?: {/** though the perfTimer will auto log, it only does when .start() or .stop() is called (no async timers are used)*/ autoLogIntervalMs?: number; /** default to TRACE */ autoLogLevel?: environment.LogLevel } ) {
 		this.options = { autoLogLevel: environment.LogLevel.TRACE, ...options };
 		this._lastAutoLog = luxon.DateTime.utc();
 	}

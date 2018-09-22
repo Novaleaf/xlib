@@ -198,6 +198,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		const __ = xlib.lolo;
 		const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: 5000, autoLogLevel: xlib.environment.LogLevel.WARN } );
+		perfTimer.done
 		const outsideWatch = perfTimer.start( "outside" );
 		for ( let i = 0; i < 10; i++ ) {
 			const mainLoopWatch = perfTimer.start( "mainLoop" );
