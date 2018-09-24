@@ -59,7 +59,10 @@ export class Exception<TData=never> extends Error {
 			...options
 		};
 
-		this.innerException = options.innerException;
+		if ( options.innerException != null ) {
+			//make sure that what's passed is actually an error object
+			this.innerException = toError( options.innerException );
+		}
 		this.data = options.data;
 
 
