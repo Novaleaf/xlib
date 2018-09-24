@@ -26,28 +26,23 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} );
 
-	// it( "should fail, test log.assert()", () => {
-	// 	log.assert( false, "assert condition", xlib.lolo );
-	// 	let x = 0;
-	// 	log.assert( x === x );
 
 
-	// } )
-
-
-	it( "read env", () => {
+	it( "test read xlib.environment.envLevel", () => {
 		const log = xlib.diagnostics.log;
 		xlib.diagnostics.log.assert( xlib.environment.envLevel != null );
-		log.info( { envLevel: xlib.environment.envLevel } );
+		//log.info( { envLevel: xlib.environment.envLevel } );
 	} );
 
 
-	it( "logging demo", () => {
+	it( "test log auto-truncation", () => {
 		const log = xlib.diagnostics.log;
 		log.info( "hi", { some: "data" } );
 
-		log.info( "this 10000 character string gets auto-truncated nicely via __.inspect()", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) } );
-		log.warnFull( "this 10000 character screen doesn't get truncated because it's logged via the Full method ", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) } );
+		let resultArgs = log.info( "this 1000 character string gets auto-truncated nicely via __.inspect()", { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } );
+		log.assert( resultArgs[ 4 ].length < 350 );
+		resultArgs = log.warnFull( "this 1000 character screen doesn't get truncated because it's logged via the Full method ", { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } );
+		log.assert( resultArgs[ 4 ].length > 350 );
 	} );
 
 	it( "log overrides test", () => {
@@ -149,19 +144,25 @@ describe( __filename + " basic xlib unit tests", () => {
 		const log = xlib.diagnostics.log;
 		class MyException extends xlib.diagnostics.Exception { };
 
-		// try {
-		// 	try {
-		// 		throw new MyException( "first" );
-		// 	} catch ( _err ) {
-		// 		throw new MyException( "second", { innerException: _err } );
-		// 	}
-		// } catch ( _err ) {
-		// 	log.assert( _err instanceof Error );
-		// 	log.assert( _err instanceof MyException );
-		// 	const err = _err as MyException;
-		// 	log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
-		// 	log.assert( err.innerException.message === "first" );
-		// }
+		try {
+			try {
+				throw new MyException( "first" );
+			} catch ( _err ) {
+				throw new MyException( "second", { innerError: _err } );
+			}
+		} catch ( _err ) {
+			log.infoFull( "logging error object", _err );
+			log.infoFull( "logging error object as JSON", xlib.diagnostics.errorToJson( _err ) );
+
+			log.assert( _err instanceof Error );
+			log.assert( _err instanceof MyException );
+			const err = _err as MyException;
+			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
+			log.assert( err.innerError.message === "first" );
+
+
+
+		}
 
 
 
@@ -324,7 +325,7 @@ describe( __filename + " basic xlib unit tests", () => {
 				// 	}
 
 
-				const { toInspect } = await xlib.promise.awaitInspect( awaitsArray[ i ] ).timeout( ( replyDelay + replyDelaySpread ) * 2, "reply took too long" );
+				const { toInspect } = await xlib.promise.awaitInspect( awaitsArray[ i ] ).timeout( ( replyDelay + replyDelaySpread ) + 100, "reply took too long, while this could be because of debugging overhead, should investigate" );
 				__.log.assert( toInspect.isResolved() );
 				if ( toInspect.isFulfilled() ) {
 					__.log.assert( toInspect.value() === "backend success" );

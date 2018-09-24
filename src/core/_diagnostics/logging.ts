@@ -302,7 +302,7 @@ export class Logger {
 
 	/** for now, same as log.errorFull().   later will notify via email. */
 	public hackAttempt( ...args: any[] ) {
-		this.errorFull( "hack attempt", ...args );
+		return this.errorFull( "hack attempt", ...args );
 	}
 
 
@@ -374,12 +374,12 @@ export class Logger {
 	/**
 	 *  allows procedural calls to logging.
 		* 
-		* returns JSON representation of logged values.  null if not logged (such as if minLogLevel is greater than requested)
+		* @returns array of strings representing all logged values.  array element 0 is time, element 1 is callsite, element 2 is logLevel.  passed args are in element 3 onwards.  ```undefined``` is returned if not logged (such as if minLogLevel is greater than requested)
 	 */
 	public _tryLog( requestedLogLevel: LogLevel, args: any[], fullOutput: boolean,
 		/** if not set, the function **two levels up*** is marked as the callsite.
 		if that's not what you want, you can create your callsite, example showing 3 levels up: ```callSite = diagnostics.computeStackTrace( 3, 1 )[ 0 ];``` */
-		callSite?: string, ): any[] {
+		callSite?: string, ): string[] {
 
 		if ( callSite == null ) {
 			callSite = diagnostics.computeStackTrace( 2, 1 )[ 0 ];
@@ -396,7 +396,7 @@ export class Logger {
 			} );
 
 			if ( requestedLogLevel < minLogLevel ) {
-				return null;
+				return undefined;
 			}
 		}
 
@@ -406,10 +406,11 @@ export class Logger {
 
 
 		let finalArgs = this._doLog( callSite, requestedLogLevel, args, fullOutput );// this._doLog.apply( this, arguments );
-
+		//strip colors
+		finalArgs = finalArgs.map( ( arg ) => stripAnsi( arg ) );
 		if ( requestedLogLevel >= LogLevel.ERROR ) {
 			//log these for our diagnostics api to pickup:   http://localhost/metrics/v2/healthcheck-errors
-			let errorHistoryEntry: string[] = finalArgs.map( ( arg ) => stripAnsi( arg ) );
+			let errorHistoryEntry: string[] = finalArgs;
 			Logger.errorHistory.unshift( errorHistoryEntry );
 			if ( Logger.errorHistory.length > Logger.errorHistoryMaxLength ) {
 				Logger.errorHistory.length = Logger.errorHistoryMaxLength;
@@ -458,7 +459,7 @@ export class Logger {
 		const nameToReport = Chalk.magenta( callSite );
 
 
-		const finalArgs = [];
+		const finalArgs: string[] = [];
 
 		/** add "header" info to the log data */
 		finalArgs.unshift( logLevelColor( LogLevel[ targetLogLevel ] ) );
@@ -545,7 +546,7 @@ function _self_initialize() {
 				Logger.overrideLogLevel( callSiteMatch, minLevel as any );
 			} );
 		} catch ( _ex ) {
-			throw new diagnostics.Exception( `unable to parse environment logLevelOverrides. you passed: ${ envVar }`, { innerException: diagnostics.toError( _ex ) } );
+			throw new diagnostics.Exception( `unable to parse environment logLevelOverrides. you passed: ${ envVar }`, { innerError: diagnostics.toError( _ex ) } );
 		}
 	}
 	_populateLogLevelOverridesFromEnvVars()

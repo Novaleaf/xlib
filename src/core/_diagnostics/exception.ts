@@ -7,8 +7,10 @@ import * as stringHelper from "../_util/stringhelper";
 export interface IError {
 	name: string;
 	message: string;
+	/** while almost always available, it may not be set under unusual circumstances */
 	stack?: string;
-
+	/** may be set if the error was created via xlib.diagnostics.Exception  */
+	innerError?: IError;
 }
 
 /** the shape of Errors that xlib prefers to use, IE with a stack that's an array (not a string),  and an innerException parameter*/
@@ -19,13 +21,13 @@ export interface IErrorJson {
 	message: string;
 	/** the callstack.  */
 	stack?: string[];
-	/** optional */
-	innerException?: any;
+	/** optional, can pass an innerException of you use xlib.diagnostics.Exception */
+	innerError?: IErrorJson;
 }
 
 
 export interface IExceptionOptions<TData = never> {
-	innerException?: Error;
+	innerError?: Error;
 	/** truncate extra stack frames from the stack that's attached to this, 
 	 * a good way to remove logging/util functions from the trace */
 	stackFramesToTruncate?: number;
@@ -45,7 +47,7 @@ export class Exception<TData=never> extends Error {
 	//public options: IExceptionOptions;
 	private static _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
 
-	public innerException: Error;
+	public innerError?: Error;
 	public data: TData;
 
 	constructor( public message: string, options?: IExceptionOptions<TData> ) {
@@ -59,12 +61,12 @@ export class Exception<TData=never> extends Error {
 			...options
 		};
 
-		if ( options.innerException != null ) {
-			//make sure that what's passed is actually an error object
-			this.innerException = toError( options.innerException );
-		}
 		this.data = options.data;
 
+		if ( options.innerError != null ) {
+			//make sure that what's passed is actually an error object
+			options.innerError = toError( options.innerError );
+		}
 
 		//if (environment.logLevel > environment.LogLevel.DEBUG) {
 		//	innerException = null;
@@ -77,8 +79,8 @@ export class Exception<TData=never> extends Error {
 		/** split up the stack for manipulation during ```.ctor()```.  will recombine at end of  ```.ctor()```. */
 		let splitStack = this.stack.split( "\n" );
 
-		if ( options.innerException != null && typeof ( options.innerException.stack ) === "string" ) {
-			let newStack = options.innerException.stack.split( "\n" );
+		if ( options.innerError != null && typeof ( options.innerError.stack ) === "string" ) {
+			let newStack = options.innerError.stack.split( "\n" );
 			newStack.unshift( "innerException stack:" );
 			newStack.unshift( splitStack[ 1 ] );
 			newStack.unshift( splitStack[ 0 ] );
@@ -107,8 +109,10 @@ export class Exception<TData=never> extends Error {
 
 
 
-		if ( options.innerException != null && typeof ( options.innerException.message ) === "string" ) {
-			this.message = message + "	innerException: " + options.innerException.message;
+		if ( options.innerError != null && typeof ( options.innerError.message ) === "string" ) {
+			this.message = message + "	innerException: " + options.innerError.message;
+		} else {
+			this.message = message;//making sure it's set for explicit order when serializing to JSON
 		}
 
 
@@ -122,39 +126,8 @@ export class Exception<TData=never> extends Error {
 			this.name = ( results && results.length > 1 ) ? results[ 1 ] : "";
 		}
 
+		this.innerError = options.innerError; //putting this last to help ensure json serialization order
 
-
-		//this.message = message;
-		//this.stack = (<any>new Error()).stack;		
-
-		// //remove our Error ctor from the stack (reduce unneeded verbosity of stack trace)
-		// let defaultFramesToRemove = 1;
-		// let tempStack: string;
-		// if ( this.stack == null ) {
-		// 	tempStack = new Error( "Error Shim" ).stack as string;
-		// 	//remove our extra errorShim ctor off the stack trace
-		// 	defaultFramesToRemove = 2;
-		// } else {
-		// 	tempStack = this.stack;
-		// }
-
-		// //truncate the stack if set by options
-		// let _array = tempStack.split( "\n" );
-
-		// if ( _array.length > ( defaultFramesToRemove + options.stackFramesToTruncate ) ) {
-		// 	let line1 = _array.shift();
-		// 	let line2 = _array.shift();
-
-		// 	for ( let i = 0; i < options.stackFramesToTruncate; i++ ) {
-		// 		_array.shift();
-		// 	}
-		// 	//put the message as the first item in the stack (as what normally is seen)
-		// 	_array.unshift( `${ this.name }: ${ this.message }` as string );
-		// }
-		// let finalStack = _array.join( "\n" );
-		// this.stack = finalStack;
-
-		//console.log(typeof (this.stack));
 	}
 
 	/** includes stack track in string*/
@@ -197,14 +170,14 @@ export class Exception<TData=never> extends Error {
 
 
 /** all errors thrown by xlib extend this error type */
-export class XlibException extends Exception { }
+export class XlibException<TData=never> extends Exception<TData> { }
 
 /**
  * an exception that includes a statusCode for returning via http requests
  */
-export class HttpStatusCodeException extends Exception {
+export class HttpStatusCodeException<TData=never> extends Exception<TData> {
 	constructor( message: string, public statusCode: number, innerException?: Error ) {
-		super( message, { innerException: innerException } );
+		super( message, { innerError: innerException } );
 	}
 
 	public toJson() {
@@ -255,7 +228,7 @@ export class HttpStatusCodeException extends Exception {
 	* //use err as a normal Error object
 	* }
 */
-export function toError( ex: any | Error ): Error {
+export function toError( ex: any | Error ): Error & IError {
 	if ( ex instanceof Error ) {
 		return ex;
 	}
@@ -279,39 +252,37 @@ export function toError( ex: any | Error ): Error {
 }
 
 
-/** get a string representation of the error, with full stack-track (if any exists) */
-export function errorToString( ex: Error ): string {
-	// var msg = ex.name + ": " + ex.message;
-	// var stack = ( <any>ex ).stack;
-	// if ( stack ) {
-	// 	if ( stack.join != null ) {			//if (__.arrayHelper.isArray(stack)) {
-	// 		stack = stack.join( "\n" );
-	// 	}
-	// 	if ( environment.platformType === environment.PlatformType.NodeJs ) {
-	// 		//stack already includes message
-	// 		msg = stack;
-	// 	} else {
-	// 		msg += "\n" + stack;
-	// 	}
-	// }
-	// return msg;
-
-	let exJson = errorToJson( ex );
+/** get a string representation of the error */
+export function errorToString( ex: Error | IError, options?: IErrorToJsonOptions ): string {
+	let exJson = errorToJson( ex, options );
 	exJson.stack = exJson.stack.join( "\n" ) as any; //add line breaks to stack
 	return JSON.stringify( exJson );
 }
 
+export interface IErrorToJsonOptions {
+	/** max stack depth to output
+		* @default Infinity
+	 */
+	maxStacks?: number;
+	/** by default, we will hide the stack in UAT or PROD envLevel, unless DEBUG logLevel is set.    pass TRUE to never hide the stack.
+		* @default false
+	*/
+	alwaysShowFullStack?: boolean;
+}
 
-export function errorToJson( _error: Error | IError | string, maxStacks?: number ): IErrorJson {
+/** convert an error and all it's properties to JSON.   */
+export function errorToJson( _error: Error | IError, options?: IErrorToJsonOptions ): IErrorJson {
+
+	options = { ...options };
 
 	let error = toError( _error );
 	let stackArray: string[];
-	let innerException = ( error as any ).innerException;
+	let innerError = error.innerError;
 
-	if ( environment.logLevel > environment.LogLevel.DEBUG && environment.envLevel !== environment.EnvLevel.DEV ) {
+	if ( options.alwaysShowFullStack !== true && environment.logLevel > environment.LogLevel.DEBUG && environment.envLevel > environment.EnvLevel.TEST ) {
 		//sanitize
-		stackArray = [ "no stack unless in logLevel.DEBUG or envLevel.DEV mode" ];
-		innerException = undefined;
+		stackArray = [ "no stack unless env is DEV or TEST, or logLevel is DEBUG or TRACE" ];
+		innerError = undefined;
 	} else {
 		let stack = error.stack;
 		if ( stack == null ) {
@@ -333,16 +304,28 @@ export function errorToJson( _error: Error | IError | string, maxStacks?: number
 	} catch ( ex ) {
 		serialized = {} as any;
 	}
-	if ( maxStacks != null && stackArray.length > maxStacks ) {
-		stackArray.length = maxStacks;
+	if ( options.maxStacks != null && stackArray.length > options.maxStacks ) {
+		stackArray.length = options.maxStacks;
 	}
+
+	let innerErrorJson: IErrorJson;
+
+	if ( innerError != null ) {
+		try {
+			innerErrorJson = errorToJson( innerError );
+		} catch{
+			//eat error
+			//innerErrorJson = serialized.innerError as any;
+		}
+	}
+
 
 	let toReturn = {
 		...serialized,
 		name: error.name,
 		message: error.message,
 		stack: stackArray,
-		innerException,
+		innerError: innerErrorJson,
 	};
 
 

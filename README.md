@@ -10,7 +10,7 @@ Generally, the aim is to have ```xlib``` contain 80% of the functionality you'll
 
 
 # WORK IN PROGRESS
-
+- ***active development***: ```xlib``` while no big changes are planned (v13.x represents a big refactor), changes are being made.  ```xlib``` follows [Semantic Versioning](https://semver.org/) so if you stay on the same major version, you won't have any breaking changes.
 - ***browser currently unsupported***:    while ```xlib``` is designed for brower support, it's not currently being tested and might be superficially broken.  Previously, in v9.x ```WebPack``` was tested and supported.   
 
 
@@ -21,10 +21,8 @@ Generally, the aim is to have ```xlib``` contain 80% of the functionality you'll
 While you can use ```npm install xlib``` to use this in just about any javascript project or environment, here are what we test with:
 
 - vscode v.latest
-- ts v.latest (3.0.1 or higher suggested)
+- typescript v.latest (3.0.1 or higher suggested)
 - node v8.x (6.x or higher suggested)
-
-
 
 You can check out the [PhantomJsCloud](https://www.npmjs.com/package/phantomjscloud) NPM library for a real-life usage example.
 
@@ -32,21 +30,13 @@ You can check out the [PhantomJsCloud](https://www.npmjs.com/package/phantomjscl
 --------
 # Usage
 
-```xlib``` is transpiled to ```es6``` compatable javascript using ```commonjs``` module format.   Thus you can consume it as you would any other NPM module:
+```xlib``` is heavily documented, in the typescript source code.  If the intelisense isn't enough, consider taking a peek at the source.  If you don't use typescript,  ```xlib``` is transpiled to ```es6``` compatable javascript using ```commonjs``` module format, so you can consume it as you would any other NPM module:
 
 ```javascript
 //typescript 3.0 /es6 example:
 
-//xlib is initialized upon load.  override environment variables we otherwise read from the node.commandline, system.env, or browser.querystring
-global.__xlibInitArgs = {
-    /** dev env might have different (simpler) execution paths than other envLevels */
-    envLevel: "DEV",
-    /** the minimum level of logging we allow */
-    logLevel: "ERROR",
-    /** by default, you'll see some console output regarding xlib initialization.   pass true to disable this verbosity */
-	suppressStartupMessage: true,
-};
-import * as xlib from "xlib";
+//xlib self-initializes upon first load.   see the "EnvVars Startup Options" section of the readme if you want to change it's behavior
+import * as xlib from "xlib"; 
 
 //log something
 let log = xlib.diagnostics.log;
@@ -58,7 +48,7 @@ log.info("hi",{some:"data"});
 
 I haven't found a good documentation tool (TypeDoc sucks for libraries), if you know if one, let me know!   In the meantime, I suggest browsing via your code editor's Intelisense.
 
-There's a lot of commonly used features in ```xlib```:
+Here are the major namespaces of ```xlib```:
 - **Diagnostics**: aids development and error handling.  Features error management, robust, sourcemap aware console logging, and other debug aids. *(Custom)*
 - **LoLo**: A shortcut to commonly used xlib functions and modules. *(Custom)*
 - **Net**:  An easy to use RemoteHTTPEndpoint class for calling web apis, and generic http request handlers.  *(```axios``` and custom)*
@@ -72,7 +62,7 @@ There's a lot of commonly used features in ```xlib```:
 - **Validation**: User input sanitization.  *(```sanitize-html```, ```validator```, and custom)*
 - **Utils**: Array, String, and Number helpers, and NodeJs internal modules that can be used cross platform. *(```node``` and custom)*
 
-Hopefully you agree with my (opinionated) choices.   If you disagree, let me know in the Issues section.
+Hopefully you agree with my (opinionated) choices.    If you disagree, let me know in the Issues section.
 
 > **A Note on Code Examples**: most of the examples in this doc come from ```/src/_unit.test.ts``` so consider looking in that file for more details.
 
@@ -464,7 +454,9 @@ Features that used to be in ```xlib``` but are thrown away can be found in the `
 - **filesystem**
     - add file system emulation to browsers (such as use ```browser-fs```)
 
+# development
 
+if you want to build/modify ```xlib```, download this repo and open the folder in vsCode.  included are basic unit tests that will launch automatically if you choose to "run" xlib from vsCode.
 
 --------
 # Why
