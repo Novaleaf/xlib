@@ -29,9 +29,10 @@ import * as diagnostics from "./diagnostics";
 		* as per: https://www.dataz.io/display/Public/2013/03/20/Describing+Data%3A+Why+median+and+IQR+are+often+better+than+mean+and+standard+deviation 
 				and  https://en.wikipedia.org/wiki/Quantile#Quantiles_of_a_population  
 				@returns array of ms, each representing the requested quartile's rank choice*/
-export function quantile( intervals: Array<luxon.Interval | luxon.Duration | number | Stopwatch | { valueOf(): number }>, /** by default givez IQR, ie the 0th, 1st, 2nd, 3rd, and 4th quartiles, 
-	* @default  [ 0, 0.25, 0.5, 0.75, 1 ]
-	*/
+export function quantile( intervals: Array<luxon.Interval | luxon.Duration | number | Stopwatch | { valueOf(): number }>,
+	/** by default givez IQR, ie the sample at 0,25,50,75, and 100th percentiles,
+		* @default  [ 0, 0.25, 0.5, 0.75, 1 ]
+		*/
 	quantile = [ 0, 0.25, 0.5, 0.75, 1 ] ) {
 
 	// if ( intervals == null || intervals.length === 0 ) {
@@ -131,7 +132,8 @@ import * as environment from "./environment";
 
 export class PerfTimer {
 
-	public done: { [ key: string ]: { runs: number, total: luxon.Duration, raw: Stopwatch[] } } = {};
+	/** exposed for programatic use.  If you want to control when to log perfTimes manually, please use ```.logNowAndClear()```  stores raw samples taken by the perf timer. */
+	public _storage: { [ key: string ]: { runs: number, total: luxon.Duration, raw: Stopwatch[] } } = {};
 
 
 
@@ -150,10 +152,10 @@ export class PerfTimer {
 		stopPromise.then( ( stopped ) => {
 
 
-			if ( this.done[ key ] == null ) {
-				this.done[ key ] = { raw: [], runs: 0, total: luxon.Duration.fromMillis( 0 ) };
+			if ( this._storage[ key ] == null ) {
+				this._storage[ key ] = { raw: [], runs: 0, total: luxon.Duration.fromMillis( 0 ) };
 			}
-			const samples = this.done[ key ];
+			const samples = this._storage[ key ];
 			let elapsed = stopped.getElapsed();
 			samples.raw.push( stopped );
 			samples.runs++;
@@ -170,8 +172,8 @@ export class PerfTimer {
 		* @returns the done data before it was cleared
 	*/
 	public clearDone() {
-		let toReturn = this.done;
-		this.done = {};
+		let toReturn = this._storage;
+		this._storage = {};
 		return toReturn;
 	}
 
@@ -190,23 +192,27 @@ export class PerfTimer {
 
 	}
 
+	/** logs perf times to console and clears out the internal storage.
+		* @returns data on the perf runs that were logged to console.
+	 */
 	public logNowAndClear( callSiteLevelsUp = 0 ) {
 
 		//const logData: { [ key: string ]: any } = {};// [ "PerfTimer AutoLog" ];
-		const logData = [];
-		_.forIn( this.done, ( samples, key ) => {
+		const logData: { [ key: string ]: { runs: number, total: string, mean: string, iqr: number[] } } = {};
+		_.forIn( this._storage, ( samples, key ) => {
 			let runs = samples.runs;
 			let total = samples.total.toFormat( "hh:mm:ss.SS" );
-			let avg = luxon.Duration.fromMillis( samples.total.valueOf() / samples.runs ).toFormat( "hh:mm:ss.SS" );
-			let quantiles = quantile( samples.raw );
+			let mean = luxon.Duration.fromMillis( samples.total.valueOf() / samples.runs ).toFormat( "hh:mm:ss.SS" );
+			let iqr = quantile( samples.raw );
 			//quartiles[ 2 ] = quartiles[ 2 ].toString() as any;
-			//logData[ key ] = { total, avg, quartiles };
-			logData.push( { key, runs, total, avg, quantiles } );
+			logData[ key ] = { runs, total, mean, iqr };
+			//logData.push( { key, runs, total, mean, iqr } );
 		} );
 
 		const callSite = diagnostics.computeStackTrace( callSiteLevelsUp + 1, 1 )[ 0 ];
 		diagnostics.log._tryLog( this.options.autoLogLevel, [ "PerfTimer Logging", { logData } ], true, callSite );
-		return this.clearDone();
+		const rawData = this.clearDone();
+		return { logData, rawData };
 	}
 
 

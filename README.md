@@ -89,8 +89,8 @@ a robust logger, with log-levels set via global environment variables.
 const log = xlib.diagnostics.log;
 log.info( "hi", { some: "data" } );
 
-log.warn( "this 10000 character string gets auto-truncated nicely via __.inspect()", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) }  );
-log.warnFull("this 10000 character screen doesn't get truncated because it's logged via the Full method ", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) } );
+log.warn( "this 10000 character string gets auto-truncated nicely via log.warn()", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) }  );
+log.warnFull("this 10000 character string doesn't get truncated because emitted via the log.warnFull() method ", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) } );
 
 ```
 
@@ -104,7 +104,7 @@ log.info( "hi", { some: "data" } );
 #### A note on sourcemaps:
 
 - Want proper sourcemapping in your typescript project?  Just put ```import xlib = require("xlib")``` at/near the top of your project's entrypoint, and everything loaded after will be sourcemapped.
-- For performance reasons, sourcemaps are only loaded when the ```envLevel``` is ```DEV```, or ```logLevel``` is set to ```"DEBUG"``` (the default) or ```"TRACE"```.  
+- For performance reasons, sourcemaps are only loaded when the ```envLevel``` is ```DEV``` or ```TEST```, or ```logLevel``` is set to ```DEBUG``` (the default) or ```"TRACE"```.  
 
 
 
@@ -350,11 +350,11 @@ luxon.DateTime.utc().minus( { days: 3 } ).diffNow().toFormat( "dd:hh:mm:ss.SS" )
 
 ### PerfTimer
 
-a performance timer that allows taking multiple samples of multiple areas, and shows quartiles for 5%, 25%, 50%, 75%, 95% at configurable intervals.  Here's an example:
+a performance timer that allows taking multiple samples of multiple areas, and logs the [IQR]("https://en.wikipedia.org/wiki/Interquartile_range") (0, 25, 50, 75, and 100th percentiles) of samples at configurable intervals.  Here's an example:
 
 ```typescript
 const __ = xlib.lolo;
-    const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: 5000, autoLogLevel: xlib.environment.LogLevel.WARN } );
+    const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: undefined, autoLogLevel: xlib.environment.LogLevel.WARN } );
     const outsideWatch = perfTimer.start( "outside" );
     for ( let i = 0; i < 10; i++ ) {
         const mainLoopWatch = perfTimer.start( "mainLoop" );
@@ -386,14 +386,14 @@ You can either get the output of ```PerfTimer``` manually via the ```.done``` pr
 in the case of the above code, will look like the following:
 
 ```bash
-2018-09-22T04:32:53.983Z     at Object.<anonymous> (C:\repos\stage5\xlib\src\_unit.test.ts:207:32) WARN 'PerfTimer Logging' { logData:
-   [ { key: 'innerAA', runs: 35, total: '00:00:03.590', avg: '00:00:00.102', quartiles: [ 100, 101, 102, 102, 103, [length]: 5 ] },
-     { key: 'innerA', runs: 3, total: '00:00:03.412', avg: '00:00:01.137', quartiles: [ 1118, 1118, 1132, 1162, 1162, [length]: 5 ] },
-     { key: 'innerB', runs: 10, total: '00:00:01.13', avg: '00:00:00.101', quartiles: [ '[UNDEFINED]', 102, 101.5, 102, '[UNDEFINED]', [length]: 5 ] },
-     { key: 'mainLoop', runs: 1, total: '00:00:12.518', avg: '00:00:12.518', quartiles: [ 12518, 12518, 12518, 12518, 12518, [length]: 5 ] },
-     [length]: 4 ] }
+2018-09-24T02:16:45.152Z     at Object.<anonymous> (C:\repos\stage5\xlib\src\_unit.test.ts:231:42) WARN 'PerfTimer Logging' { logData:
+   { innerAA: { runs: 125, total: '00:00:00.563', mean: '00:00:00.04', iqr: [ 3, 4, 4, 5, 20, [length]: 5 ] },
+     innerA: { runs: 25, total: '00:00:00.763', mean: '00:00:00.30', iqr: [ 20, 24, 26, 29, 54, [length]: 5 ] },
+     innerB: { runs: 25, total: '00:00:00.150', mean: '00:00:00.06', iqr: [ 3, 4, 4, 5, 43, [length]: 5 ] },
+     mainLoop: { runs: 4, total: '00:00:00.768', mean: '00:00:00.192', iqr: [ 176, 177.5, 181, 195.5, 230, [length]: 5 ] } } }
 ```
 
+For more information on IQR, see https://www.dataz.io/display/Public/2013/03/20/Describing+Data:+Why+median+and+IQR+are+often+better+than+mean+and+standard+deviation
 
 ### Stopwatch
 

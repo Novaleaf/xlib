@@ -203,7 +203,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		const __ = xlib.lolo;
 		const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: logIntervalMs, autoLogLevel: xlib.environment.LogLevel.WARN } );
-		perfTimer.done
+		perfTimer._storage
 		const outsideWatch = perfTimer.start( "outside" );
 		for ( let i = 0; i < loops; i++ ) {
 			const mainLoopWatch = perfTimer.start( "mainLoop" );
@@ -228,9 +228,9 @@ describe( __filename + " basic xlib unit tests", () => {
 			mainLoopWatch.stop();
 		}
 		outsideWatch.stop();
-		const logData = perfTimer.logNowAndClear();
+		const { logData, rawData } = perfTimer.logNowAndClear();
 		__.log.assert( logData[ "mainLoop" ].runs === 4 && logData[ "innerAA" ].runs === 125 && logData[ "innerA" ].runs === 25 && logData[ "innerB" ].runs === 25 );
-		__.log.assert( logData[ "mainLoop" ].raw.length === 4 );
+		__.log.assert( rawData[ "mainLoop" ].raw.length === 4 );
 
 
 
