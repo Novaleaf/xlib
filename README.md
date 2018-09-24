@@ -38,16 +38,19 @@ You can check out the [PhantomJsCloud](https://www.npmjs.com/package/phantomjscl
 ```javascript
 //typescript 3.0 /es6 example:
 
-import * as xlib from "xlib";
-//override environment variables we otherwise read from the node.commandline, system.env, or browser.querystring
-xlib.initialize( {
-	envLevel: xlib.environment.EnvLevel.DEV,
-	logLevel: xlib.environment.LogLevel.INFO,
+//xlib is initialized upon load.  override environment variables we otherwise read from the node.commandline, system.env, or browser.querystring
+global.__xlibInitArgs = {
+    /** dev env might have different (simpler) execution paths than other envLevels */
+    envLevel: "DEV",
+    /** the minimum level of logging we allow */
+    logLevel: "ERROR",
+    /** by default, you'll see some console output regarding xlib initialization.   pass true to disable this verbosity */
 	suppressStartupMessage: true,
-} );
+};
+import * as xlib from "xlib";
 
 //log something
-let log = new xlib.diagnostics.logging.Logger(__filename);
+let log = xlib.diagnostics.log;
 log.info("hi",{some:"data"});
 
 ```
@@ -57,21 +60,18 @@ log.info("hi",{some:"data"});
 I haven't found a good documentation tool (TypeDoc sucks for libraries), if you know if one, let me know!   In the meantime, I suggest browsing via your code editor's Intelisense.
 
 There's a lot of commonly used features in ```xlib```:
-- **Diagnostics**: features that change functionaly based on the ```xlib.environment.logLevel``` or ```xlib.environment.envLevel```.  such as sourcemaps and stacktrace logging which are active when ```logLevel <= DEBUG``` or ```envLevel==="DEV"```. *(Custom)*
-- **Environment**:  Cross-platform environment variables and platform detection.  *(Custom)*
-- **Exception**:  An Improved and extensible exception base class.  *(Custom)*
-- **Logging**:  A robust, configurable, and source-map aware console logger. *(Custom)*
+- **Diagnostics**: aids development and error handling.  Features error management, robust, sourcemap aware console logging, and other debug aids. *(Custom)*
 - **LoLo**: A shortcut to commonly used xlib functions and modules. *(Custom)*
 - **Net**:  An easy to use RemoteHTTPEndpoint class for calling web apis, and generic http request handlers.  *(```axios``` and custom)*
 - **Promise**: Various features for Promise and async/await workflows. *(```bluebird``` and custom)*
 - **Reflection**: High quality runtime type detection. *(Custom)*
 - **Security**:  Various crypto workflows *(```crypto```, ```jsonwebtoken``` and custom)*
 - **Serialization**: High quality json manipulation and other import/export features. *(```d3-dsv```, ```json5```, and custom)*
-- **Statistics**: A pretty comprehensive stats package, works on numbers and number[].  *(```simple-statistics```)*
+- **Numeric**: Math, Statistics, and number helpers.  *(```mathjs``` and custom)*
 - **Threading**: An async/await focused ReaderWriterLock implementation and autoscaler. *(Custom)*
 - **time**:  a chainable datetime lib and helpers *(```luxon```)*
 - **Validation**: User input sanitization.  *(```sanitize-html```, ```validator```, and custom)*
-- **Utils**: Array, String, and Number helpers, and pollyfills for downlevel support. *(Custom)*
+- **Utils**: Array, String, and Number helpers, and NodeJs internal modules that can be used cross platform. *(```node``` and custom)*
 
 Hopefully you agree with my (opinionated) choices.   If you disagree, let me know in the Issues section.
 
@@ -90,7 +90,7 @@ a robust logger, with log-levels set via global environment variables.
 const log = xlib.diagnostics.log;
 log.info( "hi", { some: "data" } );
 
-log.info( "this 10000 character string gets auto-truncated nicely via __.inspect()", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) }  );
+log.warn( "this 10000 character string gets auto-truncated nicely via __.inspect()", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) }  );
 log.warnFull("this 10000 character screen doesn't get truncated because it's logged via the Full method ", { longKey: xlib.security.humanFriendlyKey( 10000, 10 ) } );
 
 ```
@@ -203,6 +203,7 @@ const apiKey = xlib.environment.getEnvironmentVariable("apikey");
 
 ## reflection
 
+Here's an example showing how to get the type of various objects:
 ```typescript
 import * as xlib from "xlib";
 const log = xlib.diagnostics.log;
@@ -220,11 +221,13 @@ log.assert( reflection.getType( xlib ) === Type.object );
 
 ## lolo
 
-lolo is inspired by ```lodash``` (but doesn't dupe functionality of it).
+lolo is inspired by ```lodash```  it's shortcuts to commonly used functionality of ```xlib```.
 
 ```typescript
 const __ = xlib.lolo;
-__.log.info( `the current time is ${ __.utc().toISO() }`, {isDevOrDebug:__.isDevOrDebug()})
+__.log.info( `the current time is ${ __.utc().toISO() }`, {isDev:__.isDev()});
+await __.bb.delay(1000);
+__.log.warn(__.diag.toError("boom"));
 ```
 
 
@@ -293,7 +296,7 @@ const __ = xlib.lolo;
 try{
     throw "yes you can throw a string!";
 }catch(_err){
-    const err = __.castErr(_err);
+    const err = __.toError(_err);
     __.log.assert(err.message==="yes you can throw a string!");
 }
 ```
@@ -301,7 +304,7 @@ try{
 derive from error:
 ```typescript
 const log = xlib.diagnostics.log;
-class MyException extends xlib.exception.Exception { };
+class MyException extends xlib.diagnostics.Exception { };
 
 try {
     try {
@@ -336,6 +339,15 @@ export class AsyncReaderWriterLock<TValue=void>
 ```
 
 ## time
+
+### luxon
+```luxon``` is a nice immutable time library.   
+
+example:
+```typescript
+import luxon = xlib.time.luxon;
+luxon.DateTime.utc().minus( { days: 3 } ).diffNow().toFormat( "dd:hh:mm:ss.SS" );
+```
 
 ### PerfTimer
 

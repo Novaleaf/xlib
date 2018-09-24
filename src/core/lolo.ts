@@ -8,23 +8,9 @@ import * as _ from "lodash";
 
 
 
+/** shortcut to xlib.diagnostics */
+export import diag = require( "./diagnostics" );
 
-import _exception = require( "./exception" );
-/** shortcut to xlib.exception.Exception */
-export const Exception = _exception.Exception;
-/** wrap an error with an Exception object.   original error will be contained in the "innerException" property.
- * useful for returning a stack at the current location.
- * also see ```.castErr()``` for another useful Error method.
- * 
- * shortcut to xlib.exception.Exception.wrapErr()
- */
-export const wrapErr: typeof _exception.Exception.wrapErr = _exception.Exception.wrapErr.bind( _exception.Exception );
-/** convert a string to Error object, or return existing Error object. 
- * useful for ```try{}catch(ex){}``` statements
- * 
- * shortcut to xlib.exception.Exception.castErr()
-*/
-export const castErr: typeof _exception.Exception.castErr = _exception.Exception.castErr.bind( _exception.Exception );
 
 
 
@@ -60,19 +46,17 @@ export const castErr: typeof _exception.Exception.castErr = _exception.Exception
 //export var htmlSanitize = _stringHelper.htmlSanitizeEscapedUserInput;
 
 /** shortcut to xlib.environment */
-import { isDev, isDebug } from "./environment";
-export { isDev, isDebug };
+export { isDev, isDebug } from "./environment";
 
 
+//export * as tests from "./s"
 
-/** shortcut to xlib.stringhelper */
-export import str = require( "./stringhelper" );
-/** shortcut to xlib.numhelper */
-export import num = require( "./numhelper" );
-
-
-/** shortcut to xlib.arrayhelper */
-export import arr = require( "./arrayhelper" );
+/** shortcut to xlib.util.stringhelper */
+export import str = require( "./_util/stringhelper" );
+/** shortcut to xlib.util.numhelper */
+export import num = require( "./_util/numhelper" );
+/** shortcut to xlib.util.arrayhelper */
+export import arr = require( "./_util/arrayhelper" );
 
 import { log } from "./diagnostics";
 /** shortcut to xlib.diagnostics.log */

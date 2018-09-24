@@ -1,9 +1,7 @@
 // tslint:disable:no-console
 
-//export import bunyan = require("bunyan");
-import exception = require( "../exception" );
 import environment = require( "../environment" );
-import stringHelper = require( "../stringhelper" );
+import stringHelper = require( "../_util/stringhelper" );
 import serialization = require( "../serialization" );
 import reflection = require( "../reflection" );
 import _ = require( "lodash" );
@@ -173,7 +171,7 @@ function colorCodeToString( input: string, currentColor?: IAnsiColor ): IAnsiCol
 				result.background = "white";
 				break;
 			default:
-				throw new exception.XlibException( "colorCodeToString() unknown color " + input );
+				throw new diagnostics.XlibException( "colorCodeToString() unknown color " + input );
 			//no action (do not set anything)
 		}
 	}
@@ -194,8 +192,18 @@ export class Logger {
 
 
 
-	/** override the loglevel for specific, focused debugging.   */
-	public static overrideLogLevel( callSiteMatch: RegExp, minLevel: LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" ) {
+	/** override the loglevel for specific, focused debugging.     */
+	public static overrideLogLevel(
+		/** a RegExp that matches a part of the log callSite.  (the part of the console message in Magenta color)
+	* if ommitted, will match the caller's fileName  */
+		callSiteMatch: RegExp,
+		/** the minimum logLevel you want to be emitted.  
+			* 
+			* ***Important note***:  you can only make the minLevel stricter than the current environment.logLevel.
+			* For example, if the environment.logLevel is currently ```ERROR``` then a call to ```log.debug("hi")``` will never display.  
+			This is because, for performance reasons,  at module initialization time we no-op all logging methods beneath the environment.logLevel
+		 */
+		minLevel: LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" ) {
 
 		if ( ( typeof minLevel ) === "string" ) {
 			minLevel = LogLevel[ minLevel as string ];
@@ -210,7 +218,14 @@ export class Logger {
 	protected static _overrides: ILogLevelOverride[] = [];
 
 	/** invoke this to set a global override for the minimum log level for a given callsite.*/
-	public overrideLogLevel( minLevel: LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
+	public overrideLogLevel(
+		/** the minimum logLevel you want to be emitted.  
+			* 
+			* ***Important note***:  you can only make the minLevel stricter than the current environment.logLevel.
+			* For example, if the environment.logLevel is currently ```ERROR``` then a call to ```log.debug("hi")``` will never display.  
+			This is because, for performance reasons,  at module initialization time we no-op all logging methods beneath the environment.logLevel
+		 */
+		minLevel: LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
 		/** a RegExp that matches a part of the log callSite.  (the part of the console message in Magenta color)
 			* if ommitted, will match the caller's fileName  */
 		callSiteMatch?: string | RegExp, ) {
@@ -298,7 +313,7 @@ export class Logger {
 			return;
 		}
 		if ( testCondition !== false ) {
-			throw new exception.XlibException( "first parameter must be a boolean (to assert must evaluate to true or false)" );
+			throw new diagnostics.XlibException( "first parameter must be a boolean (to assert must evaluate to true or false)" );
 		}
 
 		let finalArgs = this._tryLog( LogLevel.ASSERT, args, true );
@@ -435,7 +450,7 @@ export class Logger {
 				break;
 			default:
 				logLevelColor = Chalk.inverse.bold;
-				throw new exception.XlibException( "unknown targetLogLevel" );
+				throw new diagnostics.XlibException( "unknown targetLogLevel" );
 			//break;
 		}
 
@@ -468,7 +483,7 @@ export class Logger {
 						console.error( ...finalArgs );
 						break;
 					default:
-						throw new exception.XlibException( "unknown targetLogLevel" );
+						throw new diagnostics.XlibException( "unknown targetLogLevel" );
 					//break;
 				}
 				break;
@@ -496,7 +511,7 @@ export class Logger {
 						console.error( ...finalArgs );
 						break;
 					default:
-						throw new exception.XlibException( "unknown targetLogLevel" );
+						throw new diagnostics.XlibException( "unknown targetLogLevel" );
 					//break;
 				}
 				break;
@@ -530,10 +545,71 @@ function _self_initialize() {
 				Logger.overrideLogLevel( callSiteMatch, minLevel as any );
 			} );
 		} catch ( _ex ) {
-			throw new exception.Exception( `unable to parse environment logLevelOverrides. you passed: ${ envVar }`, { innerException: exception.Exception.castErr( _ex ) } );
+			throw new diagnostics.Exception( `unable to parse environment logLevelOverrides. you passed: ${ envVar }`, { innerException: diagnostics.toError( _ex ) } );
 		}
 	}
 	_populateLogLevelOverridesFromEnvVars()
+
+	//noop log levels too low  for better performance
+	const LogLevel = environment.LogLevel;
+	const noopFcn = ( () => { } ) as any;
+	switch ( environment.logLevel ) {
+		case LogLevel.ASSERT:
+			Logger.prototype.fatal = noopFcn;
+			Logger.prototype.error = noopFcn;
+			Logger.prototype.errorFull = noopFcn;
+			Logger.prototype.warn = noopFcn;
+			Logger.prototype.warnFull = noopFcn;
+			Logger.prototype.info = noopFcn;
+			Logger.prototype.infoFull = noopFcn;
+			Logger.prototype.debug = noopFcn;
+			Logger.prototype.debugFull = noopFcn;
+			Logger.prototype.trace = noopFcn;
+			Logger.prototype.traceFull = noopFcn;
+			break;
+		case LogLevel.FATAL:
+			Logger.prototype.error = noopFcn;
+			Logger.prototype.errorFull = noopFcn;
+			Logger.prototype.warn = noopFcn;
+			Logger.prototype.warnFull = noopFcn;
+			Logger.prototype.info = noopFcn;
+			Logger.prototype.infoFull = noopFcn;
+			Logger.prototype.debug = noopFcn;
+			Logger.prototype.debugFull = noopFcn;
+			Logger.prototype.trace = noopFcn;
+			Logger.prototype.traceFull = noopFcn;
+			break;
+		case LogLevel.ERROR:
+			Logger.prototype.warn = noopFcn;
+			Logger.prototype.warnFull = noopFcn;
+			Logger.prototype.info = noopFcn;
+			Logger.prototype.infoFull = noopFcn;
+			Logger.prototype.debug = noopFcn;
+			Logger.prototype.debugFull = noopFcn;
+			Logger.prototype.trace = noopFcn;
+			Logger.prototype.traceFull = noopFcn;
+			break;
+		case LogLevel.WARN:
+			Logger.prototype.info = noopFcn;
+			Logger.prototype.infoFull = noopFcn;
+			Logger.prototype.debug = noopFcn;
+			Logger.prototype.debugFull = noopFcn;
+			Logger.prototype.trace = noopFcn;
+			Logger.prototype.traceFull = noopFcn;
+			break;
+		case LogLevel.INFO:
+			Logger.prototype.debug = noopFcn;
+			Logger.prototype.debugFull = noopFcn;
+			Logger.prototype.trace = noopFcn;
+			Logger.prototype.traceFull = noopFcn;
+			break;
+		case LogLevel.DEBUG:
+			Logger.prototype.trace = noopFcn;
+			Logger.prototype.traceFull = noopFcn;
+			break;
+		case LogLevel.TRACE:
+			break;
+	}
 
 
 }

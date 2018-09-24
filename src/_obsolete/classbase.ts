@@ -1,6 +1,6 @@
 "use strict";
 
-import ex = require( "../core/exception" );
+import diagnostics = require( "../core/diagnostics" );
 
 /** root class, includes the following functionality:
 typeName, toString, dispose, assertIsAlive, hashCode */
@@ -39,7 +39,7 @@ returns:  true == we just disposed.   false==already disposed so we do nothing *
 	/** dispose this object.   asserts if already disposed */
 	public dispose() {
 		if ( this._isDisposed ) {
-			throw new ex.XlibException( "already disposed.  class= " + this.getTypeName() );
+			throw new diagnostics.XlibException( "already disposed.  class= " + this.getTypeName() );
 		}
 		if ( !this._isDisposed ) {
 			this._isDisposed = true;
@@ -54,10 +54,10 @@ returns:  true == we just disposed.   false==already disposed so we do nothing *
 
 	public _assertIsAlive() {
 		if ( this._debugIsBaseCtorCalled !== true ) {
-			throw new ex.XlibException( "assertIsAlive failed.  you forgot to call the super() from your constructor class= " + this.getTypeName() );
+			throw new diagnostics.XlibException( "assertIsAlive failed.  you forgot to call the super() from your constructor class= " + this.getTypeName() );
 		}
 		if ( this.getIsDisposed() === true ) {
-			throw new ex.XlibException( "assertIsAlive failed.  already disposed.  class= " + this.getTypeName() );
+			throw new diagnostics.XlibException( "assertIsAlive failed.  already disposed.  class= " + this.getTypeName() );
 		}
 	}
 

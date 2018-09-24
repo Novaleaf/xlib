@@ -1,8 +1,9 @@
 "use strict";
 
-import exception = require( "./exception" );
-import stringHelper = require( "./stringhelper" );
-import numHelper = require( "./numhelper" );
+
+import exception = require( "./_diagnostics/exception" );
+import stringHelper = require( "./_util/stringhelper" );
+import numHelper = require( "./_util/numhelper" );
 import _ = require( "lodash" );
 
 /** cross-platform implementation of the nodejs module: http://nodejs.org/api/crypto.html

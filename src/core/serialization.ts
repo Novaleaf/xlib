@@ -1,13 +1,13 @@
 ///// <reference path="../../../typings/all.d.ts" />
 
 import * as reflection from "./reflection";
-import * as ex from "./exception";
+import * as diagnostics from "./diagnostics";
 
-import * as stringHelper from "./stringhelper";
+import * as stringHelper from "./_util/stringhelper";
 import * as bb from "bluebird";
 import * as _ from "lodash";
 
-import * as numHelper from "./numhelper";
+import * as numHelper from "./_util/numhelper";
 
 import * as d3Dsv from "d3-dsv";
 
@@ -178,7 +178,7 @@ export namespace jsonX {
 
 				case Type.Error:
 					const errOptions = { ...myOptions, maxDepth: myOptions.maxDepth + 1 };
-					return _inspectParse_internal( ex.Exception.exceptionToJsonObj( obj ), errOptions, seenObjects );
+					return _inspectParse_internal( diagnostics.errorToJson( obj ), errOptions, seenObjects );
 				case Type.function:
 					const asFunction = obj as Function;
 					let funcStr = asFunction.toString();
@@ -288,7 +288,7 @@ export namespace jsonX {
 
 
 		} catch ( _err ) {
-			const err = ex.Exception.castErr( _err );
+			const err = diagnostics.toError( _err );
 			return `[ERROR_PARSING name="${ err.name }", message="${ stringHelper.summarize( err.message, myOptions.summarizeLength ) }"]`;
 		}
 

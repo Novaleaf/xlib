@@ -1,48 +1,51 @@
 
+import * as _ from "lodash";
+import * as stringHelper from "./_util/stringhelper";
 
+import * as environment from "./environment";
 
-//#region re-exports
-
-
-//export import logging = require( "./diagnostics/logging" );
 
 import * as _logging from "./_diagnostics/logging";
 export { _logging }
+
+export * from "./_diagnostics/exception";
+import * as exception from "./_diagnostics/exception";
 /** A high quality console logger.  shortcut to diagnostics._logging.log. */
 export const log = new _logging.Logger();
-//export { Logger };
-
-
-///** obtain a stack trace at the callsite */
-//export import stacktrace = require("./diagnostics/stacktrace");
 
 
 
 
-/** cross-platform implementation of the nodejs module: http://nodejs.org/api/assert.html */
-export import assert = require( "assert" );
-//#endregion
 
-import exception = require( "./exception" );
-import environment = require( "./environment" );
-//import jsHelper = require("./runtime/jsHelper");
-
-import * as stringHelper from "./stringhelper";
-import * as _ from "lodash";
-
-
-export function computeCallFile(	/* regexp choosing the frame you wish to start after.  or number of frames to remove from the front.
+/** computes the callSite (file+line+col) of a location in the call stack */
+export function computeCallSite(	/* regexp choosing the frame you wish to start after.  or number of frames to remove from the front.
 	0 = the method calling .genStackTrace() will be on top;
 	*/ startingFrameExclusive?: RegExp | number | string,
-	/** changes the first ```startingFrameExclusive``` to be inclusive, IE keep the frame you search for, instead of throwing it away and getting the next frame.  default false */
+	/**only used if ```startingFrameExclusive``` is a string or regexp.   changes ```startingFrameExclusive``` to be inclusive, IE keep the frame you search for, instead of throwing it away and getting the next frame.  default false */
 	keepStartingFrame = false, ) {
 	if ( typeof ( startingFrameExclusive ) === "number" ) {
 		//add 1 to ignore this location
 		startingFrameExclusive += 1;
 	}
 	let frame = computeStackTrace( startingFrameExclusive, 1, keepStartingFrame )[ 0 ];
-	let callFile = stringHelper.removeBefore( frame, "(", false, true );
-	callFile = stringHelper.removeAfter( callFile, ")", false, false );
+	let callSite = stringHelper.removeBefore( frame, "(", false, true );
+	callSite = stringHelper.removeAfter( callSite, ")", false, false );
+	return callSite;
+
+}
+
+/** computes the fileName of a location in the call stack */
+export function computeCallFile(	/* regexp choosing the frame you wish to start after.  or number of frames to remove from the front.
+	0 = the method calling .genStackTrace() will be on top;
+	*/ startingFrameExclusive?: RegExp | number | string,
+	/**only used if ```startingFrameExclusive``` is a string or regexp.   changes ```startingFrameExclusive``` to be inclusive, IE keep the frame you search for, instead of throwing it away and getting the next frame.  default false */
+	keepStartingFrame = false, ) {
+
+	if ( typeof ( startingFrameExclusive ) === "number" ) {
+		//add 1 to ignore this location
+		startingFrameExclusive += 1;
+	}
+	let callFile = computeCallSite( startingFrameExclusive, keepStartingFrame );
 	//remove line and col numbers, make the assumption that the file.ext preceeds this.
 	while ( callFile.lastIndexOf( "." ) < callFile.lastIndexOf( ":" ) ) {
 		callFile = stringHelper.removeAfter( callFile, ":", false, true );
@@ -50,7 +53,7 @@ export function computeCallFile(	/* regexp choosing the frame you wish to start 
 	return callFile;
 
 }
-/** get a stack trace*/
+/** get a stack trace of the current call stack*/
 export function computeStackTrace(/**
 	* regexp choosing the frame you wish to start after.  or number of frames to remove from the front.
 	0 = the method calling .genStackTrace() will be on top;

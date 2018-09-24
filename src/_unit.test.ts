@@ -1,13 +1,14 @@
+global.__xlibInitArgs = {
+	logLevel: "DEBUG"
+};
+
+
 import xlib = require( "./_index" );
+import _ = xlib.lodash;
 
 
 
 describe( __filename + " basic xlib unit tests", () => {
-
-	// before( async () => {
-	//     __xlibInit = {};
-	//     await _initialize();
-	// } );
 
 
 
@@ -146,7 +147,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	it( "test exceptions: DISABLED (causes debugBreak on thrown exceptions when running test)", () => {
 		const log = xlib.diagnostics.log;
-		class MyException extends xlib.exception.Exception { };
+		class MyException extends xlib.diagnostics.Exception { };
 
 		// try {
 		// 	try {
@@ -188,57 +189,70 @@ describe( __filename + " basic xlib unit tests", () => {
 		await xlib.promise.bluebird.delay( 200 );
 		__.log.assert( elapsed.valueOf() === stopwatch.getElapsed().valueOf() );
 		__.log.info( "stopwatch is", elapsed.valueOf() );
-		__.log.assert( elapsed.valueOf() > 2000 );
+		__.log.assert( elapsed.valueOf() >= 2000 );
 		__.log.assert( elapsed.valueOf() < 2100 );
 
 	} );
 
-	it( "perf timer", async () => {
+	it( " test perf timer", async () => {
 
+		/** needs to stay 5 otherwise the assert check at the bottom of the test needs to be changed */
+		const loops = 5;
+		const loopSleepMs = 3;
+		const logIntervalMs = undefined;
 
 		const __ = xlib.lolo;
-		const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: 5000, autoLogLevel: xlib.environment.LogLevel.WARN } );
+		const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: logIntervalMs, autoLogLevel: xlib.environment.LogLevel.WARN } );
 		perfTimer.done
 		const outsideWatch = perfTimer.start( "outside" );
-		for ( let i = 0; i < 10; i++ ) {
+		for ( let i = 0; i < loops; i++ ) {
 			const mainLoopWatch = perfTimer.start( "mainLoop" );
-			for ( let i = 0; i < 10; i++ ) {
+			for ( let i = 0; i < loops; i++ ) {
 				const innerA = perfTimer.start( "innerA" );
-				for ( let i = 0; i < 10; i++ ) {
+				for ( let i = 0; i < loops; i++ ) {
 					const innerAA = perfTimer.start( "innerAA" );
 
-					await __.bb.delay( 100 );
+					await __.bb.delay( loopSleepMs );
 					innerAA.stop();
 				}
-				await __.bb.delay( 100 );
+				await __.bb.delay( loopSleepMs );
 				innerA.stop();
 			}
-			for ( let i = 0; i < 10; i++ ) {
+			for ( let i = 0; i < loops; i++ ) {
 				const innerB = perfTimer.start( "innerB" );
 
-				await __.bb.delay( 100 );
+				await __.bb.delay( loopSleepMs );
 				innerB.stop();
 			}
-			await __.bb.delay( 100 );
+			await __.bb.delay( loopSleepMs );
 			mainLoopWatch.stop();
 		}
 		outsideWatch.stop();
-		perfTimer.logNowAndClear();
+		const logData = perfTimer.logNowAndClear();
+		__.log.assert( logData[ "mainLoop" ].runs === 4 && logData[ "innerAA" ].runs === 125 && logData[ "innerA" ].runs === 25 && logData[ "innerB" ].runs === 25 );
+		__.log.assert( logData[ "mainLoop" ].raw.length === 4 );
 
-
-
-		// 	const rejection = xlib.promise.bluebird.reject( "error string" );
-		// 	__.log.assert( rejection.reason instanceof Error );
-		// 	__.log.assert( ( rejection.reason() as Error ).message === "error string" );
 
 
 	} );
 
-	it( "test bluebird rejection", () => {
+	it( "test quartile calculations", () => {
 
 
 		const __ = xlib.lolo;
 
+		const input = [ 500, 468, 454, 469 ];
+		const quantiles = [ 0, 0.25, 0.5, 0.75, 1 ];
+		const outputMathJs = xlib.numeric.mathjs.quantileSeq( input, quantiles, false ) as number[];
+		const inputDuration = input.map( ( val ) => xlib.time.luxon.Duration.fromMillis( val ) );
+		const outputTime = xlib.time.quantile( inputDuration );
+		__.log.info( "test quartile calculations mathjs", { input, quantiles, outputMathJs, outputTime } );
+		__.log.assert( _.isEqual( outputMathJs, [ 454, 464.5, 468.5, 476.75, 500 ] ) );
+		__.log.assert( _.isEqual( outputMathJs, outputTime ) );
+		__.log.assert( xlib.numeric.mathjs.median( input ) === outputMathJs[ 2 ], "expect mean to equal 50% quantile value" );
+
+
+
 		// 	const rejection = xlib.promise.bluebird.reject( "error string" );
 		// 	__.log.assert( rejection.reason instanceof Error );
 		// 	__.log.assert( ( rejection.reason() as Error ).message === "error string" );
@@ -247,67 +261,79 @@ describe( __filename + " basic xlib unit tests", () => {
 	} );
 
 
-	it( "autoscaler test NOOP as it's more a debugger than a test.", async () => {
+	it( "autoscaler test", async () => {
 
-		// const __ = xlib.lolo;
+		const __ = xlib.lolo;
+		const chanceOfBusy = 0.01;
+		const chanceOfFail = 0.01;
+		const replyDelay = 30;
+		const replyDelaySpread = 30;
 
-		// /** how often our backendWorker reports too busy */
+		/** how often our backendWorker reports too busy */
+		interface ITestAutoscaleOptions { chanceOfBusy: number };
+		class TestAutoScaleError extends xlib.diagnostics.Exception<{ shouldRejectBusy: boolean }>{ }
 
-
-
-		// interface ITestAutoscaleOptions { chanceOfBusy: number };
-		// class TestAutoScaleError extends xlib.exception.Exception<{ shouldRejectBusy: boolean }>{ }
-
-		// let testScaler = new xlib.threading.Autoscaler( { busyGrowDelayMs: 10000, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 3000, growDelayMs: 500, minParallel: 4 },
-		// 	async ( chanceOfBusy: number, chanceOfFail: number, replyDelay: number, replyDelaySpread: number ) => {
-
-		// 		let delay = replyDelay + __.num.randomInt( 0, replyDelaySpread );
-		// 		await __.bb.delay( replyDelay );
-		// 		const isBusy = __.num.randomBool( chanceOfBusy );
-		// 		if ( isBusy ) {
-		// 			return xlib.promise.bluebird.reject( new TestAutoScaleError( "busy", { data: { shouldRejectBusy: true } } ) );
-		// 		}
-		// 		const isFail = __.num.randomBool( chanceOfFail );
-		// 		if ( isFail ) {
-		// 			return __.bb.reject( new TestAutoScaleError( "fail", { data: { shouldRejectBusy: false } } ) );
-		// 		}
-		// 		return xlib.promise.bluebird.resolve( "OK" );
-		// 	},
-		// 	( ( err: TestAutoScaleError ) => {
-		// 		if ( err.data.shouldRejectBusy === true ) {
-		// 			return "TOO_BUSY";
-		// 		}
-		// 		return "FAIL"
-		// 	} ) );
-
-
-		// let awaitsArray: Promise<string>[] = [];
-		// for ( let i = 0; i < 10000; i++ ) {
-		// 	const chanceOfBusy = 0.01;
-		// 	const chanceOfFail = 0.0;
-		// 	const replyDelay = 3000;
-		// 	const replyDelaySpread = 3000;
+		let testScaler = new xlib.threading.Autoscaler( { busyGrowDelayMs: 100, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 30, growDelayMs: 5, minParallel: 4 },
+			async ( chanceOfBusy: number, chanceOfFail: number, replyDelay: number, replyDelaySpread: number ) => {
+				//this is the "backendWorker" that is being autoscaled
+				let delay = replyDelay + __.num.randomInt( 0, replyDelaySpread );
+				await __.bb.delay( replyDelay );
+				const isBusy = __.num.randomBool( chanceOfBusy );
+				if ( isBusy ) {
+					return xlib.promise.bluebird.reject( new TestAutoScaleError( "backend busy", { data: { shouldRejectBusy: true } } ) );
+				}
+				const isFail = __.num.randomBool( chanceOfFail );
+				if ( isFail ) {
+					return __.bb.reject( new TestAutoScaleError( "backend failure", { data: { shouldRejectBusy: false } } ) );
+				}
+				return xlib.promise.bluebird.resolve( "backend success" );
+			},
+			( ( err: TestAutoScaleError ) => {
+				if ( err.data.shouldRejectBusy === true ) {
+					return "TOO_BUSY";
+				}
+				return "FAIL"
+			} ) );
 
 
-		// 	const toAwait = testScaler.submitRequest( chanceOfBusy, chanceOfFail, replyDelay, replyDelaySpread );
-		// 	awaitsArray.push( toAwait );
+		let awaitsArray: Promise<string>[] = [];
+		for ( let i = 0; i < 1000; i++ ) {
+			const toAwait = testScaler.submitRequest( chanceOfBusy, chanceOfFail, replyDelay, replyDelaySpread );
+			toAwait.catch( () => Promise.resolve() );//mark this promise as being "handled"
+			awaitsArray.push( toAwait );
 
-		// }
+		}
 
-		// let handle = setInterval( () => {
-		// 	__.log.info( testScaler.toJson() );
-		// }, 1000 );
+		let handle = setInterval( () => {
+			__.log.info( "while testing autoscaler, log it's internal state every 1000ms", testScaler.toJson() );
+		}, 1000 );
 
-		// //wait for all
-		// for ( const i in awaitsArray ) {
-		// 	await xlib.promise.awaitInspect( awaitsArray[ i ] );
-		// }
-		// clearTimeout( handle );
+		try {
+			//wait for all
+			for ( const i in awaitsArray ) {
+				// 	try {
+				// 		const result = await awaitsArray[ i ];
+				// 		__.log.assert( result === "backend success" );
+				// 	} catch ( _err ) {
+				// 		const err = xlib.diagnostics.toError( _err );
+				// 		__.log.assert( err instanceof TestAutoScaleError );
+				// 		__.log.assert( err.message === "backend failure" );
+				// 	}
 
 
-
-
-
+				const { toInspect } = await xlib.promise.awaitInspect( awaitsArray[ i ] ).timeout( ( replyDelay + replyDelaySpread ) * 2, "reply took too long" );
+				__.log.assert( toInspect.isResolved() );
+				if ( toInspect.isFulfilled() ) {
+					__.log.assert( toInspect.value() === "backend success" );
+				} else {
+					const err = xlib.diagnostics.toError( toInspect.reason() );
+					__.log.assert( err instanceof TestAutoScaleError );
+					__.log.assert( err.message === "backend failure" );
+				}
+			}
+		} finally {
+			clearTimeout( handle );
+		}
 
 
 

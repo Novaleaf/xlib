@@ -1,7 +1,7 @@
 "use strict";
 /* tslint:disable:no-bitwise */
 
-import ex = require( "./exception" );
+import ex = require( "../_diagnostics/exception" );
 import crypto = require( "crypto" );
 
 export var INT8_MAX = 127;

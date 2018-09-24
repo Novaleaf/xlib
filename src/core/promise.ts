@@ -23,7 +23,7 @@ if ( environment.isDebug() ) {
 		// if you owan to allow cancelation, see: http://bluebirdjs.com/docs/api/cancellation.html
 		cancellation: false,
 		// Enable monitoring
-		monitoring: true
+		monitoring: true,
 	} );
 } else {
 	//noop
@@ -52,7 +52,7 @@ if(toInspect.isFulfilled()){
 }
  */
 
-export async function awaitInspect<T>( promise: PromiseLike<T> ): Promise<{ toInspect: bb<T> }> {
+export function awaitInspect<T>( promise: PromiseLike<T> ): bb<{ toInspect: bb<T> }> {
 
 	let toInspect = bb.resolve( promise );
 

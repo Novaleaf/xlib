@@ -7,8 +7,7 @@ const log = diagnostics.log; // new diagnostics.Logger( __filename );
 log.overrideLogLevel( "WARN" );
 
 import * as serialization from "../serialization";
-import * as exception from "../exception";
-import * as stringHelper from "../stringhelper";
+import * as stringHelper from "../_util/stringhelper";
 import { Autoscaler, IAutoscalerOptions } from "../threading";
 
 //import compression = require("./compression");

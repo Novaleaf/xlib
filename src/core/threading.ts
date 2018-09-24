@@ -359,6 +359,11 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<any>, 
         return { pendingCalls: this.pendingCalls.length, activeCalls: this.activeCalls.length, metrics: this.metrics, options: this.options };
     }
 
+    /** submit a request to the backend worker.     
+     * 
+     * **Important note**: to avoid "unhandled promise rejections" you need to make sure the returned Promise has a catch() applied to it.
+     * **NOT** just store the promise in an array to inspect later.  This is because if the request fails, the returned promise gets rejected, and if the Promise internal logic doesn't see a .catch() it will show the global "unhandled rejected promse" soft error message.
+     */
     public submitRequest: TWorkerFunc =
         //a worker with generic input/return args, cast to our specific worker function's sig
         ( async ( ...args: any[] ): Promise<any> => {
@@ -450,6 +455,7 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<any>, 
                                 this.pendingCalls.unshift( { args, requesterPromise } );
                                 break;
                         }
+                        return Promise.resolve();
                     } )
                     .finally( () => {
                         //remove this from actives array
@@ -463,7 +469,8 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<any>, 
                 this.activeCalls.push( { args, requesterPromise, activeMonitorPromise } );
             }
 
-
+        } catch ( _err ) {
+            log.error( _err );
         } finally {
             this._lastTryCallTime = now;
             if ( this.pendingCalls.length > 0 && this.metrics.activeCount >= this.metrics.maxActive ) {

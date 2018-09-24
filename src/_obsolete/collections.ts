@@ -1,9 +1,9 @@
 "use strict";
 
-import stringHelper = require( "../core/stringhelper" );
+import stringHelper = require( "../core/_util/stringhelper" );
 //import arrayHelper = require("./arrayhelper");
-import numHelper = require( "../core/numhelper" );
-import ex = require( "../core/exception" )
+import numHelper = require( "../core/_util/numhelper" );
+import diagnostics = require( "../core/diagnostics" )
 //import runtime = require("./runtime");
 //import diagnostics = require("./diagnostics");
 import * as bb from "bluebird";
@@ -41,7 +41,7 @@ export class BitFlags {
 		if ( index < BitFlags.MAXFLAGS && index >= 0 ) {
 			return;
 		}
-		throw new ex.XlibException( `index out of bounds.  You supplied ${ index } while expected range is 0 to ${ BitFlags.MAXFLAGS - 1 }` );
+		throw new diagnostics.XlibException( `index out of bounds.  You supplied ${ index } while expected range is 0 to ${ BitFlags.MAXFLAGS - 1 }` );
 
 	}
 	/** return the value of a certain flag */
@@ -267,7 +267,7 @@ export class ExpiresDictionary<TValue> {
 	constructor( public autoTryCleanupInterval: luxon.Duration, public defaultLifetime: luxon.Duration ) {
 		setInterval( () => {
 			this._tryCleanupOne();
-		}, this.autoTryCleanupInterval.as("millisecond") );
+		}, this.autoTryCleanupInterval.as( "millisecond" ) );
 	}
 
 	private _tryCleanupOne() {

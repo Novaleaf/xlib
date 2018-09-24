@@ -2,16 +2,11 @@
 
 import * as bb from "bluebird";
 
-import stringHelper = require( "../core/stringhelper" );
+import stringHelper = require( "../core/_util/stringhelper" );
 
 import _ = require( "lodash" );
 
 import luxon = require( "luxon" );
-
-
-//import moment = require( "moment" );
-
-import exception = require( "../core/exception" );
 
 import reflection = require( "../core/reflection" );
 
@@ -106,7 +101,7 @@ export class Cache {
 
         let now = luxon.DateTime.utc();
         if ( options.fetchExpiresDuration.valueOf() <= 0 ) {
-            throw new exception.XlibException( "Cache: item to insert is alreadey expired (fetchExpiresAmount less than or equal to zero)" );
+            throw new diagnostics.XlibException( "Cache: item to insert is alreadey expired (fetchExpiresAmount less than or equal to zero)" );
         }
         // do a garbage collection pass (one item checked per read call) 
         this._tryGCOne( now );

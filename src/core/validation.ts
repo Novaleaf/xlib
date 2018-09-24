@@ -1,7 +1,7 @@
 "use strict";
-import stringHelper = require( "./stringhelper" );
-import numHelper = require( "./numhelper" );
-import ex = require( "./exception" );
+import stringHelper = require( "./_util/stringhelper" );
+import numHelper = require( "./_util/numhelper" );
+import ex = require( "./_diagnostics/exception" );
 import _ = require( "lodash" );
 import serialization = require( "./serialization" );
 import reflection = require( "./reflection" );

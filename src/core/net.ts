@@ -5,9 +5,6 @@ import * as __ from "./lolo";
 import * as diagnostics from "./diagnostics";
 const log = diagnostics.log; // new diagnostics.Logger( __filename );
 
-import * as serialization from "./serialization";
-import * as exception from "./exception";
-import * as stringHelper from "./stringhelper";
 
 
 //import compression = require("./compression");

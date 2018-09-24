@@ -1,4 +1,4 @@
-import ex = require( "./exception" );
+
 
 export function copy<T>( array: T[], startIndex: number = 0, endIndex?: number ): T[] {
 	return Array.prototype.slice.call( array, startIndex, endIndex );
