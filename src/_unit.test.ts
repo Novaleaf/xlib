@@ -196,14 +196,15 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	it( " test perf timer", async () => {
 
+		const __ = xlib.lolo;
+
 		/** needs to stay 5 otherwise the assert check at the bottom of the test needs to be changed */
 		const loops = 5;
 		const loopSleepMs = 3;
 		const logIntervalMs = undefined;
 
-		const __ = xlib.lolo;
 		const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: logIntervalMs, autoLogLevel: xlib.environment.LogLevel.WARN } );
-		perfTimer._storage
+
 		const outsideWatch = perfTimer.start( "outside" );
 		for ( let i = 0; i < loops; i++ ) {
 			const mainLoopWatch = perfTimer.start( "mainLoop" );
@@ -228,9 +229,11 @@ describe( __filename + " basic xlib unit tests", () => {
 			mainLoopWatch.stop();
 		}
 		outsideWatch.stop();
-		const { logData, rawData } = perfTimer.logNowAndClear();
-		__.log.assert( logData[ "mainLoop" ].runs === 4 && logData[ "innerAA" ].runs === 125 && logData[ "innerA" ].runs === 25 && logData[ "innerB" ].runs === 25 );
-		__.log.assert( rawData[ "mainLoop" ].raw.length === 4 );
+		const { logData, rawData } = await perfTimer.logNowAndClear();
+		__.log.assert( Object.keys( logData ).length <= 5, "too many keys.  why?" );
+		__.log.assert( Object.keys( logData ).length === 5 && logData[ "outside" ] != null, "perfTimer.logNowAndClear() should have been awaited, giving other fulfilled promises from stopwatch('outside') a chance to finalize and be reported" );
+		__.log.assert( logData[ "outside" ].runs === 1 && logData[ "mainLoop" ].runs === 5 && logData[ "innerAA" ].runs === 125 && logData[ "innerA" ].runs === 25 && logData[ "innerB" ].runs === 25 );
+		__.log.assert( rawData[ "mainLoop" ].raw.length === 5 );
 
 
 

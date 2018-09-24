@@ -354,43 +354,50 @@ a performance timer that allows taking multiple samples of multiple areas, and l
 
 ```typescript
 const __ = xlib.lolo;
-    const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: undefined, autoLogLevel: xlib.environment.LogLevel.WARN } );
-    const outsideWatch = perfTimer.start( "outside" );
-    for ( let i = 0; i < 10; i++ ) {
-        const mainLoopWatch = perfTimer.start( "mainLoop" );
-        for ( let i = 0; i < 10; i++ ) {
-            const innerA = perfTimer.start( "innerA" );
-            for ( let i = 0; i < 10; i++ ) {
-                const innerAA = perfTimer.start( "innerAA" );
+const loops = 5;
+const loopSleepMs = 3;
+const logIntervalMs = undefined;
 
-                await __.bb.delay( 100 );
-                innerAA.stop();
-            }
-            await __.bb.delay( 100 );
-            innerA.stop();
-        }
-        for ( let i = 0; i < 10; i++ ) {
-            const innerB = perfTimer.start( "innerB" );
+const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: logIntervalMs, autoLogLevel: xlib.environment.LogLevel.WARN } );
 
-            await __.bb.delay( 100 );
-            innerB.stop();
+const outsideWatch = perfTimer.start( "outside" );
+for ( let i = 0; i < loops; i++ ) {
+    const mainLoopWatch = perfTimer.start( "mainLoop" );
+    for ( let i = 0; i < loops; i++ ) {
+        const innerA = perfTimer.start( "innerA" );
+        for ( let i = 0; i < loops; i++ ) {
+            const innerAA = perfTimer.start( "innerAA" );
+
+            await __.bb.delay( loopSleepMs );
+            innerAA.stop();
         }
-        await __.bb.delay( 100 );
-        mainLoopWatch.stop();
+        await __.bb.delay( loopSleepMs );
+        innerA.stop();
     }
-    outsideWatch.stop();
-    perfTimer.logNowAndClear();
+    for ( let i = 0; i < loops; i++ ) {
+        const innerB = perfTimer.start( "innerB" );
+
+        await __.bb.delay( loopSleepMs );
+        innerB.stop();
+    }
+    await __.bb.delay( loopSleepMs );
+    mainLoopWatch.stop();
+}
+outsideWatch.stop();
+
+const { logData, rawData } = await perfTimer.logNowAndClear(); //you can procedurally inspect the perf results if you want
 ```
 
 You can either get the output of ```PerfTimer``` manually via the ```.done``` property, or you can choose to auto log the (via the constructor) which,
 in the case of the above code, will look like the following:
 
 ```bash
-2018-09-24T02:16:45.152Z     at Object.<anonymous> (C:\repos\stage5\xlib\src\_unit.test.ts:231:42) WARN 'PerfTimer Logging' { logData:
-   { innerAA: { runs: 125, total: '00:00:00.563', mean: '00:00:00.04', iqr: [ 3, 4, 4, 5, 20, [length]: 5 ] },
-     innerA: { runs: 25, total: '00:00:00.763', mean: '00:00:00.30', iqr: [ 20, 24, 26, 29, 54, [length]: 5 ] },
-     innerB: { runs: 25, total: '00:00:00.150', mean: '00:00:00.06', iqr: [ 3, 4, 4, 5, 43, [length]: 5 ] },
-     mainLoop: { runs: 4, total: '00:00:00.768', mean: '00:00:00.192', iqr: [ 176, 177.5, 181, 195.5, 230, [length]: 5 ] } } }
+2018-09-24T03:38:46.360Z     at tryCatcher (C:\repos\stage5\xlib\node_modules\bluebird\js\release\util.js:16:23) WARN 'PerfTimer Logging' { logData:
+   { innerAA: { runs: 125, total: '00:00:00.780', mean: '00:00:00.06', iqr: [ 3, 4, 4, 5, 73, [length]: 5 ] },
+     innerA: { runs: 25, total: '00:00:00.942', mean: '00:00:00.37', iqr: [ 24, 27, 31, 35, 106, [length]: 5 ] },
+     innerB: { runs: 25, total: '00:00:00.170', mean: '00:00:00.06', iqr: [ 4, 4, 5, 5, 44, [length]: 5 ] },
+     mainLoop: { runs: 5, total: '00:00:01.138', mean: '00:00:00.227', iqr: [ 182, 194, 210, 252, 300, [length]: 5 ] },
+     outside: { runs: 1, total: '00:00:01.139', mean: '00:00:01.139', iqr: [ 1139, 1139, 1139, 1139, 1139, [length]: 5 ] } } }
 ```
 
 For more information on IQR, see https://www.dataz.io/display/Public/2013/03/20/Describing+Data:+Why+median+and+IQR+are+often+better+than+mean+and+standard+deviation

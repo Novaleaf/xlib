@@ -100,7 +100,7 @@ export class Stopwatch {
 
 
 	/** starts the current stopwatch.  calling multiple times does nothing */
-	public async start(): Promise<Stopwatch> {
+	public start(): promise.bluebird<Stopwatch> {
 		if ( this._awaitStopCalled != null ) {
 			return this._awaitStopCalled;
 		}
@@ -193,26 +193,30 @@ export class PerfTimer {
 	}
 
 	/** logs perf times to console and clears out the internal storage.
+		* logging happens asynchronously to let fulfilled stopwatches a chance to finalize (to be logged to the perfTimer)
 		* @returns data on the perf runs that were logged to console.
 	 */
 	public logNowAndClear( callSiteLevelsUp = 0 ) {
+		// ! need to wrap the actual logging in an async call so that any fulfilled promises (from stopwatch executions earlier in the callstack) can finalize themselves.
+		// ! if we don't do this, then a call to the stopwatch.stop() further up in the code would not be logged.
+		return promise.bluebird.try( () => { } ).then( () => {
+			//const logData: { [ key: string ]: any } = {};// [ "PerfTimer AutoLog" ];
+			const logData: { [ key: string ]: { runs: number, total: string, mean: string, iqr: number[] } } = {};
+			_.forIn( this._storage, ( samples, key ) => {
+				let runs = samples.runs;
+				let total = samples.total.toFormat( "hh:mm:ss.SS" );
+				let mean = luxon.Duration.fromMillis( samples.total.valueOf() / samples.runs ).toFormat( "hh:mm:ss.SS" );
+				let iqr = quantile( samples.raw );
+				//quartiles[ 2 ] = quartiles[ 2 ].toString() as any;
+				logData[ key ] = { runs, total, mean, iqr };
+				//logData.push( { key, runs, total, mean, iqr } );
+			} );
 
-		//const logData: { [ key: string ]: any } = {};// [ "PerfTimer AutoLog" ];
-		const logData: { [ key: string ]: { runs: number, total: string, mean: string, iqr: number[] } } = {};
-		_.forIn( this._storage, ( samples, key ) => {
-			let runs = samples.runs;
-			let total = samples.total.toFormat( "hh:mm:ss.SS" );
-			let mean = luxon.Duration.fromMillis( samples.total.valueOf() / samples.runs ).toFormat( "hh:mm:ss.SS" );
-			let iqr = quantile( samples.raw );
-			//quartiles[ 2 ] = quartiles[ 2 ].toString() as any;
-			logData[ key ] = { runs, total, mean, iqr };
-			//logData.push( { key, runs, total, mean, iqr } );
+			const callSite = diagnostics.computeStackTrace( callSiteLevelsUp + 1, 1 )[ 0 ];
+			diagnostics.log._tryLog( this.options.autoLogLevel, [ "PerfTimer Logging", { logData } ], true, callSite );
+			const rawData = this.clearDone();
+			return { logData, rawData };
 		} );
-
-		const callSite = diagnostics.computeStackTrace( callSiteLevelsUp + 1, 1 )[ 0 ];
-		diagnostics.log._tryLog( this.options.autoLogLevel, [ "PerfTimer Logging", { logData } ], true, callSite );
-		const rawData = this.clearDone();
-		return { logData, rawData };
 	}
 
 
