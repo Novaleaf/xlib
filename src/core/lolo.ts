@@ -69,18 +69,33 @@ export { jsonX };
 
 
 import * as luxon from "luxon";
-/** return time in utc.  this is the most common entrypoint into time usage via the ```luxon``` module.
+/** Time: return time in utc.  pass no arguments to get the current time.
+	* 
+	* Shortcut to ```xlib.time.luxon.DateTime.utc()```
 	* @example
 const start = __.utc();
 //....do stuff...
 const elapsed = start.until( __.utc() ).length( "millisecond" );
 */
 export const utc = luxon.DateTime.utc;
+/** Time:  create a duration object.
+	* 
+	* Shortcut to ```xlib.time.Duration.fromObject()```
+	* @example
+	const oneHundredMs = __.duration( { milliseconds: 100 } );
+  */
+export const duration = luxon.Duration.fromObject;
+
 
 
 
 import { bluebird } from "./promise";
-// /** the ```bluebird``` library with some helpers injected , and rejection reasons restricted to Error*/
+/** the ```bluebird``` library with some helpers injected , and rejection reasons restricted to Error
+	* 
+	* shortcut to ```xlib.promise.bluebird```
+	* @example
+	const results = await __.bb.resolve(someObject.someAsyncFcn()).timeout(1000,"waited too long");
+*/
 export const bb = bluebird;
 
 
