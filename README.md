@@ -11,7 +11,6 @@ Generally, the aim is to have ```xlib``` contain 80% of the functionality you'll
 
 # WORK IN PROGRESS
 
-- ***new changes*** under ```xlib@next``` : currently under very active development. Instead of publishing a new .major version every day or two, instead I'll be publishing to ```xlib@next``` for the near term.   
 - ***browser currently unsupported***:    while ```xlib``` is designed for brower support, it's not currently being tested and might be superficially broken.  Previously, in v9.x ```WebPack``` was tested and supported.   
 
 
