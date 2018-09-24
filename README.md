@@ -369,7 +369,7 @@ export class AsyncReaderWriterLock<TValue=void>
 ## time
 
 ### luxon
-```luxon``` is a nice immutable time library.   
+```luxon``` is a nice immutable time library.   See [https://moment.github.io/luxon/](https://moment.github.io/luxon/)
 
 example:
 ```typescript
