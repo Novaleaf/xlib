@@ -3,9 +3,11 @@ import * as _ from "lodash";
 import * as stringHelper from "../_util/stringhelper";
 
 
-/** shape of javascript ```Error```s */
+/** shape of all errors.   either derived from the ```Error``` object, or Error objects serialized to JSON */
 export interface IError {
+	/** the name of the Error class (typeName) */
 	name: string;
+	/** human readable and ***actionable*** error message */
 	message: string;
 	/** while almost always available, it may not be set under unusual circumstances */
 	stack?: string;
@@ -13,13 +15,13 @@ export interface IError {
 	innerError?: IError;
 }
 
-/** the shape of Errors that xlib prefers to use, IE with a stack that's an array (not a string),  and an innerException parameter*/
+/** the shape of Errors that xlib serializes (the same as normal Error serialization, except the stack is an array, not a single string)*/
 export interface IErrorJson {
-	/** the name of the class inheriting from Error */
+	/** the name of the Error class (typeName) */
 	name: string;
-	/** human readable (and actionable) message describing the circumstances of the error*/
+	/** human readable and ***actionable*** error message */
 	message: string;
-	/** the callstack.  */
+	/** while almost always available, it may not be set under unusual circumstances */
 	stack?: string[];
 	/** optional, can pass an innerException of you use xlib.diagnostics.Exception */
 	innerError?: IErrorJson;

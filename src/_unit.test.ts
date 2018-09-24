@@ -151,12 +151,13 @@ describe( __filename + " basic xlib unit tests", () => {
 				throw new MyException( "second", { innerError: _err } );
 			}
 		} catch ( _err ) {
-			log.infoFull( "logging error object", _err );
-			log.infoFull( "logging error object as JSON", xlib.diagnostics.errorToJson( _err ) );
+			//log.infoFull( "logging error object", _err );
+			//log.infoFull( "logging error object as JSON", xlib.diagnostics.errorToJson( _err ) );
 
 			log.assert( _err instanceof Error );
 			log.assert( _err instanceof MyException );
-			const err = _err as MyException;
+			const err = xlib.diagnostics.toError( _err );
+			log.assert( err === _err, "because _err was an instanceOf Error, we should have gotten the same object back, but now strongly typed" );
 			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
 			log.assert( err.innerError.message === "first" );
 
