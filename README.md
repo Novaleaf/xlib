@@ -8,6 +8,45 @@
 
 Generally, the aim is to have ```xlib``` contain 80% of the functionality you'll need from ```npm``` modules.
 
+--------
+
+- [Abstract](#abstract)
+- [WORK IN PROGRESS](#work-in-progress)
+- [expected setup](#expected-setup)
+- [Usage](#usage)
+- [Functionality](#functionality)
+    - [Logging](#logging)
+        - [Basic Logging](#basic-logging)
+            - [A note on sourcemaps:](#a-note-on-sourcemaps)
+        - [log filtering](#log-filtering)
+    - [Environment](#environment)
+        - [EnvVars Startup Options](#envvars-startup-options)
+        - [Reading/Writing custom envVars](#readingwriting-custom-envvars)
+            - [read envVars in your code](#read-envvars-in-your-code)
+            - [write envVars](#write-envvars)
+            - [> #### NodeJs](#--nodejs)
+            - [> #### Browser](#--browser)
+    - [reflection](#reflection)
+    - [lolo](#lolo)
+    - [network code](#network-code)
+        - [```RemoteHttpEndpoint```](#remotehttpendpoint)
+    - [exception](#exception)
+    - [threading](#threading)
+            - [```AsyncReaderWriterLock```](#asyncreaderwriterlock)
+    - [time](#time)
+        - [luxon](#luxon)
+        - [PerfTimer](#perftimer)
+        - [Stopwatch](#stopwatch)
+    - [old features](#old-features)
+        - [_obsolete](#_obsolete)
+        - [_graveyard](#_graveyard)
+- [Versioning / Upgrading](#versioning--upgrading)
+    - [planned future work (roadmap)](#planned-future-work-roadmap)
+- [development](#development)
+- [Why](#why)
+- [Changelog](#changelog)
+
+--------
 
 # WORK IN PROGRESS
 - ***active development***: ```xlib``` while no big changes are planned (v13.x represents a big refactor), changes are being made.  ```xlib``` follows [Semantic Versioning](https://semver.org/) so if you stay on the same major version, you won't have any breaking changes.
