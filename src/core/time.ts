@@ -35,9 +35,14 @@ export function quantile( intervals: Array<luxon.Interval | luxon.Duration | num
 		*/
 	quantile = [ 0, 0.25, 0.5, 0.75, 1 ] ) {
 
-	// if ( intervals == null || intervals.length === 0 ) {
-	// 	return [ undefined, undefined, undefined, undefined, undefined ];
-	// }
+	if ( intervals == null || intervals.length === 0 ) {
+		//don't crash on empty imput.  just return NaN
+		let toReturn = [];
+		for ( let i = 0; i < quantile.length; i++ ) {
+			toReturn.push( NaN );
+		}
+		return toReturn;;
+	}
 
 
 
