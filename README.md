@@ -6,11 +6,25 @@
 
 **```xlib```** is a monolitic core/utilities library.  It's designed to be a one-stop-shop for professional developers who need functionality that will work across Browser or Server. 
 
+## Goals
+
+In no particular order:
+1. **Full Features**: Contain 80% of the functionality you'd need from external modules. *(reduce your need to research/test potential dependencies)*
+2. **Easy to use**: Make sure all modules, both external and custom to ```xlib```, work well together, and are easy to debug.  *(no need to write glue or custom debug code)*
+3. **Use the best**: Ensure all code is high quality.  Prefer well supported 3rd party modules over custom ```xlib``` code.  *(Don't fall to [NIH syndrom](https://en.wikipedia.org/wiki/Not_invented_here))*
+4. **Organized and tested**: Ensure all code+3rd party modules are properly [Namespaced](https://en.wikipedia.org/wiki/Namespace) and unit tests cover all custom ```xlib``` code. *(gain inspiration from the [.NET Framework Design Guidelines](https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/))*
+5. **Modern Typescript**: Focus on supporting [async/await](https://blogs.msdn.microsoft.com/typescript/2015/11/03/what-about-asyncawait/) workflows.  *(All async workflows are [Promise](https://www.promisejs.org/) based and ```xlib``` was reworked with [Typescript 3.x](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-0.html) in mind)*
+6. **For Professional Use**: no hacks, descriptive documentation, follow [SemVer](https://semver.org/), and deployment environment aware.  *(```xlib``` has been in production use since 2015)*
+
+
+
+
 Generally, the aim is to have ```xlib``` contain 80% of the functionality you'll need from ```npm``` modules.
 
 --------
 
 - [Abstract](#abstract)
+    - [Goals](#goals)
 - [WORK IN PROGRESS](#work-in-progress)
 - [expected setup](#expected-setup)
 - [Usage](#usage)
@@ -18,31 +32,31 @@ Generally, the aim is to have ```xlib``` contain 80% of the functionality you'll
     - [Logging](#logging)
         - [Basic Logging](#basic-logging)
             - [A note on sourcemaps:](#a-note-on-sourcemaps)
-        - [log filtering](#log-filtering)
+        - [Log Filtering](#log-filtering)
     - [Environment](#environment)
         - [EnvVars Startup Options](#envvars-startup-options)
         - [Reading/Writing custom envVars](#readingwriting-custom-envvars)
             - [read envVars in your code](#read-envvars-in-your-code)
-            - [write envVars](#write-envvars)
+            - [Write EnvVars](#write-envvars)
             - [> #### NodeJs](#--nodejs)
             - [> #### Browser](#--browser)
-    - [reflection](#reflection)
-    - [lolo](#lolo)
-    - [network code](#network-code)
-        - [```RemoteHttpEndpoint```](#remotehttpendpoint)
-    - [exception](#exception)
-    - [threading](#threading)
-            - [```AsyncReaderWriterLock```](#asyncreaderwriterlock)
-    - [time](#time)
-        - [luxon](#luxon)
+    - [Reflection](#reflection)
+    - [Lolo](#lolo)
+    - [Network Code](#network-code)
+        - [RemoteHttpEndpoint](#remotehttpendpoint)
+    - [Exception](#exception)
+    - [Threading](#threading)
+            - [AsyncReaderWriterLock](#asyncreaderwriterlock)
+    - [Time](#time)
+        - [Luxon](#luxon)
         - [PerfTimer](#perftimer)
         - [Stopwatch](#stopwatch)
-    - [old features](#old-features)
-        - [_obsolete](#_obsolete)
-        - [_graveyard](#_graveyard)
+    - [Old Features](#old-features)
+        - ["_obsolete"](#_obsolete)
+        - ["_graveyard"](#_graveyard)
 - [Versioning / Upgrading](#versioning--upgrading)
-    - [planned future work (roadmap)](#planned-future-work-roadmap)
-- [development](#development)
+    - [Planned Future Work (Roadmap)](#planned-future-work-roadmap)
+- [Development](#development)
 - [Why](#why)
 - [Changelog](#changelog)
 
@@ -51,6 +65,8 @@ Generally, the aim is to have ```xlib``` contain 80% of the functionality you'll
 # WORK IN PROGRESS
 - ***active development***: ```xlib``` while no big changes are planned (v13.x represents a big refactor), changes are being made.  ```xlib``` follows [Semantic Versioning](https://semver.org/) so if you stay on the same major version, you won't have any breaking changes.
 - ***browser currently unsupported***:    while ```xlib``` is designed for brower support, it's not currently being tested and might be superficially broken.  Previously, in v9.x ```WebPack``` was tested and supported.   
+
+    Additionally, no minified version is currently available.  When the browser is supported, the target minified size is 500kb.  Plan is to support [Tree Shaking](https://webpack.js.org/guides/tree-shaking/) for those who want a super tiny dependency.
 
 
 
@@ -137,7 +153,7 @@ log.info( "hi", { some: "data" } );
 
 
 
-### log filtering
+### Log Filtering
 
 you can set a minimum log level per file or per ```RegExp``` so that you can toggle the verbosity of your files.  
 
@@ -207,7 +223,7 @@ Environmental variables can be detected from numerous sources, in the following 
 const apiKey = xlib.environment.getEnvironmentVariable("apikey");
 ```
 
-#### write envVars
+#### Write EnvVars
 
 > #### NodeJs
 1. CommandLine Args
@@ -229,7 +245,7 @@ const apiKey = xlib.environment.getEnvironmentVariable("apikey");
 4. dom attribute "KEY" in a node
 
 
-## reflection
+## Reflection
 
 Here's an example showing how to get the type of various objects:
 ```typescript
@@ -247,7 +263,7 @@ log.assert( reflection.getType( reflection.getType ) === Type.function );
 log.assert( reflection.getType( xlib ) === Type.object );
 ```
 
-## lolo
+## Lolo
 
 lolo is inspired by ```lodash```  it's shortcuts to commonly used functionality of ```xlib```.
 
@@ -259,10 +275,10 @@ __.log.warn(__.diag.toError("boom"));
 ```
 
 
-## network code
+## Network Code
 
 
-### ```RemoteHttpEndpoint```
+### RemoteHttpEndpoint
 
 you can easily construct a request from a webserver: 
 
@@ -316,7 +332,7 @@ try {
 }
 ```
 
-## exception
+## Exception
 
 make sure throws are actually errors:
 ```typescript
@@ -351,9 +367,11 @@ try {
 ```
 
  
-## threading
+## Threading
 
-#### ```AsyncReaderWriterLock```
+#### AsyncReaderWriterLock
+a custom ReaderWriterLock focused on async/await workflows.
+
 ```typescript
 /** an async+promise capable, readerwriter lock.
  * 
@@ -363,12 +381,12 @@ try {
  * 
  * when a race occurs, writes take precidence
  */
-export class AsyncReaderWriterLock<TValue=void>
+export class AsyncReaderWriterLock<TValue=never>
 ```
 
-## time
+## Time
 
-### luxon
+### Luxon
 ```luxon``` is a nice immutable time library.   See [https://moment.github.io/luxon/](https://moment.github.io/luxon/)
 
 example:
@@ -448,9 +466,9 @@ __.log.assert( elapsed.valueOf() < 2100 );
 
 ```
 
-## old features
+## Old Features
 
-### _obsolete
+### "_obsolete"
 
 A lot of "scenario" focused features are obsolete given advances in Typescript and Javascript.   they are still published under the ```/dist/_obsolete/``` folder in case you need them.
 
@@ -462,7 +480,7 @@ they include:
 - Stripe.d.ts:  type definitions for an old version of the Stripe api.  
 
 
-### _graveyard
+### "_graveyard"
 Features that used to be in ```xlib``` but are thrown away can be found in the ```/dist/_graveyard/``` folder, but due to dependencies on old ```xlib``` code, those may not build or work anymore.
 
 
@@ -473,27 +491,41 @@ Features that used to be in ```xlib``` but are thrown away can be found in the `
 ```xlib``` follows [Semver](https://docs.npmjs.com/getting-started/semantic-versioning) versioning.  Thus any breaking change will be released under a major version, and new functionality will be released under minor versions.  
 
 
-## planned future work (roadmap)
+## Planned Future Work (Roadmap)
 
 ```xlib```'s core functionality has been used in production code since 2015.   While mostly stable since, here are the future plans:
 
 - **improved diagnostics**: 
-    - chaos testing
+    - chaos testing 
         - ability to randomly inject segfaults into child processes, and reject pending promise/async calls
     - custom promise library wrapping ```bluebird```:
         - stictly typed promise errors
         - full es6 promise compliance
+        - disallow empty catches (cause warnings in node)
         - querying of all pending promises (part of further integration with chaos testing)
     - debug friendly dateTime wrapping ```luxon```
         - simulate normal execution time while manually stepping code in a debugger, including instrumentation of ```setTimeout()```
+    - jsonX.inspectParse()  
+        - should handle any iterable object, or at least new builtins like Set<T>
+        - allow 3rd party code to plugin their own inspectors for custom objects
 - **browser support**
+    - minification and dependency size reduction.  currently ```xlib``` and dependencies weighs in at 3.5mb, gzipped. this can be brought down by more than 75% easily, by using minified versions of dependencies such as ```mathjs```, ```lodash```, and ```luxon```.  
     - ensure all unit tests pass on chrome, firefox, edge, and IE11
 - **logging**
     - log to a remote http endpoint or smtp email
 - **filesystem**
     - add file system emulation to browsers (such as use ```browser-fs```)
+- **numeric**
+    - find modules to help flesh out this namespace. maybe candidates are:
+        - https://www.npmjs.com/package/accounting
+        - https://www.npmjs.com/package/numbers
+        - find something that can support numerical methods on anything with a ```{ valueOf():number; }``` interface.
+- **webservices** (maybe?)
+    - add Free(mium) webservices that make sense (perhaps a geolocation api, currency converter, translation, password strength estimation, etc)
 
-# development
+> **If you have an idea**, Please add an issue on the Repo so we can discuss!  (pull reqeusts are welcome, but lets make sure the feature is a good fit first)
+
+# Development
 
 if you want to build/modify ```xlib```, download this repo and open the folder in vsCode.  included are basic unit tests that will launch automatically if you choose to "run" xlib from vsCode.
 
