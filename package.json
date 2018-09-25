@@ -1,6 +1,6 @@
 {
   "name": "xlib",
-  "version": "14.1.1",
+  "version": "14.1.2",
   "description": "A Cross Platform, Monolithic Core Library for Typescript.",
   "main": "./dist/_index.js",
   "types": "./dist/_index.d.ts",
