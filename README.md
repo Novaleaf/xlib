@@ -18,9 +18,6 @@ In no particular order:
 
 
 
-
-Generally, the aim is to have ```xlib``` contain 80% of the functionality you'll need from ```npm``` modules.
-
 --------
 
 - [Abstract](#abstract)
@@ -451,7 +448,7 @@ For more information on IQR, see https://www.dataz.io/display/Public/2013/03/20/
 
 ### Stopwatch
 
-If you need something simpler than PerfTimer, there is ```StopWatch``
+If you need something simpler than PerfTimer, there is ```StopWatch```
 
 ```typescript
 const __ = xlib.lolo;
@@ -461,7 +458,7 @@ await xlib.promise.bluebird.delay( 2000 );
 stopwatch.stop();
 let elapsed = stopwatch.getElapsed();
 __.log.info( "stopwatch is", elapsed.valueOf() );
-__.log.assert( elapsed.valueOf() > 2000 );
+__.log.assert( elapsed.valueOf() >= 2000 );
 __.log.assert( elapsed.valueOf() < 2100 );
 
 ```
@@ -535,7 +532,8 @@ if you want to build/modify ```xlib```, download this repo and open the folder i
 Since I started programming, I've a big fan of the .NET Framework.  Xlib is my attempt to bring that level of great features + (re)usability to the Typescript.  
 
 # Changelog
+- v14: polish.  small but breaking change to ```xlib.diagnostics.Exception``` required a major version bump.  
 - v13: modernize.  upgrade all dependencies to latest, deprecate or remove obsolete features, ```xlib.net``` improvements, general cleanup, remove ```moment``` in favor of ```luxon```
-- v12: reconfig initialization arguments to be passed prior to import of xlib (IE: specify a ```global.__xlibInitArgs```) . also change logger to be a singleton, and allow better log filtering via log.
-- v11: remove testLevel as external testing frameworks like mocha set their testLevel in a different way.
-- v10: the 10.x  branch (and semver) is a restructure of this project to take advantage of the now fully mature typescript ecosystem.  Prior to 10.x, to publish a typescript project was a tedious process.
+- v12: refactor xlib initialization workflow.  reconfig initialization arguments to be passed prior to import of xlib (IE: specify a ```global.__xlibInitArgs```) . also change logger to be a singleton, and allow better log filtering via log.
+- v11: refactor EnvVars.  remove testLevel as external testing frameworks like mocha set their testLevel in a different way.
+- v10: typescript 3.x.  a restructure of this project to take advantage of the now fully mature typescript ecosystem.  Prior to this, to publish and consume a typescript project was a tedious process.
