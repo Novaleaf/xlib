@@ -52,6 +52,18 @@ export function unescapeUserInput( value: string ): string {
     return decodeURIComponent( value );
 }
 
+/** helper for the .isUnicodeDoubleByte() method */
+const _isUnicodeDoubleByte_regex = /[^\u0000-\u00ff]/; // Small performance gain from pre-compiling the regex
+/** does the string contain characters larger than a single byte */
+export function isUnicodeDoubleByte( str: string ) {
+    //from: https://stackoverflow.com/questions/147824/how-to-find-whether-a-particular-string-has-unicode-characters-esp-double-byte
+    if ( str == null || str.length === 0 ) {
+        return false;
+    }
+    if ( str.charCodeAt( 0 ) > 255 ) return true;
+    return _isUnicodeDoubleByte_regex.test( str );
+}
+
 /**
  * basic, simple check if the string has been encoded via encodeURIComponent() or encodeURI()
  * may return false-positives, but never false-negatives.

@@ -347,7 +347,9 @@ export namespace jsonX {
 
 		//loop through all nodeHiearchyStrings to remove, removing the leaf.
 		_.forEach( nodeHiearchyStrings, ( hiearchyString ) => {
-
+			if ( hiearchyString == null ) {
+				return;
+			}
 
 			var hiearchy = hiearchyString.split( "." );
 
