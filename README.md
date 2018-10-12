@@ -208,7 +208,7 @@ global.__xlibInitArgs = {
     /** let any previously set args override these */
     ...global.__xlibInitArgs
 };
-import xlib = require( "xlib" );
+import * as xlib from "xlib";
 ```
 
 ### Reading/Writing custom envVars

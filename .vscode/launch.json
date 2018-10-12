@@ -42,6 +42,7 @@
 			"request": "launch",
 			"runtimeArgs": [
 				"--watch",
+				"--sourcemaps"
 				//"--trace-warnings",
 			],
 			"args": [

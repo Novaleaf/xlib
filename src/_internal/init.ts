@@ -1,5 +1,5 @@
 /** allows internal xlib modules to hook the xlib.initialize() method */
-import promise = require( "../core/promise" );
+import * as promise from "../core/promise";
 import * as environment from '../core/environment';
 import bb = promise.bluebird;
 

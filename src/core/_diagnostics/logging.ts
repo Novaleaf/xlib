@@ -1,21 +1,21 @@
 // tslint:disable:no-console
 
-import environment = require( "../environment" );
-import stringHelper = require( "../_util/stringhelper" );
-import serialization = require( "../serialization" );
-import reflection = require( "../reflection" );
-import _ = require( "lodash" );
+import * as environment from "../environment";
+import * as stringHelper from "../_util/stringhelper";
+import * as serialization from "../serialization";
+import * as reflection from "../reflection";
+import * as _ from "lodash";
 //import moment = require( "moment" );
 //import * as luxon from "luxon";
 import * as diagnostics from "../diagnostics";
 
 import { LogLevel } from "../environment";
-import util = require( "util" )
+import * as util from "util";
 
 /** coloring for node console */
 import { default as Chalk } from "chalk";
+//import * as stripAnsi from "strip-ansi";
 import stripAnsi = require( "strip-ansi" );
-
 
 
 interface IAnsiColor {

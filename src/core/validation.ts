@@ -1,10 +1,10 @@
 "use strict";
-import stringHelper = require( "./_util/stringhelper" );
-import numHelper = require( "./_util/numhelper" );
-import ex = require( "./_diagnostics/exception" );
-import _ = require( "lodash" );
-import serialization = require( "./serialization" );
-import reflection = require( "./reflection" );
+import * as stringHelper from "./_util/stringhelper";
+import * as numHelper from "./_util/numhelper";
+import * as ex from "./_diagnostics/exception";
+import * as _ from "lodash";
+import * as serialization from "./serialization";
+import * as reflection from "./reflection";
 
 
 /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
@@ -12,7 +12,7 @@ export import validator = require( "validator" );
 
 export import sanitizeHtml = require( "sanitize-html" );
 
-import diagnostics = require( "./diagnostics" )
+import * as diagnostics from "./diagnostics";
 
 import { URL } from "url";
 

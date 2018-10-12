@@ -1,9 +1,9 @@
 "use strict";
 
-import stringHelper = require( "../core/_util/stringhelper" );
+import * as stringHelper from "../core/_util/stringhelper";
 //import arrayHelper = require("./arrayhelper");
-import numHelper = require( "../core/_util/numhelper" );
-import diagnostics = require( "../core/diagnostics" )
+import * as numHelper from "../core/_util/numhelper";
+import * as diagnostics from "../core/diagnostics";
 //import runtime = require("./runtime");
 //import diagnostics = require("./diagnostics");
 import * as bb from "bluebird";

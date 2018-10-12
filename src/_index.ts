@@ -1,7 +1,7 @@
 /// <reference path="./types/xlib-globals/index.d.ts" />
 
 
-import jsShims = require( "./_internal/jsshims" );
+import * as jsShims from "./_internal/jsshims";
 /** 
  * ! initialization of xlib:  some "preinit" has to be done as soon as a submodule is imported, 
  * ! so it can be properly used by other xlib submodules, so we do that manually inline.
@@ -10,7 +10,8 @@ import jsShims = require( "./_internal/jsshims" );
 jsShims.initialize();
 
 
-import source_map_support = require( "source-map-support" );
+//import source_map_support = require( "source-map-support" );
+import * as source_map_support from "source-map-support";
 
 let _initArgs: init.IInitArgs;
 if ( typeof global !== "undefined" && global.__xlibInitArgs ) {
@@ -37,7 +38,7 @@ if ( environment.getGlobal()[ "_" ] == null ) {
 
 
 ///** allows embeding mocha tests (unit tests) in your code, no-oping them if mocha is not present.  */
-import mockMocha = require( "./_internal/mockmocha" );
+import * as mockMocha from "./_internal/mockmocha";
 mockMocha.initialize();
 
 
@@ -131,7 +132,7 @@ export import security = require( "./core/security" );
 export import _obsolete = require( "./_obsolete/_index" );
 
 //////////////////////  initialization section
-import init = require( "./_internal/init" );
+import * as init from "./_internal/init";
 let floatingPromise = init.initialize( _initArgs );
 
 
