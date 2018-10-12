@@ -42,7 +42,7 @@
 			"request": "launch",
 			"runtimeArgs": [
 				"--watch",
-				"--sourcemaps"
+				"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
 				//"--trace-warnings",
 			],
 			"args": [
