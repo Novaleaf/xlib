@@ -1,10 +1,10 @@
 // tslint:disable:no-console
 
-import nodeHelper = require( "../_internal/nodehelper" );
-import browserHelper = require( "../_internal/browserhelper" );
+import * as nodeHelper from "../_internal/nodehelper";
+import * as browserHelper from "../_internal/browserhelper";
 //import ex = require("./exception");
-import init = require( "../_internal/init" );
-import _ = require( "lodash" );
+import * as init from "../_internal/init";
+import * as _ from "lodash";
 
 
 

@@ -1,12 +1,12 @@
 "use strict";
 
-import _ = require( "lodash" );
+import * as _ from "lodash";
 
 export import Chalk = require( "chalk" );
 export import stripAnsi = require( "strip-ansi" );
 
 
-import _sanitizeHtml = require( "sanitize-html" );
+import * as _sanitizeHtml from "sanitize-html";
 
 /**
  * takes our normal "escaped at rest" user input and unescapes it, then sanitizes

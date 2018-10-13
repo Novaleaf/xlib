@@ -2,15 +2,15 @@
 
 import * as bb from "bluebird";
 
-import stringHelper = require( "../core/_util/stringhelper" );
+import * as stringHelper from "../core/_util/stringhelper";
 
-import _ = require( "lodash" );
+import * as _ from "lodash";
 
-import luxon = require( "luxon" );
+import * as luxon from "luxon";
 
-import reflection = require( "../core/reflection" );
+import * as reflection from "../core/reflection";
 
-import diagnostics = require( "../core/diagnostics" );
+import * as diagnostics from "../core/diagnostics";
 const log = diagnostics.log; // new diagnostics.Logger( __filename );
 
 interface ICacheItem<TValue> {

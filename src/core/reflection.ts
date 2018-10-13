@@ -3,7 +3,7 @@
 //import stringHelper = require("../stringhelper");
 //import arrayHelper = require("../arrayhelper");
 
-import ex = require( "./_diagnostics/exception" );
+import * as ex from "./_diagnostics/exception";
 
 
 

@@ -1,9 +1,9 @@
 // tslint:disable
 
-import _ = require( "lodash" );
+import * as _ from "lodash";
 
 
-import ex = require( "../core/exception" );
+import * as ex from "../core/exception";
 
 /** low-level javascript helpers, to smooth over warts in the language */
 
@@ -465,7 +465,7 @@ export function disablePropertyEnumeration( obj: any, propertyName: string ): bo
 	}
 }
 
-import util = require( "util" );
+import * as util from "util";
 
 /** inherit the prototype methods from one constructor into another. The prototype of constructor will be set to a new object created from superConstructor.
 

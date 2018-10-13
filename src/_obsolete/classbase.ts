@@ -1,6 +1,6 @@
 "use strict";
 
-import diagnostics = require( "../core/diagnostics" );
+import * as diagnostics from "../core/diagnostics";
 
 /** root class, includes the following functionality:
 typeName, toString, dispose, assertIsAlive, hashCode */

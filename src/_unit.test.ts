@@ -3,7 +3,7 @@ global.__xlibInitArgs = {
 };
 
 
-import xlib = require( "./_index" );
+import * as xlib from "./_index";
 import _ = xlib.lodash;
 
 
@@ -138,7 +138,7 @@ describe( __filename + " basic xlib unit tests", () => {
 			log.assert( false, "request failed", _err );
 		}
 
-	} );
+	} ).timeout( 5000 );
 
 	it( "test exceptions: DISABLED (causes debugBreak on thrown exceptions when running test)", () => {
 		const log = xlib.diagnostics.log;
@@ -194,7 +194,7 @@ describe( __filename + " basic xlib unit tests", () => {
 		__.log.assert( elapsed.valueOf() >= 2000 );
 		__.log.assert( elapsed.valueOf() < 2100 );
 
-	} );
+	} ).timeout( 3000 );
 
 	it( " test perf timer", async () => {
 
@@ -326,7 +326,7 @@ describe( __filename + " basic xlib unit tests", () => {
 				// 	}
 
 
-				const { toInspect } = await xlib.promise.awaitInspect( awaitsArray[ i ] ).timeout( ( replyDelay + replyDelaySpread ) + 100, "reply took too long, while this could be because of debugging overhead, should investigate" );
+				const { toInspect } = await xlib.promise.awaitInspect( awaitsArray[ i ] ).timeout( ( replyDelay + replyDelaySpread ) + 300, "reply took too long, while this could be because of debugging overhead, should investigate" );
 				__.log.assert( toInspect.isResolved() );
 				if ( toInspect.isFulfilled() ) {
 					__.log.assert( toInspect.value() === "backend success" );
@@ -342,7 +342,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 
 
-	} );  //end it()
+	} ).timeout( 10000 );  //end it()
 
 } ); //end describe()
 

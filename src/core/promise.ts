@@ -1,13 +1,13 @@
 ﻿"use strict";
 
-import _ = require( "lodash" );
+import * as _ from "lodash";
 
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance 
  * global.Promise is aliased to this.
  */
 export import bluebird = require( "bluebird" );
 import * as bb from "bluebird";
-import environment = require( "./environment" );
+import * as environment from "./environment";
 
 //bluebird.longStackTraces();
 
