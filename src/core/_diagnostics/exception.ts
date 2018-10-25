@@ -273,13 +273,16 @@ export interface IErrorToJsonOptions {
 }
 
 /** convert an error and all it's properties to JSON.   */
-export function errorToJson( _error: Error | IError, options?: IErrorToJsonOptions ): IErrorJson {
+export function errorToJson( error: Error | IError, options?: IErrorToJsonOptions ): IErrorJson {
 
+	if ( error == null ) {
+		return undefined;
+	}
 	options = { ...options };
 
-	let error = toError( _error );
+	//let error = toError( _error );
 	let stackArray: string[];
-	let innerError = error.innerError;
+	let innerError: any = ( error as any ).innerError;
 
 	if ( options.alwaysShowFullStack !== true && environment.logLevel > environment.LogLevel.DEBUG && environment.envLevel > environment.EnvLevel.TEST ) {
 		//sanitize
@@ -296,8 +299,10 @@ export function errorToJson( _error: Error | IError, options?: IErrorToJsonOptio
 		} else if ( _.isArray( stack ) ) {
 			//array;
 			stackArray = stack as string[];
-		} else {
+		} else if ( typeof ( stack as any ).toString === "function" ) {
 			stackArray = [ ( stack as any ).toString() ];
+		} else {
+			stackArray = [ "unknown" ];
 		}
 	}
 	let serialized: IError;

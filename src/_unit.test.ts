@@ -157,34 +157,38 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} ).timeout( 5000 );
 
-	// it(function testExceptionsDISABLED (causes debugBreak on thrown exceptions when running test)(){
-	// 		const log = xlib.diagnostics.log;
-	// 		class MyException extends xlib.diagnostics.Exception { };
+	it1( function testExceptions() { //causes debugBreak on thrown exceptions when running test
+		const log = xlib.diagnostics.log;
+		class MyException extends xlib.diagnostics.Exception {
+			public someVal = 22;
+		};
 
-	// 		try {
-	// 			try {
-	// 				throw new MyException( "first" );
-	// 			} catch ( _err ) {
-	// 				throw new MyException( "second", { innerError: _err } );
-	// 			}
-	// 		} catch ( _err ) {
-	// 			//log.infoFull( "logging error object", _err );
-	// 			//log.infoFull( "logging error object as JSON", xlib.diagnostics.errorToJson( _err ) );
+		try {
+			try {
+				throw new MyException( "first" );
+			} catch ( _err ) {
+				throw new MyException( "second", { innerError: _err } );
+			}
+		} catch ( _err ) {
+			//log.infoFull( "logging error object", _err );
+			//log.infoFull( "logging error object as JSON", xlib.diagnostics.errorToJson( _err ) );
 
-	// 			log.assert( _err instanceof Error );
-	// 			log.assert( _err instanceof MyException );
-	// 			const err = xlib.diagnostics.toError( _err );
-	// 			log.assert( err === _err, "because _err was an instanceOf Error, we should have gotten the same object back, but now strongly typed" );
-	// 			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
-	// 			log.assert( err.innerError.message === "first" );
+			log.assert( _err instanceof Error );
+			log.assert( _err instanceof MyException );
+			const err = xlib.diagnostics.toError( _err );
+			log.assert( err === _err, "because _err was an instanceOf Error, we should have gotten the same object back, but now strongly typed" );
+			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
+			log.assert( err.innerError.message === "first" );
+
+			const asJson = xlib.diagnostics.errorToJson( _err );
+			log.assert( _.isEqual( asJson, ( err as MyException ).toJson() ), "json vals should be equal" );
+			log.assert( asJson[ "someVal" ] === 22 );
+			log.info( "testExceptions", asJson );
+		}
 
 
 
-	// 		}
-
-
-
-	// 	} );
+	} );
 
 	it1( function testLolo() {
 
@@ -215,9 +219,9 @@ describe( __filename + " basic xlib unit tests", () => {
 		stopwatch.start();
 		__.log.assert( __.num.aboutEqual( stopwatch.valueOf(), 0, 100 ) );
 		__.log.assert( elapsedMs > stopwatch.valueOf() );
-		elapsedMs = stopwatch.valueOf();
 		__.log.assert( stopwatch.isPaused === false )
 		await __.bb.delay( 10 );
+		elapsedMs = stopwatch.valueOf();
 		log.info( "restarted delay 10ms", stopwatch.toJson() );
 		stopwatch.pause();
 		log.info( "restarted aprox pause", stopwatch.toJson() );
