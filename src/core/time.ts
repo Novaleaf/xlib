@@ -77,59 +77,131 @@ export class Stopwatch {
 
 	constructor( public name?: string ) { }
 
-	public startTime: luxon.DateTime;
-	public stopTime: luxon.DateTime;
+	private startTime: number;
+	private stopTime: number;
 
 	/** if the stopwatch has not started, will return 0
-		* if started but not yet stopped, will return duration from start
+	* if started but not yet stopped, will return duration from start
 	* if stopped, returns duration between start and stop.
+ *
+ * if you want ```ms```, use [[valueOf]]
 	 */
 	public getElapsed() {
-		if ( this.startTime == null ) {
-			return luxon.Duration.fromMillis( 0 );
-		}
-		if ( this.stopTime == null ) {
-			const now = luxon.DateTime.utc();
-			const toReturn = now.diff( this.startTime );
-			return toReturn;
-		}
-		return this.stopTime.diff( this.startTime );
+		return luxon.Duration.fromMillis( this.valueOf() );
 	}
 
+	/** same as [[getElapsed]], except outputs as number of ms.   provided for javascript comparison interface compatability */
 	public valueOf(): number {
-		return this.getElapsed().valueOf();
+		let toReturn = this._pausedElapsed;
+		if ( this._isPaused === true || this.startTime == null ) { //is paused or not started
+			return toReturn;
+		}
+		if ( this.stopTime == null ) {
+			const now = Date.now();
+			toReturn += now - this.startTime;
+		} else {
+			toReturn += this.stopTime - this.startTime;
+		}
+		return toReturn;
+	}
+
+	private _isPaused = false;
+	/** private storage of elapsed, used for pausing */
+	private _pausedElapsed = 0;
+
+	public toJson() {
+		return { elapsedMs: this.valueOf(), isStarted: this.isStarted, isPaused: this.isPaused };
+	}
+
+	/** if the stopwatch is running but paused.  (calling [[stop]] makes a stopwatch to be considered unpaused) */
+	public get isPaused() {
+		return this._isPaused;
+	}
+
+	public get isStarted() {
+		return this.startTime != null && this.stopTime == null;
+	}
+
+	/** pause the stopwatch.  if already paused, or stopped, does nothing. */
+	public pause(): this {
+		if ( this._isPaused === true || this.isStarted !== true ) {
+			//only allow pause to do something if running and not already paused
+			return this;
+		}
+		this._pausedElapsed = this.valueOf();
+		this._isPaused = true;
+		return this;
+	}
+
+	/** unpause the stopwatch.  if not paused (including if already stopped), does nothing */
+	public unpause(): this {
+		if ( this._isPaused !== true ) {
+			return this;
+		}
+		this._isPaused = false;
+		//reset the start time, 
+		this.startTime = Date.now();
+
 	}
 
 	/** mostly for supprting the ```PerfTimer``` class.    allows notifying an external to do something when ```.stop()``` is called. */
 	private _awaitStopCalled: promise.IExposedPromise<Stopwatch>;
 
 
-	/** starts the current stopwatch.  calling multiple times does nothing */
+	/** starts the current stopwatch.  calling multiple times does nothing, unless [[stop]] is called */
 	public start(): promise.bluebird<Stopwatch> {
-		if ( this._awaitStopCalled != null ) {
+		if ( this.isStarted === true ) {
+			//if already running, just return our stopPromise
 			return this._awaitStopCalled;
 		}
-		this.startTime = luxon.DateTime.utc();
-		this._awaitStopCalled = promise.CreateExposedPromise();
+		//clear out all vars (start the stopwatch)
+		this._pausedElapsed = 0;
+		this._isPaused = false;
+		this.startTime = Date.now();
+		this.stopTime = null;
+		this._awaitStopCalled = promise.CreateExposedPromise<Stopwatch>();
+
 		return this._awaitStopCalled;
 	}
 
+	/** stops the stopwatch.  can only be used again by calling [[start]], but current value can be obtained
+	 */
 	public stop(): this {
 
 		try {
-			if ( this.startTime == null ) {
+			if ( this.isStarted === false ) {
+				//only do work if started and not already stopped.
 				return this;
 			}
-
-			if ( this.stopTime == null ) {
-				this.stopTime = luxon.DateTime.utc();
-			}
+			//stop the stopwatch
+			this.stopTime = Date.now();
+			this._isPaused = false; //stopped, so not paused anymore
 			return this;
 		} finally {
 			if ( this._awaitStopCalled != null ) {
 				this._awaitStopCalled.fulfill( this );
 			}
 		}
+	}
+
+	/** resets a started stopwatch to zero (elapsed will be zero, but keeps running)
+	 * 
+	 * if paused, does not unpause
+	 * 
+	 * if stopped, does nothing
+	 */
+	public reset(): this {
+
+		if ( this.isStarted === false ) {
+			return this;
+		}
+
+		this._pausedElapsed = 0;
+		this.startTime = Date.now();
+
+
+
+		return this;
 	}
 }
 

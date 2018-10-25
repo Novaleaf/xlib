@@ -5,7 +5,24 @@ global.__xlibInitArgs = {
 
 import * as xlib from "./_index";
 import _ = xlib.lodash;
+import log = xlib.diagnostics.log;
 
+
+function it1( testFcn: () => void ) {
+	const testName = xlib.reflection.getTypeName( testFcn );
+	return it( testName, testFcn );
+}
+
+
+/** hack fix for mocha bug, unable to have a timeout for async tests */
+function it2( testFcn: () => Promise<any> ) {
+	const testName = xlib.reflection.getTypeName( testFcn );
+	return it( testName, async function () {
+		const timeoutMs = this.timeout();
+		return xlib.promise.bluebird.resolve( testFcn.apply( this ) ).timeout( timeoutMs, new xlib.promise.bluebird.TimeoutError( `operation timed out.  Max of ${ timeoutMs }ms exceeded` ) );
+
+	} );
+}
 
 
 describe( __filename + " basic xlib unit tests", () => {
@@ -14,7 +31,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 
 
-	it( "logger basic console output", async () => {
+	it2( async function loggerBasicConsoleOutput() {
 
 		const testLogger = xlib.diagnostics.log; //  new diagnostics.Logger( "test logging" );
 
@@ -28,14 +45,14 @@ describe( __filename + " basic xlib unit tests", () => {
 
 
 
-	it( "test read xlib.environment.envLevel", () => {
+	it1( function testReadXlibEnvironmentEnvLevel() {
 		const log = xlib.diagnostics.log;
 		xlib.diagnostics.log.assert( xlib.environment.envLevel != null );
 		//log.info( { envLevel: xlib.environment.envLevel } );
 	} );
 
 
-	it( "test log auto-truncation", () => {
+	it1( function testLogAutoTruncation() {
 		const log = xlib.diagnostics.log;
 		log.info( "hi", { some: "data" } );
 
@@ -45,7 +62,7 @@ describe( __filename + " basic xlib unit tests", () => {
 		log.assert( resultArgs[ 4 ].length > 350 );
 	} );
 
-	it( "log overrides test", () => {
+	it1( function logOverridesTest() {
 		const log = xlib.diagnostics.log;
 		try {
 			let result = log.info( "should show" );
@@ -67,7 +84,7 @@ describe( __filename + " basic xlib unit tests", () => {
 		}
 	} );
 
-	it( "testing basic net.RemoteHttpEndpoint functionality: read from example.com", async () => {
+	it2( async function testingBasicNetRemoteHttpEndpointFunctionalityReadFromExampleCom() {
 
 		const log = xlib.diagnostics.log;
 		const remoteEndpoint = new xlib.net.RemoteHttpEndpoint<void, string>( {
@@ -85,7 +102,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} );
 
-	it( "testing reflection", () => {
+	it1( function testingReflection() {
 		const log = xlib.diagnostics.log;
 		const reflection = xlib.reflection;
 		const Type = reflection.Type;
@@ -99,7 +116,7 @@ describe( __filename + " basic xlib unit tests", () => {
 		log.assert( reflection.getType( xlib ) === Type.object );
 	} );
 
-	it( "testing autoscaler functionality: request from phantomjscloud.com", async () => {
+	it2( async function testingAutoscalerFunctionalityRequestFromPhantomjscloudCom() {
 
 		const log = xlib.diagnostics.log;
 
@@ -140,43 +157,43 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} ).timeout( 5000 );
 
-	it( "test exceptions: DISABLED (causes debugBreak on thrown exceptions when running test)", () => {
-		const log = xlib.diagnostics.log;
-		class MyException extends xlib.diagnostics.Exception { };
+	// it(function testExceptionsDISABLED (causes debugBreak on thrown exceptions when running test)(){
+	// 		const log = xlib.diagnostics.log;
+	// 		class MyException extends xlib.diagnostics.Exception { };
 
-		try {
-			try {
-				throw new MyException( "first" );
-			} catch ( _err ) {
-				throw new MyException( "second", { innerError: _err } );
-			}
-		} catch ( _err ) {
-			//log.infoFull( "logging error object", _err );
-			//log.infoFull( "logging error object as JSON", xlib.diagnostics.errorToJson( _err ) );
+	// 		try {
+	// 			try {
+	// 				throw new MyException( "first" );
+	// 			} catch ( _err ) {
+	// 				throw new MyException( "second", { innerError: _err } );
+	// 			}
+	// 		} catch ( _err ) {
+	// 			//log.infoFull( "logging error object", _err );
+	// 			//log.infoFull( "logging error object as JSON", xlib.diagnostics.errorToJson( _err ) );
 
-			log.assert( _err instanceof Error );
-			log.assert( _err instanceof MyException );
-			const err = xlib.diagnostics.toError( _err );
-			log.assert( err === _err, "because _err was an instanceOf Error, we should have gotten the same object back, but now strongly typed" );
-			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
-			log.assert( err.innerError.message === "first" );
-
-
-
-		}
+	// 			log.assert( _err instanceof Error );
+	// 			log.assert( _err instanceof MyException );
+	// 			const err = xlib.diagnostics.toError( _err );
+	// 			log.assert( err === _err, "because _err was an instanceOf Error, we should have gotten the same object back, but now strongly typed" );
+	// 			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
+	// 			log.assert( err.innerError.message === "first" );
 
 
 
-	} );
+	// 		}
 
-	it( "test lolo", () => {
+
+
+	// 	} );
+
+	it1( function testLolo() {
 
 		const __ = xlib.lolo;
 		__.log.info( `the current time is ${ __.utc().toISO() }`, { isDebug: __.isDebug() } )
 
 	} );
 
-	it( "test stopwatch", async () => {
+	it2( async function testStopwatch() {
 		const __ = xlib.lolo;
 		const stopwatch = new xlib.time.Stopwatch( "unit test" );
 		__.log.assert( stopwatch.getElapsed().valueOf() === 0 )
@@ -194,9 +211,39 @@ describe( __filename + " basic xlib unit tests", () => {
 		__.log.assert( elapsed.valueOf() >= 2000 );
 		__.log.assert( elapsed.valueOf() < 2100 );
 
-	} ).timeout( 3000 );
+		//restarting
+		stopwatch.start();
+		__.log.assert( __.num.aboutEqual( stopwatch.valueOf(), 0, 100 ) );
+		__.log.assert( elapsedMs > stopwatch.valueOf() );
+		elapsedMs = stopwatch.valueOf();
+		__.log.assert( stopwatch.isPaused === false )
+		await __.bb.delay( 10 );
+		log.info( "restarted delay 10ms", stopwatch.toJson() );
+		stopwatch.pause();
+		log.info( "restarted aprox pause", stopwatch.toJson() );
+		__.log.assert( stopwatch.isPaused );
+		await __.bb.delay( 200 );
+		log.info( "restarted delay 200ms", stopwatch.toJson() );
 
-	it( " test perf timer", async () => {
+		log.assert( __.num.aboutEqual( stopwatch.valueOf(), elapsedMs, 0.1, 100 ) );
+
+
+		elapsedMs = stopwatch.valueOf();
+		log.assert( elapsedMs === stopwatch.valueOf() );
+		stopwatch.unpause();
+		log.info( "unpause", stopwatch.toJson() );
+
+		__.log.assert( stopwatch.isPaused === false );
+		await __.bb.delay( 1 );
+		log.info( "delay 1", stopwatch.toJson() );
+		stopwatch.stop();
+		log.info( "stop", stopwatch.toJson() );
+		log.assert( stopwatch.valueOf() > elapsedMs );
+
+	} ).timeout( 3200 );
+
+
+	it2( async function testPerfTimer() {
 
 		const __ = xlib.lolo;
 
@@ -241,7 +288,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} );
 
-	it( "test quartile calculations", () => {
+	it1( function testQuartileCalculations() {
 
 
 		const __ = xlib.lolo;
@@ -266,7 +313,7 @@ describe( __filename + " basic xlib unit tests", () => {
 	} );
 
 
-	it( "autoscaler test", async () => {
+	it2( async function autoscalerTest() {
 
 		const __ = xlib.lolo;
 		const chanceOfBusy = 0.01;

@@ -44,6 +44,7 @@
 				"--watch",
 				"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
 				//"--trace-warnings",
+				//"--grep",				"testStopwatch"
 			],
 			"args": [
 				// 	"logLevel=TRACE",
