@@ -163,7 +163,19 @@ export function round( value: number,
 
     return Math.round( value * mult ) / mult;
 }
-
+/** check that two nombers are close enough to eachother.     all parameters are combined when calculating, IE:   ```maxValue =  ( ( input * ( 1 + percentTollerance ) )  + spreadTollerance ) ```*/
+export function aboutEqual( input: number, checkAgainst: number,
+    /** how many percent different the two numbers can be 
+     * 
+     * Default is ```0```, meaning this parameter is ignored */
+    percentTollerance: number,
+    /** a fixed spread tollerance that the numbers should be within   
+     * 
+     * Default is ```0```, meaning this parameter is ignored */
+    spreadTollerance: number = 0 ): boolean {
+    return ( ( ( input * ( 1 + percentTollerance ) ) + spreadTollerance ) >= checkAgainst
+        && ( ( input * ( 1 - percentTollerance ) ) - spreadTollerance ) <= checkAgainst );
+}
 
 /** randomize order of elements in this array */
 export function randomizeArray( myArray: any[] ) {

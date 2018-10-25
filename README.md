@@ -35,8 +35,6 @@ In no particular order:
         - [Reading/Writing custom envVars](#readingwriting-custom-envvars)
             - [read envVars in your code](#read-envvars-in-your-code)
             - [Write EnvVars](#write-envvars)
-            - [> #### NodeJs](#--nodejs)
-            - [> #### Browser](#--browser)
     - [Reflection](#reflection)
     - [Lolo](#lolo)
     - [Network Code](#network-code)
@@ -492,6 +490,8 @@ Features that used to be in ```xlib``` but are thrown away can be found in the `
 
 ```xlib```'s core functionality has been used in production code since 2015.   While mostly stable since, here are the future plans:
 
+- **improved helpers**:
+    - replace lodash with an async aware helper, maybe shim with something like Aigle, as per: https://hackernoon.com/how-to-use-lo-dash-functions-with-async-await-b0be7709534c
 - **improved diagnostics**: 
     - chaos testing 
         - ability to randomly inject segfaults into child processes, and reject pending promise/async calls
@@ -519,6 +519,10 @@ Features that used to be in ```xlib``` but are thrown away can be found in the `
         - find something that can support numerical methods on anything with a ```{ valueOf():number; }``` interface.
 - **webservices** (maybe?)
     - add Free(mium) webservices that make sense (perhaps a geolocation api, currency converter, translation, password strength estimation, etc)
+- **deno support**
+    - support the deno runtime: https://github.com/denoland/deno
+- **docs**
+    - find a documentation solution, such as docusarus or perhaps the msft api
 
 > **If you have an idea**, Please add an issue on the Repo so we can discuss!  (pull reqeusts are welcome, but lets make sure the feature is a good fit first)
 
