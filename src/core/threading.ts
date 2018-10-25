@@ -160,6 +160,10 @@ export class AsyncReaderWriterLock<TValue=void> {
     }
 
 
+    /** begin a read lock.   the returned promise resolves once the lock is aquired
+     * 
+     * many simulatanious read locks are allowed, and be sure to call [[readEnd]] for each call of [[readBegin]]
+     */
     public async readBegin(): Promise<TValue | undefined> {
         //let readToken = 
 
@@ -178,6 +182,7 @@ export class AsyncReaderWriterLock<TValue=void> {
         return this._value;
     }
 
+    /** release your read lock */
     public readEnd() {
         log.assert( this.currentReads.length > 0, "out of current reads, over decremented?" );
         log.assert( this.currentWrite == null, "race, current write should not be possible while reading" );
@@ -204,6 +209,7 @@ export class AsyncReaderWriterLock<TValue=void> {
         return true;
     }
 
+    /** take a write lock.   returned promise resolves once your lock is aquired. */
     public async writeBegin() {
         const writeId = this.writeCounter++;
         let thisWrite = promise.CreateExposedPromise( { writeId } );
@@ -222,7 +228,10 @@ export class AsyncReaderWriterLock<TValue=void> {
         log.assert( this.currentWrite === this.pendingWrites[ 0 ], "current write should be at head of queue.  (writeBegin)" );
     }
 
-    public async writeEnd(/**write the data, or if a promise is passed, an exclusive write lock will be held until it exits*/ valueOrWritePromise: TValue | PromiseLike<TValue> ) {
+    /** finish the write lock, allowing writing of the stored [[value]] when doing so */
+    public async writeEnd(
+        /**write the data [[value]], or if a promise is passed, an exclusive write lock will be held until it exits*/
+        valueOrWritePromise?: TValue | PromiseLike<TValue> ) {
 
 
         try {
