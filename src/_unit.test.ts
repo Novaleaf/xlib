@@ -190,6 +190,20 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} );
 
+	it1( function testUrlValidation() {
+
+		let urlVal = new xlib.validation.UrlValidator( "http://www.example.com:881" );
+		log.assert( urlVal.isValid === true, "basic url should be valid", urlVal );
+		urlVal = new xlib.validation.UrlValidator( "data:text/html,<script>alert('hi');</script>" );
+		log.assert( urlVal.isValid === true, "data url should be valid", urlVal );
+		urlVal = new xlib.validation.UrlValidator( "http://localhost:881" );
+		log.assert( urlVal.isValid === false, "local url should be invalid", urlVal );
+		urlVal = new xlib.validation.UrlValidator( "http://localhost:881", { allowLocalhost: true } );
+		log.assert( urlVal.isValid === true, "local url should be valid", urlVal );
+
+
+	} );
+
 	it1( function testLolo() {
 
 		const __ = xlib.lolo;

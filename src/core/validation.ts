@@ -45,9 +45,12 @@ export class UrlValidator {
 			allowFileProtocol: false,
 			allowLocalhost: false,
 			allowPrivateIp: false,
+			allowGopherProtocol: false,
+			allowUnicodeDomain: false,
 			//merge in user defined options
 			...options
 		};
+		options = this.options;
 
 		try {
 			if ( input instanceof URL ) {
@@ -59,29 +62,33 @@ export class UrlValidator {
 				throw new Error( "input is not string or URL" );
 			}
 
-			//check hostname
-			const hostname = this.url.hostname.toLowerCase();
-			if ( hostname.length === 0 ) {
-				throw new Error( `invalid hostname blank: "${ hostname }"` );
-			}
-			if ( options.allowUnicodeDomain === true ) {
-				//ok
-			} else if ( isAscii( hostname ) !== true ) {
-				throw new Error( `invalid hostname characters of "${ hostname }"` );
-			}
-			if ( options.allowLocalhost === true ) {
-				//ok
-			} else if ( hostname === "localhost" || hostname === "127.0.0.1" ) {
-				throw new Error( `invalid hostname of "${ hostname }"` );
-			}
-			if ( options.allowPrivateIp === true ) {
-				//ok
-			} else {
-				if ( isPrivateIp( hostname ) === true ) {
-					if ( options.allowLocalhost === true && hostname === "127.0.0.1" ) {
-						//ok, we allow localhost
-					} else {
-						throw new Error( `invalid hostname ip of "${ hostname }"` );
+			if ( this.url.protocol !== "data:" ) {
+				//check hostname
+				const hostname = this.url.hostname.toLowerCase();
+				if ( hostname.length === 0 ) {
+					throw new Error( `invalid hostname blank: "${ hostname }"` );
+				}
+				if ( options.allowUnicodeDomain === true ) {
+					//ok
+				} else if ( isAscii( hostname ) !== true ) {
+					throw new Error( `invalid hostname characters of "${ hostname }"` );
+				}
+				if ( options.allowLocalhost === true ) {
+					//ok
+				} else if ( hostname === "localhost" || hostname === "127.0.0.1" ) {
+					throw new Error( `invalid hostname of "${ hostname }"` );
+				}
+
+
+				if ( options.allowPrivateIp === true ) {
+					//ok
+				} else {
+					if ( isPrivateIp( hostname ) === true ) {
+						if ( options.allowLocalhost === true && hostname === "127.0.0.1" ) {
+							//ok, we allow localhost
+						} else {
+							throw new Error( `invalid hostname ip of "${ hostname }"` );
+						}
 					}
 				}
 			}
