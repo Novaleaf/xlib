@@ -107,6 +107,7 @@ export class UrlValidator {
 				case "ftp:":
 				case "ws:":
 				case "wss:":
+				case "data:":
 					//ok;
 					break;
 				default:
