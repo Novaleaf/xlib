@@ -182,7 +182,7 @@ export class HttpStatusCodeException<TData=never> extends Exception<TData> {
 		super( message, { innerError: innerException } );
 	}
 
-	public toJson() {
+	public toJson(): IErrorJson & { statusCode: number } {
 		let baseJson = super.toJson();//  Exception.exceptionToJsonObj( this );
 		return {
 			...baseJson,
