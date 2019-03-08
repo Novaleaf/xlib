@@ -1,6 +1,6 @@
 {
   "name": "xlib",
-  "version": "14.3.2",
+  "version": "15.0.0",
   "description": "A Cross Platform, Monolithic Core Library for Typescript.",
   "main": "./built/_entrypoint.js",
   "private": false,
