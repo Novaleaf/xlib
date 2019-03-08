@@ -129,7 +129,7 @@ export import security = require( "./core/security" );
 
 
 /** @deprecated obsolete features of xlib that are made available for backcompat.  May be updated in the future, but likely will be replaced with something else.*/
-export import _obsolete = require( "./_obsolete/_index" );
+//export import _obsolete = require( "./_obsolete/_index" );
 
 //////////////////////  initialization section
 import * as init from "./_internal/init";

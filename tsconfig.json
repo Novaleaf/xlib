@@ -1,5 +1,5 @@
 {
-  "compileOnSave": true,
+  //"compileOnSave": true,
   "compilerOptions": {
     "module": "commonjs",
     "removeComments": false,
@@ -7,10 +7,9 @@
     "sourceMap": true,
     "inlineSources": false,
     "inlineSourceMap": false,
-    "composite": true,
+    //"composite": true,
     "declaration": true,
     "declarationMap": true,
-    "strict": false, /////////  change for vNext    
     "noEmitOnError": false,
     "jsx": "react",
     "newLine": "LF",
@@ -22,16 +21,17 @@
     "target": "es6",
     "watch": false,
     "moduleResolution": "node",
-    // * type strictness section
+    // * type strictness section    
+    "strict": false, /////////  change for vNext    
     "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": false, /////////  change for vNext
+    "noImplicitReturns": true, /////////  change for vNext
     "noImplicitAny": false, /////////  change for vNext
-    "noImplicitThis": true, // ! strict for vNext
+    "noImplicitThis": true, // v14
     "noUnusedLocals": false, /////////  change for vNext
     "noUnusedParameters": false,
-    "strictNullChecks": false, // change for v16
-    "suppressExcessPropertyErrors": false, // ! v14
-    "suppressImplicitAnyIndexErrors": false, // ! v14
+    "strictNullChecks": false, //! v16 maybe, VERY MUCH A PAIN IN THE ASS
+    "suppressExcessPropertyErrors": false, // v14
+    "suppressImplicitAnyIndexErrors": false, // v14
     "noStrictGenericChecks": false, //! v15
     "skipLibCheck": false,
     "alwaysStrict": true,
@@ -39,7 +39,7 @@
     "allowSyntheticDefaultImports": false,
     "allowUnreachableCode": false,
     "allowUnusedLabels": true,
-    "strictFunctionTypes": true,
+    "strictFunctionTypes": false, // ! strict for vNext
     "strictPropertyInitialization": false, // ! strict for vNext
     //"baseUrl": null,
     //"charset": null,
@@ -62,7 +62,7 @@
     "types": [
       "xlib-globals",
     ],
-    "outDir": "dist",
+    "outDir": "built",
     "rootDir": "src",
     // "lib": [
     //   "es2015",
@@ -73,35 +73,35 @@
   // "typeAcquisition": { //not enabling to force explicit usage of new types
   //   "enable": true,
   // },
-  // "include": [
-  //   "./src/**/*.ts",
-  //   "./src/_internal/**/*.ts",
-  // ],
-  "exclude": [
-    "node_modules",
-    "src/_graveyard",
-    "dist",
+  "include": [
+    "./src/**/*.ts",
+    //"./src/_internal/**/*.ts",
   ],
-  "typedocOptions": {
-    "mode": "modules",
-    "out": "docs",
-    "exclude": "test",
-    "theme": "default",
-    "ignoreCompilerErrors": true,
-    "excludePrivate": true,
-    "excludeNotExported": true,
-    "excludeExternals": false,
-    "excludeProtected": true,
-    //"target": "ES3",
-    "moduleResolution": "node",
-    "preserveConstEnums": true,
-    "stripInternal": true,
-    "suppressExcessPropertyErrors": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "module": "commonjs",
-    "hideGenerator": true,
-    "includeDeclarations": false,
-    "readme": "none",
-    //"entryPoint": "\"src/xlib\""
-  }
+  "exclude": [
+    //"node_modules",
+    "src/_graveyard",
+    //"dist",
+  ],
+  // "typedocOptions": {
+  //   "mode": "modules",
+  //   "out": "docs",
+  //   "exclude": "test",
+  //   "theme": "default",
+  //   "ignoreCompilerErrors": true,
+  //   "excludePrivate": true,
+  //   "excludeNotExported": true,
+  //   "excludeExternals": false,
+  //   "excludeProtected": true,
+  //   //"target": "ES3",
+  //   "moduleResolution": "node",
+  //   "preserveConstEnums": true,
+  //   "stripInternal": true,
+  //   "suppressExcessPropertyErrors": true,
+  //   "suppressImplicitAnyIndexErrors": true,
+  //   "module": "commonjs",
+  //   "hideGenerator": true,
+  //   "includeDeclarations": false,
+  //   "readme": "none",
+  //   //"entryPoint": "\"src/xlib\""
+  // }
 }

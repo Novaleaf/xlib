@@ -33,7 +33,7 @@ export interface IExceptionOptions<TData = never> {
 	/** truncate extra stack frames from the stack that's attached to this, 
 	 * a good way to remove logging/util functions from the trace */
 	stackFramesToTruncate?: number;
-	/** extra data you want logged. */
+	/** extra custom data you wish to attach to your error object that you want logged. */
 	data?: TData;
 	/** if you wish to restrict the number of stack frames stored, set this.   by default all stack frames are stored. */
 	maxStackFrames?: number;
@@ -50,17 +50,18 @@ export class Exception<TData=never> extends Error {
 	private static _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
 
 	public innerError?: Error;
-	public data: TData;
+	/** extra custom data you wish to attach to your error object that you want logged. */
+	public data?: TData;
 
-	constructor( public message: string, options?: IExceptionOptions<TData> ) {
+	constructor( public message: string, _options: IExceptionOptions<TData> = {} ) {
 
 		super( message );
 		Object.setPrototypeOf( this, new.target.prototype );//fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
 		//jsHelper.setPrototypeOf( this, new.target.prototype ); 
 
-		options = {
+		const options = {
 			stackFramesToTruncate: 0,
-			...options
+			..._options
 		};
 
 		this.data = options.data;
@@ -96,8 +97,10 @@ export class Exception<TData=never> extends Error {
 			for ( let i = 0; i < options.stackFramesToTruncate; i++ ) {
 				splitStack.shift();
 			}
-			//put message back
-			splitStack.unshift( messageFrame );
+			if ( messageFrame != null ) {
+				//put message back
+				splitStack.unshift( messageFrame );
+			}
 		}
 
 		//max stackframes
@@ -257,7 +260,7 @@ export function toError( ex: any | Error ): Error & IError {
 /** get a string representation of the error */
 export function errorToString( ex: Error | IError, options?: IErrorToJsonOptions ): string {
 	let exJson = errorToJson( ex, options );
-	exJson.stack = exJson.stack.join( "\n" ) as any; //add line breaks to stack
+	exJson.stack = exJson.stack == null ? "" : exJson.stack.join( "\n" ) as any; //add line breaks to stack
 	return JSON.stringify( exJson );
 }
 
@@ -276,7 +279,7 @@ export interface IErrorToJsonOptions {
 export function errorToJson( error: Error | IError, options?: IErrorToJsonOptions ): IErrorJson {
 
 	if ( error == null ) {
-		return undefined;
+		return { message: "", name: "NullNotError" };
 	}
 	options = { ...options };
 
@@ -315,7 +318,7 @@ export function errorToJson( error: Error | IError, options?: IErrorToJsonOption
 		stackArray.length = options.maxStacks;
 	}
 
-	let innerErrorJson: IErrorJson;
+	let innerErrorJson: IErrorJson | undefined;
 
 	if ( innerError != null ) {
 		try {
@@ -323,6 +326,7 @@ export function errorToJson( error: Error | IError, options?: IErrorToJsonOption
 		} catch{
 			//eat error
 			//innerErrorJson = serialized.innerError as any;
+			innerErrorJson = { name: "UnknownErrorToJson", message: "" };
 		}
 	}
 

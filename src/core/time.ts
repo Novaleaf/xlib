@@ -141,7 +141,7 @@ export class Stopwatch {
 		this._isPaused = false;
 		//reset the start time, 
 		this.startTime = Date.now();
-
+		return this;
 	}
 
 	/** mostly for supprting the ```PerfTimer``` class.    allows notifying an external to do something when ```.stop()``` is called. */

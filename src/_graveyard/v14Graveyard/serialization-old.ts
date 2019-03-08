@@ -1,7 +1,7 @@
 ///// <reference path="../../../typings/all.d.ts" />
 
 import * as jsHelper from "../core/jshelper";
-import * as reflection from "../core/reflection";
+import * as reflection from "../../core/reflection";
 import * as ex from "../core/exception";
 
 import * as json5 from "json5";

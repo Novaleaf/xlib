@@ -385,20 +385,21 @@ export class Logger {
 	public _tryLog( requestedLogLevel: LogLevel, args: any[], fullOutput: boolean,
 		/** if not set, the function **two levels up*** is marked as the callsite.
 		if that's not what you want, you can create your callsite, example showing 3 levels up: ```callSite = diagnostics.computeStackTrace( 3, 1 )[ 0 ];``` */
-		callSite?: string, ): string[] {
+		callSite?: string, ): string[] | undefined {
 
 		if ( callSite == null ) {
 			callSite = diagnostics.computeStackTrace( 2, 1 )[ 0 ];
 		}
 
-		if ( typeof requestedLogLevel !== "string" ) {
+		if ( callSite != null && typeof requestedLogLevel !== "string" ) {
 			let minLogLevel: LogLevel = environment.logLevel;
 
 			//allow runtime adjustment of loglevels (useful for focused debugging)
 			Logger._overrides.forEach( ( pair ) => {
-				if ( pair.callSiteMatch.test( callSite ) ) {
+				if ( pair.callSiteMatch.test( callSite as string ) ) {
 					minLogLevel = pair.minLevel;
 				}
+
 			} );
 
 			if ( requestedLogLevel < minLogLevel ) {
@@ -539,7 +540,7 @@ function _self_initialize() {
 	function _populateLogLevelOverridesFromEnvVars() {
 		const envVar = environment.getEnvironmentVariable( "logLevelOverrides", null );
 		if ( envVar == null || envVar.length === 0 ) {
-			return [];
+			return;
 		}
 		try {
 			let parsedData: { [ key: string ]: string } = serialization.jsonX.parse( envVar );

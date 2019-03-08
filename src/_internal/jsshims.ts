@@ -89,7 +89,7 @@ export function initialize() {
 					if ( <any>i in <any>t ) {
 						var val = t[ i ]; // in case fun mutates this
 						if ( fun.call( thisp, val, i, t ) )
-							res.push( val );
+							res.push( val as any as never );
 					}
 				}
 

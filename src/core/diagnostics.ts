@@ -22,7 +22,7 @@ export function computeCallSite(	/* regexp choosing the frame you wish to start 
 	0 = the method calling .genStackTrace() will be on top;
 	*/ startingFrameExclusive?: RegExp | number | string,
 	/**only used if ```startingFrameExclusive``` is a string or regexp.   changes ```startingFrameExclusive``` to be inclusive, IE keep the frame you search for, instead of throwing it away and getting the next frame.  default false */
-	keepStartingFrame = false, ) {
+	keepStartingFrame = false, ): string {
 	if ( typeof ( startingFrameExclusive ) === "number" ) {
 		//add 1 to ignore this location
 		startingFrameExclusive += 1;

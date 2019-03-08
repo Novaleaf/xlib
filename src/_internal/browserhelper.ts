@@ -124,6 +124,7 @@ export function getDomElement( elementType: string,
 					}
 				}
 			}
+			return false;
 		};
 
 		if ( searchTopDown ) {

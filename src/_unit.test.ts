@@ -178,7 +178,7 @@ describe( __filename + " basic xlib unit tests", () => {
 			const err = xlib.diagnostics.toError( _err );
 			log.assert( err === _err, "because _err was an instanceOf Error, we should have gotten the same object back, but now strongly typed" );
 			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
-			log.assert( err.innerError.message === "first" );
+			log.assert( err.innerError != null && err.innerError.message === "first" );
 
 			const asJson = xlib.diagnostics.errorToJson( _err );
 			log.assert( _.isEqual( asJson, ( err as MyException ).toJson() ), "json vals should be equal" );
@@ -359,7 +359,7 @@ describe( __filename + " basic xlib unit tests", () => {
 				return xlib.promise.bluebird.resolve( "backend success" );
 			},
 			( ( err: TestAutoScaleError ) => {
-				if ( err.data.shouldRejectBusy === true ) {
+				if ( err.data != null && err.data.shouldRejectBusy === true ) {
 					return "TOO_BUSY";
 				}
 				return "FAIL"
