@@ -13,7 +13,7 @@ jsShims.initialize();
 //import source_map_support = require( "source-map-support" );
 import * as source_map_support from "source-map-support";
 
-let _initArgs: init.IInitArgs;
+let _initArgs: init.IInitArgs = {};
 if ( typeof global !== "undefined" && global.__xlibInitArgs ) {
     _initArgs = global.__xlibInitArgs;
 } else if ( typeof window !== "undefined" && window.__xlibInitArgs ) {

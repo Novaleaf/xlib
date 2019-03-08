@@ -29,10 +29,10 @@
     "noImplicitThis": true, // ! strict for vNext
     "noUnusedLocals": false, /////////  change for vNext
     "noUnusedParameters": false,
-    "strictNullChecks": false, /////////  change for vNext
-    "suppressExcessPropertyErrors": false, // ! strict for vNext
-    "suppressImplicitAnyIndexErrors": false, // ! strict for vNext
-    "noStrictGenericChecks": true, /////////  change for vNext
+    "strictNullChecks": false, // change for v16
+    "suppressExcessPropertyErrors": false, // ! v14
+    "suppressImplicitAnyIndexErrors": false, // ! v14
+    "noStrictGenericChecks": false, //! v15
     "skipLibCheck": false,
     "alwaysStrict": true,
     "allowJs": false,

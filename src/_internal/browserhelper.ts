@@ -86,7 +86,7 @@ export function getDomAttribute( elementType: string, attribute: string, searchT
 		return null;
 	}
 
-	var foundElement = getDomElement( elementType, attribute, null, searchTopDown );
+	var foundElement = getDomElement( elementType, attribute, undefined, searchTopDown );
 	if ( foundElement == null ) { return null; }
 
 	return foundElement.getAttribute( attribute );
@@ -94,7 +94,7 @@ export function getDomAttribute( elementType: string, attribute: string, searchT
 /** get the first html element found and return it.  */
 export function getDomElement( elementType: string,
 	/** if not null, finds an element with this attribute */
-	attribute?: string, attributeValue?: string, searchTopDown = false ): HTMLElement {
+	attribute?: string, attributeValue?: string, searchTopDown = false ): HTMLElement | null {
 	if ( typeof ( document ) === "undefined" ) {
 		return null;
 	}
