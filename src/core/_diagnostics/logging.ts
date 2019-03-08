@@ -17,6 +17,12 @@ import { default as Chalk } from "chalk";
 //import * as stripAnsi from "strip-ansi";
 import stripAnsi = require( "strip-ansi" );
 
+// if ( environment.platformType === environment.PlatformType.NodeJs && environment.osName === environment.OsName.win32 ) {
+// 	Chalk.enabled = true;
+// 	Chalk.level = 2;
+// }
+
+
 
 interface IAnsiColor {
 	foreground: string;
