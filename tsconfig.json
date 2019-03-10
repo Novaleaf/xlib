@@ -24,8 +24,8 @@
     // * type strictness section    
     "strict": false, /////////  change for vNext    
     "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true, /////////  change for vNext
-    "noImplicitAny": false, /////////  change for vNext
+    "noImplicitReturns": true,
+    "noImplicitAny": true, /////////  change for vNext
     "noImplicitThis": true, // v14
     "noUnusedLocals": false, /////////  change for vNext
     "noUnusedParameters": false,

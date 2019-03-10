@@ -180,9 +180,10 @@ describe( __filename + " basic xlib unit tests", () => {
 			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
 			log.assert( err.innerError != null && err.innerError.message === "first" );
 
-			const asJson = xlib.diagnostics.errorToJson( _err );
+			const asJson = xlib.diagnostics.errorToJson( _err as MyException );
+
 			log.assert( _.isEqual( asJson, ( err as MyException ).toJson() ), "json vals should be equal" );
-			log.assert( asJson[ "someVal" ] === 22 );
+			log.assert( asJson.someVal === 22 );
 			log.info( "testExceptions", asJson );
 		}
 
@@ -268,7 +269,7 @@ describe( __filename + " basic xlib unit tests", () => {
 		/** needs to stay 5 otherwise the assert check at the bottom of the test needs to be changed */
 		const loops = 5;
 		const loopSleepMs = 3;
-		const logIntervalMs = undefined;
+		const logIntervalMs: number = undefined;
 
 		const perfTimer = new xlib.time.PerfTimer( { autoLogIntervalMs: logIntervalMs, autoLogLevel: xlib.environment.LogLevel.WARN } );
 

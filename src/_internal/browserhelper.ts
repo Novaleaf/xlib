@@ -109,7 +109,7 @@ export function getDomElement( elementType: string,
 	} else {
 		//search for attribute name
 
-		var searchPredicate = ( element ) => {
+		var searchPredicate = ( element: any ) => {
 			var foundAttributeValue = element.getAttribute( attribute );
 			if ( foundAttributeValue ) {
 				if ( attributeValue == null ) {
@@ -276,9 +276,9 @@ export var getQuerystringVariables = ( () => {
 
 export function getQuerystringVariable( key: string, valueIfNullOrEmpty?: string ): string {
 	//from: https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-	var parsedQuerystrings = getQuerystringVariables();
+	var parsedQuerystrings: any = getQuerystringVariables();
 
-	var result = parsedQuerystrings[ key ];
+	var result: any = parsedQuerystrings[ key ];
 	if ( valueIfNullOrEmpty != null ) {
 		if ( result == null || result.length === 0 ) {
 			return valueIfNullOrEmpty;

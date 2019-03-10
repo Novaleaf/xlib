@@ -118,11 +118,13 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
     /**
      *  don't use easily confused characters in key
      */
-    var keyReplacements = {
+    var keyReplacements: { [ key: string]: string;} = {
         "o": "z",
         "i": "y",
         "l": "x",
         "u": "w",
+        //[ key: "o" | "i" | "l" | "u"]: st
+
     };
 
 

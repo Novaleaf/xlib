@@ -212,7 +212,7 @@ export class Logger {
 		minLevel: LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" ) {
 
 		if ( ( typeof minLevel ) === "string" ) {
-			minLevel = LogLevel[ minLevel as string ];
+			minLevel = LogLevel[ minLevel as "TRACE" ];
 		}
 		minLevel = minLevel as LogLevel;
 		Logger._overrides.push( { callSiteMatch, minLevel } );

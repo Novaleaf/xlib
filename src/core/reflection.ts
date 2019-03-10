@@ -37,7 +37,7 @@ export enum Type {
 
 
 /** provides the primitive type of a variable. better than using 'typeof()' because this handles array and null. */
-export function getType( obj ): Type {
+export function getType( obj: any ): Type {
 	if ( obj === null ) {
 		return Type.null;
 	}
@@ -62,7 +62,7 @@ export function getType( obj ): Type {
 				} else {
 					name = "object";
 				}
-				return Type[ name ];
+				return Type[ name as keyof typeof Type ];
 			}
 		case "function":
 			{
@@ -80,7 +80,7 @@ export function getType( obj ): Type {
 }
 
 /** get the name of an object's type. better than using 'typeof()' because this handles array and null.*/
-export function getTypeName( obj ): string {
+export function getTypeName( obj: any ): string {
 	let type = getType( obj );
 	switch ( type ) {
 		case Type.object:
@@ -153,7 +153,7 @@ export function getArgumentNames( argsOrFunction: any ): string[] {
 	}
 	let reg = /\(([\s\S]*?)\)/;
 	let params = reg.exec( func.toString() );
-	let paramNames;
+	let paramNames: string[];
 	if ( params ) {
 		paramNames = params[ 1 ].split( "," );
 	} else {

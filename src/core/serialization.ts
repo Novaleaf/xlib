@@ -99,7 +99,7 @@ export namespace jsonX {
 		replacer?: ( key: string, value: any ) => any | ( number | string )[],
 		space?: string | number,
 		quote?: string,
-	} );
+	} ): string;
 	export function stringify( value: any, ...args: any[] ) {
 		let options: {
 			replacer?: ( key: string, value: any ) => any | ( number | string )[],
@@ -121,9 +121,9 @@ export namespace jsonX {
 
 
 	export interface IInspectOptions {
-		/** how far down the object structure you wish to inspect.  No values deeper than the depth will be shown.  @default 1 (show current object's values, no children)*/ maxDepth?,
-		/** maximum array elements you want to display for each array. (half at top, half at bottom)  @default 10 */maxArrayElements?,
-		/** when we reach maxDepth, the length we summarize the values to.  @default 120 */summarizeLength?,
+		/** how far down the object structure you wish to inspect.  No values deeper than the depth will be shown.  @default 1 (show current object's values, no children)*/ maxDepth?: number,
+		/** maximum array elements you want to display for each array. (half at top, half at bottom)  @default 10 */maxArrayElements?: number,
+		/** when we reach maxDepth, the length we summarize the values to.  @default 120 */summarizeLength?: number,
 
 		aggrigateFunctions?: boolean,
 	};
@@ -143,8 +143,8 @@ export namespace jsonX {
 	/** internal helper to do actual parse work */
 	function _inspectParse_internal( obj: any, parentOptions: IInspectOptions,
 		/** for internal recursive use, tracking circular references. */
-		parentSeenObjects,
-	) {
+		parentSeenObjects: any,
+	): any {
 		let myOptions = _.clone( parentOptions );
 		try {
 			myOptions.maxDepth--;

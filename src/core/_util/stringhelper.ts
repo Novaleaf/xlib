@@ -213,7 +213,7 @@ export function intToIpV4( int: number ): string {
     return part4 + "." + part3 + "." + part2 + "." + part1;
 }
 
-export function capitalize( str ): string {
+export function capitalize( str: string ): string {
     return str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 }
 export function repeat( toRepeate: string, numberOfTimes: number ): string {

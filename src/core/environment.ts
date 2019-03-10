@@ -64,7 +64,7 @@ export var osName: OsName;
 _internalInitWork.push( ( args ) => {
 	osName = ( () => {
 		if ( typeof ( process ) !== "undefined" ) {
-			return OsName[ process.platform ];
+			return OsName[ process.platform as keyof typeof OsName ];
 		}
 		try {
 			if ( navigator.appVersion.indexOf( "Win" ) !== -1 ) { return OsName.win32; }
@@ -123,7 +123,7 @@ _internalInitWork.push( ( args ) => {
 	if ( args.disableEnvAutoRead !== true ) {
 		let envLogLevel = getEnvironmentVariable( "logLevel", null );
 		if ( envLogLevel != null ) {
-			_logLevel = LogLevel[ envLogLevel ];
+			_logLevel = LogLevel[ envLogLevel as keyof typeof LogLevel ];
 		}
 	}
 	if ( _logLevel == null ) {
@@ -172,7 +172,7 @@ _internalInitWork.push( ( args ) => {
 	if ( args.disableEnvAutoRead !== true ) {
 		let envEnvLevel = getEnvironmentVariable( "envLevel", null );
 		if ( envEnvLevel != null ) {
-			envLevel = EnvLevel[ envEnvLevel ];
+			envLevel = EnvLevel[ envEnvLevel as keyof typeof EnvLevel ];
 		}
 	}
 	if ( envLevel == null ) {

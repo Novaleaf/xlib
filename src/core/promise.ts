@@ -28,11 +28,13 @@ if ( environment.isDebug() ) {
 } else {
 	//noop
 }
+
+environment.getGlobal().Promise = bluebird;
 if ( typeof global != "undefined" ) {
 	global.Promise = bluebird;
 }
 if ( typeof window != "undefined" ) {
-	window[ "Promise" ] = bluebird;
+	( window as any )[ "Promise" ] = bluebird;
 }
 //}
 

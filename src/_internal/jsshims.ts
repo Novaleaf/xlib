@@ -33,7 +33,7 @@ export function initialize() {
 				],
 				DontEnumsLength = DontEnums.length;
 
-			return function ( o ) {
+			return function ( o: any ) {
 				if ( typeof o !== "object" && typeof o !== "function" || o == null )
 					throw new TypeError( "Object.keys called on a non-object" );
 
@@ -63,16 +63,16 @@ export function initialize() {
 		}
 
 		if ( Object.create === undefined ) {
-			Object.create = function ( o ) {
+			Object.create = function ( o: any ) {
 				function F() { }
 				F.prototype = o;
-				return new F();
+				return new ( F() as any );
 			};
 		}
 
 		/** Array.filter shim for ie7, ie8, from http://stackoverflow.com/questions/7153470/why-wont-filter-work-in-interent-explorer-8 */
 		if ( !Array.prototype.filter ) {
-			Array.prototype.filter = function ( fun /*, thisp */ ) {
+			Array.prototype.filter = function ( fun: any /*, thisp */ ) {
 				"use strict";
 
 				if ( this === void 0 || this == null )
@@ -83,7 +83,7 @@ export function initialize() {
 				if ( typeof fun !== "function" )
 					throw new TypeError();
 
-				var res = [];
+				var res: any[] = [];
 				var thisp = arguments[ 1 ];
 				for ( var i = 0; i < len; i++ ) {
 					if ( <any>i in <any>t ) {

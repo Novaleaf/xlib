@@ -25,6 +25,9 @@ export interface IErrorJson {
 	stack?: string[];
 	/** optional, can pass an innerException of you use xlib.diagnostics.Exception */
 	innerError?: IErrorJson;
+
+	/** additional fields may be attached to your error object.  if so, they will be serialized here */
+	[ keys: string ]: any;
 }
 
 
@@ -275,11 +278,13 @@ export interface IErrorToJsonOptions {
 	alwaysShowFullStack?: boolean;
 }
 
+
+
 /** convert an error and all it's properties to JSON.   */
-export function errorToJson( error: Error | IError, options?: IErrorToJsonOptions ): IErrorJson {
+export function errorToJson<TError extends Error>( error: TError | IError, options?: IErrorToJsonOptions ): PropsUnion<IErrorJson, TError> {
 
 	if ( error == null ) {
-		return { message: "", name: "NullNotError" };
+		return { message: "", name: "NullNotError" } as any;
 	}
 	options = { ...options };
 
@@ -340,6 +345,6 @@ export function errorToJson( error: Error | IError, options?: IErrorToJsonOption
 	};
 
 
-	return toReturn;
+	return toReturn as any;
 
 }
