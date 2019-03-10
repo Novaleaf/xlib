@@ -19,7 +19,7 @@
     //"diagnostics": true, // verbose debug output of tsc build
     //"listFiles": true, // verbose debug output of tsc build
     //"listEmittedFiles": true, // verbose debug output of tsc build
-    "target": "es6", //! "es2018", //es6 for browsers, node v10.15.2 supports es2018, node v8.x supports es2016
+    "target": "es2018", //es6 for browsers, node v10.15.2 supports es2018, node v8.x supports es2016  //! v15 (was es6)
     "watch": false,
     "moduleResolution": "node",
     // * type strictness section    
@@ -37,7 +37,7 @@
     "skipLibCheck": false,
     "alwaysStrict": true,
     "allowJs": false,
-    "allowSyntheticDefaultImports": false, //! try
+    "allowSyntheticDefaultImports": true, //! try
     "allowUnreachableCode": false,
     "allowUnusedLabels": true,
     "strictFunctionTypes": true, //! v15
@@ -49,11 +49,11 @@
     "emitBOM": false,
     "emitDeclarationOnly": false,
     "disableSizeLimit": false,
-    "emitDecoratorMetadata": false, /////////  change for vNext
-    "esModuleInterop": false, // ! try
-    "experimentalDecorators": false, //! try
-    "importHelpers": true, /////////  change for vNext
-    "keyofStringsOnly": true,
+    "emitDecoratorMetadata": true, // ! try /////////  change for vNext
+    "esModuleInterop": true, // ! try
+    "experimentalDecorators": true, //! try
+    "importHelpers": true, // ! try /////////  change for vNext
+    "keyofStringsOnly": true, //! v15
     "noErrorTruncation": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,

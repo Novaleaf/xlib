@@ -9,7 +9,7 @@ export import bluebird = require( "bluebird" );
 // import bluebird from "bluebird";
 // export { bluebird };
 
-import * as bb from "bluebird";
+//import * as bb from "bluebird";
 import * as environment from "./environment";
 
 
@@ -60,9 +60,9 @@ if(toInspect.isFulfilled()){
 }
  */
 
-export function awaitInspect<T>( promise: PromiseLike<T> ): bb<{ toInspect: bb<T> }> {
+export function awaitInspect<T>( promise: PromiseLike<T> ): bluebird<{ toInspect: bluebird<T> }> {
 
-	let toInspect = bb.resolve( promise );
+	let toInspect = bluebird.resolve( promise );
 
 	let results = { toInspect };
 
@@ -74,7 +74,7 @@ export function awaitInspect<T>( promise: PromiseLike<T> ): bb<{ toInspect: bb<T
 	// };
 
 
-	let toReturn = CreateExposedPromise<{ toInspect: bb<T> }>();
+	let toReturn = CreateExposedPromise<{ toInspect: bluebird<T> }>();
 
 	toInspect.then( ( result ) => {
 		toReturn.fulfill( results );
@@ -115,7 +115,7 @@ export function CreateExposedPromise<TReturn=void, TTags = void>( ...args: any[]
 	let fulfiller: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void;
 	let rejector: ( error: any ) => void;
 
-	let toReturn: IExposedPromise<TReturn, TTags> = <any>new bb<TReturn>( function ( fulfill, reject ) {
+	let toReturn: IExposedPromise<TReturn, TTags> = <any>new bluebird<TReturn>( function ( fulfill, reject ) {
 		fulfiller = fulfill;
 		rejector = reject;
 		if ( callback != null ) {
@@ -130,7 +130,7 @@ export function CreateExposedPromise<TReturn=void, TTags = void>( ...args: any[]
 	return toReturn;
 }
 
-export interface IExposedPromise<TReturn=void, TTags=never> extends bb<TReturn> {
+export interface IExposedPromise<TReturn=void, TTags=never> extends bluebird<TReturn> {
 	fulfill: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void;
 	reject: ( error: Error ) => void;
 	/** custom data for tracking state you might need, such as informing if the promise is being executed */
@@ -139,7 +139,7 @@ export interface IExposedPromise<TReturn=void, TTags=never> extends bb<TReturn> 
 
 export namespace _obsolete {
 	/** for a given function signature which returns a promise, construct a facade that will fulfill once all outstanding calls finish, and each call will be executed sequentially (not in parallel!)*/
-	export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: any[] ) => bb<T> ): ( ...args: any[] ) => bb<T[]> {
+	export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: any[] ) => bluebird<T> ): ( ...args: any[] ) => bluebird<T[]> {
 		//todo: error handling.
 
 		let __enqueuedCallArguments: IArguments[] = [];
@@ -166,7 +166,7 @@ export namespace _obsolete {
 			//get the next call to process
 			let args = __enqueuedCallArguments.shift();
 
-			let currentPromise: bb<T> = func.apply( __this, args );
+			let currentPromise: bluebird<T> = func.apply( __this, args );
 			currentPromise.then( ( currentValue ) => {
 				__batchResults.push( currentValue );
 				__doNext();
@@ -179,7 +179,7 @@ export namespace _obsolete {
 
 
 
-		function __toReturn(): bb<T[]> {
+		function __toReturn(): bluebird<T[]> {
 
 			let args: IArguments = _.clone( arguments );
 
@@ -202,17 +202,17 @@ export namespace _obsolete {
 
 	/** constructs a unified promise for your returned (callback function) promises.  wraps a lodash foreach, just adds Promise.all() glue code.
 	NOTE: executes all asynchronously.  if you need to only execute + complete one promise at a time, use Promise.each() instead. */
-	export function forEachParallel<TIn, TOut>( array: TIn[], callback: ( value: TIn ) => TOut | bb<TOut> ): bb<TOut[]> {
+	export function forEachParallel<TIn, TOut>( array: TIn[], callback: ( value: TIn ) => TOut | bluebird<TOut> ): bluebird<TOut[]> {
 		try {
-			let results: bb<TOut>[] = [];
+			let results: bluebird<TOut>[] = [];
 			_.forEach( array, ( value ) => {
 				let resultPromise = callback( value );
 				results.push( <any>resultPromise );
 			} );
 
-			return bb.all( results );
+			return bluebird.all( results );
 		} catch ( ex ) {
-			return <any>bb.reject( ex );
+			return <any>bluebird.reject( ex );
 		}
 	}
 }
@@ -278,7 +278,7 @@ The StopError constructor accepts one argument. If it is invoked with an instanc
 	}
 
 	export interface IRetryStatic {
-		<TValue>( fn: () => PromiseLike<TValue>, options?: IOptions ): bb<TValue>;
+		<TValue>( fn: () => PromiseLike<TValue>, options?: IOptions ): bluebird<TValue>;
 		/** Stopping
 The library also supports stopping the retry loop before the timeout occurs by throwing a new instance of retry.StopError from within the called function.
 		The StopError constructor accepts one argument. If it is invoked with an instance of Error, then the promise is rejected with that error argument. Otherwise the promise is rejected with the StopError itself.*/

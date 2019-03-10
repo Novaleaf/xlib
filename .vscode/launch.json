@@ -41,5 +41,42 @@
 			"smartStep": true,
 			"stopOnEntry": false,
 		},
+		{
+			"type": "node",
+			"request": "launch",
+			"runtimeArgs": [
+				//"--watch",
+				"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
+				//"--trace-warnings",
+				//"--grep",				"testExceptions"
+			],
+			"args": [
+				// 	"logLevel=TRACE",
+				// 	"envLevel=DEV",
+				// 	"logLevelOverrides={'.*connection':'WARN', '.*xlib.dev.core.net.js':'INFO'}",			
+				"./built/**/*.test.js",
+			],
+			"name": "mocha once ./built/**/*.test.js",
+			"runtimeExecutable": "mocha",
+			//"program": "${workspaceFolder}/dist/_index.js",
+			"restart": true,
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"protocol": "inspector",
+			"sourceMaps": true,
+			"skipFiles": [
+				"**/node_modules/**/*.js",
+				// 	"**/node_modules/bluebird/**/*.js",
+				// 	"**/node_modules/json5/**/*.js",
+				// 	"**/node_modules/rx/**/*.js",
+				// 	"**/node_modules/inert/**/*.js",
+				// 	"**/node_modules/@google-cloud/**/*.js",
+				"<node_internals>/**/*.js",
+				// 	"**/xlib/dev/core/serialization.ts", //has serialization functions that throw on parse errors
+			],
+			"showAsyncStacks": true,
+			"smartStep": true,
+			"stopOnEntry": false,
+		},
 	]
 }

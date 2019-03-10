@@ -180,11 +180,14 @@ describe( __filename + " basic xlib unit tests", () => {
 			log.assert( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
 			log.assert( err.innerError != null && err.innerError.message === "first" );
 
-			const asJson = xlib.diagnostics.errorToJson( _err as MyException );
+			const errCast: MyException = _err;
+			const asJson1 = errCast.toJson();
+			const asJson2 = xlib.diagnostics.errorToJson<MyException>( _err as MyException );
 
-			log.assert( _.isEqual( asJson, ( err as MyException ).toJson() ), "json vals should be equal" );
-			log.assert( asJson.someVal === 22 );
-			log.info( "testExceptions", asJson );
+			log.assert( asJson1.someVal === 22 );
+			log.assert( asJson2.someVal === 22 );
+			log.assert( _.isEqual( asJson2, asJson1 ), "json vals should be equal" );
+			log.info( "testExceptions", asJson1 );
 		}
 
 

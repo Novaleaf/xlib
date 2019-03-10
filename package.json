@@ -14,10 +14,8 @@
     "@types/luxon": "^1.2.2",
     "@types/mathjs": "^4.4.1",
     "@types/mocha": "^5.2.5",
-    "@types/sanitize-html": "^1.18.2",
     "@types/source-map-support": "^0.4.1",
     "@types/strip-ansi": "^3.0.0",
-    "@types/validator": "^9.4.2",
     "aguid": "^2.0.0",
     "axios": "^0.18.0",
     "base64url": "^3.0.0",
@@ -30,11 +28,9 @@
     "lodash": "^4.17.10",
     "luxon": "^1.3.3",
     "mathjs": "^5.1.2",
-    "sanitize-html": "^1.19.0",
     "source-map-support": "^0.5.9",
-    "strip-ansi": "^4.0.0",
-    "tslib": "^1.9.3",
-    "validator": "^10.7.1"
+    "strip-ansi": "^5.1.0",
+    "tslib": "^1.9.3"
   },
   "devDependencies": {},
   "scripts": {

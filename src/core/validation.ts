@@ -7,10 +7,10 @@ import * as serialization from "./serialization";
 import * as reflection from "./reflection";
 
 
-/** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
-export import validator = require( "validator" );
+// /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
+// export import validator = require( "validator" );
 
-export import sanitizeHtml = require( "sanitize-html" );
+// export import sanitizeHtml = require( "sanitize-html" );
 
 import * as diagnostics from "./diagnostics";
 

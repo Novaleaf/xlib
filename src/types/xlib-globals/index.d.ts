@@ -73,18 +73,31 @@ declare namespace NodeJS {
 // }
 
 
-/** returns props shared by both types.  When both types have the same properties, ```TPri```'s is used.  (does not union property types)*/
+//! Below are types useful for advanced mixin/union type creation.  See ```exception.errorToJson``` for an example usage.
+
+/** returns props shared by both types.  When both types have the same properties, ```TPri```'s is used.  (does not union property types)
+ * 
+ * ***BUG NOTE*** due to a bug in Typescript, this does not work on types with index signatures.  See: https://github.com/Microsoft/TypeScript/issues/30293*/
 type PropsIntersection<TPri, TSec> = { [ K in keyof TPri & keyof TSec ]: TPri[ K ] };
 
-/** returns props unique to ```TPri``` (not found in ```TSec```) */
+/** returns props unique to ```TPri``` (not found in ```TSec```) 
+ * 
+ * ***BUG NOTE*** due to a bug in Typescript, this does not work on types with index signatures.  See: https://github.com/Microsoft/TypeScript/issues/30293*/
 type PropsUnique<TPri, TSec> = PropsRemove<{ [ K in keyof TPri ]: K extends keyof TSec ? never : TPri[ K ] }>;
 
 
-/** helper that returns prop names except those to filter.  This helper type is needed to actually remove the prop, as otherwise the prop still exists in the type just as "never".  */
+/** helper that returns prop names except those to filter.  This helper type is needed to actually remove the prop, as otherwise the prop still exists in the type just as "never". 
+ * 
+ * ***BUG NOTE*** due to a bug in Typescript, this does not work on types with index signatures.  See: https://github.com/Microsoft/TypeScript/issues/30293 */
 type PropsRemove_Name<TTarget, TPropToRemove> = { [ K in keyof TTarget ]: TTarget[ K ] extends TPropToRemove ? never : K }[ keyof TTarget ];
-/** remove props of the given type.   always removes ```never``` type props.  if no ```TPropToRemove``` is provided, removes just ```never``` type props. */
+/** remove props of the given type.   always removes ```never``` type props.  if no ```TPropToRemove``` is provided, removes just ```never``` type props.
+ * 
+ * ***BUG NOTE*** due to a bug in Typescript, this does not work on types with index signatures.  See: https://github.com/Microsoft/TypeScript/issues/30293 */
 type PropsRemove<TTarget, TPropToRemove=never> = Pick<TTarget, PropsRemove_Name<TTarget, TPropToRemove>>;
 
 
-/** returns union of both types.  When both types have the same properties, ```TPri```'s is used.  (does not union property types)*/
+/** returns union of both types.  When both types have the same properties, ```TPri```'s is used.  (does not union property types)
+ * 
+ * ***BUG NOTE*** due to a bug in Typescript, this does not work on types with index signatures.  See: https://github.com/Microsoft/TypeScript/issues/30293
+*/
 type PropsUnion<TPri, TSec> = TPri & PropsUnique<TSec, TPri>;

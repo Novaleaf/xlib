@@ -2,19 +2,13 @@
 
 import * as _ from "lodash";
 
+/** color strings for console use.  also used by logger */
 export import Chalk = require( "chalk" );
+
+/** remove ansi characters from string.  also used by logger. */
 export import stripAnsi = require( "strip-ansi" );
 
 
-import * as _sanitizeHtml from "sanitize-html";
-
-/**
- * takes our normal "escaped at rest" user input and unescapes it, then sanitizes
- * @param html
- */
-export function htmlSanitizeEscapedUserInput( html: string ) {
-    return _sanitizeHtml( unescapeUserInput( html ) );
-}
 
 /**
  * escapes strings for html presentation.

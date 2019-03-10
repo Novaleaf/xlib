@@ -26,8 +26,8 @@ export interface IErrorJson {
 	/** optional, can pass an innerException of you use xlib.diagnostics.Exception */
 	innerError?: IErrorJson;
 
-	/** additional fields may be attached to your error object.  if so, they will be serialized here */
-	[ keys: string ]: any;
+	// /** additional fields may be attached to your error object.  if so, they will be serialized here */
+	// [ keys: string ]: any;
 }
 
 
@@ -142,8 +142,8 @@ export class Exception<TData=never> extends Error {
 	public toString() {
 		return errorToString( this );
 	}
-	public toJson() {
-		return errorToJson( this );
+	public toJson<T extends Error = this>() {
+		return errorToJson<T>( this );
 	}
 
 
@@ -188,13 +188,23 @@ export class HttpStatusCodeException<TData=never> extends Exception<TData> {
 		super( message, { innerError: innerException } );
 	}
 
-	public toJson(): IErrorJson & { statusCode: number } {
-		let baseJson = super.toJson();//  Exception.exceptionToJsonObj( this );
-		return {
-			...baseJson,
-			statusCode: this.statusCode,
-		};
-	}
+	// public toJson(): IErrorJson & { statusCode: number } {
+
+	// 	type X = this;
+	// 	let x: X;
+
+	// 	let asJson = errorToJson<X>( this );
+
+	// 	//asJson.
+
+
+	// 	let baseJson = super.toJson<HttpStatusCodeException>();//  Exception.exceptionToJsonObj( this );
+
+	// 		return {
+	// 		...baseJson,
+	// 			statusCode: this.statusCode,
+	// 	};
+	// }
 }
 
 
@@ -279,9 +289,16 @@ export interface IErrorToJsonOptions {
 }
 
 
+type ErrorAsJson<TError extends Error> = PropsUnion<IErrorJson, PropsRemove<TError, Function>>;
+
+
+// class MyException extends Exception {
+// 	public someVal = 22;
+// };
+// let t1: ErrorAsJson<MyException>;
 
 /** convert an error and all it's properties to JSON.   */
-export function errorToJson<TError extends Error>( error: TError | IError, options?: IErrorToJsonOptions ): PropsUnion<IErrorJson, TError> {
+export function errorToJson<TError extends Error>( error: TError | IError, options?: IErrorToJsonOptions ): ErrorAsJson<TError> {
 
 	if ( error == null ) {
 		return { message: "", name: "NullNotError" } as any;

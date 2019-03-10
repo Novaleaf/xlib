@@ -1,6 +1,6 @@
 "use strict";
 import * as _ from "lodash";
-import * as bb from "bluebird";
+import bb from "bluebird";
 //declare var Promise: bb<any>;
 
 
