@@ -52,11 +52,13 @@
     "emitDecoratorMetadata": true, // ! try /////////  change for vNext
     "esModuleInterop": true, // ! try
     "experimentalDecorators": true, //! try
-    "importHelpers": true, // ! try /////////  change for vNext
-    "keyofStringsOnly": true, //! v15
+    "importHelpers": true,
+    "keyofStringsOnly": false, //! v15
     "noErrorTruncation": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
+    "isolatedModules": false, //can not do this and re-export types
+    "strictBindCallApply": true, //! v15
     "typeRoots": [
       "./src/types",
     ],

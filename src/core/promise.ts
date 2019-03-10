@@ -137,85 +137,6 @@ export interface IExposedPromise<TReturn=void, TTags=never> extends bluebird<TRe
 	tags?: TTags;
 }
 
-export namespace _obsolete {
-	/** for a given function signature which returns a promise, construct a facade that will fulfill once all outstanding calls finish, and each call will be executed sequentially (not in parallel!)*/
-	export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: any[] ) => bluebird<T> ): ( ...args: any[] ) => bluebird<T[]> {
-		//todo: error handling.
-
-		let __enqueuedCallArguments: IArguments[] = [];
-		let __isExecuting = false;
-		let __batchPromise: IExposedPromise<T[]> = CreateExposedPromise<T[]>();
-		let __batchResults: T[] = [];
-
-		function __resetVariables() {
-			__isExecuting = false;
-			__batchResults = [];
-			__batchPromise = CreateExposedPromise<T[]>();
-		}
-		function __doNext() {
-
-			if ( __enqueuedCallArguments.length == 0 ) {
-				//no more enqueued, so resolve our batch Promise and clear things out incase there are future calls to the facade.
-				let tempData = __batchResults;
-				let tempPromise = __batchPromise;
-				__resetVariables();
-
-				tempPromise.fulfill( tempData );
-
-			}
-			//get the next call to process
-			let args = __enqueuedCallArguments.shift();
-
-			let currentPromise: bluebird<T> = func.apply( __this, args );
-			currentPromise.then( ( currentValue ) => {
-				__batchResults.push( currentValue );
-				__doNext();
-			}, ( error ) => {
-				let tempPromise = __batchPromise;
-				__resetVariables();
-				tempPromise.reject( error );
-			} );
-		}
-
-
-
-		function __toReturn(): bluebird<T[]> {
-
-			let args: IArguments = _.clone( arguments );
-
-			__enqueuedCallArguments.push( args );
-
-			if ( __isExecuting === true ) {
-				return __batchPromise;
-			}
-			__isExecuting = true;
-			__doNext();
-
-			return __batchPromise;
-		}
-
-
-
-
-		return __toReturn;
-	}
-
-	/** constructs a unified promise for your returned (callback function) promises.  wraps a lodash foreach, just adds Promise.all() glue code.
-	NOTE: executes all asynchronously.  if you need to only execute + complete one promise at a time, use Promise.each() instead. */
-	export function forEachParallel<TIn, TOut>( array: TIn[], callback: ( value: TIn ) => TOut | bluebird<TOut> ): bluebird<TOut[]> {
-		try {
-			let results: bluebird<TOut>[] = [];
-			_.forEach( array, ( value ) => {
-				let resultPromise = callback( value );
-				results.push( <any>resultPromise );
-			} );
-
-			return bluebird.all( results );
-		} catch ( ex ) {
-			return <any>bluebird.reject( ex );
-		}
-	}
-}
 
 
 export module _BluebirdRetryInternals {
@@ -339,3 +260,90 @@ export const retry: _BluebirdRetryInternals.IRetryStatic = require( "bluebird-re
  *  same as Bluebird's .timeout() method but does not cancel the input promise.  just error's the chain from this point onward.
  */
 //export function timeoutNoCancel
+
+
+
+
+
+
+
+
+// export namespace _obsolete {
+// 	/** for a given function signature which returns a promise, construct a facade that will fulfill once all outstanding calls finish, and each call will be executed sequentially (not in parallel!)*/
+// 	export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: any[] ) => bluebird<T> ): ( ...args: any[] ) => bluebird<T[]> {
+// 		//todo: error handling.
+
+// 		let __enqueuedCallArguments: IArguments[] = [];
+// 		let __isExecuting = false;
+// 		let __batchPromise: IExposedPromise<T[]> = CreateExposedPromise<T[]>();
+// 		let __batchResults: T[] = [];
+
+// 		function __resetVariables() {
+// 			__isExecuting = false;
+// 			__batchResults = [];
+// 			__batchPromise = CreateExposedPromise<T[]>();
+// 		}
+// 		function __doNext() {
+
+// 			if ( __enqueuedCallArguments.length == 0 ) {
+// 				//no more enqueued, so resolve our batch Promise and clear things out incase there are future calls to the facade.
+// 				let tempData = __batchResults;
+// 				let tempPromise = __batchPromise;
+// 				__resetVariables();
+
+// 				tempPromise.fulfill( tempData );
+
+// 			}
+// 			//get the next call to process
+// 			let args = __enqueuedCallArguments.shift();
+
+// 			let currentPromise: bluebird<T> = func.apply( __this, args as any[] );
+// 			currentPromise.then( ( currentValue ) => {
+// 				__batchResults.push( currentValue );
+// 				__doNext();
+// 			}, ( error ) => {
+// 				let tempPromise = __batchPromise;
+// 				__resetVariables();
+// 				tempPromise.reject( error );
+// 			} );
+// 		}
+
+
+
+// 		function __toReturn(): bluebird<T[]> {
+
+// 			let args: IArguments = _.clone( arguments );
+
+// 			__enqueuedCallArguments.push( args );
+
+// 			if ( __isExecuting === true ) {
+// 				return __batchPromise;
+// 			}
+// 			__isExecuting = true;
+// 			__doNext();
+
+// 			return __batchPromise;
+// 		}
+
+
+
+
+// 		return __toReturn;
+// 	}
+
+// 	/** constructs a unified promise for your returned (callback function) promises.  wraps a lodash foreach, just adds Promise.all() glue code.
+// 	NOTE: executes all asynchronously.  if you need to only execute + complete one promise at a time, use Promise.each() instead. */
+// 	export function forEachParallel<TIn, TOut>( array: TIn[], callback: ( value: TIn ) => TOut | bluebird<TOut> ): bluebird<TOut[]> {
+// 		try {
+// 			let results: bluebird<TOut>[] = [];
+// 			_.forEach( array, ( value ) => {
+// 				let resultPromise = callback( value );
+// 				results.push( <any>resultPromise );
+// 			} );
+
+// 			return bluebird.all( results );
+// 		} catch ( ex ) {
+// 			return <any>bluebird.reject( ex );
+// 		}
+// 	}
+// }
