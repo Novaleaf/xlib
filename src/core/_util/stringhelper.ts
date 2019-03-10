@@ -54,7 +54,7 @@ export function isUnicodeDoubleByte( str: string ) {
     if ( str == null || str.length === 0 ) {
         return false;
     }
-    if ( str.charCodeAt( 0 ) > 255 ) return true;
+    if ( str.charCodeAt( 0 ) > 255 ) { return true; }
     return _isUnicodeDoubleByte_regex.test( str );
 }
 

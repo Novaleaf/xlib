@@ -25,54 +25,6 @@ import * as _ from "lodash";
 import * as diagnostics from "./diagnostics";
 
 
-/** inspect the spread of sampled time durations.  by default, gives IQR, ie the 0th, 1st, 2nd, 3rd, and 4th quartiles, 
-		* as per: https://www.dataz.io/display/Public/2013/03/20/Describing+Data%3A+Why+median+and+IQR+are+often+better+than+mean+and+standard+deviation 
-				and  https://en.wikipedia.org/wiki/Quantile#Quantiles_of_a_population  
-				@returns array of ms, each representing the requested quartile's rank choice*/
-export function quantile( intervals: Array<luxon.Interval | luxon.Duration | number | Stopwatch | { valueOf(): number }>,
-	/** by default givez IQR, ie the sample at 0,25,50,75, and 100th percentiles,
-		* @default  [ 0, 0.25, 0.5, 0.75, 1 ]
-		*/
-	quantile = [ 0, 0.25, 0.5, 0.75, 1 ] ) {
-
-	if ( intervals == null || intervals.length === 0 ) {
-		//don't crash on empty imput.  just return NaN
-		let toReturn = [];
-		for ( let i = 0; i < quantile.length; i++ ) {
-			toReturn.push( NaN );
-		}
-		return toReturn;;
-	}
-
-
-
-	let msArray: number[] = intervals.map( ( val ) => {
-		if ( typeof val === "number" ) {
-			return val;
-		} else if ( val instanceof luxon.Interval ) {
-			return val.toDuration( undefined ).valueOf();
-		} else if ( val instanceof luxon.Duration ) {
-			return val.valueOf();
-		} else if ( val instanceof Stopwatch ) {
-			return val.getElapsed().valueOf();
-		} else if ( val.valueOf != null && typeof val.valueOf() === "number" ) {
-			return val.valueOf();
-		}
-		return NaN;
-	} );
-
-
-	let toReturn = mathjs.quantileSeq( msArray, quantile, false ) as number[];
-
-	return toReturn;
-
-}
-
-
-
-
-
-
 export class Stopwatch {
 
 	constructor( public name?: string ) { }
@@ -204,6 +156,57 @@ export class Stopwatch {
 		return this;
 	}
 }
+
+
+
+/** inspect the spread of sampled time durations.  by default, gives IQR, ie the 0th, 1st, 2nd, 3rd, and 4th quartiles, 
+		* as per: https://www.dataz.io/display/Public/2013/03/20/Describing+Data%3A+Why+median+and+IQR+are+often+better+than+mean+and+standard+deviation 
+				and  https://en.wikipedia.org/wiki/Quantile#Quantiles_of_a_population  
+				@returns array of ms, each representing the requested quartile's rank choice*/
+export function quantile( intervals: Array<luxon.Interval | luxon.Duration | number | Stopwatch | { valueOf(): number }>,
+	/** by default givez IQR, ie the sample at 0,25,50,75, and 100th percentiles,
+		* @default  [ 0, 0.25, 0.5, 0.75, 1 ]
+		*/
+	_quantile = [ 0, 0.25, 0.5, 0.75, 1 ] ) {
+
+	if ( intervals == null || intervals.length === 0 ) {
+		//don't crash on empty imput.  just return NaN
+		let toReturn = [];
+		for ( let i = 0; i < _quantile.length; i++ ) {
+			toReturn.push( NaN );
+		}
+		return toReturn;;
+	}
+
+
+
+	let msArray: number[] = intervals.map( ( val ) => {
+		if ( typeof val === "number" ) {
+			return val;
+		} else if ( val instanceof luxon.Interval ) {
+			return val.toDuration( undefined ).valueOf();
+		} else if ( val instanceof luxon.Duration ) {
+			return val.valueOf();
+		} else if ( val instanceof Stopwatch ) {
+			return val.getElapsed().valueOf();
+		} else if ( val.valueOf != null && typeof val.valueOf() === "number" ) {
+			return val.valueOf();
+		}
+		return NaN;
+	} );
+
+	{
+		let toReturn = mathjs.quantileSeq( msArray, _quantile, false ) as number[];
+
+		return toReturn;
+	}
+
+}
+
+
+
+
+
 
 import * as environment from "./environment";
 

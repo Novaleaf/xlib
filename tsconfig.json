@@ -72,6 +72,24 @@
     //   "dom",
     // ],
     //"noLib": true,
+    // "plugins": [
+    //   {
+    //     "name": "typescript-tslint-plugin"
+    //   }
+    // ]
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin",
+        "alwaysShowRuleFailuresAsWarnings": true,
+        "configFile": "./tslint.json",
+        "suppressWhileTypeErrorsPresent": false,
+        "ignoreDefinitionFiles": true, //change after first pass fix
+        // "exclude": [
+        //   "./node_modules/**/*",
+        //   "./built/**/*",
+        // ],
+      }
+    ]
   },
   // "typeAcquisition": { //not enabling to force explicit usage of new types
   //   "enable": true,

@@ -43,7 +43,7 @@
         "label-position": true,
         "linebreak-style": false,
         ////////////////////////////  above this line, few spam
-        "match-default-export-name": true,
+        "match-default-export-name": false, //hard to know exactly the default name v15
         "max-classes-per-file": [
             true,
             20
@@ -72,7 +72,7 @@
         "no-construct": true,
         "no-debugger": true,
         "no-default-export": true,
-        "no-duplicate-imports": true,
+        "no-duplicate-imports": false, //changed v15: doesn't work great with es6 modules that have no default export
         "no-duplicate-super": true,
         "no-duplicate-switch-case": true,
         "no-duplicate-variable": true,

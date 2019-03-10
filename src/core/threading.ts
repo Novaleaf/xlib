@@ -236,6 +236,7 @@ export class AsyncReaderWriterLock<TValue=void> {
 
         try {
             //log.assert( thisWrite._tags.writeId === writeId, "writeId mismatch" );
+            // tslint:disable-next-line: no-unbound-method
             if ( valueOrWritePromise instanceof bb || ( _.isObject( valueOrWritePromise ) && _.isFunction( ( valueOrWritePromise as any as bb<any> ).then ) ) ) {
                 this._value = await bb.resolve( valueOrWritePromise );
             } else {

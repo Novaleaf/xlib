@@ -559,7 +559,6 @@ function _self_initialize() {
 	_populateLogLevelOverridesFromEnvVars()
 
 	//noop log levels too low  for better performance
-	const LogLevel = environment.LogLevel;
 	const noopFcn = ( () => { } ) as any;
 	switch ( environment.logLevel ) {
 		case LogLevel.ASSERT:

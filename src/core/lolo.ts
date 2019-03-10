@@ -77,6 +77,7 @@ const start = __.utc();
 //....do stuff...
 const elapsed = start.until( __.utc() ).length( "millisecond" );
 */
+// tslint:disable-next-line: no-unbound-method
 export const utc = luxon.DateTime.utc;
 /** Time:  create a duration object.
 	* 
@@ -84,6 +85,7 @@ export const utc = luxon.DateTime.utc;
 	* @example
 	const oneHundredMs = __.duration( { milliseconds: 100 } );
   */
+// tslint:disable-next-line: no-unbound-method
 export const duration = luxon.Duration.fromObject;
 
 

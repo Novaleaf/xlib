@@ -18,7 +18,9 @@ function it1( testFcn: () => void ) {
 function it2( testFcn: () => Promise<any> ) {
 	const testName = xlib.reflection.getTypeName( testFcn );
 	return it( testName, async function () {
+		// tslint:disable-next-line: no-invalid-this
 		const timeoutMs = this.timeout();
+		// tslint:disable-next-line: no-invalid-this
 		return xlib.promise.bluebird.resolve( testFcn.apply( this ) ).timeout( timeoutMs, new xlib.promise.bluebird.TimeoutError( `operation timed out.  Max of ${ timeoutMs }ms exceeded` ) );
 
 	} );
@@ -27,7 +29,12 @@ function it2( testFcn: () => Promise<any> ) {
 
 describe( __filename + " basic xlib unit tests", () => {
 
+	it1( function checkFunctionObjectSyntxBug() {
 
+		log.assert( it1.length === 0 ); //expect tslint to complain about treating a function as an object.
+
+
+	} );
 
 
 
@@ -46,14 +53,12 @@ describe( __filename + " basic xlib unit tests", () => {
 
 
 	it1( function testReadXlibEnvironmentEnvLevel() {
-		const log = xlib.diagnostics.log;
 		xlib.diagnostics.log.assert( xlib.environment.envLevel != null );
 		//log.info( { envLevel: xlib.environment.envLevel } );
 	} );
 
 
 	it1( function testLogAutoTruncation() {
-		const log = xlib.diagnostics.log;
 		log.info( "hi", { some: "data" } );
 
 		let resultArgs = log.info( "this 1000 character string gets auto-truncated nicely via __.inspect()", { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } );
@@ -63,7 +68,7 @@ describe( __filename + " basic xlib unit tests", () => {
 	} );
 
 	it1( function logOverridesTest() {
-		const log = xlib.diagnostics.log;
+
 		try {
 			let result = log.info( "should show" );
 			log.assert( result != null );
@@ -86,7 +91,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	it2( async function testingBasicNetRemoteHttpEndpointFunctionalityReadFromExampleCom() {
 
-		const log = xlib.diagnostics.log;
+
 		const remoteEndpoint = new xlib.net.RemoteHttpEndpoint<void, string>( {
 			endpoint: { origin: "http://example.com" },
 			retryOptions: { backoff: 2, interval: 100, max_interval: 5000, max_tries: 10 },
@@ -103,7 +108,7 @@ describe( __filename + " basic xlib unit tests", () => {
 	} );
 
 	it1( function testingReflection() {
-		const log = xlib.diagnostics.log;
+
 		const reflection = xlib.reflection;
 		const Type = reflection.Type;
 		class MyClass { x = 0; };
@@ -118,7 +123,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	it2( async function testingAutoscalerFunctionalityRequestFromPhantomjscloudCom() {
 
-		const log = xlib.diagnostics.log;
+
 
 		/** POST request data you submit to the server
 			* 
@@ -158,7 +163,7 @@ describe( __filename + " basic xlib unit tests", () => {
 	} ).timeout( 5000 );
 
 	it1( function testExceptions() { //causes debugBreak on thrown exceptions when running test
-		const log = xlib.diagnostics.log;
+
 		class MyException extends xlib.diagnostics.Exception {
 			public someVal = 22;
 		};
@@ -279,9 +284,9 @@ describe( __filename + " basic xlib unit tests", () => {
 		const outsideWatch = perfTimer.start( "outside" );
 		for ( let i = 0; i < loops; i++ ) {
 			const mainLoopWatch = perfTimer.start( "mainLoop" );
-			for ( let i = 0; i < loops; i++ ) {
+			for ( let j = 0; j < loops; j++ ) {
 				const innerA = perfTimer.start( "innerA" );
-				for ( let i = 0; i < loops; i++ ) {
+				for ( let k = 0; k < loops; k++ ) {
 					const innerAA = perfTimer.start( "innerAA" );
 
 					await __.bb.delay( loopSleepMs );
@@ -290,7 +295,7 @@ describe( __filename + " basic xlib unit tests", () => {
 				await __.bb.delay( loopSleepMs );
 				innerA.stop();
 			}
-			for ( let i = 0; i < loops; i++ ) {
+			for ( let j = 0; j < loops; j++ ) {
 				const innerB = perfTimer.start( "innerB" );
 
 				await __.bb.delay( loopSleepMs );
@@ -348,15 +353,15 @@ describe( __filename + " basic xlib unit tests", () => {
 		class TestAutoScaleError extends xlib.diagnostics.Exception<{ shouldRejectBusy: boolean }>{ }
 
 		let testScaler = new xlib.threading.Autoscaler( { busyGrowDelayMs: 100, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 30, growDelayMs: 5, minParallel: 4 },
-			async ( chanceOfBusy: number, chanceOfFail: number, replyDelay: number, replyDelaySpread: number ) => {
+			async ( _chanceOfBusy: number, _chanceOfFail: number, _replyDelay: number, _replyDelaySpread: number ) => {
 				//this is the "backendWorker" that is being autoscaled
-				let delay = replyDelay + __.num.randomInt( 0, replyDelaySpread );
-				await __.bb.delay( replyDelay );
-				const isBusy = __.num.randomBool( chanceOfBusy );
+				let delay = _replyDelay + __.num.randomInt( 0, _replyDelaySpread );
+				await __.bb.delay( _replyDelay );
+				const isBusy = __.num.randomBool( _chanceOfBusy );
 				if ( isBusy ) {
 					return xlib.promise.bluebird.reject( new TestAutoScaleError( "backend busy", { data: { shouldRejectBusy: true } } ) );
 				}
-				const isFail = __.num.randomBool( chanceOfFail );
+				const isFail = __.num.randomBool( _chanceOfFail );
 				if ( isFail ) {
 					return __.bb.reject( new TestAutoScaleError( "backend failure", { data: { shouldRejectBusy: false } } ) );
 				}
@@ -384,7 +389,13 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		try {
 			//wait for all
-			for ( const i in awaitsArray ) {
+
+			// await xlib.promise.bluebird.each( awaitsArray, ( toInspect ) => {
+
+
+
+			//  } );
+			for ( const toInspectPromise of awaitsArray ) {
 				// 	try {
 				// 		const result = await awaitsArray[ i ];
 				// 		__.log.assert( result === "backend success" );
@@ -395,7 +406,7 @@ describe( __filename + " basic xlib unit tests", () => {
 				// 	}
 
 
-				const { toInspect } = await xlib.promise.awaitInspect( awaitsArray[ i ] ).timeout( ( replyDelay + replyDelaySpread ) + 300, "reply took too long, while this could be because of debugging overhead, should investigate" );
+				const { toInspect } = await xlib.promise.awaitInspect( toInspectPromise ).timeout( ( replyDelay + replyDelaySpread ) + 300, "reply took too long, while this could be because of debugging overhead, should investigate" );
 				__.log.assert( toInspect.isResolved() );
 				if ( toInspect.isFulfilled() ) {
 					__.log.assert( toInspect.value() === "backend success" );

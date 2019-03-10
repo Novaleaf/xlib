@@ -192,6 +192,7 @@ yer out
 The StopError constructor accepts one argument. If it is invoked with an instance of Error, then the promise is rejected with that error argument. Otherwise the promise is rejected with the StopError itself.*
 
 	 */
+	// tslint:disable-next-line: no-unnecessary-class
 	export declare class StopError {
 		constructor(
 			/** The StopError constructor accepts one argument. If it is invoked with an instance of Error, then the promise is rejected with that error argument. Otherwise the promise is rejected with the StopError itself.*/

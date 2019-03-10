@@ -5,6 +5,7 @@
 	"tasks": [
 		{
 			"label": "tslint",
+			//"type": "process",
 			"type": "shell",
 			"command": "tslint --project tsconfig.json --config tslint.json --format verbose",
 			//// disabling the following "prolemMatcher" section because while it shows tslint errors
