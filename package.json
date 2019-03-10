@@ -7,7 +7,6 @@
   "author": "jason swearingen <jasons@novaleaf.com>",
   "dependencies": {
     "@types/bluebird": "^3.5.26",
-    "@types/bluebird-retry": "^0.11.2",
     "@types/d3-dsv": "^1.0.33",
     "@types/json5": "0.0.30",
     "@types/jsonwebtoken": "^7.2.8",

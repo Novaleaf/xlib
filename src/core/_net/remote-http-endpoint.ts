@@ -1,3 +1,5 @@
+
+//import Bluebird from "bluebird";
 import * as promise from "../promise";
 import bb = promise.bluebird;
 import * as _ from "lodash";
@@ -45,7 +47,7 @@ predicate to be used as bluebird's Filtered Catch. func will be retried only if 
 
 throw_original to throw the last thrown error instance rather then a timeout error.
 		* default is no retries. */
-	retryOptions?: promise.retry.Options;
+	retryOptions?: promise._BluebirdRetryInternals.IOptions;
 	/** optional settings sent with the request.  from: https://www.npmjs.com/package/axios
 		* @default { 
 				timeout: 60000, 
@@ -234,7 +236,7 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 
 
 					}
-					return new bb( ( resolve, reject ) => {
+					return new promise.bluebird<axios.AxiosResponse<TRecievePayload>>( ( resolve, reject ) => {
 						//wrap axios in a REAL promise call, as it's hacky promises really sucks and breaks Bluebird
 						axiosRequestPromise.then( ( axiosResponse ) => { resolve( axiosResponse ); } )
 							.catch( ( axiosErr ) => {
