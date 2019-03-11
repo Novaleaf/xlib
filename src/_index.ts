@@ -1,9 +1,10 @@
+// tslint:disable-next-line: no-reference
 /// <reference path="./types/xlib-globals/index.d.ts" />
 
 
 import * as jsShims from "./_internal/jsshims";
-/** 
- * ! initialization of xlib:  some "preinit" has to be done as soon as a submodule is imported, 
+/**
+ * ! initialization of xlib:  some "preinit" has to be done as soon as a submodule is imported,
  * ! so it can be properly used by other xlib submodules, so we do that manually inline.
  * ! however we do other init via an IoC pattern via the _internal/init.ts module.  the init submodule is invoked at the very end of this file.
  */
@@ -14,9 +15,9 @@ jsShims.initialize();
 import * as source_map_support from "source-map-support";
 
 let _initArgs: init.IInitArgs = {};
-if ( typeof global !== "undefined" && global.__xlibInitArgs ) {
+if ( typeof global !== "undefined" && global.__xlibInitArgs!=null ) {
     _initArgs = global.__xlibInitArgs;
-} else if ( typeof window !== "undefined" && window.__xlibInitArgs ) {
+} else if ( typeof window !== "undefined" && window.__xlibInitArgs !=null ) {
     _initArgs = window.__xlibInitArgs;
 }
 
@@ -26,7 +27,6 @@ if ( _initArgs == null || lodash.isEmpty( _initArgs ) ) {
     console.log( `XLIB INFO:  no "global.__xlibInit" object detected.  we will use the default values (or read them from the environment).  To hide this message, you must set it.  For example:  global.__xlibInit={logLevel:"WARN", envLevel:"PROD",silentInit:true}` );
     _initArgs = {};
 }
-
 
 
 export import environment = require( "./core/environment" );
@@ -59,24 +59,17 @@ if ( environment.envLevel < environment.EnvLevel.UAT || environment.logLevel < e
 }
 
 
-
-
 export import promise = require( "./core/promise" );
-
-
-
-
 
 
 import * as numeric from "./core/numeric";
 export { numeric };
 
 
-
 //serialInits.push( mockMocha.initialize );
-/** contains shortcuts to commonly used xlib modules and objects. 
- * example usage: 
- * @example 
+/** contains shortcuts to commonly used xlib modules and objects.
+ * example usage:
+ * @example
  * import __ = xlib.lolo;
  * __.log.info("hi there");
  */
@@ -96,7 +89,6 @@ export import util = require( "./core/util" );
 //export import arrayHelper = require( "./core/_util/arrayhelper" );
 
 export import reflection = require( "./core/reflection" );
-
 
 
 export import time = require( "./core/time" );
@@ -124,7 +116,6 @@ export import security = require( "./core/security" );
 // export import decimal = require( "decimal.js" );
 
 
-
 //export import definitions = require( "./definitions/definitions" );
 
 
@@ -134,7 +125,6 @@ export import security = require( "./core/security" );
 //////////////////////  initialization section
 import * as init from "./_internal/init";
 let floatingPromise = init.initialize( _initArgs );
-
 
 
 // setTimeout( () => {

@@ -7,11 +7,8 @@ import * as init from "../_internal/init";
 import * as _ from "lodash";
 
 
-
-
-
 /** allow splitting up our init work near where it's asssociated variables are.   all are run by the exported .initialize() method */
-const _internalInitWork: Array<( args: init.IInitArgs ) => void> = [];
+const _internalInitWork: ( ( args: init.IInitArgs ) => void )[] = [];
 
 
 export enum PlatformType {
@@ -30,7 +27,7 @@ declare var phantom: any;
 
 
 /** info on the type of platform we are currently executing under */
-export var platformType: PlatformType = function (): PlatformType {
+export let platformType: PlatformType = function (): PlatformType {
 	if ( typeof ( phantom ) !== "undefined" ) {
 		return PlatformType.PhantomJs;
 	}
@@ -61,7 +58,7 @@ export enum OsName {
 	unix,
 }
 /** the name of the os we detect running.  uses user agent in browsers, process.platform in nodejs */
-export var osName: OsName;
+export let osName: OsName;
 _internalInitWork.push( ( args ) => {
 	osName = ( () => {
 		if ( typeof ( process ) !== "undefined" ) {
@@ -76,7 +73,6 @@ _internalInitWork.push( ( args ) => {
 		return OsName.unknown;
 	} )();
 } );
-
 
 
 /** returns the current global object.
@@ -111,7 +107,7 @@ export enum LogLevel {
  * nodejs: set by running "node entrypoint.js logLevel=DEBUG" or by setting your systemenv var: logLevel=DEBUG
  * browser: set by adding "logLevel=DEBUG" in your querystring, add a cookie, or as a attribute of your html tag
   */
-export var logLevel: LogLevel;
+export let logLevel: LogLevel;
 _internalInitWork.push( ( args ) => {
 	let _logLevel: LogLevel;
 	if ( args.logLevel != null ) {
@@ -161,7 +157,7 @@ export enum EnvLevel {
 	UAT = 30,
 	PROD = 40,
 }
-export var envLevel: EnvLevel;
+export let envLevel: EnvLevel;
 _internalInitWork.push( ( args ) => {
 	if ( args.envLevel != null ) {
 		if ( typeof args.envLevel === "string" ) {
@@ -229,8 +225,6 @@ _internalInitWork.push( ( args ) => {
 // 		}
 // 	}
 // } );
-
-
 
 
 // export const env = {
@@ -317,7 +311,7 @@ nodejs / phantomjs: reads from commandline switches (prefered) or system environ
 browser:  reads from querystring (prefered), or cookie, or <html data-key> attribute (least prefered).
  */
 export function getEnvironmentVariable( key: string,/** by default, when the envVar doesn't exist we'll return undefined*/ valueIfNullOrEmpty?: string ) {
-	var result: string;
+	let result: string;
 	switch ( platformType ) {
 		case PlatformType.Browser:
 			//try to find in querystring
@@ -366,7 +360,6 @@ export function getEnvironmentVariable( key: string,/** by default, when the env
 	}
 	return result;
 }
-
 
 
 /** reads in various environmental and process details and make it easily usable by devs */

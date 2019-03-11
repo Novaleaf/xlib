@@ -6,7 +6,6 @@ import * as diagnostics from "./diagnostics";
 const log = diagnostics.log; // new diagnostics.Logger( __filename );
 
 
-
 //import compression = require("./compression");
 
 //export import axios = require("axios");
@@ -15,9 +14,6 @@ export { /** the raw axios library used for http calls */ axios };
 
 import { RemoteHttpEndpoint, IRemoteHttpEndpointOverrideOptions, IRemoteHttpEndpointOptions } from "./_net/remote-http-endpoint";
 export { RemoteHttpEndpoint, IRemoteHttpEndpointOverrideOptions, IRemoteHttpEndpointOptions };
-
-
-
 
 
 //module _test {

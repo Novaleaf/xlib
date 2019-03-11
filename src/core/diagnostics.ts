@@ -4,17 +4,15 @@ import * as stringHelper from "./_util/stringhelper";
 
 import * as environment from "./environment";
 
+export * from "./_diagnostics/exception";
+import * as exception from "./_diagnostics/exception";
+
 
 import * as _logging from "./_diagnostics/logging";
 export { _logging };
 
-export * from "./_diagnostics/exception";
-import * as exception from "./_diagnostics/exception";
 /** A high quality console logger.  shortcut to diagnostics._logging.log. */
 export const log = new _logging.Logger();
-
-
-
 
 
 /** computes the callSite (file+line+col) of a location in the call stack */
@@ -61,7 +59,7 @@ export function computeStackTrace(/**
 	/** max frames to return */ maxFrames?: number,
 	/** changes the first ```startingFrameExclusive``` to be inclusive, IE keep the frame you search for, instead of throwing it away and getting the next frame.  default false */
 	keepStartingFrame = false,
-): string[] {
+): Array<string> {
 
 	let tempError = new Error();
 	if ( tempError.stack == null ) {
@@ -91,7 +89,7 @@ export function computeStackTrace(/**
 				}
 			}
 		} else if ( typeof ( startingFrameExclusive ) === "number" && startingFrameExclusive > 0 ) {
-			for ( var i = 0; i < startingFrameExclusive; i++ ) {
+			for ( let i = 0; i < startingFrameExclusive; i++ ) {
 				lastRemovedFrame = splitStack.shift();
 			}
 		}
@@ -106,12 +104,12 @@ export function computeStackTrace(/**
 	return splitStack;
 }
 
-/** @deprecated please use diagnostics.computeStackTrace() under most circumstances. 
-	* 
+/** @deprecated please use diagnostics.computeStackTrace() under most circumstances.
+	*
 	extract stack frames.   note that the first frame contains the message, so if you don't want that, pass the optional ```startingFrame``` parameter */
 export function extractStackFrames(/** error or stack string */ error: exception.IError | string,/** @default undefined (all frames)*/ frames?: number,/** @default 0 */ startingFrame?: number ) {
 	let stack: string;
-	let stackArray: string[];
+	let stackArray: Array<string>;
 	if ( typeof ( error ) === "string" ) {
 		stack = error;
 	} else {
@@ -136,9 +134,6 @@ export function extractStackFrames(/** error or stack string */ error: exception
 
 	return stackArray;
 }
-
-
-
 
 
 /** thrown on race-check failures */
@@ -190,7 +185,7 @@ export class DebugRaceCheck {
 
 	public toString(): string {
 		if ( environment.logLevel <= environment.LogLevel.DEBUG ) {
-			var isEdit = this._lockVersion === 0 ? false : true;
+			let isEdit = this._lockVersion === 0 ? false : true;
 			return "version=" + String( this._version ) + " isBeingEdited=" + String( isEdit );
 		} else {
 			return "DebugRaceCheck is DISABLED when baselib.environment.logLevel > EnvLevel.DEBUG.  use baselib.concurrency.Lock if you need something in production";

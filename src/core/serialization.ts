@@ -14,10 +14,8 @@ import * as d3Dsv from "d3-dsv";
 import * as time from "./time";
 
 
-
-
 /** parse comma or tab seperated values.   see https://www.npmjs.com/package/d3-dsv
-	* 
+	*
 	This module provides a parser and formatter for delimiter-separated values, most commonly comma- (CSV) or tab-separated values (TSV). These tabular formats are popular with spreadsheet programs such as Microsoft Excel, and are often more space-efficient than JSON. This implementation is based on RFC 4180.
 
 Comma (CSV) and tab (TSV) delimiters are built-in. For example, to parse:
@@ -33,12 +31,11 @@ d3.tsvFormat([{foo: "1", bar: "2"}]); // "foo\tbar\n1\t2"
 To use a different delimiter, such as “|” for pipe-separated values, use d3.dsvFormat:
 ```
 var psv = d3.dsvFormat("|");
- 
+
 console.log(psv.parse("foo|bar\n1|2")); // [{foo: "1", bar: "2"}, columns: ["foo", "bar"]]
 ```
   */
 export const dsv = d3Dsv;
-
 
 
 import * as json5 from "json5";
@@ -46,16 +43,14 @@ import * as json5 from "json5";
 /** awesome json parse and stringify capabilities */
 export namespace jsonX {
 
-	/** a forgiving JSON parser.  Allows for comments, unquoted keys, trailing commas, etc.   see: https://www.npmjs.com/package/json5 
-		* 	
+	/** a forgiving JSON parser.  Allows for comments, unquoted keys, trailing commas, etc.   see: https://www.npmjs.com/package/json5
+		*
 							* Converts a JavaScript Object Notation (JSON) string into an object.
 							* @param text A valid JSON string.
 							* @param reviver A function that transforms the results. This function is called for each member of the object.
 							* If a member contains nested objects, the nested objects are transformed before the parent object is.
 							*/
 	export const parse: ( text: string, reviver?: ( key: any, value: any ) => any ) => any = json5.parse.bind( json5 );
-
-
 
 
 	/** parses your object using ```json5```, then attempts to parse string values in your object.  failed parse() calls will return the original string for that variable */
@@ -82,7 +77,6 @@ export namespace jsonX {
 	}
 
 
-
 	/**
 			* Converts a JavaScript value to a JSON5 string, optionally replacing values if a replacer function is specified, or optionally including only the specified properties if a replacer array is specified.
 			* @param value The value to convert to a JSON5 string.
@@ -91,18 +85,18 @@ export namespace jsonX {
 		 * @param quote  A String representing the quote character to use when serializing strings.
 			*/
 	export function stringify( value: any,
-		replacer?: ( key: string, value: any ) => any | ( number | string )[],
+		replacer?: ( key: string, value: any ) => any | Array<number | string>,
 		space?: string | number,
 		quote?: string,
 	): string;
 	export function stringify( value: any, options?: {
-		replacer?: ( key: string, value: any ) => any | ( number | string )[];
+		replacer?: ( key: string, value: any ) => any | Array<number | string>;
 		space?: string | number;
 		quote?: string;
 	} ): string;
-	export function stringify( value: any, ...args: any[] ) {
+	export function stringify( value: any, ...args: Array<any> ) {
 		let options: {
-			replacer?: ( key: string, value: any ) => any | ( number | string )[];
+			replacer?: ( key: string, value: any ) => any | Array<number | string>;
 			space?: string | number;
 			quote?: string;
 		};
@@ -127,13 +121,13 @@ export namespace jsonX {
 
 		aggrigateFunctions?: boolean;
 	}
-	export function inspectStringify( obj: Object, options?: IInspectOptions
+	export function inspectStringify( obj: any, options?: IInspectOptions
 	) {
 		const outputJson = inspectParse( obj, options );
 
 	}
 	/** debug inspection helper. outputs human readable JSON (but won't round-trip with .parse()).  handles circular references gracefully */
-	export function inspectParse( obj: Object, options?: IInspectOptions
+	export function inspectParse( obj: any, options?: IInspectOptions
 	) {
 
 		options = { maxArrayElements: 10, maxDepth: 1, summarizeLength: 120, ...options };
@@ -205,7 +199,7 @@ export namespace jsonX {
 			if ( myOptions.maxDepth < 0 ) {
 				//at max depth.  output typename
 				if ( type === Type.Array ) {
-					const asArray = obj as any[];
+					const asArray = obj as Array<any>;
 					return `[ARRAY len=${ asArray.length }]`;
 				} else {
 					return `[OBJECT typeName="${ reflection.getTypeName( obj ) }"]`;
@@ -215,7 +209,7 @@ export namespace jsonX {
 
 			//recursivly walk children
 			if ( _.isArray( obj ) === true ) {
-				const objArray = obj as any[];
+				const objArray = obj as Array<any>;
 				const toReturn = [];
 				if ( objArray.length <= myOptions.maxArrayElements ) {
 					//output all
@@ -251,8 +245,8 @@ export namespace jsonX {
 				return toReturn;
 			} else {
 				//loop through object
-				let functs: string[] = [];
-				let toReturn: { [ key: string ]: any } = {};
+				let functs: Array<string> = [];
+				let toReturn: { [ key: string ]: any; } = {};
 				_.forIn( obj, ( value, key ) => {
 					const val = _inspectParse_internal( value, myOptions, seenObjects );
 
@@ -285,20 +279,17 @@ export namespace jsonX {
 			}
 
 
-
-
 		} catch ( _err ) {
 			const err = diagnostics.toError( _err );
 			return `[ERROR_PARSING name="${ err.name }", message="${ stringHelper.summarize( err.message, myOptions.summarizeLength ) }"]`;
 		}
 
 
-
 	}  //end fcn
 
 
 	/** replace a branch of your JSON object.  good for pruning nested hiearchies, for example when wanting to decrease verbosity sent to user (before doing a JSON.stringify() )
-		* 
+		*
 		* works on array children too
 	*
 	* @example
@@ -308,10 +299,10 @@ export namespace jsonX {
 		*/
 	export function replaceNodes( targetObject: any,
 		/** example:  'a.b.c.d' will remove the d node, replacing it (with null by default, effectively deleting)*/
-		nodeHiearchyStrings: string[], replaceWith: any = null, replaceEmptyLeafNodes: boolean = false ) {
+		nodeHiearchyStrings: Array<string>, replaceWith: any = null, replaceEmptyLeafNodes: boolean = false ) {
 
 		/** recursive helper for walking through the current hiearchy, replacing as it goes*/
-		function currentNodeProcessor( previousNode: any, nodeName: string, hiearchyIndex: number, hiearchy: string[] ) {
+		function currentNodeProcessor( previousNode: any, nodeName: string, hiearchyIndex: number, hiearchy: Array<string> ) {
 
 			if ( previousNode == null || _.isString( previousNode ) ) {
 				//if our previous node is null (or a string), nothing to do.
@@ -320,7 +311,7 @@ export namespace jsonX {
 
 
 			if ( hiearchyIndex === ( hiearchy.length - 1 ) ) {
-				//the node is the last node in our hiearchy, 
+				//the node is the last node in our hiearchy,
 				//so we are on the node to remove.remove it and we are done
 				if ( previousNode[ nodeName ] != null || replaceEmptyLeafNodes === true ) {
 					previousNode[ nodeName ] = replaceWith;
@@ -329,9 +320,9 @@ export namespace jsonX {
 			}
 
 			//walk down the hiearchy
-			var thisNode = previousNode[ nodeName ];
-			var nextHiearchyIndex = hiearchyIndex + 1;
-			var nextNodeName = hiearchy[ nextHiearchyIndex ];
+			let thisNode = previousNode[ nodeName ];
+			let nextHiearchyIndex = hiearchyIndex + 1;
+			let nextNodeName = hiearchy[ nextHiearchyIndex ];
 			if ( _.isArray( thisNode ) === true && _.isString( thisNode ) === false ) {
 				//walk each element in the array automatically
 				_.forEach( thisNode, ( element ) => {
@@ -351,7 +342,7 @@ export namespace jsonX {
 				return;
 			}
 
-			var hiearchy = hiearchyString.split( "." );
+			let hiearchy = hiearchyString.split( "." );
 
 			if ( hiearchy.length < 1 ) {
 				return;

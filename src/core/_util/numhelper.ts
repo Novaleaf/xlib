@@ -4,23 +4,21 @@
 import * as ex from "../_diagnostics/exception";
 import * as crypto from "crypto";
 /** max for a signed 8bit integer. (127) */
-export var INT8_MAX = 127;
+export let INT8_MAX = 127;
 
 /** min for a signed 8bit integer. (-128) */
-export var INT8_MIN = -128;
+export let INT8_MIN = -128;
 /** max for a signed 16bit integer. (32767) */
-export var INT16_MAX = 32767;
-export var INT16_MIN = -32768;
-export var INT32_MAX = 2147483647;
-export var INT32_MIN = -2147483648;
+export let INT16_MAX = 32767;
+export let INT16_MIN = -32768;
+export let INT32_MAX = 2147483647;
+export let INT32_MIN = -2147483648;
 /** largest exact integer supported in javascript.  2^53.  (53 bit mantissa) after this, floating point rounding will occur
 from http://stackoverflow.com/questions/307179/what-is-javascripts-max-int-whats-the-highest-integer-value-a-number-can-go-t */
-export var INT_MAX = 9007199254740992;
+export let INT_MAX = 9007199254740992;
 /** largest exact integer supported in javascript.  2^53.  (53 bit mantissa) after this, floating point rounding will occur
 from http://stackoverflow.com/questions/307179/what-is-javascripts-max-int-whats-the-highest-integer-value-a-number-can-go-t */
-export var INT_MIN = -9007199254740992;
-
-
+export let INT_MIN = -9007199254740992;
 
 
 /**
@@ -38,7 +36,7 @@ export function format( value: number,/** default=5 */significantDigits = 5, sep
     return toStringDigitGroupings( value, separatorChar );
 }
 
-var _aguid = require( "aguid" );
+let _aguid = require( "aguid" );
 /**
  * npm aguid module, generate a deterministic v4 uuid from input, or a random one if no input is given. https://github.com/dwyl/aguid
  */
@@ -72,7 +70,7 @@ export function randomInt( min_inc = 0, max_exc = INT32_MAX ) {
 }
 export function randomBool(/** the probability that true will be returned.  default 0.5 (50%) */trueChance = 0.5 ): boolean {
     return Math.random() < trueChance;
-    //return randomInt(0, 2) === 0; 
+    //return randomInt(0, 2) === 0;
 }
 
 export function round( value: number,
@@ -85,12 +83,12 @@ export function round( value: number,
 }
 /** check that two nombers are close enough to eachother.     all parameters are combined when calculating, IE:   ```maxValue =  ( ( input * ( 1 + percentTollerance ) )  + spreadTollerance ) ```*/
 export function aboutEqual( input: number, checkAgainst: number,
-    /** how many percent different the two numbers can be 
-     * 
+    /** how many percent different the two numbers can be
+     *
      * Default is ```0```, meaning this parameter is ignored */
     percentTollerance: number,
-    /** a fixed spread tollerance that the numbers should be within   
-     * 
+    /** a fixed spread tollerance that the numbers should be within
+     *
      * Default is ```0```, meaning this parameter is ignored */
     spreadTollerance: number = 0 ): boolean {
     return ( ( ( input * ( 1 + percentTollerance ) ) + spreadTollerance ) >= checkAgainst
@@ -98,12 +96,12 @@ export function aboutEqual( input: number, checkAgainst: number,
 }
 
 /** randomize order of elements in this array */
-export function randomizeArray( myArray: any[] ) {
+export function randomizeArray( myArray: Array<any> ) {
     //from here http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
     // tslint:disable-next-line:one-variable-per-declaration
-    var i = myArray.length, j, temp;
+    let i = myArray.length, j, temp;
     if ( i === 0 ) { return; }
-    while ( --i ) {
+    while ( ( --i ) > 0 ) {
         j = Math.floor( Math.random() * ( i + 1 ) );
         temp = myArray[ i ];
         myArray[ i ] = myArray[ j ];
@@ -120,17 +118,17 @@ export function randomStringCrypto( length: number, chars: string ) {
         throw new Error( 'Argument \'chars\' is undefined' );
     }
 
-    var charsLength = chars.length;
+    let charsLength = chars.length;
     if ( charsLength > 256 ) {
         throw new Error( 'Argument \'chars\' should not have more than 256 characters'
             + ', otherwise unpredictability will be broken' );
     }
 
-    var randomBytes = crypto.randomBytes( length );
-    var result = new Array( length );
+    let randomBytes = crypto.randomBytes( length );
+    let result = new Array( length );
 
-    var cursor = 0;
-    for ( var i = 0; i < length; i++ ) {
+    let cursor = 0;
+    for ( let i = 0; i < length; i++ ) {
         cursor += randomBytes[ i ];
         result[ i ] = chars[ cursor % charsLength ];
     }
@@ -146,20 +144,20 @@ export function randomAsciiStringCrypto( length: number ) {
         'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' );
 }
 /**
- *  create a random number output as a string, with the specified number of digits.  
+ *  create a random number output as a string, with the specified number of digits.
  * @param minDigits
  * @param maxDigits set to minDigits if not specified
- * @param radix 
+ * @param radix
  */
 export function randomIntDigits( digits: number, radix = 10 ) {
 
-    var output: string[] = [];
+    let output: Array<string> = [];
 
-    for ( var i = 0; i < digits; i++ ) {
-        var num = randomInt( 0, radix );
+    for ( let i = 0; i < digits; i++ ) {
+        let num = randomInt( 0, radix );
         output.push( num.toString( radix ) );
     }
-    var toReturn = output.join( "" );
+    let toReturn = output.join( "" );
     return toReturn;
 
     //var minValueInc = Math.pow(radix, minDigits-1);//  minDigits * radix;
@@ -173,26 +171,26 @@ export function randomIntDigits( digits: number, radix = 10 ) {
 }
 
 /**
- *  create a random number output as a string, with the specified number of digits.  
+ *  create a random number output as a string, with the specified number of digits.
  *  uses crypto, so slower but secure.
  * @param minDigits
  * @param maxDigits set to minDigits if not specified
- * @param radix 
+ * @param radix
  */
 export function randomIntDigitsCrypto( digits: number, radix = 10 ) {
 
-    var output: string[] = [];
+    let output: Array<string> = [];
 
     let hexBuffer = crypto.randomBytes( digits ).toString( "hex" );
 
-    for ( var i = 0; i < digits; i++ ) {
+    for ( let i = 0; i < digits; i++ ) {
         let hex = hexBuffer.substring( i * 2, ( i + 1 ) * 2 );
         let byte = parseInt( hex, undefined, 16 );
         let num = byte % radix;
 
         output.push( num.toString( radix ) );
     }
-    var toReturn = output.join( "" );
+    let toReturn = output.join( "" );
     return toReturn;
 }
 /**
@@ -229,8 +227,8 @@ export enum ClampType {
  *  clamp a number to be within the range specified
  */
 export function clamp( value: number, min_inc: number, max_inc: number, /** defaults to "clamp" */ clampType: ClampType = ClampType.clamp ): number {
-    var range = max_inc - min_inc;
-    var remainder: number;
+    let range = max_inc - min_inc;
+    let remainder: number;
     if ( value < min_inc ) {
         remainder = value - min_inc;
     } else if ( value > max_inc ) {
@@ -243,7 +241,7 @@ export function clamp( value: number, min_inc: number, max_inc: number, /** defa
         return value;
     }
 
-    var modRemainder = remainder % range;
+    let modRemainder = remainder % range;
 
     switch ( clampType ) {
         case ClampType.clamp:
@@ -258,7 +256,7 @@ export function clamp( value: number, min_inc: number, max_inc: number, /** defa
             return min_inc + modRemainder;
 
         case ClampType.bounce:
-            var flipBounce = ( Math.floor( Math.abs( remainder / range ) ) % 2 ) === 1;
+            let flipBounce = ( Math.floor( Math.abs( remainder / range ) ) % 2 ) === 1;
             if ( ( remainder < 0 && !flipBounce ) || ( remainder > 0 && flipBounce ) ) { return min_inc + modRemainder; }
             return max_inc - modRemainder;
 
@@ -280,15 +278,15 @@ export class Interpolator {
     }
     public update( elapsedMs: number ) {
         if ( !this.isEnabled ) { return this.current; }
-        var delta = this.rate * elapsedMs / 1000;
+        let delta = this.rate * elapsedMs / 1000;
 
-        var newCurrent = this.current + delta;
+        let newCurrent = this.current + delta;
 
         this.current = clamp( newCurrent, this.min, this.max, this.clampType );
 
         if ( this.isBounce ) {
             //if we do a bounce, flip our rate (this is buggy if we are going so fast to do multiple bounces in 1 update, but that"s acceptable for now)
-            var remainder = clamp( newCurrent, this.min, this.max, ClampType.remainder );
+            let remainder = clamp( newCurrent, this.min, this.max, ClampType.remainder );
             if ( remainder !== 0 ) {
                 this.rate = -this.rate;
             }
@@ -314,7 +312,7 @@ export function toStringDigitGroupings(
     groupDecimalsWithSpace = false ): string {
 
     if ( isNaN( num ) ) { return "NaN"; }
-    var str = num.toString().split( '.' );
+    let str = num.toString().split( '.' );
     if ( str[ 0 ].length >= 5 ) {
         str[ 0 ] = str[ 0 ].replace( /(\d)(?=(\d{3})+$)/g, '$1' + separatorChar );
     }
@@ -329,7 +327,7 @@ export function toStringDigitGroupings(
 /** parses the value into an integer. */
 export function parseInt( toParse: any,/** invalid strings are returned as this (default=NaN) */invalidResult = NaN, radix = 10 ) {
     //logger.assert(typeof (toParse) === "string", "input is not a string");
-    var result = global[ "parseInt" ]( toParse, radix );
+    let result = global[ "parseInt" ]( toParse, radix );
     if ( isNaN( result ) ) {
         return invalidResult;
     } else {
@@ -339,7 +337,7 @@ export function parseInt( toParse: any,/** invalid strings are returned as this 
 /** parses the value into a float. */
 export function parseFloat( toParse: any,/** invalid strings are returned as this (default=NaN) */invalidResult = NaN, /** the default parseFloat implementation allows for trailing text.  specifying isStrict=TRUE makes only numbers + "Infinity" allowed to be parsed.   */isStrict = false ) {
 
-    var result: number;
+    let result: number;
     if ( isStrict === true ) {
         if ( /^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/
             .test( toParse ) ) {

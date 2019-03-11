@@ -7,14 +7,8 @@ import * as _ from "lodash";
 // export const scrub = validation.scrub;
 
 
-
 /** shortcut to xlib.diagnostics */
 export import diag = require( "./diagnostics" );
-
-
-
-
-
 
 
 //export import moment = require( "moment" );
@@ -63,14 +57,13 @@ import { log } from "./diagnostics";
 export { log };
 
 
-
 import { jsonX } from "./serialization";
 export { jsonX };
 
 
 import * as luxon from "luxon";
 /** Time: return time in utc.  pass no arguments to get the current time.
-	* 
+	*
 	* Shortcut to ```xlib.time.luxon.DateTime.utc()```
 	* @example
 const start = __.utc();
@@ -80,7 +73,7 @@ const elapsed = start.until( __.utc() ).length( "millisecond" );
 // tslint:disable-next-line: no-unbound-method
 export const utc = luxon.DateTime.utc;
 /** Time:  create a duration object.
-	* 
+	*
 	* Shortcut to ```xlib.time.Duration.fromObject()```
 	* @example
 	const oneHundredMs = __.duration( { milliseconds: 100 } );
@@ -89,11 +82,9 @@ export const utc = luxon.DateTime.utc;
 export const duration = luxon.Duration.fromObject;
 
 
-
-
 import { bluebird } from "./promise";
 /** the ```bluebird``` library with some helpers injected , and rejection reasons restricted to Error
-	* 
+	*
 	* shortcut to ```xlib.promise.bluebird```
 	* @example
 	const results = await __.bb.resolve(someObject.someAsyncFcn()).timeout(1000,"waited too long");

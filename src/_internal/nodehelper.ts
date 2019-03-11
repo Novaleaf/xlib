@@ -5,7 +5,6 @@
 /** helpers for backend node.js stuff  NODE.JS ONLY!!! */
 
 
-
 //var cachedServerDomain: string;
 ///** if on windows, always returns "localhost".
 //if on linux, attempts to read the first line of '/srv/serverDomain.txt' which you'd need to populate during server install-time with your domain name. */
@@ -40,13 +39,13 @@
 //	return cachedServerDomain;
 //}
 
-/** return all key-value arguments passed tothe commandline (does not return single-value arguments) 
+/** return all key-value arguments passed tothe commandline (does not return single-value arguments)
  * example:  "myKey=myValue" will return, but "someValue" will not.
  * if you need single value args, access process.argv directly.
  */
-export var getCommandlineArgs = ( () => {
+export let getCommandlineArgs = ( () => {
 	/** cached query so we only get args once per js load*/
-	var parsedCommandlineArgs: { [ key: string ]: string };
+	let parsedCommandlineArgs: { [ key: string ]: string; };
 
 	function _getCommandlineArgs() {
 		if ( parsedCommandlineArgs == null ) {
@@ -56,16 +55,16 @@ export var getCommandlineArgs = ( () => {
 				//declare require: any;
 				//var process = require("process");
 
-				var rawVars = process.argv;
+				let rawVars = process.argv;
 				parsedCommandlineArgs = {};
-				for ( var i = rawVars.length - 1; i >= 0; i-- ) {
-					var pair = rawVars[ i ].split( "=" );
+				for ( let i = rawVars.length - 1; i >= 0; i-- ) {
+					let pair = rawVars[ i ].split( "=" );
 					if ( pair.length !== 2 ) {
 						//skip
 						continue;
 					}
-					var key = pair[ 0 ];
-					var value = pair[ 1 ];
+					let key = pair[ 0 ];
+					let value = pair[ 1 ];
 					parsedCommandlineArgs[ key ] = value;
 				}
 			}
@@ -77,15 +76,15 @@ export var getCommandlineArgs = ( () => {
 } )();
 
 
-/** return a key-value argument passed tothe commandline (does not return single-value arguments) 
+/** return a key-value argument passed tothe commandline (does not return single-value arguments)
  * example:  "myKey=myValue" will return, but "someValue" will not.
  * if you need single value args, access process.argv directly.
  */
 export function getCommandlineArg( key: string, valueIfNullOrEmpty?: string ): string {
 
-	var parsedArgs = getCommandlineArgs();
+	let parsedArgs = getCommandlineArgs();
 
-	var result = parsedArgs[ key ];
+	let result = parsedArgs[ key ];
 	if ( valueIfNullOrEmpty != null ) {
 		if ( result == null || result.length === 0 ) {
 			return valueIfNullOrEmpty;
@@ -93,8 +92,4 @@ export function getCommandlineArg( key: string, valueIfNullOrEmpty?: string ): s
 	}
 	return result;
 }
-
-
-
-
 

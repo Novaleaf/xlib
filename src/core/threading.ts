@@ -7,10 +7,10 @@ import bb from "bluebird";
 //import * as Promise from "bluebird";
 // /// <reference path="../typings/all.d.ts" />
 
-// ///** https://adambom.github.io/parallel.js/ 
+// ///** https://adambom.github.io/parallel.js/
 // // * Parallel Computing with Javascript
 
-// //Parallel.js is a tiny library for multi-core processing in Javascript. It was created to take full advantage of the ever-maturing web-workers API. Javascript is fast, 
+// //Parallel.js is a tiny library for multi-core processing in Javascript. It was created to take full advantage of the ever-maturing web-workers API. Javascript is fast,
 //no doubt, but lacks the parallel computing capabilites of its peer languages due to its single - threaded computing model.In a world where the numbers of cores on a CPU are increasing
 //faster than the speed of the cores themselves, isn't it a shame that we can't take advantage of this raw parallelism ?
 
@@ -25,7 +25,7 @@ import bb from "bluebird";
 
 // /** https://github.com/caolan/async
 //  * Async utilities for node and the browser
-//  * Async provides around 20 functions that include the usual 'functional' suspects (map, reduce, filter, each…) as well as some common patterns for asynchronous 
+//  * Async provides around 20 functions that include the usual 'functional' suspects (map, reduce, filter, each…) as well as some common patterns for asynchronous
 //control flow( parallel, series, waterfall… ).All these functions assume you follow the Node.js convention of providing a single callback as the last argument of your async function.
 //  */
 // export import async = require( "async" );
@@ -36,7 +36,7 @@ import bb from "bluebird";
 // there may be only one writer at a time,
 // there may be no writer if there are one or more readers already.
 // == Basic usage ==
-// var lock = new ReadWriteLock(); 
+// var lock = new ReadWriteLock();
 // //Acquiring a read lock:
 // lock.readLock(function (release) {
 //  // do stuff
@@ -53,7 +53,7 @@ import bb from "bluebird";
 //     setTimeout(function () {  // ok, now I'm ready
 //         release();    }, 1000);
 // });
-//  * 
+//  *
 //  */
 // export interface ReadWriteLock {
 
@@ -80,7 +80,7 @@ import bb from "bluebird";
 // there may be only one writer at a time,
 // there may be no writer if there are one or more readers already.
 // == Basic usage ==
-// var lock = new ReadWriteLock(); 
+// var lock = new ReadWriteLock();
 // //Acquiring a read lock:
 // lock.readLock(function (release) {
 //  // do stuff
@@ -97,7 +97,7 @@ import bb from "bluebird";
 //     setTimeout(function () {  // ok, now I'm ready
 //         release();    }, 1000);
 // });
-//  * 
+//  *
 //  */
 // export var ReadWriteLock: {
 //     new(): ReadWriteLock;
@@ -109,16 +109,16 @@ import * as diagnostics from "./diagnostics";
 const log = diagnostics.log; // const log = new diagnostics.Logger( __filename );
 
 /** an async+promise capable, readerwriter lock.
- * 
+ *
  * allows multiple readers (non-exclusive read lock) and single-writers (exclusive write lock)
- * 
- * additionally, allows storage of a value that is atomically written (a helper shortcut for common use: using this value is not required) 
- * 
+ *
+ * additionally, allows storage of a value that is atomically written (a helper shortcut for common use: using this value is not required)
+ *
  * when a race occurs, writes take precidence
  */
 export class AsyncReaderWriterLock<TValue=void> {
 
-    constructor( options?: { /** set to true to set the initial state to blocking (a single write already in progress)*/ writeInProgress: boolean } ) {
+    constructor( options?: { /** set to true to set the initial state to blocking (a single write already in progress)*/ writeInProgress: boolean; } ) {
         options = { writeInProgress: false, ...options };
 
         if ( options.writeInProgress === true ) {
@@ -127,25 +127,25 @@ export class AsyncReaderWriterLock<TValue=void> {
     }
     public toJson() {
         return {
-            currentWrite: this.currentWrite ? this.currentWrite.tags : null,
+            currentWrite: this.currentWrite != null ? this.currentWrite.tags : null,
             pendingWrites: this.pendingWrites.length,
             currentReads: this.currentReads.length,
             pendingReads: this.pendingReadCount,
-            value: this._value ? "yes" : "no",
+            value: this._value != null ? "yes" : "no",
         };
     }
-    private writeCounter: number = 0;
-    private currentReads: promise.IExposedPromise[] = [];
+    private writeCounter = 0;
+    private currentReads: Array<promise.IExposedPromise> = [];
     private pendingReadCount = 0;
 
-    private pendingWrites: promise.IExposedPromise<void, { writeId: number }>[] = [];
+    private pendingWrites: Array<promise.IExposedPromise<void, { writeId: number; }>> = [];
 
-    private currentWrite: promise.IExposedPromise<void, { writeId: number }> | undefined;
+    private currentWrite: promise.IExposedPromise<void, { writeId: number; }> | undefined;
 
     private _value: TValue | undefined;
-    // /** if no writes are waiting, will quickly return. otherwise will do a normal blocking wait 
-    //  * 
-    //  * returns the 
+    // /** if no writes are waiting, will quickly return. otherwise will do a normal blocking wait
+    //  *
+    //  * returns the
     // */
     // public pulseRead() {
     //     if ( this.currentWrite != null ) {
@@ -161,11 +161,11 @@ export class AsyncReaderWriterLock<TValue=void> {
 
 
     /** begin a read lock.   the returned promise resolves once the lock is aquired
-     * 
+     *
      * many simulatanious read locks are allowed, and be sure to call [[readEnd]] for each call of [[readBegin]]
      */
     public async readBegin(): Promise<TValue | undefined> {
-        //let readToken = 
+        //let readToken =
 
         if ( this.pendingWrites.length > 0 ) {
             //this.pendingReads.push(promise.CreateExposedPromise());
@@ -187,7 +187,7 @@ export class AsyncReaderWriterLock<TValue=void> {
         log.assert( this.currentReads.length > 0, "out of current reads, over decremented?" );
         log.assert( this.currentWrite == null, "race, current write should not be possible while reading" );
         let readToken = this.currentReads.pop();
-        if ( readToken ) {
+        if ( readToken != null ) {
             readToken.fulfill();
         }
     }
@@ -198,7 +198,7 @@ export class AsyncReaderWriterLock<TValue=void> {
             return false;
         }
 
-        //do sync writeBegin        
+        //do sync writeBegin
         log.assert( this.currentWrite == null, "race, current write should not be possible while start writing (tryWriteBegin)" );
         const writeId = this.writeCounter++;
         let thisWrite = promise.CreateExposedPromise( { writeId } );
@@ -222,7 +222,7 @@ export class AsyncReaderWriterLock<TValue=void> {
         while ( this.currentReads.length > 0 ) {
             await bb.all( this.currentReads );
         }
-        //now on the item        
+        //now on the item
         log.assert( this.currentWrite == null, "race, current write should not be possible while start writing" );
         this.currentWrite = thisWrite;
         log.assert( this.currentWrite === this.pendingWrites[ 0 ], "current write should be at head of queue.  (writeBegin)" );
@@ -235,7 +235,7 @@ export class AsyncReaderWriterLock<TValue=void> {
 
 
         try {
-            //log.assert( thisWrite._tags.writeId === writeId, "writeId mismatch" );
+            //log.assertIf( thisWrite._tags.writeId === writeId, "writeId mismatch" );
             // tslint:disable-next-line: no-unbound-method
             if ( valueOrWritePromise instanceof bb || ( _.isObject( valueOrWritePromise ) && _.isFunction( ( valueOrWritePromise as any as bb<any> ).then ) ) ) {
                 this._value = await bb.resolve( valueOrWritePromise );
@@ -286,10 +286,10 @@ export class AsyncReaderWriterLock<TValue=void> {
 /** required arguments when constructing a new autoscaler */
 
 export interface IAutoscalerOptions {
-	/** minimum parallel requests (maxActive) you allow, regardless of how long the autoscaler has been idle.  should be 1 or more.  
+	/** minimum parallel requests (maxActive) you allow, regardless of how long the autoscaler has been idle.  should be 1 or more.
 	*/
     minParallel: number;
-	/** optional.  set a max to number of parallel requests (maxActive) no matter how active the calls 
+	/** optional.  set a max to number of parallel requests (maxActive) no matter how active the calls
 		* @default undefined (no limit)
 	*/
     maxParallel?: number;
@@ -313,13 +313,13 @@ export interface IAutoscalerOptions {
 }
 
 
-/** while this is probably only useful+used by the ```net.RemoteHttpEndpoint``` class, this is a generic autoscaler implementation, 
+/** while this is probably only useful+used by the ```net.RemoteHttpEndpoint``` class, this is a generic autoscaler implementation,
 	* meaning that it will scale requests to a ```backendWorker``` function, gradually increasing activeParallel requests over time.   Requests exceeding activeParallel will be queued in a FIFO fashion.
-	* 
-	the only requirement is that the target ```backendWorker``` function  return a promise, 
+	*
+	the only requirement is that the target ```backendWorker``` function  return a promise,
     * and you specify a ```failureListener``` function that can tell the difference between a failure and a need for backing off.
     */
-export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<any>, TError extends Error>{
+export class Autoscaler<TWorkerFunc extends ( ...args: Array<any> ) => Promise<any>, TError extends Error>{
 
     constructor(
         private options: IAutoscalerOptions,
@@ -342,7 +342,6 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<any>, 
         this.metrics = { activeCount: 0, tooBusyWaitStart: new Date( 0 ), lastGrow: new Date( 0 ), lastMax: new Date( 0 ), maxActive: options.minParallel, lastDecay: new Date( 0 ), lastTooBusy: new Date( 0 ) };
 
 
-
     }
 
     private metrics: {
@@ -362,22 +361,22 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<any>, 
         lastDecay: Date;
     };
 
-    private pendingCalls: { args: any[]; requesterPromise: promise.IExposedPromise<any> }[] = [];
+    private pendingCalls: Array<{ args: Array<any>; requesterPromise: promise.IExposedPromise<any>; }> = [];
 
-    private activeCalls: { args: any[]; requesterPromise: promise.IExposedPromise<any>; activeMonitorPromise: bb<any> }[] = [];
+    private activeCalls: Array<{ args: Array<any>; requesterPromise: promise.IExposedPromise<any>; activeMonitorPromise: bb<any>; }> = [];
 
     public toJson() {
         return { pendingCalls: this.pendingCalls.length, activeCalls: this.activeCalls.length, metrics: this.metrics, options: this.options };
     }
 
-    /** submit a request to the backend worker.     
-     * 
+    /** submit a request to the backend worker.
+     *
      * **Important note**: to avoid "unhandled promise rejections" you need to make sure the returned Promise has a catch() applied to it.
      * **NOT** just store the promise in an array to inspect later.  This is because if the request fails, the returned promise gets rejected, and if the Promise internal logic doesn't see a .catch() it will show the global "unhandled rejected promse" soft error message.
      */
     public submitRequest: TWorkerFunc =
         //a worker with generic input/return args, cast to our specific worker function's sig
-        ( async ( ...args: any[] ): Promise<any> => {
+        ( async ( ...args: Array<any> ): Promise<any> => {
             const requesterPromise = promise.CreateExposedPromise<any>();
             this.pendingCalls.push( { args, requesterPromise } );
             this._tryCallBackend();

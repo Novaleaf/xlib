@@ -19,7 +19,7 @@ import * as axios from "axios";
 
 export type IRemoteHttpEndpointOptions = IRemoteHttpEndpointOverrideOptions & {
 	/** by default, all HTTP requests are made as soon as they are requested.  pass autoscaler options if your endpoint supports autoscaling.
-	* 
+	*
 	IMPORTANT NOTE:  The remote endpoint Needs to return either HTTP 429 or 503 errors to represent ```"BACKOFF"``` messages.  all other errors will be treated normally.*/
 	autoscalerOptions?: IAutoscalerOptions;
 };
@@ -32,7 +32,7 @@ export interface IRemoteHttpEndpointOverrideOptions {
 		path?: string;
 	};
 	/** if you want to retry failed requests.   from: https://www.npmjs.com/package/bluebird-retry
-		* Options are:  
+		* Options are:
 	interval initial wait time between attempts in milliseconds (default 1000)
 
 backoff if specified, increase interval by this factor between attempts
@@ -49,10 +49,10 @@ throw_original to throw the last thrown error instance rather then a timeout err
 		* default is no retries. */
 	retryOptions?: promise._BluebirdRetryInternals.IOptions;
 	/** optional settings sent with the request.  from: https://www.npmjs.com/package/axios
-		* @default { 
-				timeout: 60000, 
-				headers: { 
-					"Accept-Encoding": "gzip, deflate" 
+		* @default {
+				timeout: 60000,
+				headers: {
+					"Accept-Encoding": "gzip, deflate"
 				} */
 	requestOptions?: axios.AxiosRequestConfig;
 
@@ -65,7 +65,6 @@ throw_original to throw the last thrown error instance rather then a timeout err
 		err: axios.AxiosError ) => Promise<"RETRY" | "ABORT"> );
 
 }
-
 
 
 /**
@@ -89,7 +88,7 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 		let defaults: IRemoteHttpEndpointOptions = {
 			preRetryErrorIntercept: ( async ( err ) => {
 				if ( err.response != null && err.response.status <= 499 ) {
-					//console.assert(false, "err");					
+					//console.assert(false, "err");
 					return "ABORT";
 				}
 				return "RETRY";
@@ -132,7 +131,7 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 	}//end .ctor()
 
 
-	public _onTooBusy: ( ( endpoint: RemoteHttpEndpoint<TSubmitPayload, TRecievePayload> ) => any )[] = [];
+	public _onTooBusy: Array<( endpoint: RemoteHttpEndpoint<TSubmitPayload, TRecievePayload> ) => any> = [];
 
 	/** autoscaler created if the constructor is passed autoscaler options */
 	private autoscaler: Autoscaler<
@@ -142,7 +141,7 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 		axios.AxiosError>;
 
 	public toJson() {
-		return { options: this.defaultOptions, autoscaler: this.autoscaler ? this.autoscaler.toJson() : undefined };
+		return { options: this.defaultOptions, autoscaler: this.autoscaler != null ? this.autoscaler.toJson() : undefined };
 
 	}
 
@@ -191,7 +190,6 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 			return this.autoscaler.submitRequest( finalOptions, endpoint, protocol, submitPayload );
 		}
 	}
-
 
 
 	private async _doRequest_send( finalOptions: IRemoteHttpEndpointOverrideOptions, endpoint: string, protocol: "get" | "post", submitPayload: TSubmitPayload ): Promise<axios.AxiosResponse<TRecievePayload>> {
@@ -344,7 +342,6 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 
 		} );
 	}
-
 
 
 }

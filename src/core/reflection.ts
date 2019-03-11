@@ -6,7 +6,6 @@
 import * as ex from "./_diagnostics/exception";
 
 
-
 /** primitive types as identified by javascript, plus well known object types */
 export enum Type {
 	/** null is not undefined, unfortunately  */
@@ -27,7 +26,6 @@ export enum Type {
 	RegExp,
 	Date,
 }
-
 
 
 //OBSOLETE: just use getType() instead
@@ -123,7 +121,7 @@ export function getTypeName( obj: any ): string {
 			}
 		default:
 			{
-				const str = Type[ type ]; //type.toString();
+				const str = Type[ type ];
 				return str;
 			}
 	}
@@ -141,7 +139,7 @@ export function getTypeName( obj: any ): string {
 //}
 
 /** names of all parameters of a function */
-export function getArgumentNames( argsOrFunction: IArguments | Function ): string[] {
+export function getArgumentNames( argsOrFunction: IArguments | Function ): Array<string> {
 	let func: Function;
 	if ( typeof ( argsOrFunction ) === "function" ) {
 		func = argsOrFunction;
@@ -151,7 +149,7 @@ export function getArgumentNames( argsOrFunction: IArguments | Function ): strin
 	}
 	let reg = /\(([\s\S]*?)\)/;
 	let params = reg.exec( func.toString() );
-	let paramNames: string[];
+	let paramNames: Array<string>;
 	if ( params ) {
 		paramNames = params[ 1 ].split( "," );
 	} else {
@@ -160,15 +158,15 @@ export function getArgumentNames( argsOrFunction: IArguments | Function ): strin
 	return paramNames;
 }
 
-/** returns a key-value collection of argument names (keys) and their mapped input arg (values).  
+/** returns a key-value collection of argument names (keys) and their mapped input arg (values).
  * if no argumentNames are passed in, the current function's argument names are used.
  * useful for debugging/logging parameters */
-export function mapArgumentsValues( args: IArguments, argumentNames?: string[] ): { [ argName: string ]: any } {
+export function mapArgumentsValues( args: IArguments, argumentNames?: Array<string> ): { [ argName: string ]: any; } {
 	if ( argumentNames == null ) {
 		let caller = args.callee;
 		argumentNames = getArgumentNames( caller );
 	}
-	let toReturn: { [ argName: string ]: any } = {};
+	let toReturn: { [ argName: string ]: any; } = {};
 	for ( let i = 0; i < args.length; i++ ) {
 		toReturn[ argumentNames[ i ] ] = args[ i ];
 	}
@@ -187,5 +185,4 @@ export function mapArgumentsValues( args: IArguments, argumentNames?: string[] )
 //	let names = getArgumentNames(caller);
 //	return _nameArgs(names, args);
 //}
-
 

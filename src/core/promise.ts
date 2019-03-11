@@ -1,8 +1,8 @@
-﻿"use strict";
+"use strict";
 
 import * as _ from "lodash";
 
-/** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance 
+/** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance
  * global.Promise is aliased to this.
  */
 export import bluebird = require( "bluebird" );
@@ -11,8 +11,6 @@ export import bluebird = require( "bluebird" );
 
 //import * as bb from "bluebird";
 import * as environment from "./environment";
-
-
 
 
 //bluebird.longStackTraces();
@@ -44,11 +42,11 @@ if ( typeof window !== "undefined" ) {
 }
 //}
 
-/** helper to avoid throws in your code (so in dev time, avoid triggering "break on all exceptions").  
+/** helper to avoid throws in your code (so in dev time, avoid triggering "break on all exceptions").
 	* **VERY** useful in codepaths that reject during normal operation, but not very useful otherwise.
-	* 
+	*
 	* will await the promise to fulfill/reject, then return a resolved bluebird promise so you can inspect the error or obtain the results.
-	@example  
+	@example
 	const awaitInspect = xlib.promise.awaitInspect;
 	const {toInspect} = await awaitInspect(yourClass.asyncMethod());
 if(toInspect.isFulfilled()){
@@ -60,7 +58,7 @@ if(toInspect.isFulfilled()){
 }
  */
 
-export function awaitInspect<T>( promise: PromiseLike<T> ): bluebird<{ toInspect: bluebird<T> }> {
+export function awaitInspect<T>( promise: PromiseLike<T> ): bluebird<{ toInspect: bluebird<T>; }> {
 
 	let toInspect = bluebird.resolve( promise );
 
@@ -74,7 +72,7 @@ export function awaitInspect<T>( promise: PromiseLike<T> ): bluebird<{ toInspect
 	// };
 
 
-	let toReturn = CreateExposedPromise<{ toInspect: bluebird<T> }>();
+	let toReturn = CreateExposedPromise<{ toInspect: bluebird<T>; }>();
 
 	toInspect.then( ( result ) => {
 		toReturn.fulfill( results );
@@ -91,12 +89,11 @@ export function awaitInspect<T>( promise: PromiseLike<T> ): bluebird<{ toInspect
 }
 
 
-
 /** inversion of control (IoC) to let the caller specify work that will be done by the async method.     values can be a promise, function (sync or async), or result */
 export type IocCallback<TArgs=void, TResults=any> = Promise<TResults> | ( ( args: TArgs ) => Promise<TResults> ) | ( ( args: TArgs ) => TResults ) | TResults;
 
 
-// /** Reactive Extensions https://github.com/Reactive-Extensions/RxJS 
+// /** Reactive Extensions https://github.com/Reactive-Extensions/RxJS
 // ...is a set of libraries to compose asynchronous and event-based programs using observable collections and Array#extras style composition in JavaScript
 //  * global.Rx is aliased to this.
 //  */
@@ -109,7 +106,7 @@ export function CreateExposedPromise<TReturn=void>(): IExposedPromise<TReturn, n
 export function CreateExposedPromise<TReturn=void, TTags = void>( tags: TTags,
 	callback?: ( fulfill: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void, reject: ( error: any ) => void ) => void,
 ): IExposedPromise<TReturn, TTags>;
-export function CreateExposedPromise<TReturn=void, TTags = void>( ...args: any[] ): IExposedPromise<TReturn, TTags> {
+export function CreateExposedPromise<TReturn=void, TTags = void>( ...args: Array<any> ): IExposedPromise<TReturn, TTags> {
 	const tags = args[ 0 ] as TTags;
 	const callback = args[ 1 ];
 	let fulfiller: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void;
@@ -138,8 +135,7 @@ export interface IExposedPromise<TReturn=void, TTags=never> extends bluebird<TRe
 }
 
 
-
-export module _BluebirdRetryInternals {
+export namespace _BluebirdRetryInternals {
 	export interface IOptions {
 		/**  initial wait time between attempts in milliseconds(default 1000)*/
 		interval?: number;
@@ -263,12 +259,6 @@ export const retry: _BluebirdRetryInternals.IRetryStatic = require( "bluebird-re
 //export function timeoutNoCancel
 
 
-
-
-
-
-
-
 // export namespace _obsolete {
 // 	/** for a given function signature which returns a promise, construct a facade that will fulfill once all outstanding calls finish, and each call will be executed sequentially (not in parallel!)*/
 // 	export function sequentializePromisedFunction<T>( __this: any, func: ( ...args: any[] ) => bluebird<T> ): ( ...args: any[] ) => bluebird<T[]> {
@@ -310,7 +300,6 @@ export const retry: _BluebirdRetryInternals.IRetryStatic = require( "bluebird-re
 // 		}
 
 
-
 // 		function __toReturn(): bluebird<T[]> {
 
 // 			let args: IArguments = _.clone( arguments );
@@ -325,8 +314,6 @@ export const retry: _BluebirdRetryInternals.IRetryStatic = require( "bluebird-re
 
 // 			return __batchPromise;
 // 		}
-
-
 
 
 // 		return __toReturn;

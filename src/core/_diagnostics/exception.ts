@@ -22,7 +22,7 @@ export interface IErrorJson {
 	/** human readable and ***actionable*** error message */
 	message: string;
 	/** while almost always available, it may not be set under unusual circumstances */
-	stack?: string[];
+	stack?: Array<string>;
 	/** optional, can pass an innerException of you use xlib.diagnostics.Exception */
 	innerError?: IErrorJson;
 
@@ -33,7 +33,7 @@ export interface IErrorJson {
 
 export interface IExceptionOptions<TData = never> {
 	innerError?: Error;
-	/** truncate extra stack frames from the stack that's attached to this, 
+	/** truncate extra stack frames from the stack that's attached to this,
 	 * a good way to remove logging/util functions from the trace */
 	stackFramesToTruncate?: number;
 	/** extra custom data you wish to attach to your error object that you want logged. */
@@ -60,7 +60,7 @@ export class Exception<TData=never> extends Error {
 
 		super( message );
 		Object.setPrototypeOf( this, new.target.prototype );//fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
-		//jsHelper.setPrototypeOf( this, new.target.prototype ); 
+		//jsHelper.setPrototypeOf( this, new.target.prototype );
 
 		const options = {
 			stackFramesToTruncate: 0,
@@ -115,8 +115,6 @@ export class Exception<TData=never> extends Error {
 		this.stack = splitStack.join( "\n" );
 
 
-
-
 		if ( options.innerError != null && typeof ( options.innerError.message ) === "string" ) {
 			this.message = message + "	innerException: " + options.innerError.message;
 		} else {
@@ -130,8 +128,8 @@ export class Exception<TData=never> extends Error {
 			this.name = ( this.constructor as any ).name;
 		} else {
 			//es5
-			var results = ( Exception._getTypeNameOrFuncNameRegex ).exec( ( this ).constructor.toString() );
-			this.name = ( results && results.length > 1 ) ? results[ 1 ] : "";
+			let results = ( Exception._getTypeNameOrFuncNameRegex ).exec( ( this ).constructor.toString() );
+			this.name = ( results != null && results.length > 1 ) ? results[ 1 ] : "";
 		}
 
 		this.innerError = options.innerError; //putting this last to help ensure json serialization order
@@ -145,8 +143,6 @@ export class Exception<TData=never> extends Error {
 	public toJson<T extends Error = this>() {
 		return errorToJson<T>( this );
 	}
-
-
 
 
 	// disabling because in node8.x this gets in the way.
@@ -273,7 +269,7 @@ export function toError( ex: any | Error ): Error & IError {
 /** get a string representation of the error */
 export function errorToString( ex: Error | IError, options?: IErrorToJsonOptions ): string {
 	let exJson = errorToJson( ex, options );
-	exJson.stack = exJson.stack == null ? "" : exJson.stack.join( "\n" ) as any; //add line breaks to stack
+	exJson.stack = exJson.stack == null ? "" : exJson.stack.join( "\n" ) as any;
 	return JSON.stringify( exJson );
 }
 
@@ -306,7 +302,7 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 	options = { ...options };
 
 	//let error = toError( _error );
-	let stackArray: string[];
+	let stackArray: Array<string>;
 	let innerError: any = ( error as any ).innerError;
 
 	if ( options.alwaysShowFullStack !== true && environment.logLevel > environment.LogLevel.DEBUG && environment.envLevel > environment.EnvLevel.TEST ) {
@@ -323,7 +319,7 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 			stackArray = stack.split( "\n" );
 		} else if ( _.isArray( stack ) ) {
 			//array;
-			stackArray = stack as string[];
+			stackArray = stack as Array<string>;
 		} else if ( typeof ( stack as any ).toString === "function" ) {
 			stackArray = [ ( stack as any ).toString() ];
 		} else {

@@ -1,6 +1,5 @@
 /** allows internal xlib modules to hook the xlib.initialize() method */
 import * as promise from "../core/promise";
-import * as environment from '../core/environment';
 import bb = promise.bluebird;
 
 
@@ -9,11 +8,10 @@ export type IInitArgs = {
     disableEnvAutoRead?: boolean;
     logLevel?: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT";
     envLevel?: "DEV" | "TEST" | "UAT" | "PROD";
-    logLevelOverrides?: { callSiteMatch: RegExp; minLevel: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT" }[];
+    logLevelOverrides?: Array<{ callSiteMatch: RegExp; minLevel: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT"; }>;
     /** set to true to not log startup initialization details */
     silentInit?: boolean;
 };
-
 
 
 let isStarted = false;
@@ -24,7 +22,7 @@ export function isInitializeStarted() {
 /** resolves when xlib is fully initialized */
 export const finishedPromise: promise.IExposedPromise<IInitArgs> = promise.CreateExposedPromise<IInitArgs>();
 
-const initWorkArray: Array<promise.IocCallback<IInitArgs, void>> = [];
+const initWorkArray: promise.IocCallback<IInitArgs, void>[] = [];
 
 export async function initialize( args?: IInitArgs ) {
     args = { ...args };
@@ -47,9 +45,6 @@ export async function initialize( args?: IInitArgs ) {
 
     finishedPromise.fulfill( args );
 }
-
-
-
 
 
 /** do work during the .initialize() call.   returning promise yields once all initialize work is complete. */

@@ -11,7 +11,6 @@ export import Chalk = require( "chalk" );
 export import stripAnsi = require( "strip-ansi" );
 
 
-
 /**
  * escapes strings for html presentation.
  * firstly decodeUriComponent's the string, then html escapes it
@@ -110,14 +109,14 @@ export function indexOf( target: string, toFind: string, ignoreCase = false, sta
 }
 
 /** if the target is encapsulated by prefix/suffix, returns the unencapsulated version
-otherwise, returns the target (non modified) 
+otherwise, returns the target (non modified)
 */
 export function between( target: string, prefix: string, suffix: string, ignoreCase = false, trimFirst = false ) {
     if ( trimFirst ) {
         target = target.trim();
     }
     //copy target in case we need to compare case-insensitive.
-    var compareTarget = target;
+    let compareTarget = target;
     if ( ignoreCase ) {
         compareTarget = compareTarget.toLowerCase();
         prefix = prefix.toLowerCase();
@@ -136,31 +135,40 @@ export function summarize( str: string | any,/** default = 100 */ maxLength: num
     if ( str == null ) {
         return "NULL";
     }
-    if ( str.substring == null || str.length == null ) {
-        try {
-            str = JSON.stringify( str );
-        } catch ( ex ) {
-            str = "ERROR SUMMARIZING";
+    let tempStr: string;
+    if ( typeof ( str ) === "string" ) {
+        tempStr = str;
+    } else {
+        if ( typeof ( str.substring ) !== "function" || typeof ( str.length ) !== "number" ) {
+            try {
+                tempStr = JSON.stringify( str );
+            } catch ( ex ) {
+                tempStr = "ERROR SUMMARIZING";
+            }
+        } else {
+            //has str-like settings
+            tempStr = str.substring( 0, length );
         }
     }
-    if ( str.length <= maxLength ) {
-        return str;
+
+    if ( tempStr.length <= maxLength ) {
+        return tempStr;
     }
-    var half = ( maxLength - 3 ) / 2;
+    let half = ( maxLength - 3 ) / 2;
     // tslint:disable-next-line: restrict-plus-operands
-    var toReturn = str.substring( 0, half ) + "..." + str.substring( str.length - half );
+    let toReturn = tempStr.substring( 0, half ) + "..." + tempStr.substring( tempStr.length - half );
 
     return toReturn;
 }
 
 
 /** converts a string to something that can be used as a machine-readable id.
-input is converted to lowercase, alphanumeric with underscore (or your choosen 'whitespaceChar').  
-example:  "  (hi)   world!" ==> "hi_world" 
+input is converted to lowercase, alphanumeric with underscore (or your choosen 'whitespaceChar').
+example:  "  (hi)   world!" ==> "hi_world"
 the rules: maximum of 1 underscore at a time, and won't prefix/suffix with underscores (or your chosen 'whitespaceChar'*/
 export function toId( str: string, whitespaceChar = "_" ): string {
     //strip out invalid characters (valid=alphanumeric) groups are replaced by a single whitespace (which will be replaced in a following line)
-    var toReturn = str;
+    let toReturn = str;
     //lowercase
     toReturn = toReturn.toLowerCase();
     //convert to alpha-numeric, with any groups of non-alpha being converted to a single space
@@ -176,7 +184,7 @@ export function toId( str: string, whitespaceChar = "_" ): string {
 
 ///**
 // * creates a human-readable key.   similar to toId(), but also replaces underscores with "x" and "l" with "5".
-// * example: "  (hi)   world!" ==> "hixwor5d" 
+// * example: "  (hi)   world!" ==> "hixwor5d"
 // */
 //export function toKey(str: string): string {
 //    var toReturn = toId(str, "");
@@ -191,8 +199,8 @@ export function toId( str: string, whitespaceChar = "_" ): string {
 
 
 export function ipV4toInt( ip: string ): number {
-    var parts = ip.split( "." );
-    var res = 0;
+    let parts = ip.split( "." );
+    let res = 0;
 
 
     res += parseInt( parts[ 0 ], 10 ) << 24;
@@ -203,10 +211,10 @@ export function ipV4toInt( ip: string ): number {
     return res;
 }
 export function intToIpV4( int: number ): string {
-    var part1 = int & 255;
-    var part2 = ( ( int >> 8 ) & 255 );
-    var part3 = ( ( int >> 16 ) & 255 );
-    var part4 = ( ( int >> 24 ) & 255 );
+    let part1 = int & 255;
+    let part2 = ( ( int >> 8 ) & 255 );
+    let part3 = ( ( int >> 16 ) & 255 );
+    let part4 = ( ( int >> 24 ) & 255 );
 
     // tslint:disable-next-line: restrict-plus-operands
     return part4 + "." + part3 + "." + part2 + "." + part1;
@@ -220,7 +228,7 @@ export function repeat( toRepeate: string, numberOfTimes: number ): string {
 }
 
 export function replaceAll( target: string, strToFind: string, replaceWith: string, ignoreCase = false ): string {
-    var flags = "g"; //global match
+    let flags = "g"; //global match
     if ( ignoreCase === true ) {
         flags += "i";
     }
@@ -232,16 +240,16 @@ export function insertAt( target: string, toInsert: string, insertPosition: numb
     return [ target.slice( 0, insertPosition ), toInsert, target.slice( insertPosition ) ].join( "" );
 }
 
-export function remove( target: string, ...textToRemove: string[] ): string {
+export function remove( target: string, ...textToRemove: Array<string> ): string {
     if ( target == null ) {
         return target;
     }
-    var loop;
+    let loop;
     do {
         loop = false;
-        for ( var i = 0; i < textToRemove.length; i++ ) {
-            var toTrim = textToRemove[ i ];
-            var trimLen = toTrim.length;
+        for ( let i = 0; i < textToRemove.length; i++ ) {
+            let toTrim = textToRemove[ i ];
+            let trimLen = toTrim.length;
             while ( target.indexOf( toTrim ) === 0 ) {
                 target = target.substr( trimLen );
                 loop = true;
@@ -255,16 +263,16 @@ export function remove( target: string, ...textToRemove: string[] ): string {
 
     return target;
 }
-export function removePrefix( target: string, ...prefixToRemove: string[] ): string {
+export function removePrefix( target: string, ...prefixToRemove: Array<string> ): string {
     if ( target == null ) {
         return target;
     }
-    var loop;
+    let loop;
     do {
         loop = false;
-        for ( var i = 0; i < prefixToRemove.length; i++ ) {
-            var toTrim = prefixToRemove[ i ];
-            var trimLen = toTrim.length;
+        for ( let i = 0; i < prefixToRemove.length; i++ ) {
+            let toTrim = prefixToRemove[ i ];
+            let trimLen = toTrim.length;
             while ( target.indexOf( toTrim ) === 0 ) {
                 target = target.substr( trimLen );
                 loop = true;
@@ -278,16 +286,16 @@ export function removePrefix( target: string, ...prefixToRemove: string[] ): str
 
     return target;
 }
-export function removeSuffix( target: string, ...suffixToRemove: string[] ): string {
+export function removeSuffix( target: string, ...suffixToRemove: Array<string> ): string {
     if ( target == null ) {
         return target;
     }
-    var loop;
+    let loop;
     do {
         loop = false;
-        for ( var i = 0; i < suffixToRemove.length; i++ ) {
-            var toTrim = suffixToRemove[ i ];
-            var trimLen = toTrim.length;
+        for ( let i = 0; i < suffixToRemove.length; i++ ) {
+            let toTrim = suffixToRemove[ i ];
+            let trimLen = toTrim.length;
             //while (target.indexOf(toTrim) === 0) {
             //	target = target.substr(trimLen);
             //	loop = true;
@@ -347,11 +355,11 @@ export function isNullOrEmpty( str: string ): boolean {
 export function tryRemoveBom( str: string ): string {
     if ( str == null ) { return str; }
     if ( str.length < 1 ) { return str; }
-    var firstChar = str[ 0 ];
+    let firstChar = str[ 0 ];
 
     //check for zero-width non-breaking space U+FEFF
-    var thisEndian = "\ufeff"; //little endian on windows
-    var otherEndian = "\ufffe";
+    let thisEndian = "\ufeff"; //little endian on windows
+    let otherEndian = "\ufffe";
 
     if ( firstChar === thisEndian || firstChar === otherEndian ) {
         return str.substring( 1 );
@@ -363,7 +371,7 @@ export function tryRemoveBom( str: string ): string {
         return str;
     }
 }
-/** escape a string for use as a literal match in a regex expression 
+/** escape a string for use as a literal match in a regex expression
 copied from http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
 */
 export function escapeRegExp( str: string ): string {
@@ -376,8 +384,8 @@ export function escapeRegExp( str: string ): string {
 example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
 uses the npm package: https://www.npmjs.com/package/base64url
  */
-export var base64Url: {
-    /** base64url encode stringOrBuffer 
+export let base64Url: {
+    /** base64url encode stringOrBuffer
     ```
     Example
 
@@ -385,7 +393,7 @@ export var base64Url: {
 'bGFkaWVzIGFuZCBnZW50bGVtYW4sIHdlIGFyZSBmbG9hdGluZyBpbiBzcGFjZQ'
     ```*/
     encode( input: string | Buffer ): string;
-    /** Convert a base64url encoded string into a raw string. Encoding defaults to 'utf8'. 
+    /** Convert a base64url encoded string into a raw string. Encoding defaults to 'utf8'.
     ```
     > base64url.decode('cmlkZTogZHJlYW1zIGJ1cm4gZG93bg')
 'ride: dreams burn down'
@@ -396,7 +404,7 @@ export var base64Url: {
 Example
     ```
 > base64url.fromBase64('qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA==')
-'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA' 
+'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'
     ```
     */
     fromBase64( b64Encoded: string ): string;
@@ -420,12 +428,12 @@ Example
 /**
  *  base64 encode and decode functions
  */
-export module base64 {
+export namespace base64 {
     export function encode( input: string | Buffer ): string {
-        var isStr = _.isString( input );
+        let isStr = _.isString( input );
         if ( isStr !== true || ( typeof ( btoa ) === "undefined" && typeof ( Buffer ) !== "undefined" ) ) {
             if ( isStr ) {
-                //nodejs does not define bota or atob                
+                //nodejs does not define bota or atob
                 return Buffer.from( input as string, "utf8" ).toString( "base64" );
             } else {
                 return ( input as Buffer ).toString( "base64" );
@@ -445,8 +453,6 @@ export module base64 {
         return Buffer.from( base64Encoded, "base64" );
     }
 }
-
-
 
 
 ///** common js method, missing from typescript d.ts */
@@ -493,7 +499,7 @@ export function hash( input: string ): number {
 //			//convert our arg to string
 //			var originalArg = args[i];
 //			args[i] = originalArg.toString();
-//			//if we show a non-meaningful "object" lets try to at least show it's typeName.  
+//			//if we show a non-meaningful "object" lets try to at least show it's typeName.
 //			if (args[i] === "[object Object]") {
 //				try {
 //					var _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
@@ -518,7 +524,6 @@ export function hash( input: string ): number {
 //	//		}
 //	//	}
 //	//}
-
 
 
 //	//__.forEach(args, (arg) => { newArgs.push(arg == null ? "NULL" : arg.toString()); });

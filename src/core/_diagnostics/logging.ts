@@ -8,6 +8,7 @@ import * as _ from "lodash";
 //import moment = require( "moment" );
 //import * as luxon from "luxon";
 import * as diagnostics from "../diagnostics";
+import * as exception from "./exception";
 
 import { LogLevel } from "../environment";
 import * as util from "util";
@@ -23,7 +24,6 @@ import stripAnsi = require( "strip-ansi" );
 // }
 
 
-
 interface IAnsiColor {
 	foreground: string;
 	background: string;
@@ -32,12 +32,12 @@ interface IAnsiColor {
 }
 /**
  * helper to convert ansi color codes to string representations.    conversions taken from https://en.wikipedia.org/wiki/ANSI_escape_code#graphics
- * @param input
+ * @param input color code input.
  */
 function colorCodeToString( input: string, currentColor?: IAnsiColor ): IAnsiColor {
-	var defaultColor: IAnsiColor = { foreground: "grey", background: "black", bold: false, highIntensity: false, };
+	let defaultColor: IAnsiColor = { foreground: "grey", background: "black", bold: false, highIntensity: false, };
 
-	var result = _.clone( defaultColor );
+	let result = _.clone( defaultColor );
 
 	if ( currentColor != null ) {
 		result = _.clone( currentColor );
@@ -51,9 +51,9 @@ function colorCodeToString( input: string, currentColor?: IAnsiColor ): IAnsiCol
 		input = input.substring( 0, input.length - 1 );
 	}
 
-	var sections = input.split( ";" );
+	let sections = input.split( ";" );
 	for ( let i = 0; i < sections.length; i++ ) {
-		var num = parseInt( sections[ i ] );
+		let num = parseInt( sections[ i ] );
 		//color names from http://www.w3schools.com/cssref/css_colornames.asp
 		switch ( num ) {
 			case 0: //reset
@@ -70,7 +70,7 @@ function colorCodeToString( input: string, currentColor?: IAnsiColor ): IAnsiCol
 				result.bold = false;
 				break;
 			case 7: //swap
-				var tmp = result.foreground;
+				let tmp = result.foreground;
 				result.foreground = result.background;
 				result.background = tmp;
 				break;
@@ -177,7 +177,7 @@ function colorCodeToString( input: string, currentColor?: IAnsiColor ): IAnsiCol
 				result.background = "white";
 				break;
 			default:
-				throw new diagnostics.XlibException( "colorCodeToString() unknown color " + input );
+				throw new exception.XlibException( "colorCodeToString() unknown color " + input );
 			//no action (do not set anything)
 		}
 	}
@@ -192,10 +192,36 @@ interface IReplacement extends IAnsiColor {
 interface ILogLevelOverride { callSiteMatch: RegExp; minLevel: LogLevel; }
 
 
+class LogThrowException extends exception.Exception {
+	constructor( message: string, public logOutput: string[], options?: exception.IExceptionOptions ) {
+		super( message, options );
+	}
+}
+/** the results of an attempt to log. */
+interface ILogResults {
+	/** @returns array of strings representing all logged values.
+	 *  array element 0 is time,
+	 * element 1 is callsite,
+	 * element 2 is logLevel.
+	 * passed args are in element 3 onwards, converted to stringified JSON if objects.
+	 * ```null``` is returned if not logged (such as if minLogLevel is greater than requested) */
+	consoleOut?: string[];
+	/** if the request was logged.   IE: if the log level was high enough to meet minLogLevel (env.LogLevel or explicit overrides).   If false, the other details such as args will be null */
+	isLogged: boolean;
+
+	time: Date;
+	callsite: string;
+	logLevel: LogLevel;
+	/** the arguments passed to the log function. if objects, they are converted to JSON.
+	 * If the request is not logged, this will be null.
+	 */
+	parsedArgs?: Array<string | boolean | number | Date | {}>;
+
+}
+
 
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
 export class Logger {
-
 
 
 	/** override the loglevel for specific, focused debugging.     */
@@ -219,9 +245,8 @@ export class Logger {
 	}
 
 
-
 	/** storage of  env.logLevelOverrides  for filtering log requests .  added to  by the .initialize() static method and log._overrideLogLevel() method */
-	protected static _overrides: ILogLevelOverride[] = [];
+	protected static _overrides: Array<ILogLevelOverride> = [];
 
 	/** invoke this to set a global override for the minimum log level for a given callsite.*/
 	public overrideLogLevel(
@@ -250,80 +275,111 @@ export class Logger {
 
 	public static errorHistoryMaxLength = 200;
 	/** storage of errors encountered, for diagnostics reporting */
-	public static errorHistory: any[] = [];
+	public static errorHistory: Array<any> = [];
 
 	/** log a message, output will not be auto-truncated to decrease verbosity */
-	public traceFull( ...args: any[] ) {
+	public traceFull( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.TRACE, args, true );
 	}
 
 	/** log a message, output will not be auto-truncated to decrease verbosity */
-	public debugFull( ...args: any[] ) {
+	public debugFull( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.DEBUG, args, true );
 	}
 
 	/** log a message, output will not be auto-truncated to decrease verbosity */
-	public infoFull( ...args: any[] ) {
+	public infoFull( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.INFO, args, true );
 	}
 
 	/** log a message, output will not be auto-truncated to decrease verbosity */
-	public warnFull( ...args: any[] ) {
+	public warnFull( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.WARN, args, true );
 	}
 
 	/** log a message, output will not be auto-truncated to decrease verbosity */
-	public errorFull( ...args: any[] ) {
+	public errorFull( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.ERROR, args, true );
 	}
 
 	/** log a message, output will be auto truncated in a smart way to decrease verbosity */
-	public trace( ...args: any[] ) {
+	public trace( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.TRACE, args, false );
 	}
 
 	/** log a message, output will be auto truncated in a smart way to decrease verbosity */
-	public debug( ...args: any[] ) {
+	public debug( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.DEBUG, args, false );
 	}
 
 	/** log a message, output will be auto truncated in a smart way to decrease verbosity */
-	public info( ...args: any[] ) {
+	public info( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.INFO, args, false );
 	}
 
 	/** log a message, output will be auto truncated in a smart way to decrease verbosity */
-	public warn( ...args: any[] ) {
+	public warn( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.WARN, args, false );
 	}
 
 	/** log a message, output will be auto truncated in a smart way to decrease verbosity */
-	public error( ...args: any[] ) {
+	public error( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.ERROR, args, false );
 	}
 	/** log a fatal error that is about to crash your application.   the output of this is never truncated.  (it's always full verbosity) */
-	public fatal( ...args: any[] ) {
+	public fatal( ...args: Array<any> ) {
 		return this._tryLog( LogLevel.FATAL, args, false );
 	}
 
 	/** for now, same as log.errorFull().   later will notify via email. */
-	public hackAttempt( ...args: any[] ) {
+	public hackAttempt( ...args: Array<any> ) {
 		return this.errorFull( "hack attempt", ...args );
 	}
 
+	/** log an Error and then throw an Exception */
+	public throw( ...args: Array<any> ): never {
+		let results = this._tryLog( LogLevel.ERROR, args, false );
+		throw new LogThrowException( results.join( ", " ), results, { stackFramesToTruncate: 1 } );
+	}
 
-
-	/** log a bug that's going to trigger a debug.assert.   the output of this is never truncated.  (it's always full verbosity) */
-	assert( testCondition: boolean, ...args: any[] ): void {
+	/** log an Error if the testCondition evaluates to false.  */
+	throwIf( testCondition: boolean, ...args: Array<any> ): void {
 		if ( testCondition === true ) {
 			return;
 		}
 		if ( testCondition !== false ) {
-			throw new diagnostics.XlibException( "first parameter must be a boolean (to assert must evaluate to true or false)" );
+			throw new exception.XlibException( "first parameter must be a boolean (to assert must evaluate to true or false)" );
 		}
 
-		let finalArgs = this._tryLog( LogLevel.ASSERT, args, true );
+		if ( args.length === 0 ) {
+			args.push( "throwIf testCondition===false." );
+		}
 
+		let finalArgs = this._tryLog( LogLevel.ERROR, args, false );
+		throw new LogThrowException( finalArgs.join( ", " ), finalArgs, { stackFramesToTruncate: 1 } );
+
+	}
+
+	/** if ```testCondition``` succeeds, nothing happens.   
+	 * Otherwise, if running in ```environment.EnvLevel=PROD``` an assert will be raised (no code interuption).  
+	 * If running in a non ```PROD``` environment, a code-interupting ```LogThrowException``` will then be thrown.  
+	 * 
+	 * 
+	 * If you want an exception to always be thrown, use ```throwIf()``` instead.
+	 *  */
+	assert( testCondition: boolean, ...args: Array<any> ) {
+		if ( testCondition === true ) {
+			return;
+		}
+		if ( testCondition !== false ) {
+			throw new exception.XlibException( "first parameter must be a boolean (to assert must evaluate to true or false)" );
+		}
+
+		if ( args.length === 0 ) {
+			args.push( "tryAssert testCondition===false." );
+		}
+
+		let finalArgs = this._tryLog( LogLevel.ASSERT, args, false );
 		//on chrome, we want to use console methods that provide trace, because it's nicely collapsed by default
 		switch ( environment.platformType ) {
 			case environment.PlatformType.Browser:
@@ -345,36 +401,40 @@ export class Logger {
 				// console.assert.apply( console, finalArgs );
 				break;
 		}
-
-
-
-	}
-	/** use to mark code that needs to be finished before it can be run.   asserts when hit. */
-	todo( ...args: any[] ) {
-		//	var msg = "TODO: " + stringHelper.format2( format, params );
-		this.assert( false, ...args );
-	}
-
-	/** notes to do something later. */
-	todo_later( ...args: any[] ) {
-		//var msg = "TODO: LATER:" + stringHelper.format2( format, params );
-		this.warn( ...args );
-	}
-
-
-	deprecated( message?: string ) {
-		this.assert( false, "implement deprecated", message );
-	}
-	/** note to redo this before shipping (any time not in #DEBUG mode) */
-	refactor( ...args: any[] ) {
-		if ( environment.envLevel === environment.EnvLevel.DEV ) {
-			this.warn( ...args );
-		} else {
-			this.fatal( "refactor must be done before production", ...args );
+		switch ( environment.envLevel ) {
+			case environment.EnvLevel.PROD:
+				//noop
+				break;
+			default:
+				throw new LogThrowException( finalArgs.join( ", " ), finalArgs, { stackFramesToTruncate: 1 } );
 		}
-		//this.assert(false, "implement deprecated");
 	}
 
+	// /** use to mark code that needs to be finished before it can be run.   asserts when hit. */
+	// todo( ...args: Array<any> ) {
+	// 	//	var msg = "TODO: " + stringHelper.format2( format, params );
+	// 	this.assert( false, ...args );
+	// }
+
+	// /** notes to do something later. */
+	// todo_later( ...args: Array<any> ) {
+	// 	//var msg = "TODO: LATER:" + stringHelper.format2( format, params );
+	// 	this.warn( ...args );
+	// }
+
+
+	// deprecated( message?: string ) {
+	// 	this.assert( false, "implement deprecated", message );
+	// }
+	// /** note to redo this before shipping (any time not in #DEBUG mode) */
+	// refactor( ...args: Array<any> ) {
+	// 	if ( environment.envLevel === environment.EnvLevel.DEV ) {
+	// 		this.warn( ...args );
+	// 	} else {
+	// 		this.fatal( "refactor must be done before production", ...args );
+	// 	}
+	// 	//this.assert(false, "implement deprecated");
+	// }
 
 
 	/**
@@ -382,10 +442,10 @@ export class Logger {
 		*
 		* @returns array of strings representing all logged values.  array element 0 is time, element 1 is callsite, element 2 is logLevel.  passed args are in element 3 onwards.  ```undefined``` is returned if not logged (such as if minLogLevel is greater than requested)
 	 */
-	public _tryLog( requestedLogLevel: LogLevel, args: any[], fullOutput: boolean,
+	public _tryLog( requestedLogLevel: LogLevel, args: Array<any>, fullOutput: boolean,
 		/** if not set, the function **two levels up*** is marked as the callsite.
 		if that's not what you want, you can create your callsite, example showing 3 levels up: ```callSite = diagnostics.computeStackTrace( 3, 1 )[ 0 ];``` */
-		callSite?: string, ): string[] | undefined {
+		callSite?: string, ): Array<string> | undefined {
 
 		if ( callSite == null ) {
 			callSite = diagnostics.computeStackTrace( 2, 1 )[ 0 ];
@@ -396,7 +456,7 @@ export class Logger {
 
 			//allow runtime adjustment of loglevels (useful for focused debugging)
 			Logger._overrides.forEach( ( pair ) => {
-				if ( pair.callSiteMatch.test( callSite as string ) ) {
+				if ( pair.callSiteMatch.test( callSite ) ) {
 					minLogLevel = pair.minLevel;
 				}
 
@@ -408,16 +468,12 @@ export class Logger {
 		}
 
 
-
-
-
-
 		let finalArgs = this._doLog( callSite, requestedLogLevel, args, fullOutput );// this._doLog.apply( this, arguments );
 		//strip colors
 		finalArgs = finalArgs.map( ( arg ) => stripAnsi( arg ) );
 		if ( requestedLogLevel >= LogLevel.ERROR ) {
 			//log these for our diagnostics api to pickup:   http://localhost/metrics/v2/healthcheck-errors
-			let errorHistoryEntry: string[] = finalArgs;
+			let errorHistoryEntry: Array<string> = finalArgs;
 			Logger.errorHistory.unshift( errorHistoryEntry );
 			if ( Logger.errorHistory.length > Logger.errorHistoryMaxLength ) {
 				Logger.errorHistory.length = Logger.errorHistoryMaxLength;
@@ -427,13 +483,10 @@ export class Logger {
 	}
 
 
+	private _doLog( callSite: string, targetLogLevel: LogLevel, args: Array<any>, fullOutput: boolean ) {
 
 
-
-	private _doLog( callSite: string, targetLogLevel: LogLevel, args: any[], fullOutput: boolean ) {
-
-
-		var logLevelColor: stringHelper.Chalk.Chalk;
+		let logLevelColor: stringHelper.Chalk.Chalk;
 		switch ( targetLogLevel ) {
 			case LogLevel.TRACE:
 				logLevelColor = Chalk.black.bgWhite;
@@ -458,7 +511,7 @@ export class Logger {
 				break;
 			default:
 				logLevelColor = Chalk.inverse.bold;
-				throw new diagnostics.XlibException( "unknown targetLogLevel" );
+				throw new exception.XlibException( "unknown targetLogLevel" );
 			//break;
 		}
 
@@ -466,7 +519,7 @@ export class Logger {
 		const nameToReport = Chalk.magenta( callSite );
 
 
-		const finalArgs: string[] = [];
+		const finalArgs: Array<string> = [];
 
 		/** add "header" info to the log data */
 		finalArgs.unshift( logLevelColor( LogLevel[ targetLogLevel ] ) );
@@ -491,7 +544,7 @@ export class Logger {
 						console.error( ...finalArgs );
 						break;
 					default:
-						throw new diagnostics.XlibException( "unknown targetLogLevel" );
+						throw new exception.XlibException( "unknown targetLogLevel" );
 					//break;
 				}
 				break;
@@ -519,7 +572,7 @@ export class Logger {
 						console.error( ...finalArgs );
 						break;
 					default:
-						throw new diagnostics.XlibException( "unknown targetLogLevel" );
+						throw new exception.XlibException( "unknown targetLogLevel" );
 					//break;
 				}
 				break;
@@ -527,7 +580,6 @@ export class Logger {
 
 		return finalArgs;
 	}
-
 
 
 }
@@ -543,7 +595,7 @@ function _self_initialize() {
 			return;
 		}
 		try {
-			let parsedData: { [ key: string ]: string } = serialization.jsonX.parse( envVar );
+			let parsedData = serialization.jsonX.parse( envVar ) as { [ key: string ]: string; };
 			if ( _.isPlainObject( parsedData ) === false ) {
 				throw new Error( `unable to parse.  must be in format ' { [ key: string ]: string }' ` );
 			}
@@ -553,13 +605,13 @@ function _self_initialize() {
 				Logger.overrideLogLevel( callSiteMatch, minLevel as any );
 			} );
 		} catch ( _ex ) {
-			throw new diagnostics.Exception( `unable to parse environment logLevelOverrides. you passed: ${ envVar }`, { innerError: diagnostics.toError( _ex ) } );
+			throw new exception.Exception( `unable to parse environment logLevelOverrides. you passed: ${ envVar }`, { innerError: exception.toError( _ex ) } );
 		}
 	}
 	_populateLogLevelOverridesFromEnvVars();
 
 	//noop log levels too low  for better performance
-// tslint:disable-next-line: no-empty
+	// tslint:disable-next-line: no-empty
 	const noopFcn = ( () => { } ) as any;
 	switch ( environment.logLevel ) {
 		case LogLevel.ASSERT:

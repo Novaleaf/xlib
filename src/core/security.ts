@@ -19,20 +19,20 @@ export import crypto = require( "crypto" );
  */
 export function sha512(
     /** if an array, generates a hash of all values (passing each value to consecutively update the returning hash) */
-    input: string | Buffer | string[] | Buffer[]
+    input: string | Buffer | Array<string> | Array<Buffer>
 ): string {
     /** set to true to use base64 output instead of base64Url*/
-    let useNormalBase64Encode: boolean = true;
-    let toHash: Array<string | Buffer>;
+    let useNormalBase64Encode = true;
+    let toHash: ( string | Buffer )[];
     if ( _.isArray( input ) !== true ) {
         //input = [ input ] as any[];
         toHash = [ input as any ];
     } else {
-        toHash = input as Array<any>;
+        toHash = input as any[];
     }
 
-    var hashFunction = crypto.createHash( "sha512" );
-    for ( var i = 0; i < toHash.length; i++ ) {
+    let hashFunction = crypto.createHash( "sha512" );
+    for ( let i = 0; i < toHash.length; i++ ) {
         let currentInput = toHash[ i ];
         if ( currentInput == null ) {
             continue;
@@ -52,7 +52,6 @@ export function sha512(
 export import jwt = require( "jsonwebtoken" );  //good intro to JWT: https://stormpath.com/blog/token-auth-spa/
 
 
-
 /**
  * returns a user-friendly alpha-numeric key.  By Default, constructs a cryptographically secure random one, or parses and normalizes one provided by userInput.
  * The key comprises the characters 0-9 and a-z, but not the characters o,i,l,u to avoid human transcription errors.
@@ -65,7 +64,7 @@ export import jwt = require( "jsonwebtoken" );  //good intro to JWT: https://sto
  */
 export function humanFriendlyKey( digits?: number, digitGroupings?: number, userInputToParse?: string, groupingSeperator?: string, suppressThrowOnBadInput = false ): string {
 
-    var radix = 32; //target 0-9 and a-z, except for easily mixed up characters (see keyReplacements structure below)
+    let radix = 32; //target 0-9 and a-z, except for easily mixed up characters (see keyReplacements structure below)
 
     if ( digits == null ) {
         digits = 25;
@@ -80,8 +79,8 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
     }
 
 
-    var finalKey: string[] = [];
-    var initialKey: string;
+    let finalKey: Array<string> = [];
+    let initialKey: string;
     if ( userInputToParse != null ) {
 
 
@@ -118,22 +117,22 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
     /**
      *  don't use easily confused characters in key
      */
-    var keyReplacements: { [ key: string ]: string } = {
-        "o": "z",
-        "i": "y",
-        "l": "x",
-        "u": "w",
+    let keyReplacements: { [ key: string ]: string; } = {
+        o: "z",
+        i: "y",
+        l: "x",
+        u: "w",
         //[ key: "o" | "i" | "l" | "u"]: st
 
     };
 
 
-    for ( var i = 0; i < initialKey.length; i++ ) {
+    for ( let i = 0; i < initialKey.length; i++ ) {
         if ( digitGroupings !== 0 && i % digitGroupings === 0 && i !== 0 ) {
             //insert digit groupins
             finalKey.push( groupingSeperator );
         }
-        var char = initialKey[ i ];
+        let char = initialKey[ i ];
 
         if ( userInputToParse != null ) {
             //the initialKey is formed from user input.  handle potential wrong characters (o,i,l,u)
@@ -154,7 +153,7 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
             }
         } else {
             //the initialKey is formed from randomDigits.  map potential wrong characters (o,i,l,u) to (z,y,x,w)
-            var replacement = keyReplacements[ char ];
+            let replacement = keyReplacements[ char ];
             if ( replacement != null ) {
                 char = replacement;
             } else {
@@ -164,7 +163,7 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
         finalKey.push( char );
     }
 
-    var toReturn = finalKey.join( "" );
+    let toReturn = finalKey.join( "" );
     //console.log("randomKey", minDigits, maxDigits, initialKey, toReturn);
     return toReturn;
 

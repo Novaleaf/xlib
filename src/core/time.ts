@@ -91,7 +91,7 @@ export class Stopwatch {
 			return this;
 		}
 		this._isPaused = false;
-		//reset the start time, 
+		//reset the start time,
 		this.startTime = Date.now();
 		return this;
 	}
@@ -127,7 +127,7 @@ export class Stopwatch {
 			}
 			//stop the stopwatch
 			this.stopTime = Date.now();
-			this._isPaused = false; //stopped, so not paused anymore
+			this._isPaused = false;
 			return this;
 		} finally {
 			if ( this._awaitStopCalled != null ) {
@@ -137,9 +137,9 @@ export class Stopwatch {
 	}
 
 	/** resets a started stopwatch to zero (elapsed will be zero, but keeps running)
-	 * 
+	 *
 	 * if paused, does not unpause
-	 * 
+	 *
 	 * if stopped, does nothing
 	 */
 	public reset(): this {
@@ -152,18 +152,16 @@ export class Stopwatch {
 		this.startTime = Date.now();
 
 
-
 		return this;
 	}
 }
 
 
-
-/** inspect the spread of sampled time durations.  by default, gives IQR, ie the 0th, 1st, 2nd, 3rd, and 4th quartiles, 
-		* as per: https://www.dataz.io/display/Public/2013/03/20/Describing+Data%3A+Why+median+and+IQR+are+often+better+than+mean+and+standard+deviation 
-				and  https://en.wikipedia.org/wiki/Quantile#Quantiles_of_a_population  
+/** inspect the spread of sampled time durations.  by default, gives IQR, ie the 0th, 1st, 2nd, 3rd, and 4th quartiles,
+		* as per: https://www.dataz.io/display/Public/2013/03/20/Describing+Data%3A+Why+median+and+IQR+are+often+better+than+mean+and+standard+deviation
+				and  https://en.wikipedia.org/wiki/Quantile#Quantiles_of_a_population
 				@returns array of ms, each representing the requested quartile's rank choice*/
-export function quantile( intervals: Array<luxon.Interval | luxon.Duration | number | Stopwatch | { valueOf(): number }>,
+export function quantile( intervals: (luxon.Interval | luxon.Duration | number | Stopwatch | { valueOf(): number; })[],
 	/** by default givez IQR, ie the sample at 0,25,50,75, and 100th percentiles,
 		* @default  [ 0, 0.25, 0.5, 0.75, 1 ]
 		*/
@@ -179,8 +177,7 @@ export function quantile( intervals: Array<luxon.Interval | luxon.Duration | num
 	}
 
 
-
-	let msArray: number[] = intervals.map( ( val ) => {
+	let msArray: Array<number> = intervals.map( ( val ) => {
 		if ( typeof val === "number" ) {
 			return val;
 		} else if ( val instanceof luxon.Interval ) {
@@ -196,7 +193,7 @@ export function quantile( intervals: Array<luxon.Interval | luxon.Duration | num
 	} );
 
 	{
-		let toReturn = mathjs.quantileSeq( msArray, _quantile, false ) as number[];
+		let toReturn = mathjs.quantileSeq( msArray, _quantile, false ) as Array<number>;
 
 		return toReturn;
 	}
@@ -204,21 +201,15 @@ export function quantile( intervals: Array<luxon.Interval | luxon.Duration | num
 }
 
 
-
-
-
-
 import * as environment from "./environment";
 
 export class PerfTimer {
 
 	/** exposed for programatic use.  If you want to control when to log perfTimes manually, please use ```.logNowAndClear()```  stores raw samples taken by the perf timer. */
-	public _storage: { [ key: string ]: { runs: number; total: luxon.Duration; raw: Stopwatch[] } } = {};
+	public _storage: { [ key: string ]: { runs: number; total: luxon.Duration; raw: Array<Stopwatch>; }; } = {};
 
 
-
-
-	constructor( public options?: {/** though the perfTimer will auto log, it only does when .start() or .stop() is called (no async timers are used)*/ autoLogIntervalMs?: number; /** default to TRACE */ autoLogLevel?: environment.LogLevel } ) {
+	constructor( public options?: {/** though the perfTimer will auto log, it only does when .start() or .stop() is called (no async timers are used)*/ autoLogIntervalMs?: number; /** default to TRACE */ autoLogLevel?: environment.LogLevel; } ) {
 		this.options = { autoLogLevel: environment.LogLevel.TRACE, ...options };
 		this._lastAutoLog = luxon.DateTime.utc();
 	}
@@ -248,7 +239,7 @@ export class PerfTimer {
 		return toReturn;
 
 	}
-	/** manually clear out done perfTimes.  not needed if you turn autoLogging on (via .ctor options) 
+	/** manually clear out done perfTimes.  not needed if you turn autoLogging on (via .ctor options)
 		* @returns the done data before it was cleared
 	*/
 	public clearDone() {
@@ -285,7 +276,7 @@ export class PerfTimer {
 		// ! if we don't do this, then a call to the stopwatch.stop() further up in the code would not be logged.
 		return promise.bluebird.delay( 0 ).then( () => {
 			//const logData: { [ key: string ]: any } = {};// [ "PerfTimer AutoLog" ];
-			const logData: { [ key: string ]: { runs: number; total: string; mean: string; iqr: number[] } } = {};
+			const logData: { [ key: string ]: { runs: number; total: string; mean: string; iqr: Array<number>; }; } = {};
 			_.forIn( this._storage, ( samples, key ) => {
 				let runs = samples.runs;
 				let total = samples.total.toFormat( "hh:mm:ss.SS" );
