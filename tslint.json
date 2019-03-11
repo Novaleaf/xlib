@@ -64,20 +64,22 @@
         "no-angle-bracket-type-assertion": false,
         "no-any": false,
         "no-arg": false,
-        "no-bitwise": false,
-        "no-boolean-literal-compare": false, /////change, autofix
+        "no-bitwise": true,
+        "no-boolean-literal-compare": false, //change in v15, autofix
         "no-conditional-assignment": true,
-        "no-consecutive-blank-lines": false, /////change, autofix
+        "no-consecutive-blank-lines": false, //change in v15, autofix
         "no-console": true,
         "no-construct": true,
         "no-debugger": true,
         "no-default-export": true,
-        "no-duplicate-imports": false, //changed v15: doesn't work great with es6 modules that have no default export
+        "no-duplicate-imports": false, //// doesn't work great with es6 modules that have no default export
         "no-duplicate-super": true,
         "no-duplicate-switch-case": true,
         "no-duplicate-variable": true,
         "no-dynamic-delete": false,
-        "no-empty": false,
+        "no-empty": {
+            "options": "allow-empty-catch"
+        },
         "no-empty-interface": true,
         "no-eval": true,
         "no-floating-promises": true,
@@ -86,21 +88,21 @@
         "no-import-side-effect": true,
         "no-inferrable-types": false,
         "no-inferred-empty-object-type": false,
-        "no-internal-module": false, ////change in vNext
+        "no-internal-module": false, //change in v15
         "no-invalid-template-strings": true,
         "no-invalid-this": true,
-        "no-irregular-whitespace": false, /////change, autofix
-        "no-magic-numbers": false, ////change in vNext
+        "no-irregular-whitespace": false, //change in v15, autofix
+        "no-magic-numbers": false, //change in v15
         "no-mergeable-namespace": true,
         "no-misused-new": true,
-        "no-namespace": false, ////change in vNext
+        "no-namespace": false, //change in v15
         "no-non-null-assertion": true,
         "no-null-keyword": false,
         "no-object-literal-type-assertion": true,
         "no-parameter-properties": false,
         "no-parameter-reassignment": false,
-        "no-redundant-jsdoc": false, ////change in vNext
-        "no-reference": false, ////change in vNext
+        "no-redundant-jsdoc": false, //change in v15
+        "no-reference": false, //change in v15
         "no-reference-import": true,
         "no-require-imports": false,
         "no-return-await": true,
@@ -111,35 +113,54 @@
         "no-submodule-imports": true,
         "no-switch-case-fall-through": true,
         "no-this-assignment": true,
-        "no-trailing-whitespace": false, /////change, autofix
+        "no-trailing-whitespace": false, //! ///change, autofix
         "no-unbound-method": true,
-        "no-unnecessary-callback-wrapper": false,
+        "no-unnecessary-callback-wrapper": false, // overly brief code
         "no-unnecessary-class": true,
         "no-unnecessary-initializer": true,
         "no-unnecessary-qualifier": true,
         "no-unnecessary-type-assertion": false, //change later, maybe
-        "no-unsafe-any": false, ////change in vNext
+        "no-unsafe-any": false, //change in v15
         "no-unsafe-finally": true,
         "no-unused-expression": true,
-        "no-unused-variable": false, ////change in vNext
+        "no-unused-variable": false, //change in v15
         "no-use-before-declare": true,
-        "no-var-keyword": false, ////change in vNext
-        "no-var-requires": false, ////change in vNext
-        "no-void-expression": false, ////change in vNext
+        "no-var-keyword": false, //change in v15
+        "no-var-requires": false, //change in v15
+        "no-void-expression": false, //change in v15
         "number-literal-format": false,
-        "object-literal-key-quotes": false, ////change in vNext
-        "object-literal-shorthand": false, ////change in vNext, autofix
+        "object-literal-key-quotes": false, //change in v15
+        "object-literal-shorthand": false, //change in v15, autofix
         "object-literal-sort-keys": false,
         "one-line": false,
         "one-variable-per-declaration": true,
-        "only-arrow-functions": false, ////change in vNext
+        "only-arrow-functions": false, //change in v15
         "ordered-imports": false,
         "strict-boolean-expressions": [
             true,
             "allow-null-union",
             "allow-undefined-union",
             "allow-number"
-        ]
+        ],
+        ///////////////////////////////////////
+        //!maybe? section  remaining properties not entered when starting v15 linting
+        "prefer-function-over-method": false,
+        "prefer-object-spread": true,
+        "prefer-for-of": false,
+        "restrict-plus-operands": true,
+        "return-undefined": true,
+        "semicolon": true,
+        "strict-type-predicates": false, //requires strict-null-checks
+        "triple-equals": {
+            "options": [
+                "allow-null-check"
+            ]
+        },
+        "type-literal-delimiter": true,
+        "typeof-compare": false, //included in ts2.2, so not needed.
+        "use-default-type-parameter": false, ////overly terse
+        "unified-signatures": true,
+        "use-isnan": true
     },
     "rulesDirectory": [],
     "linterOptions": {

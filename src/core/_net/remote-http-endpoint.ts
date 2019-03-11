@@ -21,7 +21,7 @@ export type IRemoteHttpEndpointOptions = IRemoteHttpEndpointOverrideOptions & {
 	/** by default, all HTTP requests are made as soon as they are requested.  pass autoscaler options if your endpoint supports autoscaling.
 	* 
 	IMPORTANT NOTE:  The remote endpoint Needs to return either HTTP 429 or 503 errors to represent ```"BACKOFF"``` messages.  all other errors will be treated normally.*/
-	autoscalerOptions?: IAutoscalerOptions
+	autoscalerOptions?: IAutoscalerOptions;
 };
 
 export interface IRemoteHttpEndpointOverrideOptions {
@@ -125,7 +125,7 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 								return "TOO_BUSY";
 						}
 					}
-					return "FAIL"
+					return "FAIL";
 				} );
 		}
 

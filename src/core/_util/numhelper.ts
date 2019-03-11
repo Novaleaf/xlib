@@ -263,7 +263,7 @@ export function clamp( value: number, min_inc: number, max_inc: number, /** defa
             return max_inc - modRemainder;
 
         default:
-            throw new ex.XlibException( "unknown ClampType: " + ClampType );
+            throw new ex.XlibException( "unknown ClampType: " + ClampType[ clampType ] );
     }
 }
 
@@ -381,7 +381,7 @@ export function parseBoolean( toParse: string | number, invalidResult = false, t
         return toParse !== 0;
     }
     if ( throwOnInvalid === true ) {
-        throw new ex.XlibException( "unable to parseBoolean on input value= " + toParse );
+        throw new ex.XlibException( `unable to parseBoolean on input value= ${ toParse }` );
     }
     return invalidResult;
 }

@@ -111,7 +111,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		const reflection = xlib.reflection;
 		const Type = reflection.Type;
-		class MyClass { x = 0; };
+		class MyClass { x = 0; }
 		log.assert( reflection.getType( MyClass ) === Type.classCtor );
 		log.assert( reflection.getTypeName( MyClass ) === "MyClass" );
 		let myInstance = new MyClass();
@@ -129,12 +129,12 @@ describe( __filename + " basic xlib unit tests", () => {
 			* 
 			real request data can be more elaborate:  see ```IPageRequest``` in https://phantomjscloud.com/docs/http-api/
 			*/
-		type IPjscPostData = { url: string, renderType: "png" | "html" | "pdf" | "jpeg" | "plainText", outputAsJson?: boolean };
+		type IPjscPostData = { url: string; renderType: "png" | "html" | "pdf" | "jpeg" | "plainText"; outputAsJson?: boolean };
 		/** response data you will get back from the server.
 			* 
 		real response data is more elaborate:  see ```IUserResponse``` in https://phantomjscloud.com/docs/http-api/
 		 */
-		type IPjscUserResponse = { content: { name: string, data: string, encoding: string } };
+		type IPjscUserResponse = { content: { name: string; data: string; encoding: string } };
 
 		const apiKey = xlib.environment.getEnvironmentVariable( "phantomjscloud_apikey", "a-demo-key-with-low-quota-per-ip-address" );
 		const options: xlib.net.IRemoteHttpEndpointOptions = {
@@ -166,7 +166,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		class MyException extends xlib.diagnostics.Exception {
 			public someVal = 22;
-		};
+		}
 
 		try {
 			try {
@@ -216,19 +216,19 @@ describe( __filename + " basic xlib unit tests", () => {
 	it1( function testLolo() {
 
 		const __ = xlib.lolo;
-		__.log.info( `the current time is ${ __.utc().toISO() }`, { isDebug: __.isDebug() } )
+		__.log.info( `the current time is ${ __.utc().toISO() }`, { isDebug: __.isDebug() } );
 
 	} );
 
 	it2( async function testStopwatch() {
 		const __ = xlib.lolo;
 		const stopwatch = new xlib.time.Stopwatch( "unit test" );
-		__.log.assert( stopwatch.getElapsed().valueOf() === 0 )
+		__.log.assert( stopwatch.getElapsed().valueOf() === 0 );
 		await xlib.promise.bluebird.delay( 200 );
-		__.log.assert( stopwatch.getElapsed().valueOf() === 0 )
+		__.log.assert( stopwatch.getElapsed().valueOf() === 0 );
 		stopwatch.start();
 		await xlib.promise.bluebird.delay( 2000 );
-		let elapsedMs = stopwatch.getElapsed().valueOf()
+		let elapsedMs = stopwatch.getElapsed().valueOf();
 		__.log.assert( elapsedMs > 0 );
 		stopwatch.stop();
 		let elapsed = stopwatch.getElapsed();
@@ -242,7 +242,7 @@ describe( __filename + " basic xlib unit tests", () => {
 		stopwatch.start();
 		__.log.assert( __.num.aboutEqual( stopwatch.valueOf(), 0, 100 ) );
 		__.log.assert( elapsedMs > stopwatch.valueOf() );
-		__.log.assert( stopwatch.isPaused === false )
+		__.log.assert( stopwatch.isPaused === false );
 		await __.bb.delay( 10 );
 		elapsedMs = stopwatch.valueOf();
 		log.info( "restarted delay 10ms", stopwatch.toJson() );
@@ -349,7 +349,7 @@ describe( __filename + " basic xlib unit tests", () => {
 		const replyDelaySpread = 30;
 
 		/** how often our backendWorker reports too busy */
-		interface ITestAutoscaleOptions { chanceOfBusy: number };
+		interface ITestAutoscaleOptions { chanceOfBusy: number; }
 		class TestAutoScaleError extends xlib.diagnostics.Exception<{ shouldRejectBusy: boolean }>{ }
 
 		let testScaler = new xlib.threading.Autoscaler( { busyGrowDelayMs: 100, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 30, growDelayMs: 5, minParallel: 4 },
@@ -371,7 +371,7 @@ describe( __filename + " basic xlib unit tests", () => {
 				if ( err.data != null && err.data.shouldRejectBusy === true ) {
 					return "TOO_BUSY";
 				}
-				return "FAIL"
+				return "FAIL";
 			} ) );
 
 

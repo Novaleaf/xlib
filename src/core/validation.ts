@@ -29,15 +29,15 @@ export class UrlValidator {
 		input: string | URL,
 		public options?: {
 			/** default false to mitigate attack surface.  setting to true allows "localhost" or "127.0.0.1" */
-			allowLocalhost?: boolean,
+			allowLocalhost?: boolean;
 			/** default false to avoid reading the local file system */
-			allowFileProtocol?: boolean,
+			allowFileProtocol?: boolean;
 			/** default false to avoid obsolete protocol */
-			allowGopherProtocol?: boolean,
+			allowGopherProtocol?: boolean;
 			/** default false to mitigate network scans.  setting to true allows local subnet ip's. */
-			allowPrivateIp?: boolean,
+			allowPrivateIp?: boolean;
 			/** default false, allow domain name using non-printable ascii characters */
-			allowUnicodeDomain?: boolean,
+			allowUnicodeDomain?: boolean;
 		}
 	) {
 		this.options = {
@@ -95,7 +95,7 @@ export class UrlValidator {
 
 
 			//check protocol
-			const protocol = this.url.protocol
+			const protocol = this.url.protocol;
 			switch ( protocol ) {
 				case "gopher:":
 					if ( options.allowGopherProtocol === true ) {
@@ -125,7 +125,7 @@ export class UrlValidator {
 			if ( ex instanceof Error ) {
 				this.errorMessage = ex.message;
 			} else {
-				this.errorMessage = "unknown error:" + ex;
+				this.errorMessage = `unknown error: ${ ex }`;
 			}
 		}
 	}

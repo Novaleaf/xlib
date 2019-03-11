@@ -6,7 +6,7 @@ import * as environment from "./environment";
 
 
 import * as _logging from "./_diagnostics/logging";
-export { _logging }
+export { _logging };
 
 export * from "./_diagnostics/exception";
 import * as exception from "./_diagnostics/exception";
@@ -200,8 +200,12 @@ export class DebugRaceCheck {
 
 if ( !environment.isDebug() ) {
 	//noop racecheck functions
+	// tslint:disable-next-line: no-empty
 	DebugRaceCheck.prototype.edit = () => { };
+	// tslint:disable-next-line: no-empty
 	DebugRaceCheck.prototype.enter = () => { };
+	// tslint:disable-next-line: no-empty
 	DebugRaceCheck.prototype.exit = () => { };
+	// tslint:disable-next-line: no-empty
 	DebugRaceCheck.prototype.poke = () => { };
 }

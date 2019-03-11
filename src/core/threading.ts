@@ -288,29 +288,29 @@ export class AsyncReaderWriterLock<TValue=void> {
 export interface IAutoscalerOptions {
 	/** minimum parallel requests (maxActive) you allow, regardless of how long the autoscaler has been idle.  should be 1 or more.  
 	*/
-    minParallel: number,
+    minParallel: number;
 	/** optional.  set a max to number of parallel requests (maxActive) no matter how active the calls 
 		* @default undefined (no limit)
 	*/
-    maxParallel?: number,
+    maxParallel?: number;
     /** if we get a "TOO_BUSY" rejection (from the ```failureListener```), how long we should wait before trying to expand our maxActive again. */
-    busyGrowDelayMs: number,
+    busyGrowDelayMs: number;
     /** when we are at max parallel and still able to successfully submit requests (not getting "TOO_BUSY" errors), how long to delay before increasing our maxActive by 1. */
-    growDelayMs: number,
+    growDelayMs: number;
     /** when we are under our max parallel, how long before our max should decrease by 1 .   Also, when we are consistently getting "TOO_BUSY" rejections, we will decrease our maxActive by 1 this often.  pass null to never decay (not recomended).*/
-    idleOrBusyDecreaseMs: number,
+    idleOrBusyDecreaseMs: number;
 	/** optional.  when we first get a "TOO_BUSY" rejection, we will reduce maxActive by this amount.  interval to check if we should penalize resets after ```busyWaitMs```
      * Note: when too busy, we also reduce maxActive via the ```decayDelayMs``` parameter every so often (as set by decayDelayMs)..   set to 0 to have no penalty except that set by decayDelayMs
 		* @default 1
 	 */
-    busyExtraPenalty?: number,
+    busyExtraPenalty?: number;
 
 
     // /** while there is pending work, how often to wakeup and see if we can submit more.  should be less than half of grow/decay delayMs
     //  * @default 1/10th of the minimum of  grow/decay delayMs
     //  */
     // heartbeatMs?: number,
-};
+}
 
 
 /** while this is probably only useful+used by the ```net.RemoteHttpEndpoint``` class, this is a generic autoscaler implementation, 
@@ -347,24 +347,24 @@ export class Autoscaler<TWorkerFunc extends ( ...args: any[] ) => Promise<any>, 
 
     private metrics: {
         /** the max number of active parallel requests we currently allow.   increases and decreases based on the growDelayMs and decayDelayMs */
-        maxActive: number,
+        maxActive: number;
         /** time in which we decided to stop growing (based on options.busyWaitMs ) */
-        tooBusyWaitStart: Date,
+        tooBusyWaitStart: Date;
         /** the current number of parallel requests active in our backendWorker */
-        activeCount: number,
+        activeCount: number;
         /** the last time we grew our maxActive count  */
-        lastGrow: Date,
+        lastGrow: Date;
         /** the last time we were at our maxActive count */
-        lastMax: Date,
+        lastMax: Date;
         /** the last time we got a "TOO_BUSY" rejection from the backendWorker.  note that this could happen while in a options.busyWaitMs interval, if the backend is sufficently overwhelmed */
-        lastTooBusy: Date,
+        lastTooBusy: Date;
         /** the last time we decayed our maxActive */
-        lastDecay: Date,
+        lastDecay: Date;
     };
 
-    private pendingCalls: { args: any[], requesterPromise: promise.IExposedPromise<any> }[] = [];
+    private pendingCalls: { args: any[]; requesterPromise: promise.IExposedPromise<any> }[] = [];
 
-    private activeCalls: { args: any[], requesterPromise: promise.IExposedPromise<any>, activeMonitorPromise: bb<any> }[] = [];
+    private activeCalls: { args: any[]; requesterPromise: promise.IExposedPromise<any>; activeMonitorPromise: bb<any> }[] = [];
 
     public toJson() {
         return { pendingCalls: this.pendingCalls.length, activeCalls: this.activeCalls.length, metrics: this.metrics, options: this.options };

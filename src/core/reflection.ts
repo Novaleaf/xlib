@@ -117,7 +117,7 @@ export function getTypeName( obj: any ): string {
 			{
 				const objAsFunction = obj as Function;
 				const str = objAsFunction.toString().trim();
-				const results = /\s*function\s*(\S{1,})\s*\(/.exec( str )
+				const results = /\s*function\s*(\S{1,})\s*\(/.exec( str );
 				const name = results ? results[ 1 ] : "[anonymous]";
 				return name;
 			}
@@ -141,9 +141,7 @@ export function getTypeName( obj: any ): string {
 //}
 
 /** names of all parameters of a function */
-export function getArgumentNames( args: IArguments ): string[];
-export function getArgumentNames( func: Function ): string[];
-export function getArgumentNames( argsOrFunction: any ): string[] {
+export function getArgumentNames( argsOrFunction: IArguments | Function ): string[] {
 	let func: Function;
 	if ( typeof ( argsOrFunction ) === "function" ) {
 		func = argsOrFunction;

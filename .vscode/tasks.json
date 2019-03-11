@@ -27,10 +27,7 @@
 			"label": "tslint-fix",
 			"type": "shell",
 			"command": "tslint --project tsconfig.json --config tslint.json --format verbose --fix",
-			"group": {
-				"kind": "test",
-				"isDefault": false
-			}
+			"group": "test",
 		},
 	]
 }

@@ -175,7 +175,7 @@ export function quantile( intervals: Array<luxon.Interval | luxon.Duration | num
 		for ( let i = 0; i < _quantile.length; i++ ) {
 			toReturn.push( NaN );
 		}
-		return toReturn;;
+		return toReturn;
 	}
 
 
@@ -213,7 +213,7 @@ import * as environment from "./environment";
 export class PerfTimer {
 
 	/** exposed for programatic use.  If you want to control when to log perfTimes manually, please use ```.logNowAndClear()```  stores raw samples taken by the perf timer. */
-	public _storage: { [ key: string ]: { runs: number, total: luxon.Duration, raw: Stopwatch[] } } = {};
+	public _storage: { [ key: string ]: { runs: number; total: luxon.Duration; raw: Stopwatch[] } } = {};
 
 
 
@@ -261,13 +261,15 @@ export class PerfTimer {
 	private _lastAutoLog: luxon.DateTime;
 	private _tryAutoLog( callSiteLevelsUp: number ) {
 		if ( this.options.autoLogIntervalMs == null ) {
-			return;
+			return Promise.resolve();
 		}
 		const now = luxon.DateTime.utc();
 		if ( now.diff( this._lastAutoLog ) > luxon.Duration.fromMillis( this.options.autoLogIntervalMs ) ) {
 			//time to log
 			this._lastAutoLog = now;
-			this.logNowAndClear( callSiteLevelsUp + 1 );
+			return this.logNowAndClear( callSiteLevelsUp + 1 );
+		} else {
+			return Promise.resolve();
 		}
 
 	}
@@ -276,12 +278,14 @@ export class PerfTimer {
 		* logging happens asynchronously to let fulfilled stopwatches a chance to finalize (to be logged to the perfTimer)
 		* @returns data on the perf runs that were logged to console.
 	 */
-	public logNowAndClear( callSiteLevelsUp = 0 ) {
+	public async logNowAndClear( callSiteLevelsUp = 0 ) {
+
+
 		// ! need to wrap the actual logging in an async call so that any fulfilled promises (from stopwatch executions earlier in the callstack) can finalize themselves.
 		// ! if we don't do this, then a call to the stopwatch.stop() further up in the code would not be logged.
-		return promise.bluebird.try( () => { } ).then( () => {
+		return promise.bluebird.delay( 0 ).then( () => {
 			//const logData: { [ key: string ]: any } = {};// [ "PerfTimer AutoLog" ];
-			const logData: { [ key: string ]: { runs: number, total: string, mean: string, iqr: number[] } } = {};
+			const logData: { [ key: string ]: { runs: number; total: string; mean: string; iqr: number[] } } = {};
 			_.forIn( this._storage, ( samples, key ) => {
 				let runs = samples.runs;
 				let total = samples.total.toFormat( "hh:mm:ss.SS" );

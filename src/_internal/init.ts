@@ -6,12 +6,12 @@ import bb = promise.bluebird;
 
 export type IInitArgs = {
     /** if true, disables overriding settings from the commandline, envVars, or querystring */
-    disableEnvAutoRead?: boolean,
-    logLevel?: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT",
-    envLevel?: "DEV" | "TEST" | "UAT" | "PROD",
-    logLevelOverrides?: { callSiteMatch: RegExp, minLevel: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT" }[],
+    disableEnvAutoRead?: boolean;
+    logLevel?: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT";
+    envLevel?: "DEV" | "TEST" | "UAT" | "PROD";
+    logLevelOverrides?: { callSiteMatch: RegExp; minLevel: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL" | "ASSERT" }[];
     /** set to true to not log startup initialization details */
-    silentInit?: boolean,
+    silentInit?: boolean;
 };
 
 
@@ -46,7 +46,7 @@ export async function initialize( args?: IInitArgs ) {
 
 
     finishedPromise.fulfill( args );
-};
+}
 
 
 

@@ -1,5 +1,7 @@
 "use strict";
 
+// tslint:disable: no-bitwise
+
 import * as _ from "lodash";
 
 /** color strings for console use.  also used by logger */
@@ -67,7 +69,7 @@ export function isEncodedMaybe( value: string ) {
 
     if ( value.indexOf( "%" ) < 0 ) {
         return false;
-    };
+    }
     return true;
 }
 export function count( target: string, subStrToCount: string, ignoreCase = false, startingPosition = 0,/**default false.  if true, we allow overlapping finds, such as "aa" in the string "aaa" would return 2*/ allowOverlaps = false ): number {
@@ -143,8 +145,9 @@ export function summarize( str: string | any,/** default = 100 */ maxLength: num
     }
     if ( str.length <= maxLength ) {
         return str;
-    };
+    }
     var half = ( maxLength - 3 ) / 2;
+    // tslint:disable-next-line: restrict-plus-operands
     var toReturn = str.substring( 0, half ) + "..." + str.substring( str.length - half );
 
     return toReturn;
@@ -191,6 +194,7 @@ export function ipV4toInt( ip: string ): number {
     var parts = ip.split( "." );
     var res = 0;
 
+
     res += parseInt( parts[ 0 ], 10 ) << 24;
     res += parseInt( parts[ 1 ], 10 ) << 16;
     res += parseInt( parts[ 2 ], 10 ) << 8;
@@ -204,6 +208,7 @@ export function intToIpV4( int: number ): string {
     var part3 = ( ( int >> 16 ) & 255 );
     var part4 = ( ( int >> 24 ) & 255 );
 
+    // tslint:disable-next-line: restrict-plus-operands
     return part4 + "." + part3 + "." + part2 + "." + part1;
 }
 
@@ -409,7 +414,7 @@ Example
 > base64url.toBuffer('c3Bpcml0dWFsaXplZA')
 <Buffer 73 70 69 72 69 74 75 61 6c 69 7a 65 64>
     ```*/
-    toBuffer( b64UrlEncoded: string ): Buffer
+    toBuffer( b64UrlEncoded: string ): Buffer;
 } = require( "base64url" );
 
 /**
@@ -418,7 +423,7 @@ Example
 export module base64 {
     export function encode( input: string | Buffer ): string {
         var isStr = _.isString( input );
-        if ( isStr !== true || ( typeof ( btoa ) === "undefined" && Buffer != undefined ) ) {
+        if ( isStr !== true || ( typeof ( btoa ) === "undefined" && typeof ( Buffer ) !== "undefined" ) ) {
             if ( isStr ) {
                 //nodejs does not define bota or atob                
                 return Buffer.from( input as string, "utf8" ).toString( "base64" );
@@ -429,7 +434,7 @@ export module base64 {
         return btoa( input as string );
     }
     export function decode( base64Encoded: string ): string {
-        if ( typeof ( atob ) === "undefined" && Buffer != undefined ) {
+        if ( typeof ( atob ) === "undefined" && typeof ( Buffer ) !== "undefined" ) {
             //nodejs does not define bota or atob
             return Buffer.from( base64Encoded, "base64" ).toString( "utf8" );
         }

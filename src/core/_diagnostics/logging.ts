@@ -189,7 +189,7 @@ function colorCodeToString( input: string, currentColor?: IAnsiColor ): IAnsiCol
 interface IReplacement extends IAnsiColor {
 	start: number; end: number; matchText: string;
 }
-interface ILogLevelOverride { callSiteMatch: RegExp, minLevel: LogLevel };
+interface ILogLevelOverride { callSiteMatch: RegExp; minLevel: LogLevel; }
 
 
 
@@ -203,10 +203,10 @@ export class Logger {
 		/** a RegExp that matches a part of the log callSite.  (the part of the console message in Magenta color)
 	* if ommitted, will match the caller's fileName  */
 		callSiteMatch: RegExp,
-		/** the minimum logLevel you want to be emitted.  
-			* 
+		/** the minimum logLevel you want to be emitted.
+			*
 			* ***Important note***:  you can only make the minLevel stricter than the current environment.logLevel.
-			* For example, if the environment.logLevel is currently ```ERROR``` then a call to ```log.debug("hi")``` will never display.  
+			* For example, if the environment.logLevel is currently ```ERROR``` then a call to ```log.debug("hi")``` will never display.
 			This is because, for performance reasons,  at module initialization time we no-op all logging methods beneath the environment.logLevel
 		 */
 		minLevel: LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL" ) {
@@ -225,10 +225,10 @@ export class Logger {
 
 	/** invoke this to set a global override for the minimum log level for a given callsite.*/
 	public overrideLogLevel(
-		/** the minimum logLevel you want to be emitted.  
-			* 
+		/** the minimum logLevel you want to be emitted.
+			*
 			* ***Important note***:  you can only make the minLevel stricter than the current environment.logLevel.
-			* For example, if the environment.logLevel is currently ```ERROR``` then a call to ```log.debug("hi")``` will never display.  
+			* For example, if the environment.logLevel is currently ```ERROR``` then a call to ```log.debug("hi")``` will never display.
 			This is because, for performance reasons,  at module initialization time we no-op all logging methods beneath the environment.logLevel
 		 */
 		minLevel: LogLevel | "TRACE" | "INFO" | "WARN" | "ERROR" | "FATAL",
@@ -379,7 +379,7 @@ export class Logger {
 
 	/**
 	 *  allows procedural calls to logging.
-		* 
+		*
 		* @returns array of strings representing all logged values.  array element 0 is time, element 1 is callsite, element 2 is logLevel.  passed args are in element 3 onwards.  ```undefined``` is returned if not logged (such as if minLogLevel is greater than requested)
 	 */
 	public _tryLog( requestedLogLevel: LogLevel, args: any[], fullOutput: boolean,
@@ -500,7 +500,7 @@ export class Logger {
 			default:
 				//node console needs help displaying nicely
 				if ( fullOutput ) {
-					finalArgs.push( ...args.map( ( arg ) => util.inspect( serialization.jsonX.inspectParse( arg, { maxDepth: Infinity, aggrigateFunctions: true, summarizeLength: Infinity, maxArrayElements: Infinity } ), { colors: true, showHidden: true, depth: Infinity, maxArrayLength: Infinity, breakLength: 300 } ) ) )
+					finalArgs.push( ...args.map( ( arg ) => util.inspect( serialization.jsonX.inspectParse( arg, { maxDepth: Infinity, aggrigateFunctions: true, summarizeLength: Infinity, maxArrayElements: Infinity } ), { colors: true, showHidden: true, depth: Infinity, maxArrayLength: Infinity, breakLength: 300 } ) ) );
 				} else {
 					finalArgs.push( ...args.map( ( arg ) => util.inspect( serialization.jsonX.inspectParse( arg, { maxDepth: 2, aggrigateFunctions: true, summarizeLength: 300 } ), { colors: true, showHidden: true, depth: Infinity, maxArrayLength: Infinity, breakLength: 200 } ) ) );
 				}
@@ -556,9 +556,10 @@ function _self_initialize() {
 			throw new diagnostics.Exception( `unable to parse environment logLevelOverrides. you passed: ${ envVar }`, { innerError: diagnostics.toError( _ex ) } );
 		}
 	}
-	_populateLogLevelOverridesFromEnvVars()
+	_populateLogLevelOverridesFromEnvVars();
 
 	//noop log levels too low  for better performance
+// tslint:disable-next-line: no-empty
 	const noopFcn = ( () => { } ) as any;
 	switch ( environment.logLevel ) {
 		case LogLevel.ASSERT:

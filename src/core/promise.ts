@@ -36,10 +36,10 @@ if ( environment.isDebug() ) {
 }
 
 environment.getGlobal().Promise = bluebird;
-if ( typeof global != "undefined" ) {
+if ( typeof global !== "undefined" ) {
 	global.Promise = bluebird;
 }
-if ( typeof window != "undefined" ) {
+if ( typeof window !== "undefined" ) {
 	( window as any )[ "Promise" ] = bluebird;
 }
 //}
@@ -108,7 +108,7 @@ export type IocCallback<TArgs=void, TResults=any> = Promise<TResults> | ( ( args
 export function CreateExposedPromise<TReturn=void>(): IExposedPromise<TReturn, never>;
 export function CreateExposedPromise<TReturn=void, TTags = void>( tags: TTags,
 	callback?: ( fulfill: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void, reject: ( error: any ) => void ) => void,
-): IExposedPromise<TReturn, TTags>
+): IExposedPromise<TReturn, TTags>;
 export function CreateExposedPromise<TReturn=void, TTags = void>( ...args: any[] ): IExposedPromise<TReturn, TTags> {
 	const tags = args[ 0 ] as TTags;
 	const callback = args[ 1 ];

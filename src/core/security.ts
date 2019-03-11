@@ -104,7 +104,7 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
         //remove non-alphanumeric inputs
         initialKey = stringHelper.toId( userInputToParse, "" );
 
-        if ( initialKey.length != digits ) {
+        if ( initialKey.length !== digits ) {
             if ( suppressThrowOnBadInput === true ) {
                 return "";
             }
@@ -118,7 +118,7 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
     /**
      *  don't use easily confused characters in key
      */
-    var keyReplacements: { [ key: string]: string;} = {
+    var keyReplacements: { [ key: string ]: string } = {
         "o": "z",
         "i": "y",
         "l": "x",

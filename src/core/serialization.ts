@@ -96,14 +96,14 @@ export namespace jsonX {
 		quote?: string,
 	): string;
 	export function stringify( value: any, options?: {
-		replacer?: ( key: string, value: any ) => any | ( number | string )[],
-		space?: string | number,
-		quote?: string,
+		replacer?: ( key: string, value: any ) => any | ( number | string )[];
+		space?: string | number;
+		quote?: string;
 	} ): string;
 	export function stringify( value: any, ...args: any[] ) {
 		let options: {
-			replacer?: ( key: string, value: any ) => any | ( number | string )[],
-			space?: string | number,
+			replacer?: ( key: string, value: any ) => any | ( number | string )[];
+			space?: string | number;
 			quote?: string;
 		};
 
@@ -121,12 +121,12 @@ export namespace jsonX {
 
 
 	export interface IInspectOptions {
-		/** how far down the object structure you wish to inspect.  No values deeper than the depth will be shown.  @default 1 (show current object's values, no children)*/ maxDepth?: number,
-		/** maximum array elements you want to display for each array. (half at top, half at bottom)  @default 10 */maxArrayElements?: number,
-		/** when we reach maxDepth, the length we summarize the values to.  @default 120 */summarizeLength?: number,
+		/** how far down the object structure you wish to inspect.  No values deeper than the depth will be shown.  @default 1 (show current object's values, no children)*/ maxDepth?: number;
+		/** maximum array elements you want to display for each array. (half at top, half at bottom)  @default 10 */maxArrayElements?: number;
+		/** when we reach maxDepth, the length we summarize the values to.  @default 120 */summarizeLength?: number;
 
-		aggrigateFunctions?: boolean,
-	};
+		aggrigateFunctions?: boolean;
+	}
 	export function inspectStringify( obj: Object, options?: IInspectOptions
 	) {
 		const outputJson = inspectParse( obj, options );
@@ -153,7 +153,7 @@ export namespace jsonX {
 			const seenObjects = _.clone( parentSeenObjects );
 			if ( _.isObject( obj ) ) {
 				if ( parentSeenObjects.indexOf( obj ) !== -1 ) {
-					return `[CIRCULAR REFERENCE type=${ reflection.getTypeName( obj ) }]`
+					return `[CIRCULAR REFERENCE type=${ reflection.getTypeName( obj ) }]`;
 				}
 				seenObjects.push( obj );
 			}
@@ -208,7 +208,7 @@ export namespace jsonX {
 					const asArray = obj as any[];
 					return `[ARRAY len=${ asArray.length }]`;
 				} else {
-					return `[OBJECT typeName="${ reflection.getTypeName( obj ) }"]`
+					return `[OBJECT typeName="${ reflection.getTypeName( obj ) }"]`;
 				}
 			}
 
