@@ -77,6 +77,7 @@ export function getType( obj: any ): Type {
 	}
 }
 
+
 /** get the name of an object's type. better than using 'typeof()' because this handles array and null.*/
 export function getTypeName( obj: any ): string {
 	let type = getType( obj );

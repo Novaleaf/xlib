@@ -115,7 +115,7 @@ export class Exception<TData=never> extends Error {
 		this.stack = splitStack.join( "\n" );
 
 
-		if ( options.innerError != null && typeof ( options.innerError.message ) === "string" ) {
+		if ( options.innerError != null && typeof ( options.innerError.message ) === "string" && message.includes( this.innerError.message ) !== true ) {
 			this.message = message + "	innerException: " + options.innerError.message;
 		} else {
 			this.message = message;//making sure it's set for explicit order when serializing to JSON
