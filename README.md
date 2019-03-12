@@ -21,36 +21,31 @@ In no particular order:
 --------
 
 - [Abstract](#abstract)
-    - [Goals](#goals)
+  - [Goals](#goals)
 - [WORK IN PROGRESS](#work-in-progress)
 - [expected setup](#expected-setup)
 - [Usage](#usage)
 - [Functionality](#functionality)
-    - [Logging](#logging)
-        - [Basic Logging](#basic-logging)
-            - [A note on sourcemaps:](#a-note-on-sourcemaps)
-        - [Log Filtering](#log-filtering)
-    - [Environment](#environment)
-        - [EnvVars Startup Options](#envvars-startup-options)
-        - [Reading/Writing custom envVars](#readingwriting-custom-envvars)
-            - [read envVars in your code](#read-envvars-in-your-code)
-            - [Write EnvVars](#write-envvars)
-    - [Reflection](#reflection)
-    - [Lolo](#lolo)
-    - [Network Code](#network-code)
-        - [RemoteHttpEndpoint](#remotehttpendpoint)
-    - [Exception](#exception)
-    - [Threading](#threading)
-            - [AsyncReaderWriterLock](#asyncreaderwriterlock)
-    - [Time](#time)
-        - [Luxon](#luxon)
-        - [PerfTimer](#perftimer)
-        - [Stopwatch](#stopwatch)
-    - [Old Features](#old-features)
-        - ["_obsolete"](#_obsolete)
-        - ["_graveyard"](#_graveyard)
+  - [Logging](#logging)
+    - [Basic Logging](#basic-logging)
+      - [A note on sourcemaps:](#a-note-on-sourcemaps)
+    - [Log Filtering](#log-filtering)
+  - [Environment](#environment)
+    - [EnvVars Startup Options](#envvars-startup-options)
+    - [Reading/Writing custom envVars](#readingwriting-custom-envvars)
+      - [read envVars in your code](#read-envvars-in-your-code)
+      - [Write EnvVars](#write-envvars)
+  - [Reflection](#reflection)
+  - [Lolo](#lolo)
+  - [Network Code](#network-code)
+    - [RemoteHttpEndpoint](#remotehttpendpoint)
+    - [PerfTimer](#perftimer)
+    - [Stopwatch](#stopwatch)
+  - [Old Features](#old-features)
+    - ["_obsolete"](#_obsolete)
+    - ["_graveyard"](#_graveyard)
 - [Versioning / Upgrading](#versioning--upgrading)
-    - [Planned Future Work (Roadmap)](#planned-future-work-roadmap)
+  - [Planned Future Work (Roadmap)](#planned-future-work-roadmap)
 - [Development](#development)
 - [Why](#why)
 - [Changelog](#changelog)
@@ -104,13 +99,13 @@ Here are the major namespaces of ```xlib```:
 - **Net**:  An easy to use RemoteHTTPEndpoint class for calling web apis, and generic http request handlers.  *(```axios``` and custom)*
 - **Promise**: Various features for Promise and async/await workflows. *(```bluebird``` and custom)*
 - **Reflection**: High quality runtime type detection. *(Custom)*
-- **Security**:  Various crypto workflows *(```crypto```, ```jsonwebtoken``` and custom)*
+- **Security**:  Various crypto workflows *(```jsonwebtoken``` and custom)*
 - **Serialization**: High quality json manipulation and other import/export features. *(```d3-dsv```, ```json5```, and custom)*
 - **Numeric**: Math, Statistics, and number helpers.  *(```mathjs``` and custom)*
-- **Threading**: An async/await focused ReaderWriterLock implementation and autoscaler. *(Custom)*
-- **time**:  a chainable datetime lib and helpers *(```luxon```)*
-- **Validation**: User input sanitization.  *(```sanitize-html```, ```validator```, and custom)*
-- **Utils**: Array, String, and Number helpers, and NodeJs internal modules that can be used cross platform. *(```node``` and custom)*
+- **Threading**: An async/await focused ReaderWriterLock implementation, retry, and autoscaler. *(Custom)*
+- **Time**:  a chainable datetime lib and helpers *(```luxon```)*
+- **Validation**: User input sanitization.  *(Custom)*
+- **Utils**: Array, String, and Number helpers. *(Custom)*
 
 Hopefully you agree with my (opinionated) choices.    If you disagree, let me know in the Issues section.
 
@@ -179,6 +174,7 @@ global.__xlibInitArgs = { logLevelOverrides: [
 ## Environment
 
 ### EnvVars Startup Options
+
 ```xlib``` is automatically initialized as soon as you import it for the first time.    It will read system environmental variables from the commandline, querystring, or systemEnv (in that order of priority).    Alternately, you ***may*** configure it's environment variables explicitly via code BEFORE you import ```xlib```.  Here's an example showing how you can explicitly set the initialization:
 
 ``` typescript
@@ -365,6 +361,7 @@ try {
 ## Threading
 
 #### AsyncReaderWriterLock
+
 a custom ReaderWriterLock focused on async/await workflows.
 
 ```typescript
@@ -382,6 +379,7 @@ export class AsyncReaderWriterLock<TValue=never>
 ## Time
 
 ### Luxon
+
 ```luxon``` is a nice immutable time library.   See [https://moment.github.io/luxon/](https://moment.github.io/luxon/)
 
 example:
@@ -465,7 +463,11 @@ __.log.assert( elapsed.valueOf() < 2100 );
 
 ### "_obsolete"
 
-A lot of "scenario" focused features are obsolete given advances in Typescript and Javascript.   they are still published under the ```/dist/_obsolete/``` folder in case you need them.
+currently empty, as these were moved into ```_graveyard``` for v15.
+
+
+### "_graveyard"
+Features that used to be in ```xlib``` but are thrown away can be found in the ```/dist/_graveyard/``` folder, but due to dependencies on old ```xlib``` code, those may not build or work anymore.
 
 they include:
 
@@ -475,14 +477,11 @@ they include:
 - Stripe.d.ts:  type definitions for an old version of the Stripe api.  
 
 
-### "_graveyard"
-Features that used to be in ```xlib``` but are thrown away can be found in the ```/dist/_graveyard/``` folder, but due to dependencies on old ```xlib``` code, those may not build or work anymore.
-
-
-
 
 --------
+
 # Versioning / Upgrading
+
 ```xlib``` follows [Semver](https://docs.npmjs.com/getting-started/semantic-versioning) versioning.  Thus any breaking change will be released under a major version, and new functionality will be released under minor versions.  
 
 
@@ -528,7 +527,7 @@ Features that used to be in ```xlib``` but are thrown away can be found in the `
 
 # Development
 
-if you want to build/modify ```xlib```, download this repo and open the folder in vsCode.  included are basic unit tests that will launch automatically if you choose to "run" xlib from vsCode.
+if you want to build/modify ```xlib```, download this repo and open the folder in vsCode.  included are basic unit tests that will launch automatically if you choose to "run" xlib from vsCode (see ```./.vscode/tasks.json```).
 
 --------
 # Why
@@ -536,6 +535,7 @@ if you want to build/modify ```xlib```, download this repo and open the folder i
 Since I started programming, I've a big fan of the .NET Framework.  Xlib is my attempt to bring that level of great features + (re)usability to the Typescript.  
 
 # Changelog
+- v15: remove bloat.  removed uncommonly used sub-modules (validation), full linting via ```tslint```, mostly strict ```tsconfig.json``` settings.  
 - v14: polish.  small but breaking change to ```xlib.diagnostics.Exception``` required a major version bump.  
 - v13: modernize.  upgrade all dependencies to latest, deprecate or remove obsolete features, ```xlib.net``` improvements, general cleanup, remove ```moment``` in favor of ```luxon```
 - v12: refactor xlib initialization workflow.  reconfig initialization arguments to be passed prior to import of xlib (IE: specify a ```global.__xlibInitArgs```) . also change logger to be a singleton, and allow better log filtering via log.
