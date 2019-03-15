@@ -342,7 +342,7 @@ export class Logger {
 		throw new LogThrowException( results.join( ", " ), results, { stackFramesToTruncate: 1 } );
 	}
 
-	/** log an Error if the testCondition evaluates to false.  */
+	/** if the testCondition evaluates to false, log an Error and then throw an Exception  */
 	throwCheck( testCondition: boolean, ...args: Array<any> ): void {
 		if ( testCondition === true ) {
 			return;

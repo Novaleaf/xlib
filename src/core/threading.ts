@@ -418,16 +418,17 @@ export interface IRetryState {
     options: IRetryOptions;
 
     /** the retry object associated */
-    retryObject: Retry<any, any, any>;
+    retryObject: Retry<any, any>;
 
 }
 
 import * as numHelper from "./_util/numhelper";
 
 /** helper class to retry a ```workerFunc``` as needed, based on a configurable backoff algorithm.   Our default algorithm (see options.delayHandler)  */
-export class Retry<TWorkerFunc extends ( ...args: TArgs[] ) => Promise<TResult>, TArgs, TResult>{
+export class Retry<TWorkerFunc extends ( ...args: any[] ) => Promise<TResult>, TResult>{
 
-    constructor( public options: IRetryOptions, private workerFunc: TWorkerFunc ) {
+    constructor( public options: IRetryOptions,
+        private workerFunc: TWorkerFunc ) {
 
         const rand = numHelper.randomInt;
         // tslint:disable-next-line: no-unbound-method
@@ -457,7 +458,7 @@ export class Retry<TWorkerFunc extends ( ...args: TArgs[] ) => Promise<TResult>,
     // }
 
     /** invoke the workerFunc passed via the constructor, and retries as needed. */
-    public invoke: TWorkerFunc = async function invoke( this: Retry<TWorkerFunc, TArgs, TResult>, ...args: any[] ) {
+    public invoke: TWorkerFunc = async function __invoke( this: Retry<TWorkerFunc, TResult>, ...args: any[] ) {
 
         const state: IRetryState = {
             lastSleep: luxon.Duration.fromMillis( 0 ),
@@ -471,6 +472,9 @@ export class Retry<TWorkerFunc extends ( ...args: TArgs[] ) => Promise<TResult>,
 
         //loop trys until we either have a valid return or an explicit abort.
         while ( true ) {
+            if ( state.try > this.options.maxRetries ) {
+                throw new RetryException( state, "max tries exceeded" );
+            }
             state.try++;
 
             const timeoutMs = Math.min( this.options.totalTimeout.valueOf() - luxon.DateTime.utc().diff( state.invokeTime ).valueOf(), this.options.tryTimeout.valueOf() );
@@ -482,10 +486,10 @@ export class Retry<TWorkerFunc extends ( ...args: TArgs[] ) => Promise<TResult>,
             const tryTimeoutMessage = "try timeout exceeded";
             try {
                 state.tryStart = luxon.DateTime.utc();
-                let invokeResult = await bb.resolve( this.invoke( ...args ) ).timeout( timeoutMs, new RetryTimeoutException( state, tryTimeoutMessage ) );
-                if ( state.options.responseHandler != null ) {
+                let invokeResult = await bb.resolve( this.workerFunc( ...args ) ).timeout( timeoutMs, new RetryTimeoutException( state, tryTimeoutMessage ) );
+                if ( this.options.responseHandler != null ) {
                     //let user filter the result
-                    invokeResult = await state.options.responseHandler( invokeResult, state );
+                    invokeResult = await this.options.responseHandler( invokeResult, state );
                 }
                 return invokeResult;
             } catch ( _err ) {
@@ -493,25 +497,25 @@ export class Retry<TWorkerFunc extends ( ...args: TArgs[] ) => Promise<TResult>,
                 //could fail due to timeout, or error in the invoked function.
                 if ( err instanceof RetryTimeoutException && err.statePtr === state && err.message === tryTimeoutMessage ) {
                     //this try timed out.
-                    if ( state.options.abortHandler != null ) {
+                    if ( this.options.abortHandler != null ) {
                         //allow graceful abort
-                        await state.options.abortHandler( err );
+                        await this.options.abortHandler( err );
                     }
                 }
                 //allow user handling of whatever error
-                if ( state.options.responseHandler != null ) {
-                    const toReturn = await state.options.responseErrorHandler<TResult>( err, state );
+                if ( this.options.responseHandler != null ) {
+                    const toReturn = await this.options.responseErrorHandler<TResult>( err, state );
                     //valid toReturn.  if the above promise was rejected, await would throw.
                     return toReturn;
                 }
 
                 //if here, an error.  retry
-                const delayMs = state.options.delayHandler( state ).valueOf();
+                const delayMs = this.options.delayHandler( state ).valueOf();
 
                 //make sure our next try time doesn't exceed our totalTimeout
                 const nextRetryTime = luxon.DateTime.utc().plus( { milliseconds: delayMs } );
                 const minTimeThatWillElapse = nextRetryTime.diff( state.invokeTime );
-                if ( minTimeThatWillElapse.valueOf() > state.options.totalTimeout.valueOf() ) {
+                if ( minTimeThatWillElapse.valueOf() > this.options.totalTimeout.valueOf() ) {
                     throw new RetryTimeoutException( state, `options.totalTimeout would be exceeded upon next try attempt, so aborting now (try=${ state.try }).` );
                 }
 
