@@ -122,6 +122,7 @@ export class Exception<TData=never> extends Error {
 
 
 		if ( options.innerError != null && typeof ( options.innerError.message ) === "string" && message.includes( options.innerError.message ) !== true ) {
+			//include the innerError message in our message, but only if it wasn't manually added there already.
 			this.message = message + "	innerException: " + options.innerError.message;
 		} else {
 			this.message = message;//making sure it's set for explicit order when serializing to JSON
