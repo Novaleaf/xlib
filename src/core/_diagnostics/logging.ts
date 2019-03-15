@@ -343,7 +343,7 @@ export class Logger {
 	}
 
 	/** log an Error if the testCondition evaluates to false.  */
-	throwIf( testCondition: boolean, ...args: Array<any> ): void {
+	throwCheck( testCondition: boolean, ...args: Array<any> ): void {
 		if ( testCondition === true ) {
 			return;
 		}

@@ -34,17 +34,21 @@ export interface IErrorJson {
 export interface IExceptionOptions<TData = never> {
 	innerError?: Error;
 	/** truncate extra stack frames from the stack that's attached to this,
-	 * a good way to remove logging/util functions from the trace */
+	 * a good way to remove logging/util functions from the trace. */
 	stackFramesToTruncate?: number;
 	/** extra custom data you wish to attach to your error object that you want logged. */
 	data?: TData;
 	/** if you wish to restrict the number of stack frames stored, set this.   by default all stack frames are stored. */
 	maxStackFrames?: number;
+	// /** set to true if you wish additional properties of your exception to be included when the exception is serialized (to json or string).  This may be a security risk, so is false by default. */
+	// logProperties?: boolean;
 }
 
 /** class to allow extending of javascript errors (custom errors thrown by exceptions)
-usage example:  class MyException extends base.Exception{}  throw new MyException("boo");
+usage example:  class MyException extends Exception{ } throw new MyException("boo");
 from https://stackoverflow.com/questions/12915412/how-do-i-extend-a-host-object-e-g-error-in-typescript
+
+Note: you can control if additional properties are logged via options.logProperties=true.  While stack frames will only be logged when envLevel!=PROD.
 */
 export class Exception<TData=never> extends Error {
 
@@ -56,16 +60,18 @@ export class Exception<TData=never> extends Error {
 	/** extra custom data you wish to attach to your error object that you want logged. */
 	public data?: TData;
 
-	constructor( public message: string, _options: IExceptionOptions<TData> = {} ) {
+	constructor( public message: string, options: IExceptionOptions<TData> = {} ) {
 
 		super( message );
 		Object.setPrototypeOf( this, new.target.prototype );//fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
 		//jsHelper.setPrototypeOf( this, new.target.prototype );
 
-		const options = {
+		options = {
 			stackFramesToTruncate: 0,
-			..._options
+			//logProperties:false,
+			...options
 		};
+		//this.options = options;
 
 		this.data = options.data;
 
@@ -115,7 +121,7 @@ export class Exception<TData=never> extends Error {
 		this.stack = splitStack.join( "\n" );
 
 
-		if ( options.innerError != null && typeof ( options.innerError.message ) === "string" && message.includes( this.innerError.message ) !== true ) {
+		if ( options.innerError != null && typeof ( options.innerError.message ) === "string" && message.includes( options.innerError.message ) !== true ) {
 			this.message = message + "	innerException: " + options.innerError.message;
 		} else {
 			this.message = message;//making sure it's set for explicit order when serializing to JSON
@@ -242,7 +248,7 @@ export class HttpStatusCodeException<TData=never> extends Exception<TData> {
 	* //use err as a normal Error object
 	* }
 */
-export function toError( ex: any | Error ): Error & IError {
+export function toError( ex: any | Error ): Error {
 	if ( ex instanceof Error ) {
 		return ex;
 	}
@@ -262,6 +268,20 @@ export function toError( ex: any | Error ): Error & IError {
 	}
 
 	const toReturn = new Exception( message, { maxStackFrames: 0 } );
+	//apply other properties
+	if ( typeof ( ex.innerError ) === "string" ) {
+		toReturn.innerError = ex.innerError;
+	}
+	if ( typeof ( ex.name ) === "string" ) {
+		toReturn.name = ex.name;
+	}
+	if ( ex.stack != null ) {
+		if ( typeof ( ex.stack ) === "string" ) {
+			toReturn.stack = ex.stack;
+		} else if ( _.isArray( ex.stack ) === true ) {
+			toReturn.stack = ( ex.stack as any[] ).join( ",\n" );
+		}
+	}
 	return toReturn;
 }
 
@@ -282,15 +302,15 @@ export interface IErrorToJsonOptions {
 		* @default false
 	*/
 	alwaysShowFullStack?: boolean;
+	/** by default, we will hide the extra properties if the exception ctor options specify it.  pass TRUE to never hide properties */
+	alwaysShowProperties?: boolean;
 }
 
+type ErrorAsJson<TError extends Error> =
+	//IErrorJson & TError; //inaccurate, as it unions all properties (that are actually overridden, not unioned)
+	PropsUnion<IErrorJson, PropsRemove<TError, Function>>;
 
-type ErrorAsJson<TError extends Error> = PropsUnion<IErrorJson, PropsRemove<TError, Function>>;
 
-
-// class MyException extends Exception {
-// 	public someVal = 22;
-// };
 // let t1: ErrorAsJson<MyException>;
 
 /** convert an error and all it's properties to JSON.   */
@@ -307,7 +327,7 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 
 	if ( options.alwaysShowFullStack !== true && environment.logLevel > environment.LogLevel.DEBUG && environment.envLevel > environment.EnvLevel.TEST ) {
 		//sanitize
-		stackArray = [ "no stack unless env is DEV or TEST, or logLevel is DEBUG or TRACE" ];
+		stackArray = [ "no stack or extra properties unless envLevel=DEV|TEST, or logLevel=DEBUG|TRACE" ];
 		innerError = undefined;
 	} else {
 		let stack = error.stack;
@@ -328,7 +348,14 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 	}
 	let serialized: IError;
 	try {
-		serialized = JSON.parse( JSON.stringify( error ) );
+		if ( options.alwaysShowProperties !== true && environment.logLevel > environment.LogLevel.DEBUG && environment.envLevel > environment.EnvLevel.TEST ) {
+			//don't show extra properties
+			let _tmpEx = error as Exception;
+			serialized = { innerError: _tmpEx.innerError, message: _tmpEx.message, name: _tmpEx.name, stack: _tmpEx.stack };
+			serialized = JSON.parse( JSON.stringify( serialized ) );
+		} else {
+			serialized = JSON.parse( JSON.stringify( error ) );
+		}
 	} catch ( ex ) {
 		serialized = {} as any;
 	}

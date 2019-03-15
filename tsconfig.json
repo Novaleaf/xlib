@@ -90,7 +90,7 @@
         //   "./built/**/*",
         // ],
       }
-    ]
+    ],
   },
   // "typeAcquisition": { //not enabling to force explicit usage of new types
   //   "enable": true,

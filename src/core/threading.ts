@@ -313,6 +313,219 @@ export interface IAutoscalerOptions {
 }
 
 
+import * as luxon from "luxon";
+import * as exception from "./_diagnostics/exception";
+
+export class RetryException extends exception.Exception {
+
+    constructor( public statePtr: IRetryState, message: string, options?: exception.IExceptionOptions ) {
+        super( message, options );
+    }
+
+}
+
+export class RetryTimeoutException extends RetryException { }
+
+
+export interface IRetryOptions {
+
+    /** exponential factor.  to bias retries towards taking more time. see [[delayHandler]] for details
+     * @default 1
+    */
+    expFactor?: number;
+
+
+    /** maximum number of attempts.  exceeding this will cause a ```RetryException``` to be thrown
+     * @default null (not used)
+     */
+    maxRetries?: number | null;
+
+    /** Duration Object or number of milliseconds. 
+     * 
+     * maximum time to wait (all attempts combined). exceeding this will cause a ```RetryException``` to be thrown . 
+     * @default ```60 seconds```
+     * */
+    totalTimeout?: luxon.Duration | number;
+
+
+    /** Duration Object or number of milliseconds. 
+         * @default ```60 seconds```
+     * 
+     * if a try exceeds this, it will be considered failed.   If your invocation function supports aborting, be sure you also set the [[abortHandler]] property
+     */
+    tryTimeout?: luxon.Duration | number;
+
+    /**  Duration Object or number of milliseconds. 
+     * @default ```0ms```
+     * 
+     *  how long to wait on the first retry, and the minimum wait for all retries.  Defaults to zero, though also see the [[maxJitter]] property*/
+    baseWait?: luxon.Duration | number;
+
+    /**  Duration Object or number of milliseconds. 
+     * @default ```5 seconds```
+     * 
+     *  the maximum to ever wait between each try. */
+    waitCap?: luxon.Duration | number;
+
+    /**  Duration Object or number of milliseconds.   
+     * @Default of ```100ms```
+     * 
+     * on each retry we add a random amount of extra time delay, the amount ranging from zero to this supplied ```maxJitter``` amount.
+     * 
+     * Jitter helps remove pathological cases of resource contention by smoothing out loads.
+     */
+    maxJitter?: luxon.Duration | number;
+
+    /** Optional.  Allows aborting a timed-out request.  
+     * 
+     * ***performance note:*** We do not retry until the abortHandler's returned promise resolves. */
+    abortHandler?: ( err: RetryTimeoutException, ) => Promise<void>;
+
+    /** Optional.  Allows interecepting the invocation function's response and manually decide if a failure occured.
+     * 
+     * return a rejected promise to retry
+     * 
+     * return a resolved promise to complete the invoke request. */
+    responseHandler?: <TResult>( result: TResult, state: IRetryState ) => Promise<TResult>;
+    /** Optional.  Allows interecepting the invocation function's error response and manually decide if a failure occured. 
+     * 
+     * return a rejected promise to retry
+     * 
+     * return a resolved promise to complete the invoke request.
+    */
+    responseErrorHandler?: <TResult> ( err: Error, state: IRetryState ) => Promise<TResult>;
+
+
+    /** Optional.  allows overriding the algorithm computing how long to wait between retries.  
+     * 
+     * default is ```nextSleep = min(waitCap,randBetween(baseWait,lastSleep*(try^expFactor))) + randBetween(0,maxJitter)``` which is loosely based on this article: https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/ */
+    delayHandler?: ( state: IRetryState ) => luxon.Duration | number;
+
+}
+/** state for this current [[Retry]].[[Retry.invoke]]() attempt */
+export interface IRetryState {
+    /** time that .invoke() was called */
+    invokeTime: luxon.DateTime;
+    /** the current, or next try.  the first try is ```1``` */
+    try: number;
+    /** the time the latest try started */
+    tryStart: luxon.DateTime;
+
+    /** the amount of time we last slept.   on the first try will be zero. */
+    lastSleep: luxon.Duration;
+
+    /** options passed to the [[Retry]] object ctor */
+    options: IRetryOptions;
+
+    /** the retry object associated */
+    retryObject: Retry<any, any, any>;
+
+}
+
+import * as numHelper from "./_util/numhelper";
+
+/** helper class to retry a ```workerFunc``` as needed, based on a configurable backoff algorithm.   Our default algorithm (see options.delayHandler)  */
+export class Retry<TWorkerFunc extends ( ...args: TArgs[] ) => Promise<TResult>, TArgs, TResult>{
+
+    constructor( public options: IRetryOptions, private workerFunc: TWorkerFunc ) {
+
+        const rand = numHelper.randomInt;
+        // tslint:disable-next-line: no-unbound-method
+        const min = Math.min;
+
+        //apply defaults
+        options = {
+            expFactor: 1,
+            maxJitter: 100,
+            baseWait: 0,
+            totalTimeout: luxon.Duration.fromObject( { seconds: 60 } ),
+            waitCap: luxon.Duration.fromObject( { seconds: 5 } ),
+            tryTimeout: luxon.Duration.fromObject( { seconds: 60 } ),
+            /** default is ```nextSleep = min(waitCap,randBetween(baseWait,lastSleep*(try^expFactor))) + randBetween(0,maxJitter)``` 
+             * which is loosely based on this article: https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/ */
+            delayHandler: ( s ) => min( s.options.waitCap.valueOf(), rand( s.options.baseWait.valueOf(), s.lastSleep.valueOf() * ( Math.pow( s.try, s.options.expFactor ) ) ) ) + rand( 0, s.options.maxJitter.valueOf() ),
+            ...options
+        };
+        this.options = options;
+
+    }
+
+
+    // public async invoke( ...args: TArgs[] ): Promise<TResult> {
+
+
+    // }
+
+    /** invoke the workerFunc passed via the constructor, and retries as needed. */
+    public invoke: TWorkerFunc = async function invoke( this: Retry<TWorkerFunc, TArgs, TResult>, ...args: any[] ) {
+
+        const state: IRetryState = {
+            lastSleep: luxon.Duration.fromMillis( 0 ),
+            options: this.options,
+            retryObject: this,
+            invokeTime: luxon.DateTime.utc(),
+            tryStart: null,
+            try: 0,
+        };
+
+
+        //loop trys until we either have a valid return or an explicit abort.
+        while ( true ) {
+            state.try++;
+
+            const timeoutMs = Math.min( this.options.totalTimeout.valueOf() - luxon.DateTime.utc().diff( state.invokeTime ).valueOf(), this.options.tryTimeout.valueOf() );
+            if ( timeoutMs < 0 ) {
+                throw new RetryTimeoutException( state, `timeout exceeded on try ${ state.try }.  timeLeft=${ timeoutMs }.  totalTimeout=${ this.options.totalTimeout.valueOf() }, startTime=${ state.invokeTime.toISOTime() }` );
+            }
+
+
+            const tryTimeoutMessage = "try timeout exceeded";
+            try {
+                state.tryStart = luxon.DateTime.utc();
+                let invokeResult = await bb.resolve( this.invoke( ...args ) ).timeout( timeoutMs, new RetryTimeoutException( state, tryTimeoutMessage ) );
+                if ( state.options.responseHandler != null ) {
+                    //let user filter the result
+                    invokeResult = await state.options.responseHandler( invokeResult, state );
+                }
+                return invokeResult;
+            } catch ( _err ) {
+                const err = exception.toError( _err );
+                //could fail due to timeout, or error in the invoked function.
+                if ( err instanceof RetryTimeoutException && err.statePtr === state && err.message === tryTimeoutMessage ) {
+                    //this try timed out.
+                    if ( state.options.abortHandler != null ) {
+                        //allow graceful abort
+                        await state.options.abortHandler( err );
+                    }
+                }
+                //allow user handling of whatever error
+                if ( state.options.responseHandler != null ) {
+                    const toReturn = await state.options.responseErrorHandler<TResult>( err, state );
+                    //valid toReturn.  if the above promise was rejected, await would throw.
+                    return toReturn;
+                }
+
+                //if here, an error.  retry
+                const delayMs = state.options.delayHandler( state ).valueOf();
+
+                //make sure our next try time doesn't exceed our totalTimeout
+                const nextRetryTime = luxon.DateTime.utc().plus( { milliseconds: delayMs } );
+                const minTimeThatWillElapse = nextRetryTime.diff( state.invokeTime );
+                if ( minTimeThatWillElapse.valueOf() > state.options.totalTimeout.valueOf() ) {
+                    throw new RetryTimeoutException( state, `options.totalTimeout would be exceeded upon next try attempt, so aborting now (try=${ state.try }).` );
+                }
+
+                await bb.delay( delayMs );
+                continue;
+            }
+
+        }
+
+    } as any;
+
+
+}
+
 /** while this is probably only useful+used by the ```net.RemoteHttpEndpoint``` class, this is a generic autoscaler implementation,
 	* meaning that it will scale requests to a ```backendWorker``` function, gradually increasing activeParallel requests over time.   Requests exceeding activeParallel will be queued in a FIFO fashion.
 	*
