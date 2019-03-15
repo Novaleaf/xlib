@@ -216,7 +216,7 @@ describe( __filename + " basic xlib unit tests", () => {
 			try {
 				throw new MyException( "first" );
 			} catch ( _err ) {
-				throw new MyException( "second", { innerError: __.diag.toError( _err ) } );
+				throw new MyException( "second", { innerError: _err } );
 			}
 		} catch ( _err ) {
 			//log.infoFull( "logging error object", _err );
