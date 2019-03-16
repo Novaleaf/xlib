@@ -365,7 +365,7 @@ export interface IRetryOptions {
      * @default ```5 seconds```
      * 
      *  the maximum to ever wait between each try. */
-    waitCap?: luxon.Duration | number;
+    maxWait?: luxon.Duration | number;
 
     /**  Duration Object or number of milliseconds.   
      * @Default of ```100ms```
@@ -424,7 +424,9 @@ export interface IRetryState {
 
 import * as numHelper from "./_util/numhelper";
 
-/** helper class to retry a ```workerFunc``` as needed, based on a configurable backoff algorithm.   Our default algorithm (see options.delayHandler)  */
+/** helper class that wraps a ```workerFunc``` and if that fails when you invoke it, will retry as needed.   
+ * 
+ * By default, will retry at a semi-random time between ```options.baseWait``` and ```options.maxWait```, increasingly biased towards ```maxWait``` the more retry attempts fail.   You can configure your own custom retry logic by overriding the ```options.delayHandler```  */
 export class Retry<TWorkerFunc extends ( ...args: any[] ) => Promise<TResult>, TResult>{
 
     constructor( public options: IRetryOptions,
@@ -440,11 +442,11 @@ export class Retry<TWorkerFunc extends ( ...args: any[] ) => Promise<TResult>, T
             maxJitter: 100,
             baseWait: 0,
             totalTimeout: luxon.Duration.fromObject( { seconds: 60 } ),
-            waitCap: luxon.Duration.fromObject( { seconds: 5 } ),
+            maxWait: luxon.Duration.fromObject( { seconds: 5 } ),
             tryTimeout: luxon.Duration.fromObject( { seconds: 60 } ),
             /** default is ```nextSleep = min(waitCap,randBetween(baseWait,lastSleep*(try^expFactor))) + randBetween(0,maxJitter)``` 
              * which is loosely based on this article: https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/ */
-            delayHandler: ( s ) => min( s.options.waitCap.valueOf(), rand( s.options.baseWait.valueOf(), s.lastSleep.valueOf() * ( Math.pow( s.try, s.options.expFactor ) ) ) ) + rand( 0, s.options.maxJitter.valueOf() ),
+            delayHandler: ( s ) => min( s.options.maxWait.valueOf(), rand( s.options.baseWait.valueOf(), s.lastSleep.valueOf() * ( Math.pow( s.try, s.options.expFactor ) ) ) ) + rand( 0, s.options.maxJitter.valueOf() ),
             ...options
         };
         this.options = options;
