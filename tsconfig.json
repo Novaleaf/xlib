@@ -64,6 +64,7 @@
     ],
     "types": [
       "xlib-globals",
+      //"node"
     ],
     "outDir": "built",
     "rootDir": "src",

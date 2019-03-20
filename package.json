@@ -2,7 +2,7 @@
   "name": "xlib",
   "version": "15.1.1",
   "description": "A Cross Platform, Monolithic Core Library for Typescript.",
-  "main": "./built/_entrypoint.js",
+  "main": "./built/_index.js",
   "private": false,
   "author": "jason swearingen <jasons@novaleaf.com>",
   "dependencies": {
@@ -33,6 +33,7 @@
     "tslib": "^1.9.3"
   },
   "devDependencies": {},
+  "peerDependencies": {},
   "scripts": {
     "test": "mocha",
     "publishNext": "npm version patch && npm publish --tag next"
