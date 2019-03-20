@@ -15,9 +15,9 @@ jsShims.initialize();
 import * as source_map_support from "source-map-support";
 
 let _initArgs: init.IInitArgs = {};
-if ( typeof global !== "undefined" && global.__xlibInitArgs!=null ) {
+if ( typeof global !== "undefined" && global.__xlibInitArgs != null ) {
     _initArgs = global.__xlibInitArgs;
-} else if ( typeof window !== "undefined" && window.__xlibInitArgs !=null ) {
+} else if ( typeof window !== "undefined" && window.__xlibInitArgs != null ) {
     _initArgs = window.__xlibInitArgs;
 }
 
@@ -58,6 +58,8 @@ if ( environment.envLevel < environment.EnvLevel.UAT || environment.logLevel < e
     //}
 }
 
+/** helper types, useful for creating complex typescript types such as mixins */
+export import types = require( "./core/types" );
 
 export import promise = require( "./core/promise" );
 

@@ -307,9 +307,11 @@ export interface IErrorToJsonOptions {
 	alwaysShowProperties?: boolean;
 }
 
+import * as types from "../types";
+
 type ErrorAsJson<TError extends Error> =
 	//IErrorJson & TError; //inaccurate, as it unions all properties (that are actually overridden, not unioned)
-	PropsUnion<IErrorJson, PropsRemove<TError, Function>>;
+	types.PropsUnion<IErrorJson, types.PropsRemove<TError, Function>>;
 
 
 // let t1: ErrorAsJson<MyException>;
