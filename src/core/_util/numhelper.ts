@@ -2,7 +2,9 @@
 /* tslint:disable:no-bitwise */
 
 import * as ex from "../_diagnostics/exception";
-import * as crypto from "crypto";
+
+//import * as crypto from "crypto";
+import crypto = require( "crypto" );
 /** max for a signed 8bit integer. (127) */
 export let INT8_MAX = 127;
 

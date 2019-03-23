@@ -470,7 +470,7 @@ export class Logger {
 
 		let finalArgs = this._doLog( callSite, requestedLogLevel, args, fullOutput );// this._doLog.apply( this, arguments );
 		//strip colors
-		finalArgs = finalArgs.map( ( arg ) => stripAnsi( arg ) );
+		finalArgs = finalArgs.map( ( arg ) => stripAnsi.default( arg ) );
 		if ( requestedLogLevel >= LogLevel.ERROR ) {
 			//log these for our diagnostics api to pickup:   http://localhost/metrics/v2/healthcheck-errors
 			let errorHistoryEntry: Array<string> = finalArgs;

@@ -123,7 +123,7 @@ export class Exception<TData=never> extends Error {
 
 		if ( options.innerError != null && typeof ( options.innerError.message ) === "string" && message.includes( options.innerError.message ) !== true ) {
 			//include the innerError message in our message, but only if it wasn't manually added there already.
-			this.message = message + "	innerException: " + options.innerError.message;
+			this.message = message + "   innerException: " + options.innerError.message;
 		} else {
 			this.message = message;//making sure it's set for explicit order when serializing to JSON
 		}
@@ -354,7 +354,12 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 		if ( options.alwaysShowProperties !== true && environment.logLevel > environment.LogLevel.DEBUG && environment.envLevel > environment.EnvLevel.TEST ) {
 			//don't show extra properties
 			let _tmpEx = error as Exception;
-			serialized = { innerError: _tmpEx.innerError, message: _tmpEx.message, name: _tmpEx.name, stack: _tmpEx.stack };
+			serialized = {
+				name: _tmpEx.name,
+				message: _tmpEx.message,
+				innerError: _tmpEx.innerError,
+				stack: _tmpEx.stack
+			};
 			serialized = JSON.parse( JSON.stringify( serialized ) );
 		} else {
 			serialized = JSON.parse( JSON.stringify( error ) );

@@ -47,6 +47,8 @@ In no particular order:
 - [Versioning / Upgrading](#versioning--upgrading)
   - [Planned Future Work (Roadmap)](#planned-future-work-roadmap)
 - [Development](#development)
+  - [Dev Problems](#dev-problems)
+    - [Typescript Build Error: ```Conflicting definitions for 'node'``` when symlinking](#typescript-build-error-conflicting-definitions-for-node-when-symlinking)
 - [Why](#why)
 - [Changelog](#changelog)
 
@@ -528,6 +530,23 @@ they include:
 # Development
 
 if you want to build/modify ```xlib```, download this repo and open the folder in vsCode.  included are basic unit tests that will launch automatically if you choose to "run" xlib from vsCode (see ```./.vscode/tasks.json```).
+
+## Dev Problems
+
+### Typescript Build Error: ```Conflicting definitions for 'node'``` when symlinking
+
+***NOTE: this bug only occurs if you are symlinking ```xlib``` or perhaps symlinking another lib that references ```xlib```.***
+
+Even with Typescript 3.x, there are still bugs in ```typing``` which causes monolithic libraries (such as ```xlib```) to be problematic.   Specifically, libs that bundle other libs with type definitions (such as ```jsonwebtoken``` and ```@types/jsonwebtoken```) unintentionally cause problems because they directly ```///<reference type="node">``` in them.  This can lead to build errors in consuming projects if you symlink via ```npm link xlib``` or ```yarn link xlib``` [[1]].  
+
+- ***Cause***: ```yarn link xlib```, then ```yarn install```
+
+- ***Workaround***:  The workaround seems to be to either ```yarn install``` everything, and then symlink afterwards.  Speculation on whythis works: doing the ```yarn install``` first will flatten all the sub-dependencies, whereas doing a ```yarn link xlib``` first would have all xlib dependencies in a tree structure, encouraging collisions.
+
+- ***Alt (maybe?) workaround***: add ```"typeRoots": ["./node_modules/@types"]``` to your ```tsconfig.json``` file. [[2]].  
+
+1. circa 2019 ```yarn link``` is better, because using ```npm install``` deletes the symlink.   see: https://github.com/npm/npm/issues/10013 (bug is closed + not fixed)
+2. workaround symlinked libraries (npm link, yarn link).  see https://github.com/Microsoft/TypeScript/issues/6496  if that doesn't work, might try adding ```node``` to your types as per https://github.com/Microsoft/TypeScript/issues/11107
 
 --------
 # Why
