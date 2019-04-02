@@ -226,7 +226,7 @@ describe( __filename + " basic xlib unit tests", () => {
 			log.throwCheck( _err instanceof MyException );
 			const err = xlib.diagnostics.toError( _err );
 			log.throwCheck( err === _err, "because _err was an instanceOf Error, we should have gotten the same object back, but now strongly typed" );
-			log.throwCheck( err.message === "second	innerException: first" ); //we include innerException message in the parent exception message
+			log.throwCheck( err.message === "second   innerException: first" ); //we include innerException message in the parent exception message
 			if ( err instanceof MyException ) {
 				log.throwCheck( err.innerError != null && err.innerError.message === "first" );
 			}
@@ -387,7 +387,15 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		/** how often our backendWorker reports too busy */
 		interface ITestAutoscaleOptions { chanceOfBusy: number; }
-		class TestAutoScaleError extends xlib.diagnostics.Exception<{ shouldRejectBusy: boolean; }>{ }
+		class TestAutoScaleError extends xlib.diagnostics.Exception {
+			public shouldRejectBusy: boolean;
+			constructor( message: string, options: xlib.diagnostics.IExceptionOptions & { shouldRejectBusy: boolean; } ) {
+				super( message, options );
+				this.shouldRejectBusy = options.shouldRejectBusy;
+			}
+
+
+		}
 
 		let testScaler = new xlib.threading.Autoscaler( { busyGrowDelayMs: 100, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 30, growDelayMs: 5, minParallel: 4 },
 			async ( _chanceOfBusy: number, _chanceOfFail: number, _replyDelay: number, _replyDelaySpread: number ) => {
@@ -396,16 +404,16 @@ describe( __filename + " basic xlib unit tests", () => {
 				await __.bb.delay( _replyDelay );
 				const isBusy = __.num.randomBool( _chanceOfBusy );
 				if ( isBusy ) {
-					return xlib.promise.bluebird.reject( new TestAutoScaleError( "backend busy", { data: { shouldRejectBusy: true } } ) );
+					return xlib.promise.bluebird.reject( new TestAutoScaleError( "backend busy", { shouldRejectBusy: true } ) );
 				}
 				const isFail = __.num.randomBool( _chanceOfFail );
 				if ( isFail ) {
-					return __.bb.reject( new TestAutoScaleError( "backend failure", { data: { shouldRejectBusy: false } } ) );
+					return __.bb.reject( new TestAutoScaleError( "backend failure", { shouldRejectBusy: false } ) );
 				}
 				return xlib.promise.bluebird.resolve( "backend success" );
 			},
 			( ( err: TestAutoScaleError ) => {
-				if ( err.data != null && err.data.shouldRejectBusy === true ) {
+				if ( err.shouldRejectBusy === true ) {
 					return "TOO_BUSY";
 				}
 

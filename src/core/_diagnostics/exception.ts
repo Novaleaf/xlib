@@ -36,8 +36,8 @@ export interface IExceptionOptions<TData = never> {
 	/** truncate extra stack frames from the stack that's attached to this,
 	 * a good way to remove logging/util functions from the trace. */
 	stackFramesToTruncate?: number;
-	/** extra custom data you wish to attach to your error object that you want logged. */
-	data?: TData;
+	// /** extra custom data you wish to attach to your error object that you want logged. */
+	// data?: TData;
 	/** if you wish to restrict the number of stack frames stored, set this.   by default all stack frames are stored. */
 	maxStackFrames?: number;
 	// /** set to true if you wish additional properties of your exception to be included when the exception is serialized (to json or string).  This may be a security risk, so is false by default. */
@@ -50,17 +50,17 @@ from https://stackoverflow.com/questions/12915412/how-do-i-extend-a-host-object-
 
 Note: you can control if additional properties are logged via options.logProperties=true.  While stack frames will only be logged when envLevel!=PROD.
 */
-export class Exception<TData=never> extends Error {
+export class Exception extends Error {
 
 	public stack: string;
 	//public options: IExceptionOptions;
 	private static _getTypeNameOrFuncNameRegex = /function (.{1,})\(/;
 
 	public innerError?: Error;
-	/** extra custom data you wish to attach to your error object that you want logged. */
-	public data?: TData;
+	// /** extra custom data you wish to attach to your error object that you want logged. */
+	// public data?: any;
 
-	constructor( public message: string, options: IExceptionOptions<TData> = {} ) {
+	constructor( public message: string, options: IExceptionOptions = {} ) {
 
 		super( message );
 		Object.setPrototypeOf( this, new.target.prototype );//fix inheritance, new in ts2.2: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
@@ -73,7 +73,7 @@ export class Exception<TData=never> extends Error {
 		};
 		//this.options = options;
 
-		this.data = options.data;
+		//this.data = options.any;
 
 		if ( options.innerError != null ) {
 			//make sure that what's passed is actually an error object
@@ -181,12 +181,12 @@ export class Exception<TData=never> extends Error {
 
 
 /** all errors thrown by xlib extend this error type */
-export class XlibException<TData=never> extends Exception<TData> { }
+export class XlibException extends Exception { }
 
 /**
  * an exception that includes a statusCode for returning via http requests
  */
-export class HttpStatusCodeException<TData=never> extends Exception<TData> {
+export class HttpStatusCodeException extends Exception {
 	constructor( message: string, public statusCode: number, innerException?: Error ) {
 		super( message, { innerError: innerException } );
 	}
