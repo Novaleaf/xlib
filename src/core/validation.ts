@@ -145,6 +145,7 @@ export function isPrivateIp( ipV4Address: string ) {
 		|| ( ipParts[ 0 ] === 172 && ipParts[ 1 ] >= 16 && ipParts[ 1 ] <= 31 ) // 16 contiguous class B network
 		|| ( ipParts[ 0 ] === 192 && ipParts[ 1 ] === 168 ) // 256 contiguous class C network
 		|| ( ipParts[ 0 ] === 169 && ipParts[ 1 ] === 254 ) // Link-local address also referred to as Automatic Private IP Addressing
+		|| ( ipParts[ 0 ] === 100 && ipParts[ 1 ] === 64 && ipParts[ 2 ] <= 192 ) // 100.64.0.0/10 for use in carrier-grade NAT environments. see https://en.wikipedia.org/wiki/Carrier-grade_NAT
 		|| ( ipParts[ 0 ] === 127 ) // localhost
 	) {
 		return true;

@@ -55,7 +55,7 @@ In no particular order:
 --------
 
 # WORK IN PROGRESS
-- ***active development***: ```xlib``` while no big changes are planned (v13.x represents a big refactor), changes are being made.  ```xlib``` follows [Semantic Versioning](https://semver.org/) so if you stay on the same major version, you won't have any breaking changes.
+- ***active development***: ```xlib``` while no big changes are planned (v13 and v15 represented big refactors), changes ***ARE*** being made.  ```xlib``` follows [Semantic Versioning](https://semver.org/) so if you stay on the same major version, you won't have any breaking changes.
 - ***browser currently unsupported***:    while ```xlib``` is designed for brower support, it's not currently being tested and might be superficially broken.  Previously, in v9.x ```WebPack``` was tested and supported.   
 
     Additionally, no minified version is currently available.  When the browser is supported, the target minified size is 500kb.  Plan is to support [Tree Shaking](https://webpack.js.org/guides/tree-shaking/) for those who want a super tiny dependency.
@@ -68,8 +68,8 @@ In no particular order:
 While you can use ```npm install xlib``` to use this in just about any javascript project or environment, here are what we test with:
 
 - vscode v.latest
-- typescript v.latest (3.0.1 or higher suggested)
-- node v8.x (6.x or higher suggested)
+- typescript v.latest (3.x or higher suggested)
+- node v10.x (6.x or higher suggested)
 
 You can check out the [PhantomJsCloud](https://www.npmjs.com/package/phantomjscloud) NPM library for a real-life usage example.
 

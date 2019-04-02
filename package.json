@@ -43,6 +43,7 @@
     "url": "https://github.com/novaleaf/xlib.git"
   },
   "keywords": [
+    "xlib",
     "monolithic",
     "corelib",
     "typescript"

@@ -91,5 +91,10 @@ import { bluebird } from "./promise";
 */
 export const bb = bluebird;
 
+/** shortcut to the ```xlib.diagnostics.Exception``` class,
+ * @example
+ * throw new __.Ex("reason");
+ *  */
+export import Ex = diag.Exception;
 
 // bb.
