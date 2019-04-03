@@ -49,13 +49,16 @@ if ( environment.envLevel < environment.EnvLevel.UAT || environment.logLevel < e
     //  */
     if ( _initArgs.silentInit !== true ) {
         // tslint:disable-next-line:no-console
-        console.log( "loading sourcemap support (envLevel is DEV or TEST,  or if logLevel is TRACE or DEBUG" );
+        console.log( "loading sourcemap support and longjohn for long stack traces  (envLevel is DEV or TEST,  or if logLevel is TRACE or DEBUG" );
     }
     let envName: "browser" | "node" = environment.platformType === environment.PlatformType.Browser ? "browser" : "node";
     source_map_support.install( { handleUncaughtExceptions: true, environment: envName } );
     //} catch (ex) {
     //	console.log("eating sourcemap support call");
     //}
+    
+    const longjohn: any = require( "longjohn" );  //see https://github.com/mattinsler/longjohn
+    longjohn.async_trace_limit = -1;
 }
 
 /** helper types, useful for creating complex typescript types such as mixins */
