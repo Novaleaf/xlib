@@ -9,7 +9,7 @@ import log = xlib.diagnostics.log;
 import __ = xlib.lolo;
 
 
-export function it1( testFcn: () => void ) {
+export function it1( testFcn: () => void | PromiseLike<any> ) {
 	const testName = xlib.reflection.getTypeName( testFcn );
 
 	return it( testName, testFcn );

@@ -206,6 +206,23 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} ).timeout( 5000 );
 
+	it1( async function testRequestLib_basicE2e() {
+		const response = await xlib.net.request( { url: "http://example.com" } );
+		log.throwCheck( typeof ( response.body ) === "string", "body not string" );
+		log.throwCheck( ( response.body as string ).includes( "Example Domain" ), "expect example.com to include 'Example Domain'" );
+	} );
+
+	it1( async function testRequestLib_technicalFailure() {
+		let caughtErr = false;
+		try {
+			await xlib.net.request( { url: "hXXPTT://lkajsfduiasreiul.coiaoidfal" } );
+		} catch ( _err ) {
+			caughtErr = true;
+			log.info( "verified error thrown as expected by invalid reqeust() call", { _err, type: xlib.reflection.getTypeName( _err ) } );
+		}
+		log.throwCheck( caughtErr === true, "error was not thrown by request() as we expected" );
+	} )
+
 	it1( function testExceptions() { //causes debugBreak on thrown exceptions when running test
 
 		class MyException extends xlib.diagnostics.Exception {

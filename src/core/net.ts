@@ -16,6 +16,28 @@ import { RemoteHttpEndpoint, IRemoteHttpEndpointOverrideOptions, IRemoteHttpEndp
 export { RemoteHttpEndpoint, IRemoteHttpEndpointOverrideOptions, IRemoteHttpEndpointOptions };
 
 
+// tslint:disable-next-line: no-implicit-dependencies
+import * as __rp from "request-promise-any";
+import * as req from "request";
+//import * as bb from "bluebird";
+
+/** make a network request.    Pass ```options.simple=false``` to get a normal response for non 2xx statusCodes.  
+ * 
+ * This can return 2 possible Error types on failures:  [[StatusCodeError]] (if  ```options.simple=true```, the default) or [[RequestError]] on technical failures.
+ * 
+ * internally we use the ```request``` library.   https://www.npmjs.com/package/request
+ * 
+ * We switched from ```axios``` because it has persistant bugs around proxy and httpsAgent support.
+ */
+export async function request( options: req.Options ) {
+	let toReturn = __rp.default( { ...options, resolveWithFullResponse: true, } );
+	return toReturn;
+}
+
+export type RequestError = __rp.RequestError;
+export type StatusCodeError = __rp.StatusCodeError;
+
+
 //module _test {
 
 //	describe(__filename, () => {
