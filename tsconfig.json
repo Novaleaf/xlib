@@ -64,7 +64,8 @@
     ],
     "types": [
       "xlib-globals",
-      //"node"
+      //"request-promise-any",
+      //"request-promise-any/errors",
     ],
     "outDir": "built",
     "rootDir": "src",

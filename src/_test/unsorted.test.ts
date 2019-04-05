@@ -219,9 +219,14 @@ describe( __filename + " basic xlib unit tests", () => {
 		} catch ( _err ) {
 			caughtErr = true;
 			log.info( "verified error thrown as expected by invalid reqeust() call", { _err, type: xlib.reflection.getTypeName( _err ) } );
+
+			log.throwCheck( _err instanceof xlib.net.RequestError, "not instance of RequestError" );
+			// if ( _err instanceof xlib.net.RequestError ) {
+
+			// }
 		}
 		log.throwCheck( caughtErr === true, "error was not thrown by request() as we expected" );
-	} )
+	} );
 
 	it1( function testExceptions() { //causes debugBreak on thrown exceptions when running test
 

@@ -17,25 +17,83 @@ export { RemoteHttpEndpoint, IRemoteHttpEndpointOverrideOptions, IRemoteHttpEndp
 
 
 // tslint:disable-next-line: no-implicit-dependencies
-import * as __rp from "request-promise-any";
-import * as req from "request";
+import * as __requestPromiseAny from "request-promise-any";
+
+
+import * as __request from "request";
+export { __request };
+
+
+type IRequestOptions = {
+	/** a boolean to set whether status codes other than 2xx should also reject the promise 		 * 
+	*/
+	simple?: boolean;
+	// /**  a boolean to set whether the promise should be resolved with the full response or just the response body
+	//  * 
+	//  * For our simple type definitions, we require this to be set to TRUE
+	//  */
+	// resolveWithFullResponse: true;
+} & __request.Options;
+
 //import * as bb from "bluebird";
 
 /** make a network request.    Pass ```options.simple=false``` to get a normal response for non 2xx statusCodes.  
  * 
- * This can return 2 possible Error types on failures:  [[StatusCodeError]] (if  ```options.simple=true```, the default) or [[RequestError]] on technical failures.
+ * This can return 2 possible Promise Rejection (Error) types on failures:  [[StatusCodeError]] (if  ```options.simple=true```, the default) or [[RequestError]] on technical failures.
  * 
  * internally we use the ```request``` library.   https://www.npmjs.com/package/request
  * 
  * We switched from ```axios``` because it has persistant bugs around proxy and httpsAgent support.
  */
-export async function request( options: req.Options ) {
-	let toReturn = __rp.default( { ...options, resolveWithFullResponse: true, } );
+export async function request( options: IRequestOptions ) {
+	let toReturn = __requestPromiseAny.default( { ...options, resolveWithFullResponse: true, } );
 	return toReturn;
 }
 
-export type RequestError = __rp.RequestError;
-export type StatusCodeError = __rp.StatusCodeError;
+
+// tslint:disable-next-line: no-submodule-imports
+const __requestPromiseAnyErrors: any = require( "request-promise-any/errors" );
+
+
+
+/** if the request has options.simple=true and a non 2xxx code is returned, this Error type will be thrown */
+declare class _StatusCodeError extends Error {
+	/** the non 2xx statusCode returned. */
+	statusCode: number;
+	/** the body of the response */
+	error: string;
+	options: __request.Options;
+	response: __request.Response;
+}	/** if the request fails for technical reasons, this Error type will be thrown */
+declare class _RequestError extends Error {
+	/** the root cause passed by the request library */
+	cause: Error;
+	error: Error;
+	options: __request.Options;
+	response: __request.Response;
+}
+// import requestErrors = require( "request-promise-any/errors" );
+// StatusCodeError = requestErrors.StatusCodeError;
+
+
+// //export import requestErrors = require( "request-promise-any/errors" );
+
+// // tslint:disable-next-line: no-submodule-imports
+//import { RequestError, StatusCodeError } from "request-promise-any/errors";
+//export StatusCodeError;
+export const RequestError: typeof _RequestError = __requestPromiseAnyErrors.RequestError;
+export const StatusCodeError: typeof _StatusCodeError = __requestPromiseAnyErrors.StatusCodeError;
+
+// export import requestErrors = require( "request-promise-any/errors" );
+
+// export const testErr:typeof(requestErrors.RequestError);
+
+
+// import * as __errors from "request-promise-any/errors";
+// export const RequestError:_RequestError = __RequestError;
+
+// export type RequestError = __rp.RequestError;
+// export type StatusCodeError = __rp.StatusCodeError;
 
 
 //module _test {
