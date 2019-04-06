@@ -228,6 +228,68 @@ describe( __filename + " basic xlib unit tests", () => {
 		log.throwCheck( caughtErr === true, "error was not thrown by request() as we expected" );
 	} );
 
+	//MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfsPvbmKqU3kPfXn7fz/DS1N2O\nDlrn+2aFche4FacoHL7h16ZpVRFHNllaLO1OenasG8Z9ILZxgKg4s2R+j3ChXajC\nVzbj8MYENDyCne2tc2ztt7Q8HqF75J70LmQ6bLoG39Xadf6MpQYEqkCzkETWxxrL\nsXnPgOXaKY563y9ldQIDAQAB
+
+	it2( async function jwt_keyPair_basicE2e() {
+
+
+
+		return new __.bb<void>( ( resolve, reject ) => {
+			//generate RSA key pair
+
+			//from: https://stackoverflow.com/a/52775583/1115220
+			xlib.security.crypto.generateKeyPair( 'rsa', {
+				modulusLength: 4096,
+				publicKeyEncoding: {
+					type: 'spki',
+					format: 'pem'
+				},
+				privateKeyEncoding: {
+					type: 'pkcs8',
+					format: 'pem',
+					cipher: undefined,//'aes-256-cbc',
+					passphrase: undefined, //"secret word"
+				}
+			}, ( err: Error, publicKey: string, privateKey: string ) => {
+				// Handle errors and use the generated key pair.
+				try {
+					log.throwCheck( err == null, "error encountered", err );
+
+					const testData = { hello: "world" };
+					//log.info( "signing" );
+					const jwtPayload = xlib.security.jwt.sign( testData, privateKey, { algorithm: "RS256" } );
+					//log.info( "verifying" );
+					const resultData: typeof testData = xlib.security.jwt.verify( jwtPayload, publicKey, {
+						algorithms: [ "RS256" ],
+						clockTolerance: 600, maxAge: "5m"
+					} ) as any;
+
+					log.throwCheck( resultData.hello === testData.hello, "data is wrong" );
+
+
+
+
+
+					resolve();
+				} catch ( _err ) {
+					reject( _err );
+				}
+			} );
+
+
+
+
+
+
+
+			// const rsaPub = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfsPvbmKqU3kPfXn7fz/DS1N2O\nDlrn+2aFche4FacoHL7h16ZpVRFHNllaLO1OenasG8Z9ILZxgKg4s2R+j3ChXajC\nVzbj8MYENDyCne2tc2ztt7Q8HqF75J70LmQ6bLoG39Xadf6MpQYEqkCzkETWxxrL\nsXnPgOXaKY563y9ldQIDAQAB\n-----END PUBLIC KEY-----\n";
+			// const rsaPri = "-----BEGIN PRIVATE KEY-----\nMIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAN+w+9uYqpTeQ99e\nft/P8NLU3Y4OWuf7ZoVyF7gVpygcvuHXpmlVEUc2WVos7U56dqwbxn0gtnGAqDiz\nZH6PcKFdqMJXNuPwxgQ0PIKd7a1zbO23tDweoXvknvQuZDpsugbf1dp1/oylBgSq\nQLOQRNbHGsuxec+A5dopjnrfL2V1AgMBAAECgYEAneC9MdVDeASTpOB97ZtG3pbs\ntGl/UcIHLuJCyWNG8jGvq5hX1Hn80uUSFWomJ0CZ54lHA2OGQP/MOxCqOgUlOPzO\nZxzTXZRLkpRc+RftMVEUU3qYF+0OFhXXQDYHSeudISwWe+Yd0eaBcBHifFB54cNo\n1bktZ4EjqZnKT/iy1BUCQQD6Q0VusaQRnCl7O8MZOEmSpy66HrnQxMpXuhA8d7Yn\nfQa284E5nJ8mWljiZ711jtwZfEdsedDQSzmWqIQsY+l7AkEA5NHFhpK6uUXxXs8e\nDetRPHcQYcRci/WjDkoqpxgczYamXyhh9066cq5QNyqF0HgwuKmvRGx2Zh0fOqw3\ntmphzwJAeIU3BcTkt1pWG7O/FAEoZUi/1v//CkwLCc5gDU61WTT7q9V+sQj9F9JA\npd/BvMBsvJU+LD5J0lW3yRckd+AxywJBAM6v5Vpfo6bDVPms4Jr2GlUhv3xwYKBT\n60t3FvwEPdAwdoux8Hvxc10vs2mBUYozZt8G9zg5OOGYIKNg+JofkeUCQQCIg2hk\naRPniqczmMKn+FuqGr2228w2snLhwIfAQMSI/Zd4/F+9Omn6jEWZqZ+/+XHbsNQ/\nA+bIgi4sCUHTuZ/t\n-----END PRIVATE KEY-----\n";
+
+
+
+		} ).timeout( 10000 );
+
+	} );
 	it1( function testExceptions() { //causes debugBreak on thrown exceptions when running test
 
 		class MyException extends xlib.diagnostics.Exception {

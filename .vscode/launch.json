@@ -48,7 +48,8 @@
 				//"--watch",
 				//"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
 				//	"--trace-warnings",
-				//"--grep",				"testExceptions"
+				"--grep",
+				"jwt_keyPair_basicE2e"
 			],
 			"args": [
 				// 	"logLevel=TRACE",
