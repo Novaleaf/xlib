@@ -5,6 +5,8 @@ import _ = xlib.lodash;
 import __ = xlib.lolo;
 import log = xlib.diagnostics.log;
 
+import zlib = require( "zlib" );
+
 // import * as os from "os";
 // const loadAvg = ( os.loadavg[ 0 ] / os.cpus.length );
 
@@ -228,38 +230,61 @@ describe( __filename + " basic xlib unit tests", () => {
 		log.throwCheck( caughtErr === true, "error was not thrown by request() as we expected" );
 	} );
 
-	let keyPair: { pub: string; pri: string };
+	let keyPair_P256: { pub: string; pri: string; };
+	let keyPair_secp112: { pub: string; pri: string; };
 	before( async () => {
-		keyPair = await xlib.security.generateECKeyPair( "P-256" );// "secp112r1" );
+		keyPair_P256 = await xlib.security.generateECKeyPair( "P-256" );// "secp112r1" );
+		keyPair_secp112 = await xlib.security.generateECKeyPair( "secp112r1" );
 	} );
-	it2( async function tinyToken_basicE2e() {
+	it1( async function tinyToken_basicE2e() {
+
+		const data = { billing: "bypass", credits: 1.0, use: "direct", lots: { of: "less than words", values: [ "abc", "do re me", 123 ], now: new Date() }, mots2: {} };
+		const token = await xlib.security.tinyToken.create( data, keyPair_secp112.pri, { expires: "5m" } );
+
+		const result = await xlib.security.tinyToken.verify<typeof data>( token, keyPair_secp112.pub );
+
+		//log.infoFull( "tinyToken_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
+
+
+	} );
+	it1( async function jwt_ec_keyPair_basicE2e() {
 
 		const data = { billing: "bypass", credits: 1.0, use: "direct", lots: { of: "more more more more", values: [ 123, 345, 566 ], now: new Date() } };
-		const token = await xlib.security.tinyToken.create( data, keyPair.pri, { expires: "5m" } );
-
-		const result = await xlib.security.tinyToken.verify<typeof data>( token, keyPair.pub );
-
-		log.info( "tinyToken_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
 
 
-	} );
-	it2( async function jwt_ec_keyPair_basicE2e() {
+		const token = await new __.bb<string>( ( resolve, reject ) => {
+			xlib.security.jwt.sign( data, keyPair_P256.pri, { algorithm: "ES256", expiresIn: "5m" }, ( _err, encoded ) => {
+				if ( _err != null ) {
+					reject( _err );
+					return;
+				}
+				resolve( encoded );
+			} );
+		} );
 
-		const data = { billing: "bypass", credits: 1.0, use: "direct", lots: { of: "more more more more", values: [ 123, 345, 566 ], now: new Date() } };
+		// const tokenZipBuff = zlib.deflateRawSync( token );
+
+		// const tokenZip = xlib.util.stringHelper.base64Url.encode( tokenZipBuff );
 
 
-		//log.info( "signing" );
-		const token = xlib.security.jwt.sign( data, keyPair.pri, { algorithm: "ES256", expiresIn: "5m" } );
 		//log.info( "verifying" );
-		const result: typeof data = xlib.security.jwt.verify( token, keyPair.pub, {
-			algorithms: [ "ES256" ],
-		} ) as any;
+		const result = await new __.bb<typeof data>( ( resolve, reject ) => {
+			xlib.security.jwt.verify( token, keyPair_P256.pub, {
+				algorithms: [ "ES256" ],
+			}, ( _err, decoded: any ) => {
+				if ( _err != null ) {
+					reject( _err );
+					return;
+				}
+				resolve( decoded );
+			} );
+		} );
 
 
-		log.info( "jwt_ec_keyPair_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
+		//log.infoFull( "jwt_ec_keyPair_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
 
 
-	} ).timeout( 10000 );
+	} );
 	it2( async function jwt_keyPair_basicE2e() {
 
 

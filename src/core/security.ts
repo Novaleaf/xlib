@@ -178,7 +178,7 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
 export type ECNamedCurves =/** secp112r1 is not commonly supported, but offers the smallest ECDSA sig of 36 bytes, so can be useful for circumstances where byte size is limited.*/
     "secp112r1" | "P-256" | "P-384" | "P-521";
 
-/** generate an elliptic curve key pair.  generallly stick with the ```P-*``` named curves.  ```secp112r1``` is not commonly supported, but offers the smallest ECDSA sig of 36 bytes, so can be useful for circumstances where byte size is limited. */
+/** generate an elliptic curve key pair.  generallly stick with the ```P-*``` named curves.  ```secp112r1``` is supported on node, but may not on browsers, but offers the smallest ECDSA sig of 36 bytes, so can be useful for circumstances where byte size is limited. */
 export async function generateECKeyPair(/** defaults to ```P-256``` */ namedCurve: ECNamedCurves = "P-256" ) {
     return new bb<{ pub: string; pri: string; }>( ( resolve, reject ) => {
 
@@ -204,26 +204,28 @@ export async function generateECKeyPair(/** defaults to ```P-256``` */ namedCurv
 }
 
 import zlib = require( "zlib" );
-const _tinyTokenDeflateDict = Buffer.from( `,{"},"data":"created":"expires":"` );
+//const _tinyTokenDeflateDict: Buffer = undefined;//
+const _tinyTokenDeflateDict: Buffer = Buffer.from( `:false,:true,{"}},":["]:","data":{"created":155"expires":"` );
 
 
 /** a custom alternative to JWT that is aprox 50% the size.  only really useful when you are under a size limit (eg: 255) */
 export const tinyToken = {
     /** create and signs a token.  */
     create: async function tinyToken_create( data: string | {},
-        /** can be any priKey in ```PEM``` format, but for tiny and secure tokens, we recomend using a key generated from [[generateECKeyPair]] */
+        /** can be any priKey in ```PEM``` format, but for tiny and secure tokens, we recomend using a key generated from [[generateECKeyPair]] (```secp112r1``` for the smallest) */
         privateKey: string | Buffer, options?: {
             /** duration.  eg: ```5m``` = 5min.  see  https://www.npmjs.com/package/ms */
             expires?: string;
         } ) {
         options = { ...options };
-        let payload = {
-            data,
+        const payload = {
             created: Math.floor( Date.now() / 1000 ),
             expires: options.expires,
+            data,
         };
+        const payloadStringified = JSON.stringify( payload );
         const deflatedBuffer = await new bb<Buffer>( ( resolve, reject ) => {
-            zlib.deflateRaw( JSON.stringify( payload ), { dictionary: _tinyTokenDeflateDict }, ( _err, result ) => {
+            zlib.deflateRaw( payloadStringified, { dictionary: _tinyTokenDeflateDict }, ( _err, result ) => {
                 if ( _err != null ) {
                     reject( _err );
                     return;
@@ -234,6 +236,8 @@ export const tinyToken = {
         const signer = crypto.createSign( "sha256" );
         const sig = stringHelper.base64Url.encode( signer.update( deflatedBuffer ).sign( privateKey ) );
         const deflated = stringHelper.base64Url.encode( deflatedBuffer );
+
+        //console.warn( `log debug: payloadStringified.len=${ payloadStringified.length } defLen=${ deflated.length }, sig.len=${ sig.length }, payloadStringified=${ payloadStringified }` )
         return `0.${ deflated }.${ sig }`;
     },
 
