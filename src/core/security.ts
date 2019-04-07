@@ -209,10 +209,15 @@ import zlib = require( "zlib" );
 const _tinyTokenDeflateDict: Buffer = Buffer.from( `:false,:true,{"}},":["]:","data":{"created":"TT_DATE_MS_=155000","expires":"` );
 
 
-/** a custom alternative to JWT that is aprox 50% the size.  only really useful when you are under a size limit (eg: 255) */
-export const tinyToken = {
+/** a custom alternative to JWT that is aprox 50% the size.  only really useful when you are under a size limit (eg: 255chars or smaller).  
+
+Designed for manditory key signing (use elliptic curve for smallest signature size) and supports token expiration.
+
+if size doesn't matter, use [[jwt]] instead as that's a standard and implementations are available on various platforms+languages.
+*/
+export namespace tinyToken {
     /** create and signs a token.  */
-    sign: async function tinyToken_sign( data: string | {},
+    export async function sign( data: string | {},
         /** can be any priKey in ```PEM``` format, but for tiny and secure tokens, we recomend using a key generated from [[generateECKeyPair]] (```P-256``` for the smallest yet secure) */
         privateKey: string | Buffer, options?: {
             /** duration.  eg: ```5m``` = 5min.  see  https://www.npmjs.com/package/ms */
@@ -254,10 +259,10 @@ export const tinyToken = {
 
         //console.warn( `log debug: payloadStringified.len=${ payloadStringified.length } defLen=${ deflated.length }, sig.len=${ sig.length }, payloadStringified=${ payloadStringified }` )
         return `0.${ deflated }.${ sig }`;
-    },
+    }
 
     /** verify and parse a token */
-    verify: async function tinyToken_verify<TData = string | {}>( token: string,
+    export async function verify<TData = string | {}>( token: string,
         /** public key for the keyPair used when calling [[create()]] */publicKey: string | Buffer, options?: {
         /** default false.  if true, we won't reject the promise when a validation fails (bad sig, expired).  instead you'll need to check the resulting payload yourself */
         allowValidationFailure?: boolean;
@@ -336,4 +341,4 @@ export const tinyToken = {
 
     }
 
-};
+}
