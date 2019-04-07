@@ -205,7 +205,8 @@ export async function generateECKeyPair(/** defaults to ```P-256``` */ namedCurv
 
 import zlib = require( "zlib" );
 //const _tinyTokenDeflateDict: Buffer = undefined;//
-const _tinyTokenDeflateDict: Buffer = Buffer.from( `:false,:true,{"}},":["]:","data":{"created":155"expires":"` );
+/** custom dictionary for compressing tinyToken payloads */
+const _tinyTokenDeflateDict: Buffer = Buffer.from( `:false,:true,{"}},":["]:","data":{"created":"TT_DATE_MS_=155000","expires":"` );
 
 
 /** a custom alternative to JWT that is aprox 50% the size.  only really useful when you are under a size limit (eg: 255) */
@@ -216,18 +217,30 @@ export const tinyToken = {
         privateKey: string | Buffer, options?: {
             /** duration.  eg: ```5m``` = 5min.  see  https://www.npmjs.com/package/ms */
             expires?: string;
-            /** by default the current date+time is used when signing.  you can override this */
+            /** by default the current date+time is used when signing.  you can override this.   this value is rounded down to the closest second */
             currentDate?: Date;
         } ) {
         options = { currentDate: new Date(), ...options };
         const payload = {
-            created: Math.floor( options.currentDate.valueOf() / 1000 ),
+            created: new Date( numHelper.round( options.currentDate.valueOf(), 3 ) ), //Math.floor( options.currentDate.valueOf() / 1000 ) ),
             expires: options.expires,
             data,
         };
-        const payloadStringified = JSON.stringify( payload );
+
+        const payloadStringified = JSON.stringify( payload, ( key, val ) => {
+
+            try {
+                if ( typeof ( val ) === "string" && val.endsWith( "Z" ) ) {
+                    let asMs = Date.parse( val );
+                    return `TT_DATE_MS_=${ asMs }`;
+                }
+            } catch ( _err ) { }
+            return val;
+        } );
         const deflatedBuffer = await new bb<Buffer>( ( resolve, reject ) => {
-            zlib.deflateRaw( payloadStringified, { dictionary: _tinyTokenDeflateDict }, ( _err, result ) => {
+            zlib.deflateRaw( payloadStringified, {
+                dictionary: _tinyTokenDeflateDict, //level: zlib.constants.Z_BEST_COMPRESSION
+            }, ( _err, result ) => {
                 if ( _err != null ) {
                     reject( _err );
                     return;
@@ -248,7 +261,7 @@ export const tinyToken = {
         /** public key for the keyPair used when calling [[create()]] */publicKey: string | Buffer, options?: {
         /** default false.  if true, we won't reject the promise when a validation fails (bad sig, expired).  instead you'll need to check the resulting payload yourself */
         allowValidationFailure?: boolean;
-        /** by default the current date+time is used when verifying.  you can override this */
+        /** by default the current date+time is used when verifying.  you can override this.    this value is rounded down to the closest second */
         currentDate?: Date;
     } ) {
 
@@ -286,17 +299,24 @@ export const tinyToken = {
 
         let payload: {
             data: TData;
-            created: number;
+            created: Date;
             expires: string;
-        } = JSON.parse( payloadStr );
+        } = JSON.parse( payloadStr, ( key, val ) => {
+            if ( typeof ( val ) === "string" && val.startsWith( "TT_DATE_MS_=" ) ) {
+                let msStr = val.split( "=" )[ 1 ];
+                let msVal = Number.parseInt( msStr );
+                return new Date( msVal );//.toISOString();
+            }
+            return val;
+        } );
 
-        const created = new Date( payload.created * 1000 );
+        //const created = new Date( payload.created  );
 
         //check if expired
         let isExpired = false;
         if ( payload.expires != null ) {
             const expireDur = ms( payload.expires );
-            isExpired = ( created.valueOf() + expireDur ) < options.currentDate.valueOf();
+            isExpired = ( payload.created.valueOf() + expireDur ) < options.currentDate.valueOf();
         }
         if ( isExpired === true && options.allowValidationFailure !== true ) {
             return bb.reject( new Error( "Invalid Token.  Expired." ) );
@@ -305,7 +325,7 @@ export const tinyToken = {
 
         let toReturn = {
             data: payload.data,
-            created: created,
+            created: payload.created,
             isExpired: isExpired,
             isSigValid: isSigValid,
             isValid: isExpired === false && isSigValid === true,

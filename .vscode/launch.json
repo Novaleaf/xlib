@@ -48,8 +48,8 @@
 				//"--watch",
 				//"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
 				//	"--trace-warnings",
-				//"--grep",
-				//"tinyToken_basicE2e",
+				"--grep",
+				"tinyToken_*",
 				//"jwt_ec_keyPair_basicE2e",
 			],
 			"args": [

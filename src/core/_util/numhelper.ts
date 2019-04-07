@@ -76,7 +76,8 @@ export function randomBool(/** the probability that true will be returned.  defa
 }
 
 export function round( value: number,
-    /** default = 0.  round(123.456,10)=>0;    round(123.456,2)=>100;   round(123.456,-2)=>123.46;   round(123.456,0)=>123;   round(123.456,-10)=>123.456;*/
+    /** default = 0.  round(123.456,10)=>0;    round(123.456,2)=>100;   round(123.456,-2)=>123.46;   round(123.456,0)=>123;   round(123.456,-10)=>123.456;
+    */
     digitsOrNegativeForDecimals: number = 0 ) {
 
     let mult = Math.pow( 10, -digitsOrNegativeForDecimals );
