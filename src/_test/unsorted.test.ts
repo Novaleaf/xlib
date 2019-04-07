@@ -239,7 +239,7 @@ describe( __filename + " basic xlib unit tests", () => {
 	it1( async function tinyToken_basicE2e() {
 
 		const data = { billing: "bypass", credits: 1.0, use: "direct", lots: { of: "less than words", values: [ "abc", "do re me", 123 ], now: new Date() }, mots2: {} };
-		const token = await xlib.security.tinyToken.create( data, keyPair_secp112.pri, { expires: "5m" } );
+		const token = await xlib.security.tinyToken.sign( data, keyPair_secp112.pri, { expires: "5m" } );
 
 		const result = await xlib.security.tinyToken.verify<typeof data>( token, keyPair_secp112.pub );
 

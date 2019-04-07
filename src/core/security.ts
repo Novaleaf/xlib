@@ -211,15 +211,17 @@ const _tinyTokenDeflateDict: Buffer = Buffer.from( `:false,:true,{"}},":["]:","d
 /** a custom alternative to JWT that is aprox 50% the size.  only really useful when you are under a size limit (eg: 255) */
 export const tinyToken = {
     /** create and signs a token.  */
-    create: async function tinyToken_create( data: string | {},
+    sign: async function tinyToken_sign( data: string | {},
         /** can be any priKey in ```PEM``` format, but for tiny and secure tokens, we recomend using a key generated from [[generateECKeyPair]] (```secp112r1``` for the smallest) */
         privateKey: string | Buffer, options?: {
             /** duration.  eg: ```5m``` = 5min.  see  https://www.npmjs.com/package/ms */
             expires?: string;
+            /** by default the current date+time is used when signing.  you can override this */
+            currentDate?: Date;
         } ) {
-        options = { ...options };
+        options = { currentDate: new Date(), ...options };
         const payload = {
-            created: Math.floor( Date.now() / 1000 ),
+            created: Math.floor( options.currentDate.valueOf() / 1000 ),
             expires: options.expires,
             data,
         };
@@ -246,9 +248,11 @@ export const tinyToken = {
         /** public key for the keyPair used when calling [[create()]] */publicKey: string | Buffer, options?: {
         /** default false.  if true, we won't reject the promise when a validation fails (bad sig, expired).  instead you'll need to check the resulting payload yourself */
         allowValidationFailure?: boolean;
+        /** by default the current date+time is used when verifying.  you can override this */
+        currentDate?: Date;
     } ) {
 
-        options = { allowValidationFailure: false, ...options };
+        options = { currentDate: new Date(), allowValidationFailure: false, ...options };
 
         if ( token.startsWith( "0." ) !== true ) {
             return bb.reject( new Error( "Invalid Token.  Can not Parse.  not a TinyToken or a newer version.  we expected to start with '0.' " ) );
@@ -292,7 +296,7 @@ export const tinyToken = {
         let isExpired = false;
         if ( payload.expires != null ) {
             const expireDur = ms( payload.expires );
-            isExpired = ( created.valueOf() + expireDur ) < Date.now();
+            isExpired = ( created.valueOf() + expireDur ) < options.currentDate.valueOf();
         }
         if ( isExpired === true && options.allowValidationFailure !== true ) {
             return bb.reject( new Error( "Invalid Token.  Expired." ) );
