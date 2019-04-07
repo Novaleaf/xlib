@@ -17,6 +17,8 @@ Native time zone and Intl support (no locale or tz files).
 see https://www.npmjs.com/package/luxon  */
 export import luxon = require( "luxon" );
 
+/** allow creating ms durations from simple strings */
+export import ms = require( "ms" );
 
 import * as mathjs from "mathjs";
 
@@ -161,7 +163,7 @@ export class Stopwatch {
 		* as per: https://www.dataz.io/display/Public/2013/03/20/Describing+Data%3A+Why+median+and+IQR+are+often+better+than+mean+and+standard+deviation
 				and  https://en.wikipedia.org/wiki/Quantile#Quantiles_of_a_population
 				@returns array of ms, each representing the requested quartile's rank choice*/
-export function quantile( intervals: (luxon.Interval | luxon.Duration | number | Stopwatch | { valueOf(): number; })[],
+export function quantile( intervals: ( luxon.Interval | luxon.Duration | number | Stopwatch | { valueOf(): number; } )[],
 	/** by default givez IQR, ie the sample at 0,25,50,75, and 100th percentiles,
 		* @default  [ 0, 0.25, 0.5, 0.75, 1 ]
 		*/

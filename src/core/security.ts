@@ -5,6 +5,9 @@ import * as exception from "./_diagnostics/exception";
 import * as stringHelper from "./_util/stringhelper";
 import * as numHelper from "./_util/numhelper";
 import * as _ from "lodash";
+import bb = require( "bluebird" );
+import luxon = require( "luxon" );
+import ms = require( "ms" );
 
 /** cross-platform implementation of the nodejs module: http://nodejs.org/api/crypto.html
  * -------------------
@@ -168,3 +171,141 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
     return toReturn;
 
 }
+
+/** well known elliptic curves.   note: 
+* see: https://w3c.github.io/webcrypto/#ecdsa
+ */
+export type ECNamedCurves =/** secp112r1 is not commonly supported, but offers the smallest ECDSA sig of 36 bytes, so can be useful for circumstances where byte size is limited.*/
+    "secp112r1" | "P-256" | "P-384" | "P-521";
+
+/** generate an elliptic curve key pair.  generallly stick with the ```P-*``` named curves.  ```secp112r1``` is not commonly supported, but offers the smallest ECDSA sig of 36 bytes, so can be useful for circumstances where byte size is limited. */
+export async function generateECKeyPair(/** defaults to ```P-256``` */ namedCurve: ECNamedCurves = "P-256" ) {
+    return new bb<{ pub: string; pri: string; }>( ( resolve, reject ) => {
+
+        crypto.generateKeyPair( 'ec', {
+            namedCurve,//: "secp112r1",// "secp256k1",// "P-256", //P-256, P-384, P-521 " P-521",// "secp521r1",// 
+            publicKeyEncoding: {
+                type: 'spki',
+                format: 'pem'
+            },
+            privateKeyEncoding: {
+                type: 'pkcs8',
+                format: 'pem',
+                cipher: undefined,//'aes-256-cbc',
+                passphrase: undefined, //"secret word"
+            }
+        }, ( err: Error, pub: string, pri: string ) => {
+            if ( err != null ) {
+                reject( err );
+            }
+            resolve( { pub, pri } );
+        } );
+    } );
+}
+
+import zlib = require( "zlib" );
+const _tinyTokenDeflateDict = Buffer.from( `,{"},"data":"created":"expires":"` );
+
+
+/** a custom alternative to JWT that is aprox 50% the size.  only really useful when you are under a size limit (eg: 255) */
+export const tinyToken = {
+    /** create and signs a token.  */
+    create: async function tinyToken_create( data: string | {},
+        /** can be any priKey in ```PEM``` format, but for tiny and secure tokens, we recomend using a key generated from [[generateECKeyPair]] */
+        privateKey: string | Buffer, options?: {
+            /** duration.  eg: ```5m``` = 5min.  see  https://www.npmjs.com/package/ms */
+            expires?: string;
+        } ) {
+        options = { ...options };
+        let payload = {
+            data,
+            created: Math.floor( Date.now() / 1000 ),
+            expires: options.expires,
+        };
+        const deflatedBuffer = await new bb<Buffer>( ( resolve, reject ) => {
+            zlib.deflateRaw( JSON.stringify( payload ), { dictionary: _tinyTokenDeflateDict }, ( _err, result ) => {
+                if ( _err != null ) {
+                    reject( _err );
+                    return;
+                }
+                resolve( result );
+            } );
+        } );
+        const signer = crypto.createSign( "sha256" );
+        const sig = stringHelper.base64Url.encode( signer.update( deflatedBuffer ).sign( privateKey ) );
+        const deflated = stringHelper.base64Url.encode( deflatedBuffer );
+        return `0.${ deflated }.${ sig }`;
+    },
+
+    /** verify and parse a token */
+    verify: async function tinyToken_verify<TData = string | {}>( token: string,
+        /** public key for the keyPair used when calling [[create()]] */publicKey: string | Buffer, options?: {
+        /** default false.  if true, we won't reject the promise when a validation fails (bad sig, expired).  instead you'll need to check the resulting payload yourself */
+        allowValidationFailure?: boolean;
+    } ) {
+
+        options = { allowValidationFailure: false, ...options };
+
+        if ( token.startsWith( "0." ) !== true ) {
+            return bb.reject( new Error( "Invalid Token.  Can not Parse.  not a TinyToken or a newer version.  we expected to start with '0.' " ) );
+        }
+        const tokenParse = token.split( ".", 10 );
+        if ( tokenParse.length > 3 ) {
+            return bb.reject( new Error( "Invalid Token.  Can not Parse.  not a TinyToken or a newer version.  found too many '.' characters (expected 2) " ) );
+        }
+        const header = tokenParse[ 0 ];
+        const deflated = stringHelper.base64Url.toBuffer( tokenParse[ 1 ] );
+        const sig = stringHelper.base64Url.toBuffer( tokenParse[ 2 ] );
+
+        //verify signature
+        const verifier = crypto.createVerify( "sha256" );
+        verifier.update( deflated );
+        const isSigValid = verifier.verify( publicKey, sig );
+
+        if ( isSigValid !== true && options.allowValidationFailure !== true ) {
+            return bb.reject( new Error( "Invalid Token.  Signature is invalid." ) );
+        }
+
+        const payloadStr = await new bb<string>( ( resolve, reject ) => {
+            zlib.inflateRaw( deflated, { dictionary: _tinyTokenDeflateDict }, ( _err, result ) => {
+                if ( _err != null ) {
+                    reject( _err );
+                    return;
+                }
+                resolve( result.toString( "utf-8" ) );
+            } );
+        } );
+
+        let payload: {
+            data: TData;
+            created: number;
+            expires: string;
+        } = JSON.parse( payloadStr );
+
+        const created = new Date( payload.created * 1000 );
+
+        //check if expired
+        let isExpired = false;
+        if ( payload.expires != null ) {
+            const expireDur = ms( payload.expires );
+            isExpired = ( created.valueOf() + expireDur ) < Date.now();
+        }
+        if ( isExpired === true && options.allowValidationFailure !== true ) {
+            return bb.reject( new Error( "Invalid Token.  Expired." ) );
+        }
+
+
+        let toReturn = {
+            data: payload.data,
+            created: created,
+            isExpired: isExpired,
+            isSigValid: isSigValid,
+            isValid: isExpired === false && isSigValid === true,
+        };
+
+        return toReturn;
+
+
+    }
+
+};

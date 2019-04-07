@@ -22,7 +22,6 @@ In no particular order:
 
 - [Abstract](#abstract)
   - [Goals](#goals)
-- [WORK IN PROGRESS](#work-in-progress)
 - [expected setup](#expected-setup)
 - [Usage](#usage)
 - [Functionality](#functionality)
@@ -47,19 +46,13 @@ In no particular order:
 - [Versioning / Upgrading](#versioning--upgrading)
   - [Planned Future Work (Roadmap)](#planned-future-work-roadmap)
 - [Development](#development)
+  - [WORK IN PROGRESS!](#work-in-progress)
   - [Dev Problems](#dev-problems)
     - [Typescript Build Error: ```Conflicting definitions for 'node'``` when symlinking](#typescript-build-error-conflicting-definitions-for-node-when-symlinking)
 - [Why](#why)
 - [Changelog](#changelog)
 
 --------
-
-# WORK IN PROGRESS
-- ***active development***: ```xlib``` while no big changes are planned (v13 and v15 represented big refactors), changes ***ARE*** being made.  ```xlib``` follows [Semantic Versioning](https://semver.org/) so if you stay on the same major version, you won't have any breaking changes.
-- ***browser currently unsupported***:    while ```xlib``` is designed for brower support, it's not currently being tested and might be superficially broken.  Previously, in v9.x ```WebPack``` was tested and supported.   
-
-    Additionally, no minified version is currently available.  When the browser is supported, the target minified size is 500kb.  Plan is to support [Tree Shaking](https://webpack.js.org/guides/tree-shaking/) for those who want a super tiny dependency.
-
 
 
 
@@ -528,6 +521,20 @@ they include:
 > **If you have an idea**, Please add an issue on the Repo so we can discuss!  (pull reqeusts are welcome, but lets make sure the feature is a good fit first)
 
 # Development
+
+
+## WORK IN PROGRESS!  
+
+
+- ***active development***: ```xlib``` while no big changes are planned, changes ***ARE*** being made.  ```xlib``` follows [Semantic Versioning](https://semver.org/) so if you stay on the same major version, you won't have any breaking changes.
+
+    To support ***stable*** public usage and yet still allow for ***fast*** development, the latest stable release will always have the highest ```semver minor``` value (eg: ```16.2.x```) while the development version will have an odd ```semver minor``` value, one lower than the latest stable (eg: ```16.1.x```).  This means if you look at the version history, you may see long streches of version updates to an odd ```semver minor``` patch release while the current latest remains unchanged.
+
+- ***browser currently unsupported***:    while ```xlib``` is designed for brower support, it's not currently being tested and might be superficially broken.  Previously, in v9.x ```WebPack``` was tested and supported.   
+
+    Additionally, no minified version is currently available.  When the browser is supported, the target minified size is 500kb.  Plan is to support [Tree Shaking](https://webpack.js.org/guides/tree-shaking/) for those who want a super tiny dependency.
+
+
 
 if you want to build/modify ```xlib```, download this repo and open the folder in vsCode.  included are basic unit tests that will launch automatically if you choose to "run" xlib from vsCode (see ```./.vscode/tasks.json```).
 

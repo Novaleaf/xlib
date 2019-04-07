@@ -228,10 +228,39 @@ describe( __filename + " basic xlib unit tests", () => {
 		log.throwCheck( caughtErr === true, "error was not thrown by request() as we expected" );
 	} );
 
-	//MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfsPvbmKqU3kPfXn7fz/DS1N2O\nDlrn+2aFche4FacoHL7h16ZpVRFHNllaLO1OenasG8Z9ILZxgKg4s2R+j3ChXajC\nVzbj8MYENDyCne2tc2ztt7Q8HqF75J70LmQ6bLoG39Xadf6MpQYEqkCzkETWxxrL\nsXnPgOXaKY563y9ldQIDAQAB
+	let keyPair: { pub: string; pri: string };
+	before( async () => {
+		keyPair = await xlib.security.generateECKeyPair( "P-256" );// "secp112r1" );
+	} );
+	it2( async function tinyToken_basicE2e() {
 
+		const data = { billing: "bypass", credits: 1.0, use: "direct", lots: { of: "more more more more", values: [ 123, 345, 566 ], now: new Date() } };
+		const token = await xlib.security.tinyToken.create( data, keyPair.pri, { expires: "5m" } );
+
+		const result = await xlib.security.tinyToken.verify<typeof data>( token, keyPair.pub );
+
+		log.info( "tinyToken_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
+
+
+	} );
+	it2( async function jwt_ec_keyPair_basicE2e() {
+
+		const data = { billing: "bypass", credits: 1.0, use: "direct", lots: { of: "more more more more", values: [ 123, 345, 566 ], now: new Date() } };
+
+
+		//log.info( "signing" );
+		const token = xlib.security.jwt.sign( data, keyPair.pri, { algorithm: "ES256", expiresIn: "5m" } );
+		//log.info( "verifying" );
+		const result: typeof data = xlib.security.jwt.verify( token, keyPair.pub, {
+			algorithms: [ "ES256" ],
+		} ) as any;
+
+
+		log.info( "jwt_ec_keyPair_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
+
+
+	} ).timeout( 10000 );
 	it2( async function jwt_keyPair_basicE2e() {
-
 
 
 		return new __.bb<void>( ( resolve, reject ) => {
@@ -267,9 +296,6 @@ describe( __filename + " basic xlib unit tests", () => {
 					log.throwCheck( resultData.hello === testData.hello, "data is wrong" );
 
 
-
-
-
 					resolve();
 				} catch ( _err ) {
 					reject( _err );
@@ -277,14 +303,8 @@ describe( __filename + " basic xlib unit tests", () => {
 			} );
 
 
-
-
-
-
-
 			// const rsaPub = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfsPvbmKqU3kPfXn7fz/DS1N2O\nDlrn+2aFche4FacoHL7h16ZpVRFHNllaLO1OenasG8Z9ILZxgKg4s2R+j3ChXajC\nVzbj8MYENDyCne2tc2ztt7Q8HqF75J70LmQ6bLoG39Xadf6MpQYEqkCzkETWxxrL\nsXnPgOXaKY563y9ldQIDAQAB\n-----END PUBLIC KEY-----\n";
 			// const rsaPri = "-----BEGIN PRIVATE KEY-----\nMIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAN+w+9uYqpTeQ99e\nft/P8NLU3Y4OWuf7ZoVyF7gVpygcvuHXpmlVEUc2WVos7U56dqwbxn0gtnGAqDiz\nZH6PcKFdqMJXNuPwxgQ0PIKd7a1zbO23tDweoXvknvQuZDpsugbf1dp1/oylBgSq\nQLOQRNbHGsuxec+A5dopjnrfL2V1AgMBAAECgYEAneC9MdVDeASTpOB97ZtG3pbs\ntGl/UcIHLuJCyWNG8jGvq5hX1Hn80uUSFWomJ0CZ54lHA2OGQP/MOxCqOgUlOPzO\nZxzTXZRLkpRc+RftMVEUU3qYF+0OFhXXQDYHSeudISwWe+Yd0eaBcBHifFB54cNo\n1bktZ4EjqZnKT/iy1BUCQQD6Q0VusaQRnCl7O8MZOEmSpy66HrnQxMpXuhA8d7Yn\nfQa284E5nJ8mWljiZ711jtwZfEdsedDQSzmWqIQsY+l7AkEA5NHFhpK6uUXxXs8e\nDetRPHcQYcRci/WjDkoqpxgczYamXyhh9066cq5QNyqF0HgwuKmvRGx2Zh0fOqw3\ntmphzwJAeIU3BcTkt1pWG7O/FAEoZUi/1v//CkwLCc5gDU61WTT7q9V+sQj9F9JA\npd/BvMBsvJU+LD5J0lW3yRckd+AxywJBAM6v5Vpfo6bDVPms4Jr2GlUhv3xwYKBT\n60t3FvwEPdAwdoux8Hvxc10vs2mBUYozZt8G9zg5OOGYIKNg+JofkeUCQQCIg2hk\naRPniqczmMKn+FuqGr2228w2snLhwIfAQMSI/Zd4/F+9Omn6jEWZqZ+/+XHbsNQ/\nA+bIgi4sCUHTuZ/t\n-----END PRIVATE KEY-----\n";
-
 
 
 		} ).timeout( 10000 );
