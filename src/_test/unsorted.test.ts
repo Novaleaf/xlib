@@ -232,22 +232,22 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	const tokenTestData = { billing: "bypass", credits: 1.0, use: "direct", lots: { of: "less than words", values: [ "abc", "do re me", 123 ], now: new Date() }, mots2: {} };
 	let keyPair_P256: { pub: string; pri: string; };
-	let keyPair_secp112: { pub: string; pri: string; };
+	let keyPair_P256_2: { pub: string; pri: string; };
 	before( async () => {
-		keyPair_P256 = await xlib.security.generateECKeyPair( "P-256" );// "secp112r1" );
-		keyPair_secp112 = await xlib.security.generateECKeyPair( "secp112r1" );
+		keyPair_P256 = await xlib.security.generateECKeyPair( "P-256" );
+		keyPair_P256_2 = await xlib.security.generateECKeyPair();
 	} );
 	it1( async function tinyToken_validNoExpire() {
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_secp112.pri );
-		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_secp112.pub );
+		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri );
+		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
 		log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
 		log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
 		//log.infoFull( "tinyToken_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
 	} );
 	it1( async function tinyToken_validExpire5s() {
 		const now = __.utc().minus( { second: 5 } );
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_secp112.pri, { expires: "10s", currentDate: now.toJSDate() } );
-		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_secp112.pub );
+		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "10s", currentDate: now.toJSDate() } );
+		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
 		log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
 		log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
 	} );
@@ -265,10 +265,10 @@ describe( __filename + " basic xlib unit tests", () => {
 	} );
 	it1( async function tinyToken_Expired1s() {
 		const now = __.utc().minus( { second: 11 } );
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_secp112.pri, { expires: "10s", currentDate: now.toJSDate() } );
+		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "10s", currentDate: now.toJSDate() } );
 		let isError = false;
 		try {
-			const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_secp112.pub );
+			const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
 		} catch ( _err ) {
 			isError = true;
 		}
@@ -279,9 +279,9 @@ describe( __filename + " basic xlib unit tests", () => {
 	it1( async function tinyToken_Expired1s_resultsAnyway() {
 		const smallTestData = { now: new Date() };
 		const now = __.utc().minus( { second: 11 } );
-		const token = await xlib.security.tinyToken.sign( smallTestData, keyPair_secp112.pri, { expires: "10s", currentDate: now.toJSDate() } );
+		const token = await xlib.security.tinyToken.sign( smallTestData, keyPair_P256_2.pri, { expires: "10s", currentDate: now.toJSDate() } );
 
-		const result = await xlib.security.tinyToken.verify<typeof smallTestData>( token, keyPair_secp112.pub, { allowValidationFailure: true } );
+		const result = await xlib.security.tinyToken.verify<typeof smallTestData>( token, keyPair_P256_2.pub, { allowValidationFailure: true } );
 
 		log.warnFull( "diagnose payloads", { smallTestData: smallTestData, token, result } );
 
@@ -293,10 +293,10 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	it1( async function tinyToken_Expired7d1s() {
 		const now = __.utc().minus( { day: 7, second: 1 } );
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_secp112.pri, { expires: "7d", currentDate: now.toJSDate() } );// currentDate: new Date( Date.now() - ( ( 7 * 24 * 3600 ) - ( 1 * 60 ) ) * 1000 ) } ) );
+		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "7d", currentDate: now.toJSDate() } );// currentDate: new Date( Date.now() - ( ( 7 * 24 * 3600 ) - ( 1 * 60 ) ) * 1000 ) } ) );
 		let isError = false;
 		try {
-			const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_secp112.pub );
+			const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
 		} catch ( _err ) {
 			isError = true;
 		}
@@ -305,22 +305,20 @@ describe( __filename + " basic xlib unit tests", () => {
 	} );
 	it1( async function tinyToken_invalid_wrongSig() {
 		const now = __.utc();//.minus( { day: 7, second: 1 } );
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_secp112.pri, { expires: "7d", currentDate: now.toJSDate() } );// currentDate: new Date( Date.now() - ( ( 7 * 24 * 3600 ) - ( 1 * 60 ) ) * 1000 ) } ) );
+		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "7d", currentDate: now.toJSDate() } );// currentDate: new Date( Date.now() - ( ( 7 * 24 * 3600 ) - ( 1 * 60 ) ) * 1000 ) } ) );
 		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256.pub, { allowValidationFailure: true } );
 		log.throwCheck( result.isValid === false && result.isExpired === false && result.isSigValid === false, "verify result status checks abnormal" );
 	} );
 
 	it1( async function tinyToken_validExpire1sFrom7dAgo() {
 		const now = __.utc().minus( { day: 7 } ).plus( { second: 1 } );
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_secp112.pri, { expires: "7d", currentDate: now.toJSDate() } );
-		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_secp112.pub );
+		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "7d", currentDate: now.toJSDate() } );
+		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
 		log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
 		log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
 	} );
 
 	it1( async function jwt_ec_keyPair_basicE2e() {
-
-
 
 		const token = await new __.bb<string>( ( resolve, reject ) => {
 			xlib.security.jwt.sign( tokenTestData, keyPair_P256.pri, { algorithm: "ES256", expiresIn: "5m" }, ( _err, encoded ) => {

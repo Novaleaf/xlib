@@ -175,10 +175,10 @@ export function humanFriendlyKey( digits?: number, digitGroupings?: number, user
 /** well known elliptic curves.   note: 
 * see: https://w3c.github.io/webcrypto/#ecdsa
  */
-export type ECNamedCurves =/** secp112r1 is not commonly supported, but offers the smallest ECDSA sig of 36 bytes, so can be useful for circumstances where byte size is limited.*/
-    "secp112r1" | "P-256" | "P-384" | "P-521";
+export type ECNamedCurves =
+    "P-256" | "P-384" | "P-521";
 
-/** generate an elliptic curve key pair.  generallly stick with the ```P-*``` named curves.  ```secp112r1``` is supported on node, but may not on browsers, but offers the smallest ECDSA sig of 36 bytes, so can be useful for circumstances where byte size is limited. */
+/** generate an elliptic curve key pair. */
 export async function generateECKeyPair(/** defaults to ```P-256``` */ namedCurve: ECNamedCurves = "P-256" ) {
     return new bb<{ pub: string; pri: string; }>( ( resolve, reject ) => {
 
@@ -213,7 +213,7 @@ const _tinyTokenDeflateDict: Buffer = Buffer.from( `:false,:true,{"}},":["]:","d
 export const tinyToken = {
     /** create and signs a token.  */
     sign: async function tinyToken_sign( data: string | {},
-        /** can be any priKey in ```PEM``` format, but for tiny and secure tokens, we recomend using a key generated from [[generateECKeyPair]] (```secp112r1``` for the smallest) */
+        /** can be any priKey in ```PEM``` format, but for tiny and secure tokens, we recomend using a key generated from [[generateECKeyPair]] (```P-256``` for the smallest yet secure) */
         privateKey: string | Buffer, options?: {
             /** duration.  eg: ```5m``` = 5min.  see  https://www.npmjs.com/package/ms */
             expires?: string;
