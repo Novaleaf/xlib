@@ -56,7 +56,7 @@ if ( environment.envLevel < environment.EnvLevel.UAT || environment.logLevel < e
     //} catch (ex) {
     //	console.log("eating sourcemap support call");
     //}
-    
+
     const longjohn: any = require( "longjohn" );  //see https://github.com/mattinsler/longjohn
     longjohn.async_trace_limit = -1;
 }

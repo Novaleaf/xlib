@@ -8,8 +8,6 @@ import * as diagnostics from "../diagnostics";
 const log = diagnostics.log; // new diagnostics.Logger( __filename );
 log.overrideLogLevel( "WARN" );
 
-import * as serialization from "../serialization";
-import * as stringHelper from "../_util/stringhelper";
 import { Autoscaler, IAutoscalerOptions } from "../threading";
 
 //import compression = require("./compression");

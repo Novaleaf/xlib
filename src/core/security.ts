@@ -218,7 +218,10 @@ if size doesn't matter, use [[jwt]] instead as that's a standard and implementat
 export namespace tinyToken {
     /** create and signs a token.  */
     export async function sign( data: string | {},
-        /** can be any priKey in ```PEM``` format, but for tiny and secure tokens, we recomend using a key generated from [[generateECKeyPair]] (```P-256``` for the smallest yet secure) */
+        /** can be any priKey in ```PEM``` format, but for tiny and secure tokens, we recomend using a key generated from [[generateECKeyPair]] (```P-256``` for the smallest yet secure).
+        
+        Convienience Note: if your priKey is a ```string``` and does not start/end with the default PEM plaintext achor lines (eg: ```-----BEGIN PRIVATE KEY-----<eol>``` we will add them for you automatically);
+        */
         privateKey: string | Buffer, options?: {
             /** duration.  eg: ```5m``` = 5min.  see  https://www.npmjs.com/package/ms */
             expires?: string;
@@ -226,6 +229,9 @@ export namespace tinyToken {
             currentDate?: Date;
         } ) {
         options = { currentDate: new Date(), ...options };
+        if ( typeof privateKey === "string" && privateKey.trim().startsWith( "-----BEGIN PRIVATE KEY-----" ) === false ) {
+            privateKey = `-----BEGIN PRIVATE KEY-----\n${ privateKey.trim() }\n-----END PRIVATE KEY-----\n`;
+        }
         const payload = {
             created: new Date( numHelper.round( options.currentDate.valueOf(), 3 ) ), //Math.floor( options.currentDate.valueOf() / 1000 ) ),
             expires: options.expires,
@@ -263,15 +269,21 @@ export namespace tinyToken {
 
     /** verify and parse a token */
     export async function verify<TData = string | {}>( token: string,
-        /** public key for the keyPair used when calling [[create()]] */publicKey: string | Buffer, options?: {
-        /** default false.  if true, we won't reject the promise when a validation fails (bad sig, expired).  instead you'll need to check the resulting payload yourself */
-        allowValidationFailure?: boolean;
-        /** by default the current date+time is used when verifying.  you can override this.    this value is rounded down to the closest second */
-        currentDate?: Date;
-    } ) {
+        /** public key for the keyPair used when calling [[create()]] 
+        
+        Convienience Note: if your pubKey is a ```string``` and does not start/end with the default PEM plaintext achor lines (eg: ```-----BEGIN PUBLIC KEY-----<eol>``` we will add them for you automatically);*/
+        publicKey: string | Buffer,
+        options?: {
+            /** default false.  if true, we won't reject the promise when a validation fails (bad sig, expired).  instead you'll need to check the resulting payload yourself */
+            allowValidationFailure?: boolean;
+            /** by default the current date+time is used when verifying.  you can override this.    this value is rounded down to the closest second */
+            currentDate?: Date;
+        } ) {
 
         options = { currentDate: new Date(), allowValidationFailure: false, ...options };
-
+        if ( typeof publicKey === "string" && publicKey.trim().startsWith( "-----BEGIN PUBLIC KEY-----" ) === false ) {
+            publicKey = `-----BEGIN PUBLIC KEY-----\n${ publicKey.trim() }\n-----END PUBLIC KEY-----\n`;
+        }
         if ( token.startsWith( "0." ) !== true ) {
             return bb.reject( new Error( "Invalid Token.  Can not Parse.  not a TinyToken or a newer version.  we expected to start with '0.' " ) );
         }

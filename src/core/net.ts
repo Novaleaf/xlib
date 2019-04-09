@@ -50,6 +50,33 @@ export async function request( options: IRequestOptions ) {
 	return toReturn;
 }
 
+/** invokes [[request]]() but also ensures response body is of type ```application/json```, automatically parses it, and returns it as an extra parameter. */
+export async function requestJson<TResponseBody>( options: IRequestOptions & {
+	/**optional.  pass TRUE to require the "content-type" header to be set to "application/json".  Default is FALSE.  */
+	requireJsonHeader?: boolean;
+} ) {
+
+	const response = await request( options );
+	if ( options.requireJsonHeader === true && __.str.indexOf( response.headers[ "content-type" ], "application/json", true ) < 0 ) {
+		throw new __.Ex( `xlib.net.requestJson(): wrong content type.   expected "application/json" but got ${ response.headers[ "content-type" ] }` );
+	}
+	try {
+		const body: TResponseBody = JSON.parse( response.body );
+		return {
+			response,
+			body,
+		}
+	} catch ( _err ) {
+		throw new __.Ex( `xlib.net.requestJson(): can not parse response.body`, { innerError: _err } );
+	}
+}
+
+
+// import * as types from "./types";
+
+
+// type RequestResponse<TResponseBody = any> = types.PropsUnion<{ body: TResponseBody }, __request.Response>;
+
 
 // tslint:disable-next-line: no-submodule-imports
 const __requestPromiseAnyErrors: any = require( "request-promise-any/errors" );
@@ -83,6 +110,7 @@ declare class _RequestError extends Error {
 //export StatusCodeError;
 export const RequestError: typeof _RequestError = __requestPromiseAnyErrors.RequestError;
 export const StatusCodeError: typeof _StatusCodeError = __requestPromiseAnyErrors.StatusCodeError;
+
 
 // export import requestErrors = require( "request-promise-any/errors" );
 
