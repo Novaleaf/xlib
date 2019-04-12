@@ -124,7 +124,7 @@ export namespace jsonX {
 	export function inspectStringify( obj: any, options?: IInspectOptions
 	) {
 		const outputJson = inspectParse( obj, options );
-
+		return JSON.stringify( outputJson, undefined, "  " );
 	}
 	/** debug inspection helper. outputs human readable JSON (but won't round-trip with .parse()).  handles circular references gracefully */
 	export function inspectParse( obj: any, options?: IInspectOptions

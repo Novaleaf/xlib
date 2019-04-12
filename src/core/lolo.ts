@@ -89,7 +89,7 @@ import { bluebird } from "./promise";
 	* @example
 	const results = await __.bb.resolve(someObject.someAsyncFcn()).timeout(1000,"waited too long");
 */
-export const bb = bluebird;
+export import bb = bluebird;
 
 /** shortcut to the ```xlib.diagnostics.Exception``` class,
  * @example

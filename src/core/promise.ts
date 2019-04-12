@@ -1,6 +1,7 @@
 "use strict";
 
 import * as _ from "lodash";
+import * as diagnostics from "./diagnostics";
 
 /** https://github.com/petkaantonov/bluebird  Bluebird is a fully featured promise library with focus on innovative features and performance
  * global.Promise is aliased to this.
@@ -88,9 +89,14 @@ export function awaitInspect<T>( promise: PromiseLike<T> ): bluebird<{ toInspect
 
 }
 
+export function handleFloating( floatingPromise: PromiseLike<any> ): void{
+	bluebird.resolve( floatingPromise ).catch( (_err) => {		
+		diagnostics.log.error( "floating promise errored", _err );		
+	 } );
+}
 
 /** inversion of control (IoC) to let the caller specify work that will be done by the async method.     values can be a promise, function (sync or async), or result */
-export type IocCallback<TArgs=void, TResults=any> = Promise<TResults> | ( ( args: TArgs ) => Promise<TResults> ) | ( ( args: TArgs ) => TResults ) | TResults;
+export type IocCallback<TArgs = void, TResults = any> = Promise<TResults> | ( ( args: TArgs ) => Promise<TResults> ) | ( ( args: TArgs ) => TResults ) | TResults;
 
 
 // /** Reactive Extensions https://github.com/Reactive-Extensions/RxJS
@@ -102,11 +108,11 @@ export type IocCallback<TArgs=void, TResults=any> = Promise<TResults> | ( ( args
 // rx.config.Promise = bluebird;
 
 /** gets a promise which includes the "fulfill()" and "reject()" methods to allow external code to fullfill it.*/
-export function CreateExposedPromise<TReturn=void>(): IExposedPromise<TReturn, never>;
-export function CreateExposedPromise<TReturn=void, TTags = void>( tags: TTags,
+export function CreateExposedPromise<TReturn = void>(): IExposedPromise<TReturn, never>;
+export function CreateExposedPromise<TReturn = void, TTags = void>( tags: TTags,
 	callback?: ( fulfill: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void, reject: ( error: any ) => void ) => void,
 ): IExposedPromise<TReturn, TTags>;
-export function CreateExposedPromise<TReturn=void, TTags = void>( ...args: Array<any> ): IExposedPromise<TReturn, TTags> {
+export function CreateExposedPromise<TReturn = void, TTags = void>( ...args: Array<any> ): IExposedPromise<TReturn, TTags> {
 	const tags = args[ 0 ] as TTags;
 	const callback = args[ 1 ];
 	let fulfiller: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void;
@@ -127,7 +133,7 @@ export function CreateExposedPromise<TReturn=void, TTags = void>( ...args: Array
 	return toReturn;
 }
 
-export interface IExposedPromise<TReturn=void, TTags=never> extends bluebird<TReturn> {
+export interface IExposedPromise<TReturn = void, TTags = never> extends bluebird<TReturn> {
 	fulfill: ( resultOrThenable?: TReturn | PromiseLike<TReturn> ) => void;
 	reject: ( error: Error ) => void;
 	/** custom data for tracking state you might need, such as informing if the promise is being executed */

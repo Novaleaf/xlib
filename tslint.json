@@ -11,7 +11,11 @@
             true,
             "Thenable",
             "Bluebird",
-            "IExposedPromise"
+            "IExposedPromise",
+            "PromiseConstructor",
+            "Promise",
+            "PromiseLike",
+            "bluebird"
         ],
         "ban-comma-operator": true,
         "ban": [

@@ -264,6 +264,10 @@ export namespace tinyToken {
         const deflated = stringHelper.base64Url.encode( deflatedBuffer );
 
         //console.warn( `log debug: payloadStringified.len=${ payloadStringified.length } defLen=${ deflated.length }, sig.len=${ sig.length }, payloadStringified=${ payloadStringified }` )
+
+        // if ( deflated.includes( "." ) || sig.includes( "." ) ) {
+        //     throw new exception.Exception("Fatal Error:  The constructed tinyToken includes the '.' character in an invalid position.   we use the '.' character for seperating sections of the token and should not have been encoded via base64Url.")
+        // }
         return `0.${ deflated }.${ sig }`;
     }
 
