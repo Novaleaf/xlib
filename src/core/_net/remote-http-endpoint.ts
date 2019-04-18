@@ -1,7 +1,7 @@
 
 //import Bluebird from "bluebird";
 import * as promise from "../promise";
-import bb = promise.bluebird;
+import bb = require( "bluebird" );
 import * as _ from "lodash";
 import * as __ from "../lolo";
 import * as diagnostics from "../diagnostics";
@@ -210,18 +210,19 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 					/**
 						*  the actual HTTP request we send over the wire.
 						*/
-					let axiosRequestPromise: axios.AxiosPromise<TRecievePayload>;
+					let axiosRequestPromise: bb<axios.AxiosResponse<TRecievePayload>>;// axios.AxiosPromise<TRecievePayload>;
 
 					switch ( protocol ) {
 						case "post":
 							{
 								//axios.post(endpoint,null,{})
-								axiosRequestPromise = axios.default.post<TRecievePayload>( endpoint, submitPayload, finalOptions.requestOptions );
+								//console.warn( "axios post", endpoint, submitPayload, finalOptions.requestOptions );
+								axiosRequestPromise = bb.resolve( axios.default.post<TRecievePayload>( endpoint, submitPayload, finalOptions.requestOptions ) );
 							}
 							break;
 						case "get":
 							{
-								axiosRequestPromise = axios.default.get<TRecievePayload>( endpoint, finalOptions.requestOptions );
+								axiosRequestPromise = bb.resolve( axios.default.get<TRecievePayload>( endpoint, finalOptions.requestOptions ) );
 							}
 							break;
 

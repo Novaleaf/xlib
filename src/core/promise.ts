@@ -89,10 +89,10 @@ export function awaitInspect<T>( promise: PromiseLike<T> ): bluebird<{ toInspect
 
 }
 
-export function handleFloating( floatingPromise: PromiseLike<any> ): void{
-	bluebird.resolve( floatingPromise ).catch( (_err) => {		
-		diagnostics.log.error( "floating promise errored", _err );		
-	 } );
+export function handleFloating( floatingPromise: PromiseLike<any> ): void {
+	bluebird.resolve( floatingPromise ).catch( ( _err ) => {
+		diagnostics.log.error( "floating promise errored", _err );
+	} );
 }
 
 /** inversion of control (IoC) to let the caller specify work that will be done by the async method.     values can be a promise, function (sync or async), or result */
