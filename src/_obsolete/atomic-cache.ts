@@ -1,7 +1,8 @@
 
 //import * as moment from "moment";
 import * as luxon from "luxon";
-import * as bb from "bluebird";
+import bb from "bluebird";
+
 
 /**
  * abstract class used for elements stored in the AtomicCache object
@@ -12,7 +13,7 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 	/** the last time this was used.  older than max sync time (1 minute) and we dispose */
 	private _lastUsedTime: luxon.DateTime;
 
-	private _syncPending: bb<any> = bb.resolve();
+	private _syncPending: bb<void> = bb.resolve();
 
 	/** read only:  the last time this was used */
 	public get lastUsedTime() {
@@ -166,7 +167,7 @@ export abstract class AtomicCacheItem<TValue, TModifyParams>{
 					.then( () => {
 						//let currentData = this._creditBalance.data;
 						let toReturn = this.calculateCurrentValue();
-						return bb.resolve( toReturn )
+						return bb.resolve( toReturn );
 					} );
 			} else {
 				//return current balance data
@@ -276,9 +277,9 @@ export class AtomicCache<CacheItem extends AtomicCacheItem<any, any>, TValue, TM
 		}, this._autoTryCleanupInterval.as( "millisecond" ) );
 	}
 
-	private _storage: { [ key: string ]: CacheItem } = {};
+	private _storage: { [ key: string ]: CacheItem; } = {};
 
-	private _nextInspectIndex: number = 0;
+	private _nextInspectIndex = 0;
 	private _inspectKeys: string[] = [];
 
 	private _tryCleanupOne(/** set to true to force cleaning up all keys immediately  for testing "new apiKey" roundtrip times.  default false. */ testingForceDispose = false ) {
@@ -298,12 +299,14 @@ export class AtomicCache<CacheItem extends AtomicCacheItem<any, any>, TValue, TM
 		let key = this._inspectKeys[ currentIndex ];
 
 		if ( this._storage[ key ].tryDisposeIfTooOld( testingForceDispose ) === true ) {
+// tslint:disable-next-line: no-dynamic-delete
 			delete this._storage[ key ];
 
 			//since we clean up 1, try to clean another (keep going till we hit 1 that doesn't cleanup)
 			setTimeout( () => {
 				//log.info("disposing " + key);
-				return this._tryCleanupOne( testingForceDispose );
+				this._tryCleanupOne( testingForceDispose );
+				return;
 			} );
 		}
 
@@ -336,7 +339,6 @@ export class AtomicCache<CacheItem extends AtomicCacheItem<any, any>, TValue, TM
 		//item._dispose();
 
 
-
 		return toReturn;
 	}
 
@@ -352,7 +354,6 @@ export class AtomicCache<CacheItem extends AtomicCacheItem<any, any>, TValue, TM
 
 			return value;
 		} );
-
 
 
 		return toReturn;
@@ -388,7 +389,6 @@ export class AtomicCache<CacheItem extends AtomicCacheItem<any, any>, TValue, TM
 
 		return item.get();
 	}
-
 
 
 }

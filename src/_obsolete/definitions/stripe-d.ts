@@ -3,9 +3,8 @@
 export type StripeStatic = ( apiKey: string ) => StripeInstance;
 
 
-
 export interface IMetadata {
-	[ key: string ]: string
+	[ key: string ]: string;
 }
 /** wrapper for how stripe returns arrays */
 export interface IList<T> {
@@ -78,7 +77,7 @@ The parameter the error relates to if the error is parameter-specific. You can u
 		/**optional
 	The parameter the error relates to if the error is parameter-specific. You can use this to display a message near the correct form field, for example.*/
 		param?: any;
-	}
+	};
 
 }
 
@@ -97,6 +96,8 @@ export function generateUserDebugInfo( error: IError ) {
 		message: error.message,
 		code: error.code,
 		details: error.detail,
+		charge: undefined as string,
+		decline_code: undefined as string,
 	};
 
 	if ( toReturn.details == null ) {
@@ -108,7 +109,7 @@ export function generateUserDebugInfo( error: IError ) {
 		return toReturn;
 	}
 
-	toReturn[ "charge" ] = error.raw.charge;
+	toReturn.charge = error.raw.charge;
 
 	if ( error.raw.decline_code == null ) {
 		//nothing more to do
@@ -116,7 +117,7 @@ export function generateUserDebugInfo( error: IError ) {
 	}
 
 
-	toReturn[ "decline_code" ] = error.raw.decline_code;
+	toReturn.decline_code = error.raw.decline_code;
 
 	let declineDetails: string;
 	switch ( error.raw.decline_code ) {
@@ -634,7 +635,6 @@ interface IShippingInformation {
 	 */
 	tracking_number: string;
 }
-
 
 
 interface IBalanceTransaction {
@@ -1454,7 +1454,7 @@ True if you can create multiple payments using this account. If the account is r
 Whether this Alipay account object has ever been used for a payment.*/
 	used: boolean;
 	/** The username for the Alipay account.*/
-	username;
+	username: string;
 
 }
 
@@ -1793,11 +1793,9 @@ interface IInvoice {
 }
 
 
-
-
 export interface StripeInstance {
 	/** When we make backwards-incompatible changes to the API, we release new, dated versions. example version is "2016-02-03" */
-	setApiVersion( versionDate: string );
+	setApiVersion( versionDate: string ): any;
 	/** To charge a credit or a debit card, you create a charge object. You can retrieve and refund individual charges as well as list all charges. Charges are identified by a unique random ID.*/
 	charges: {
 		/** To charge a credit card, you create a charge object. If your API key is in test mode, the supplied payment source (e.g., card or Bitcoin receiver) won't actually be charged, though everything else will occur as if in live mode. (Stripe assumes that the charge would have completed successfully).*/
@@ -1838,15 +1836,15 @@ A cursor for use in pagination. starting_after is an object ID that defines your
 	/** You can create plans easily via the plan management page of the Stripe dashboard. Plan creation is also accessible via the API if you need to create plans on the fly. */
 	plans: {
 		/** todo: document*/
-		create( ...args: any[] );
+		create( ...args: any[] ): any;
 		/** Retrieves the plan with the given ID. */
 		retrieve(
 			/** The ID of the desired plan. */
 			plan: string ): Promise<IPlan>;
 		/** todo: document*/
-		update( ...args: any[] );
+		update( ...args: any[] ): any;
 		/** todo: document*/
-		del( ...args: any[] );
+		del( ...args: any[] ): any;
 		/** Returns a list of your plans. 
 		
 		Returns
@@ -1974,24 +1972,24 @@ Returns the customer object if the update succeeded. Throws an error if update p
 				child arguments*/
 				source?: string | ICard;
 
-			} ): Promise<ICustomer>
+			} ): Promise<ICustomer>;
 		/** Delete a card
 		You can delete cards from a customer, recipient, or managed account.
 		For customers: if you delete a card that is currently the default source, then the most recently added source will become the new default. If you delete a card that is the last remaining source on the customer then the default_source attribute will become null.
 		For recipients: if you delete the default card, then the most recently added card will become the new default. If you delete the last remaining card on a recipient, then the default_card attribute will become null.
 		For accounts: if a card's default_for_currency property is true, it can only be deleted if it is the only external account for its currency, and the currency is not the Stripe account's default currency. Otherwise, before deleting the card, you must set another external account to be the default for the currency.
 		Note that for cards belonging to customers, you may want to prevent customers on paid subscriptions from deleting all cards on file so that there is at least one default card for the next invoice payment attempt.*/
-		deleteCard( customerId: string, cardId: string ): Promise<{ deleted: boolean; id: string }>;
+		deleteCard( customerId: string, cardId: string ): Promise<{ deleted: boolean; id: string; }>;
 		/** Create a card
 		When you create a new credit card, you must specify a customer, recipient, or managed account to create it on.
 		If the card's owner has no default card, then the new card will become the default. However, if the owner already has a default then it will not change. To change the default, you should either update the customer to have a new default_source, update the recipient to have a new default_card, or set default_for_currency to true when creating a card for a managed account. */
-		createSource( customerId: string, options: {/** token from stripe checkout */source: string } ): Promise<ICard | IAlipayAccount>;
-		createSource( customerId: string, options: {/** token from stripe checkout */source: string }, /** optional A set of key/value pairs that you can attach to a card object. It can be useful for storing additional information about the card in a structured format. */ metadata: IMetadata ): Promise<ICard | IAlipayAccount | IBitcoinReceiver>;
+		createSource( customerId: string, options: {/** token from stripe checkout */source: string; } ): Promise<ICard | IAlipayAccount>;
+		createSource( customerId: string, options: {/** token from stripe checkout */source: string; }, /** optional A set of key/value pairs that you can attach to a card object. It can be useful for storing additional information about the card in a structured format. */ metadata: IMetadata ): Promise<ICard | IAlipayAccount | IBitcoinReceiver>;
 
 
 		/** Cancels a customer’s subscription. If you set the at_period_end parameter to true, the subscription will remain active until the end of the period, at which point it will be canceled and not renewed. By default, the subscription is terminated immediately. In either case, the customer will not be charged again for the subscription. Note, however, that any pending invoice items that you’ve created will still be charged for at the end of the period unless manually deleted. If you’ve set the subscription to cancel at period end, any pending prorations will also be left in place and collected at the end of the period, but if the subscription is set to cancel immediately, pending prorations will be removed.
 		By default, all unpaid invoices for the customer will be closed upon subscription cancellation. We do this in order to prevent unexpected payment retries once the customer has canceled a subscription. However, you can reopen the invoices manually after subscription cancellation to have us proceed with automatic retries, or you could even re-attempt payment yourself on all unpaid invoices before allowing the customer to cancel the subscription at all.*/
-		cancelSubscription( customerId: string, subscriptionId: string, options: { at_period_end?: boolean } ): Promise<ISubscription>;
+		cancelSubscription( customerId: string, subscriptionId: string, options: { at_period_end?: boolean; } ): Promise<ISubscription>;
 		/** Creates a new subscription on an existing customer.*/
 		createSubscription( customerId: string, options: {
 			/** REQUIRED
@@ -2062,13 +2060,9 @@ Unix timestamp representing the end of the trial period the customer will get be
 			trial_end?: number;
 
 
-
-
-
-
 		} ): Promise<ISubscription>;
 
-	}
+	};
 
 
 	invoices: {
@@ -2101,6 +2095,6 @@ The invoice also has a next_payment_attempt attribute that tells you the next ti
 A limit on the number of objects to be returned. Limit can range between 1 and 100 items.*/
 			limit?: number;
 		} ): Promise<IList<IInvoice>>;
-	}
+	};
 
 }

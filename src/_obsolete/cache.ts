@@ -1,12 +1,12 @@
-﻿"use strict";
+"use strict";
 
-import * as bb from "bluebird";
+import bb from "bluebird";
 
 import * as stringHelper from "../core/_util/stringhelper";
 
-import * as _ from "lodash";
+import _ from "lodash";
 
-import * as luxon from "luxon";
+import luxon from "luxon";
 
 import * as reflection from "../core/reflection";
 
@@ -38,10 +38,10 @@ export class Cache {
     constructor() {
         this._storage = {};
     }
-    private _storage: { [ key: string ]: ICacheItem<any> } = {};
+    private _storage: { [ key: string ]: ICacheItem<any>; } = {};
 
     private _cleanupKeys: string[] = [];
-    private _cleanupNextPosition: number = 0;
+    private _cleanupNextPosition = 0;
 
     /**
      * allows caching values for a period of time.   upon expiring, new values will be fetched via the "fetchFunction".
@@ -72,8 +72,6 @@ export class Cache {
     ): Promise<TValue> {
 
 
-
-
         if ( options == null ) {
             options = {};
         }
@@ -87,7 +85,7 @@ export class Cache {
 
 
         function returnOrClone( potentialValue: TValue ): TValue {
-            let toReturn: TValue
+            let toReturn: TValue;
             if ( options.noClone ) {
                 //use newValue directly
                 toReturn = potentialValue;
@@ -105,7 +103,6 @@ export class Cache {
         }
         // do a garbage collection pass (one item checked per read call) 
         this._tryGCOne( now );
-
 
 
         let cacheItem = this._storage[ key ];
@@ -143,7 +140,6 @@ export class Cache {
         }
 
 
-
         //need to fetch a new value, so start refetching new
         cacheItem.currentFetch = bb.resolve( fetchFunction() );
 
@@ -155,12 +151,11 @@ export class Cache {
 
             cacheItem.value = newValue;
             cacheItem.expires = _now.plus( options.fetchExpiresDuration );
-            cacheItem.gcAfter = now.plus( luxon.Duration.fromObject( { seconds: options.fetchExpiresDuration.as( "seconds" ) * options.gcAfterMultipler } ) ) //cacheItem.expires.plus( options.fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds" );
+            cacheItem.gcAfter = now.plus( luxon.Duration.fromObject( { seconds: options.fetchExpiresDuration.as( "seconds" ) * options.gcAfterMultipler } ) ); //cacheItem.expires.plus( options.fetchExpiresDuration.asSeconds() * options.gcAfterMultipler, "seconds" );
 
             //we might want to clone the resule
             return bb.resolve( returnOrClone( cacheItem.value ) );
         } );
-
 
 
         if ( cacheItem.value === undefined ) {
@@ -190,6 +185,7 @@ export class Cache {
     public write<TValue>( key: string, newCacheItem: ICacheItem<TValue> ) {
 
         if ( newCacheItem == null ) {
+// tslint:disable-next-line: no-dynamic-delete
             delete this._storage[ key ];
         } else {
             this._storage[ key ] = newCacheItem;
@@ -215,6 +211,7 @@ export class Cache {
         this._cleanupNextPosition++;
         let tryCleanup = this._storage[ key ];
         if ( tryCleanup == null ) {
+// tslint:disable-next-line: no-dynamic-delete
             delete this._storage[ key ];
             return;
         }
@@ -225,6 +222,7 @@ export class Cache {
 
 
         //no early exit clauses triggered, so cleanup
+// tslint:disable-next-line: no-dynamic-delete
         delete this._storage[ key ];
         return;
     }
@@ -234,5 +232,5 @@ export class Cache {
 /**
  *  default cache
  */
-export var defaultCache = new Cache();
+export let defaultCache = new Cache();
 

@@ -102,11 +102,14 @@
         "no-for-in-array": true,
         "no-implicit-dependencies": true,
         "no-import-side-effect": true,
-        "no-inferrable-types": {
-            "options": [
-                "ignore-params"
-            ]
-        },
+        "no-inferrable-types": [
+            false,
+            {
+                "options": [
+                    "ignore-params"
+                ]
+            }
+        ],
         "no-inferred-empty-object-type": true,
         "no-internal-module": true,
         "no-invalid-template-strings": true,

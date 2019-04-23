@@ -1,4 +1,4 @@
-"use strict";
+// tslint:disable: no-bitwise no-dynamic-delete
 
 import * as stringHelper from "../core/_util/stringhelper";
 //import arrayHelper = require("./arrayhelper");
@@ -6,7 +6,7 @@ import * as numHelper from "../core/_util/numhelper";
 import * as diagnostics from "../core/diagnostics";
 //import runtime = require("./runtime");
 //import diagnostics = require("./diagnostics");
-import * as bb from "bluebird";
+import bb from "bluebird";
 //import * as moment from "moment";
 import * as luxon from "luxon";
 
@@ -23,16 +23,14 @@ export class BitFlags {
 	/** internal storage for our bitflags (just a number!) */
 	public rawBuffer: number = 0;
 
-	constructor( initialValue: BitFlags )
-	constructor( initialValue: number )
-	constructor( bitFlagsOrRawBuffer?: any ) {
+	constructor( bitFlagsOrRawBuffer?: BitFlags | number ) {
 		if ( bitFlagsOrRawBuffer == null ) {
 			this.rawBuffer = 0;
 		} else if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			this.rawBuffer = rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			this.rawBuffer = flags.rawBuffer;
 		}
 	}
@@ -47,6 +45,7 @@ export class BitFlags {
 	/** return the value of a certain flag */
 	public getFlag( index: number ): boolean {
 		BitFlags.assertIndexInRange( index );
+
 		return ( ( this.rawBuffer & ( 0x01 << index ) ) !== 0 );
 	}
 	public static getFlag( rawBuffer: number, index: number ): boolean {
@@ -90,157 +89,133 @@ export class BitFlags {
 	}
 
 	/** sets any flags that are set in the input */
-	public add( flags: BitFlags );
-	public add( rawBuffer: number );
-	public add( bitFlagsOrRawBuffer: any ) {
+	public add( bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			this.rawBuffer |= rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			this.rawBuffer |= flags.rawBuffer;
 		}
 	}
-	public static add( rawBuffer: number, flags: BitFlags );
-	public static add( rawBuffer: number, rawBufferOther: number );
-	public static add( rawBuffer: number, bitFlagsOrRawBuffer: any ) {
+	public static add( rawBuffer: number, bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			rawBuffer |= rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			rawBuffer |= flags.rawBuffer;
 		}
 	}
 
 	/** unsets any set flags that are set in the input */
-	public subtract( flags: BitFlags );
-	public subtract( rawBuffer: number );
-	public subtract( bitFlagsOrRawBuffer: any ) {
+	public subtract( bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			this.rawBuffer &= ~rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			this.rawBuffer &= ~flags.rawBuffer;
 		}
 	}
 
 	/** unsets any set flags that are set in the input */
-	public static subtract( rawBuffer: number, flags: BitFlags );
-	public static subtract( rawBuffer: number, rawBufferOther: number );
-	public static subtract( rawBuffer: number, bitFlagsOrRawBuffer: any ) {
+	public static subtract( rawBuffer: number, bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			rawBuffer &= ~rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			rawBuffer &= ~flags.rawBuffer;
 		}
 	}
 
 
 	/** flips the value of any flags set in the input */
-	public flip( flags: BitFlags );
-	public flip( rawBuffer: number );
-	public flip( bitFlagsOrRawBuffer: any ) {
+	public flip( bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			this.rawBuffer ^= rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			this.rawBuffer ^= flags.rawBuffer;
 		}
 	}
 
 	/** flips the value of any flags set in the input */
-	public static flip( rawBuffer: number, flags: BitFlags );
-	public static flip( rawBuffer: number, rawBufferOther: number );
-	public static flip( rawBuffer: number, bitFlagsOrRawBuffer: any ) {
+	public static flip( rawBuffer: number, bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			rawBuffer ^= rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			rawBuffer ^= flags.rawBuffer;
 		}
 	}
 
 	/** returns true if all the set flags in the input are also set in this. */
-	public isAllOn( flags: BitFlags );
-	public isAllOn( rawBuffer: number );
-	public isAllOn( bitFlagsOrRawBuffer: any ) {
+	public isAllOn( bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			return ( this.rawBuffer & rawBufferInput ) === rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			return ( this.rawBuffer & flags.rawBuffer ) === flags.rawBuffer;
 		}
 	}
 
 
 	/** returns true if all the set flags in the input are also set in this. */
-	public static isAllOn( rawBuffer: number, flags: BitFlags );
-	public static isAllOn( rawBuffer: number, rawBufferOther: number );
-	public static isAllOn( rawBuffer: number, bitFlagsOrRawBuffer: any ) {
+	public static isAllOn( rawBuffer: number, bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			return ( rawBuffer & rawBufferInput ) === rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			return ( rawBuffer & flags.rawBuffer ) === flags.rawBuffer;
 		}
 	}
 
 	/** returns true if any of the set flags in the input are set in this. */
-	public isAnyOn( flags: BitFlags );
-	public isAnyOn( rawBuffer: number );
-	public isAnyOn( bitFlagsOrRawBuffer: any ) {
+	public isAnyOn( bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			return ( this.rawBuffer & rawBufferInput ) !== 0;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			return ( this.rawBuffer & flags.rawBuffer ) !== 0;
 		}
 	}
 
 	/** returns true if any of the set flags in the input are set in this. */
-	public static isAnyOn( rawBuffer: number, flags: BitFlags );
-	public static isAnyOn( rawBuffer: number, rawBufferOther: number );
-	public static isAnyOn( rawBuffer: number, bitFlagsOrRawBuffer: any ) {
+	public static isAnyOn( rawBuffer: number, bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			return ( rawBuffer & rawBufferInput ) !== 0;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			return ( rawBuffer & flags.rawBuffer ) !== 0;
 		}
 	}
 
 	/** returns true if the set and unset flags exactly match */
-	public equals( flags: BitFlags );
-	public equals( rawBuffer: number );
-	public equals( bitFlagsOrRawBuffer: any ) {
+	public equals( bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			return this.rawBuffer === rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			return this.rawBuffer === flags.rawBuffer;
 		}
 	}
 
 	/** returns true if the set and unset flags exactly match */
-	public static equals( rawBuffer: number, flags: BitFlags );
-	public static equals( rawBuffer: number, rawBufferOther: number );
-	public static equals( rawBuffer: number, bitFlagsOrRawBuffer: any ) {
+	public static equals( rawBuffer: number, bitFlagsOrRawBuffer: BitFlags | number ) {
 		if ( typeof ( bitFlagsOrRawBuffer ) === "number" ) {
-			var rawBufferInput = <number>bitFlagsOrRawBuffer;
+			let rawBufferInput = bitFlagsOrRawBuffer;
 			return rawBuffer === rawBufferInput;
 		} else {
-			var flags = <BitFlags>bitFlagsOrRawBuffer;
+			let flags = bitFlagsOrRawBuffer;
 			return rawBuffer === flags.rawBuffer;
 		}
 	}
@@ -251,13 +226,12 @@ export class BitFlags {
 }
 
 
-
 /**
  *  a dictionary that deletes items when they expire
  */
 export class ExpiresDictionary<TValue> {
 
-	private _storage: { [ key: string ]: IExpiresDictionaryItem<TValue> } = {};
+	private _storage: { [ key: string ]: IExpiresDictionaryItem<TValue>; } = {};
 
 	private _nextInspectIndex: number = 0;
 	private _inspectKeys: string[] = [];
@@ -285,7 +259,7 @@ export class ExpiresDictionary<TValue> {
 		let currentIndex = this._nextInspectIndex;
 		this._nextInspectIndex++;
 		let key = this._inspectKeys[ currentIndex ];
-		let item = this._storage[ key ]
+		let item = this._storage[ key ];
 
 		if ( item != null && item.expires < luxon.DateTime.utc() ) {
 			//console.log("ExpiresDictionary auto.cleanup", key);
@@ -338,14 +312,15 @@ interface IExpiresDictionaryItem<TValue> {
  * @param collection
  * @param callback
  */
-export function ezForEachAndRemove<TItem>( collection: { [ key: string ]: TItem }, callback: ( item: TItem, key: string ) => bb<any> ): bb<void> {
+export function ezForEachAndRemove<TItem>( collection: { [ key: string ]: TItem; }, callback: ( item: TItem, key: string ) => bb<any> ): bb<void> {
 
 	let keys = Object.keys( collection );
 	let nextIndex = 0;
 	let toReturn = new bb<void>( ( resolve, reject ) => {
 		function _iterationWorker() {
 			if ( nextIndex >= keys.length ) {
-				return resolve();
+				resolve();
+				return;
 			}
 			let currentIndex = nextIndex;
 			nextIndex++;
@@ -357,7 +332,8 @@ export function ezForEachAndRemove<TItem>( collection: { [ key: string ]: TItem 
 				.then( () => {
 					_iterationWorker();
 				}, ( err ) => {
-					return reject( err );
+					reject( err );
+					return undefined;
 				} );
 		}
 		_iterationWorker();
@@ -568,7 +544,6 @@ export function ezForEachAndRemove<TItem>( collection: { [ key: string ]: TItem 
 //}
 
 
-
 ///** high performance set, use like a hashset
 
 //== implementation notice (READ THIS if using for anything other than strings and numbers!) ==
@@ -759,7 +734,6 @@ export function ezForEachAndRemove<TItem>( collection: { [ key: string ]: TItem 
 
 //		return true;
 //	}
-
 
 
 //	/** returns a tuple: { key: TKey; value: TValue; isSuccess: boolean; } */
