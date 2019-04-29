@@ -50,11 +50,19 @@ export async function request( options: IRequestOptions ) {
 	return toReturn;
 }
 
-/** invokes [[request]]() but also ensures response body is of type ```application/json```, automatically parses it, and returns it as an extra parameter. */
+/** invokes [[request]]() but also ensures response body is of type ```application/json```, automatically parses it, and returns it as an extra parameter.
+*
+* additionally, if you submit an ```options.body``` as an object, we automatically convert it to a string for submission
+*/
 export async function requestJson<TResponseBody>( options: IRequestOptions & {
 	/**optional.  pass TRUE to require the "content-type" header to be set to "application/json".  Default is FALSE.  */
 	requireJsonHeader?: boolean;
 } ) {
+
+	if ( options.body != null && typeof ( options.body ) === "object" ) {
+		//convert to string for sending
+		options.body = JSON.stringify( options.body );
+	}
 
 	const response = await request( options );
 	if ( options.requireJsonHeader === true && __.str.indexOf( response.headers[ "content-type" ], "application/json", true ) < 0 ) {

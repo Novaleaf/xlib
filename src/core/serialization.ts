@@ -115,11 +115,22 @@ export namespace jsonX {
 
 
 	export interface IInspectOptions {
-		/** how far down the object structure you wish to inspect.  No values deeper than the depth will be shown.  @default 1 (show current object's values, no children)*/ maxDepth?: number;
-		/** maximum array elements you want to display for each array. (half at top, half at bottom)  @default 10 */maxArrayElements?: number;
-		/** when we reach maxDepth, the length we summarize the values to.  @default 120 */summarizeLength?: number;
+		/** how far down the object structure you wish to inspect.  No values deeper than the depth will be shown.  @default 1 (show current object's values, no children)*/
+		maxDepth?: number;
+		/** maximum array elements you want to display for each array. (half at top, half at bottom)  @default 10 */
+		maxArrayElements?: number;
+		/** when we reach maxDepth, the length we summarize the values to.  @default 120 */
+		summarizeLength?: number;
 
+		/** true to group all functions into a single string value  (reduce verbosity).  @default false */
 		aggrigateFunctions?: boolean;
+
+		/** true to not show typeNames we don't have a ```typeProcessor``` for. (Note that POJO objects will not have their typeName ("Object") shown regardless)*/
+		hideTypeNames?: boolean;
+
+		/** allows custom parsing of your own types.  return ```undefined``` or ```null``` to skip processing*/
+		typeProcessor?: ( obj: any, typeName: string, options: IInspectOptions ) => any;
+
 	}
 	export function inspectStringify( obj: any, options?: IInspectOptions
 	) {
@@ -165,11 +176,19 @@ export namespace jsonX {
 				case Type.string:
 					return stringHelper.summarize( obj, myOptions.summarizeLength );
 				case Type.Date:
-					const asDate = obj as Date;
-					const ago = time.luxon.DateTime.fromJSDate( asDate ).until( time.luxon.DateTime.utc() ).toDuration( undefined ).toFormat( "hh:mm:ss.SS" );
-					//numHelper.format((Date.now()-asDate.getTime())/1000)
-					return `${ asDate.toISOString() } (-${ ago })`;
+					{
+						const asDate = obj as Date;
+						//	return asDate.toISOString();
+						//const ago = time.luxon.DateTime.fromJSDate( asDate ).until( time.luxon.DateTime.utc() ).toDuration().toFormat( "hh:mm:ss.SS" );
 
+						const diffNow = time.luxon.DateTime.fromMillis( asDate.valueOf() ).diffNow();
+						//let ago = diffNow.toISO();
+						//  let ago = diffNow.valueOf() < 0 ? "-" : "";
+						// ago += diffNow.toFormat( "hh:mm:ss.SS" );
+						let ago = diffNow.toFormat( "hh:mm:ss.SS" );
+						// //numHelper.format((Date.now()-asDate.getTime())/1000)
+						return `${ asDate.toISOString() } (deltaNow:${ ago })`;
+					}
 				case Type.Error:
 					const errOptions = { ...myOptions, maxDepth: myOptions.maxDepth + 1 };
 					return _inspectParse_internal( diagnostics.errorToJson( obj ), errOptions, seenObjects );
@@ -188,7 +207,39 @@ export namespace jsonX {
 					return `[INSPECT_TYPE_NOT_HANDLED  type=${ Type[ type ] }]`;
 				case Type.Array:
 				case Type.object:
+
+					//if it's well known types, generate friendly values
+					const typeName = reflection.getTypeName( obj );
+
+					if ( myOptions.typeProcessor != null ) {
+						let customProcessorResult = myOptions.typeProcessor( obj, typeName, myOptions );
+						if ( customProcessorResult != null ) {
+							return customProcessorResult;
+						}
+					}
+
+					switch ( typeName ) {
+						case "Duration":
+						case "DateTime":
+							if ( obj.valueOf != null ) {
+								let asDate = new Date( obj.valueOf() );
+								const diffNow = time.luxon.DateTime.fromMillis( asDate.valueOf() ).diffNow();
+								//let ago = diffNow.toISO();
+								// let ago = diffNow.valueOf() < 0 ? "-" : "";
+								// ago += diffNow.toFormat( "hh:mm:ss.SS" );
+								let ago = diffNow.toFormat( "hh:mm:ss.SS" );
+								// //numHelper.format((Date.now()-asDate.getTime())/1000)
+								return `${ asDate.toISOString() } (deltaNow:${ ago })`;
+							}
+							break;
+						case "Timeout":
+							return `[Timer Handle (typename="Timeout")]`;
+					}
+
+
+
 					//for these cases, we need to recursively walk them.   see below
+
 
 					break;
 			}
@@ -206,8 +257,36 @@ export namespace jsonX {
 				}
 			}
 
+			let testMap = new Map<string, number>();
+			let testSet = new Set<number>();
+			let testArray = [];
+			//testArray.forE
+			//testSet.forEach()
+			// //testMap
 
-			//recursivly walk children
+
+			let arrayOrigType = "ARRAY";
+			try {
+				/** if this has a forEach method and not an array, convert it to an array for parsing */
+				if ( _.isArray( obj ) === false && obj.forEach != null && typeof ( obj.forEach ) === "function" ) {
+					arrayOrigType = reflection.getTypeName( obj );
+					let tempArray: any[] = [];
+					obj.forEach( ( val: any, key: any ) => {
+						if ( val === key || key === obj ) {
+							//if no key, just push val
+							tempArray.push( val );
+						} else {
+							tempArray.push( { key, val } );
+						}
+					} );
+					obj = tempArray;
+				}
+			} catch{
+				//eat errors
+			}
+
+
+			//recursivly walk children			
 			if ( _.isArray( obj ) === true ) {
 				const objArray = obj as Array<any>;
 				const toReturn = [];
@@ -225,7 +304,7 @@ export namespace jsonX {
 						toReturn.push( _inspectParse_internal( objArray[ i ], myOptions, seenObjects ) );
 					}
 					//missing middle
-					toReturn.push( `[ARRAY_TRUNCATED len=${ objArray.length }]` );
+					toReturn.push( `[${ arrayOrigType }_TRUNCATED len=${ objArray.length }]` );
 					//bottom half
 					for ( let i = 0; i < halfMax; i++ ) {
 						const index = objArray.length - halfMax + i;
@@ -273,6 +352,12 @@ export namespace jsonX {
 				} );
 				if ( functs.length > 0 ) {
 					toReturn[ `[FUNCTIONS count=${ functs.length }]` ] = functs.join( ", " );
+				}
+				if ( myOptions.hideTypeNames !== true ) {
+					const typeName = reflection.getTypeName( obj );
+					if ( typeName !== "Object" ) {
+						toReturn[ "[TYPENAME]" ] = typeName;
+					}
 				}
 
 				return toReturn;

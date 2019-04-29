@@ -223,6 +223,25 @@ interface ILogResults {
 /** console logger logs to screen as simple text.  This is a temporary replacement of the bunyan logger, which causes visual studio to crash when debugging. (mysterious reason, not reproducable in a "clean" project) */
 export class Logger {
 
+	constructor() {
+		//bind all functions so that "this" functions properly.
+		const _this = this as any;
+		for ( const propName of Object.getOwnPropertyNames( _this ) ) {
+			if ( typeof _this[ propName ] === "function" ) {
+				_this[ propName ] = _this[ propName ].bind( _this );
+			}
+		}
+	}
+
+	// /** helper to terminate promise chains (no floating promises).  This way if the promise fails the error gets logged, and doesn't cause a unhandled promise error.
+	// how to use:   ```yourPromise.catch(log.promiseCatch)
+	// */
+	// public promiseCatch( ...args: any[] ): void {
+	// 	this.error( ...args );
+	// }
+	// public promiseCatchFull( ...args: any[] ): void {
+	// 	this.errorFull( ...args );
+	// }
 
 	/** override the loglevel for specific, focused debugging.     */
 	public static overrideLogLevel(
