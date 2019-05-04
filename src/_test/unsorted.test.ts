@@ -208,27 +208,6 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} ).timeout( 5000 );
 
-	it1( async function testRequestLib_basicE2e() {
-		const response = await xlib.net.request( { url: "http://example.com" } );
-		log.throwCheck( typeof ( response.body ) === "string", "body not string" );
-		log.throwCheck( ( response.body as string ).includes( "Example Domain" ), "expect example.com to include 'Example Domain'" );
-	} );
-
-	it1( async function testRequestLib_technicalFailure() {
-		let caughtErr = false;
-		try {
-			await xlib.net.request( { url: "hXXPTT://lkajsfduiasreiul.coiaoidfal" } );
-		} catch ( _err ) {
-			caughtErr = true;
-			log.info( "verified error thrown as expected by invalid reqeust() call", { _err, type: xlib.reflection.getTypeName( _err ) } );
-
-			log.throwCheck( _err instanceof xlib.net.RequestError, "not instance of RequestError" );
-			// if ( _err instanceof xlib.net.RequestError ) {
-
-			// }
-		}
-		log.throwCheck( caughtErr === true, "error was not thrown by request() as we expected" );
-	} );
 
 	const tokenTestData = { billing: "bypass", credits: 1.0, use: "direct", lots: { of: "less than words", values: [ "abc", "do re me", 123 ], now: new Date() }, mots2: {} };
 	let keyPair_P256: { pub: string; pri: string; };
