@@ -226,7 +226,8 @@ export class Logger {
 	constructor() {
 		//bind all functions so that "this" functions properly.
 		const _this = this as any;
-		for ( const propName of Object.getOwnPropertyNames( _this ) ) {
+
+		for ( const propName of Object.getOwnPropertyNames( Object.getPrototypeOf( _this ) ) ) {
 			if ( typeof _this[ propName ] === "function" ) {
 				_this[ propName ] = _this[ propName ].bind( _this );
 			}
