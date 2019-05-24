@@ -501,20 +501,9 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		it1( function symbolInspection() {
 
-			let x = 0;
-			x++;
-			//let testObj = { author: "Jason", key: Symbol( new TestSymbol( "Ja", 42 ) as any ) };
-
-			//let testObj: { cache: number; cash: number; []:any; } = { cache: 22.2, cash: 88.8 };
 			let testObj = { cache: 22.2, cash: 88.8, [ Symbol( "KEY" ) ]: { name: "Jason", id: 123 }, dumbNotKey: Symbol( "seekreet" ) };
-			//testObj[ Symbol( "KAY" ) ] = { name: "Jason", id: 123 };
-
 			let parsedToInspect = xlib.serialization.jsonX.inspectStringify( testObj, { maxDepth: 999 } );
-
-			log.info( testObj, { parsed: parsedToInspect } );
-
-			log.throwCheck( parsedToInspect.includes( "Symbol(seekreet)" ) && parsedToInspect.includes( "Symbol(KEY)" ) && parsedToInspect.includes( "Jason" ), "Symbol details are missing from jxons.inspectStringify() result", { parsed: parsedToInspect } )
-
+			log.throwCheck( parsedToInspect.includes( "Symbol(seekreet)" ) && parsedToInspect.includes( "Symbol(KEY)" ) && parsedToInspect.includes( "Jason" ), "Symbol details are missing from jxons.inspectStringify() result", { parsed: parsedToInspect } );
 
 		} );
 
