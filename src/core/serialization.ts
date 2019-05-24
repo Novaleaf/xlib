@@ -171,6 +171,12 @@ export namespace jsonX {
 				case Type.number:
 				case Type.null:
 					return obj;
+				case Type.symbol:
+					if ( Symbol.keyFor( obj ) != null ) {
+						return obj.toString() + "[GLOBAL]";
+					} else {
+						return obj.toString();
+					}
 				case Type.undefined:
 					return "[UNDEFINED]";
 				case Type.string:
@@ -285,6 +291,16 @@ export namespace jsonX {
 				//eat errors
 			}
 
+			//if there are symbols present, convert those to keys that can be inspected.
+			let symbols = Object.getOwnPropertySymbols( obj );
+			if ( symbols != null && symbols.length > 0 ) {
+				obj = _.clone( obj );
+				for ( let i = 0; i < symbols.length; i++ ) {
+					obj[ symbols[ i ].toString() ] = obj[ symbols[ i ] ];
+					// tslint:disable-next-line: no-dynamic-delete
+					delete obj[ symbols[ i ] ];
+				}
+			}
 
 			//recursivly walk children			
 			if ( _.isArray( obj ) === true ) {

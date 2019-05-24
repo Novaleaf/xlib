@@ -15,7 +15,7 @@ export enum Type {
 	"number",
 	"boolean",
 	"function",
-
+	"symbol",
 	/** unknown (custom) object types.  you can use .getTypeName(obj) to get the actual type name */
 	"object",
 	/** a class that can be constructed via the "new" keyword */
@@ -44,6 +44,7 @@ export function getType( obj: any ): Type {
 		case "string":
 		case "number":
 		case "boolean":
+		case "symbol":
 		case "undefined":
 			return Type[ type ];
 		case "object":
@@ -118,6 +119,14 @@ export function getTypeName( obj: any ): string {
 				const str = objAsFunction.toString().trim();
 				const results = /\s*function\s*(\S{1,})\s*\(/.exec( str );
 				const name = results ? results[ 1 ] : "[anonymous]";
+				return name;
+			}
+		case Type.symbol:
+			{
+				const objAsSymbol = obj as Symbol;
+				const str = objAsSymbol.toString().trim();
+				const results = /Symbol\((\S{1,})\)/.exec( str );
+				const name = results ? results[ 1 ] : "[unknown symbol]";
 				return name;
 			}
 		default:

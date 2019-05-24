@@ -58,84 +58,85 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} );
 
-	it1( function testThrowIfFunctionality() {
+	describe( "log_module", function log_module() {
+		it1( function testThrowIfFunctionality() {
 
-		let gotTooFar = false;
-		try {
-			log.throwCheck( false, "should throw an error that will be caught by the test" );
-			gotTooFar = true;
-		} catch ( _err ) {
+			let gotTooFar = false;
+			try {
+				log.throwCheck( false, "should throw an error that will be caught by the test" );
+				gotTooFar = true;
+			} catch ( _err ) {
 
-		}
-		if ( gotTooFar === true ) {
-			throw new Error( "got too far.  log.throwIf() is not working properly." );
-		}
+			}
+			if ( gotTooFar === true ) {
+				throw new Error( "got too far.  log.throwIf() is not working properly." );
+			}
+		} );
+
+		it( "test assert functionality", function testAssertFunctionality() {
+
+			let gotTooFar = false;
+			try {
+				log.assert( false, "should throw an error that will be caught by the test" );
+				gotTooFar = true;
+			} catch ( _err ) {
+
+			}
+			if ( gotTooFar === true ) {
+				throw new Error( "got too far.  log.throwIf() is not working properly." );
+			}
+		} );
+
+		it2( async function loggerBasicConsoleOutput() {
+
+			const testLogger = xlib.diagnostics.log; //  new diagnostics.Logger( "test logging" );
+
+			testLogger.trace( "traced" );
+			testLogger.info( "infoed" );
+			testLogger.warn( "warned" );
+			testLogger.error( "errored" );
+			//testLogger.assert( false, "asserted" );
+
+		} );
+
+
+		it1( function testReadXlibEnvironmentEnvLevel() {
+			xlib.diagnostics.log.throwCheck( xlib.environment.envLevel != null );
+			//log.info( { envLevel: xlib.environment.envLevel } );
+		} );
+
+
+		it1( function testLogAutoTruncation() {
+			log.info( "hi", { some: "data" } );
+
+			let resultArgs = log.info( "this 1000 character string gets auto-truncated nicely via __.inspect()", { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } );
+			log.throwCheck( resultArgs[ 4 ].length < 350 );
+			resultArgs = log.warnFull( "this 1000 character screen doesn't get truncated because it's logged via the Full method ", { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } );
+			log.throwCheck( resultArgs[ 4 ].length > 350 );
+		} );
+
+		it1( function logOverridesTest() {
+
+			try {
+				let result = log.info( "should show" );
+				log.throwCheck( result != null );
+				log.overrideLogLevel( "ERROR" );
+				result = log.trace( "should not show" );
+				log.throwCheck( result == null );
+				result = log.debug( "should not show" );
+				log.throwCheck( result == null );
+				result = log.info( "should not show" );
+				log.throwCheck( result == null );
+				result = log.warn( "should not show" );
+				log.throwCheck( result == null );
+				result = log.error( "should show" );
+				log.throwCheck( result != null );
+			} finally {
+				//reset loglevel
+				log.overrideLogLevel( xlib.environment.logLevel );
+			}
+		} );
 	} );
-
-	it( "test assert functionality", function testAssertFunctionality() {
-
-		let gotTooFar = false;
-		try {
-			log.assert( false, "should throw an error that will be caught by the test" );
-			gotTooFar = true;
-		} catch ( _err ) {
-
-		}
-		if ( gotTooFar === true ) {
-			throw new Error( "got too far.  log.throwIf() is not working properly." );
-		}
-	} );
-
-	it2( async function loggerBasicConsoleOutput() {
-
-		const testLogger = xlib.diagnostics.log; //  new diagnostics.Logger( "test logging" );
-
-		testLogger.trace( "traced" );
-		testLogger.info( "infoed" );
-		testLogger.warn( "warned" );
-		testLogger.error( "errored" );
-		//testLogger.assert( false, "asserted" );
-
-	} );
-
-
-	it1( function testReadXlibEnvironmentEnvLevel() {
-		xlib.diagnostics.log.throwCheck( xlib.environment.envLevel != null );
-		//log.info( { envLevel: xlib.environment.envLevel } );
-	} );
-
-
-	it1( function testLogAutoTruncation() {
-		log.info( "hi", { some: "data" } );
-
-		let resultArgs = log.info( "this 1000 character string gets auto-truncated nicely via __.inspect()", { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } );
-		log.throwCheck( resultArgs[ 4 ].length < 350 );
-		resultArgs = log.warnFull( "this 1000 character screen doesn't get truncated because it's logged via the Full method ", { longKey: xlib.security.humanFriendlyKey( 1000, 10 ) } );
-		log.throwCheck( resultArgs[ 4 ].length > 350 );
-	} );
-
-	it1( function logOverridesTest() {
-
-		try {
-			let result = log.info( "should show" );
-			log.throwCheck( result != null );
-			log.overrideLogLevel( "ERROR" );
-			result = log.trace( "should not show" );
-			log.throwCheck( result == null );
-			result = log.debug( "should not show" );
-			log.throwCheck( result == null );
-			result = log.info( "should not show" );
-			log.throwCheck( result == null );
-			result = log.warn( "should not show" );
-			log.throwCheck( result == null );
-			result = log.error( "should show" );
-			log.throwCheck( result != null );
-		} finally {
-			//reset loglevel
-			log.overrideLogLevel( xlib.environment.logLevel );
-		}
-	} );
-
 	it2( async function testingBasicNetRemoteHttpEndpointFunctionalityReadFromExampleCom() {
 
 
@@ -208,178 +209,181 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} ).timeout( 5000 );
 
+	describe( "security_module", function security_module() {
 
-	const tokenTestData = { billing: "bypass", credits: 1.0, use: "direct", lots: { of: "less than words", values: [ "abc", "do re me", 123 ], now: new Date() }, mots2: {} };
-	let keyPair_P256: { pub: string; pri: string; };
-	let keyPair_P256_2: { pub: string; pri: string; };
-	before( async () => {
-		keyPair_P256 = await xlib.security.generateECKeyPair( "P-256" );
-		keyPair_P256_2 = await xlib.security.generateECKeyPair();
-	} );
-	it1( async function tinyToken_validNoExpire() {
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri );
-		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
-		log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
-		log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
-		//log.infoFull( "tinyToken_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
-	} );
-	it1( async function tinyToken_validExpire5s() {
-		const now = __.utc().minus( { second: 5 } );
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "10s", currentDate: now.toJSDate() } );
-		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
-		log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
-		log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
-	} );
-	it1( async function tinyToken_validExpire5s_P256_Under255Char() {
-		const maximumData = { billing: "bypass", credits: 1.0, use: "direct", lots: { values: [ "abc", "do re me", 123 ], now: new Date() } };
-		const now = __.utc().minus( { second: 5 } );
-		const token = await xlib.security.tinyToken.sign( maximumData, keyPair_P256.pri, { expires: "10s", currentDate: now.toJSDate() } );
-		const result = await xlib.security.tinyToken.verify<typeof maximumData>( token, keyPair_P256.pub );
-		log.info( "token = ", token.length, token );
-		log.info( "dataLen = ", JSON.stringify( maximumData ).length );
-
-		log.throwCheck( token.length <= 255, "token length too long" );
-		log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
-		log.throwCheck( JSON.stringify( maximumData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
-	} );
-	it1( async function tinyToken_Expired1s() {
-		const now = __.utc().minus( { second: 11 } );
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "10s", currentDate: now.toJSDate() } );
-		let isError = false;
-		try {
+		const tokenTestData = { billing: "bypass", credits: 1.0, use: "direct", lots: { of: "less than words", values: [ "abc", "do re me", 123 ], now: new Date() }, mots2: {} };
+		let keyPair_P256: { pub: string; pri: string; };
+		let keyPair_P256_2: { pub: string; pri: string; };
+		before( async () => {
+			keyPair_P256 = await xlib.security.generateECKeyPair( "P-256" );
+			keyPair_P256_2 = await xlib.security.generateECKeyPair();
+		} );
+		it1( async function tinyToken_validNoExpire() {
+			const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri );
 			const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
-		} catch ( _err ) {
-			isError = true;
-		}
-
-		log.throwCheck( isError === true, "token did not fail as test expected" );
-		//log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input" );
-	} );
-	it1( async function tinyToken_Expired1s_resultsAnyway() {
-		const smallTestData = { now: new Date() };
-		const now = __.utc().minus( { second: 11 } );
-		const token = await xlib.security.tinyToken.sign( smallTestData, keyPair_P256_2.pri, { expires: "10s", currentDate: now.toJSDate() } );
-
-		const result = await xlib.security.tinyToken.verify<typeof smallTestData>( token, keyPair_P256_2.pub, { allowValidationFailure: true } );
-
-		log.warnFull( "diagnose payloads", { smallTestData: smallTestData, token, result } );
-
-		log.throwCheck( result.isValid === false && result.isExpired === true && result.isSigValid === true, "verify result status checks abnormal" );
-
-		log.throwCheck( JSON.stringify( smallTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", smallTestData, result.data );
-
-	} );
-
-	it1( async function tinyToken_Expired7d1s() {
-		const now = __.utc().minus( { day: 7, second: 1 } );
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "7d", currentDate: now.toJSDate() } );// currentDate: new Date( Date.now() - ( ( 7 * 24 * 3600 ) - ( 1 * 60 ) ) * 1000 ) } ) );
-		let isError = false;
-		try {
+			log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
+			log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
+			//log.infoFull( "tinyToken_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
+		} );
+		it1( async function tinyToken_validExpire5s() {
+			const now = __.utc().minus( { second: 5 } );
+			const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "10s", currentDate: now.toJSDate() } );
 			const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
-		} catch ( _err ) {
-			isError = true;
-		}
-		log.throwCheck( isError === true, "token did not fail as test expected" );
-		//log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input" );
-	} );
-	it1( async function tinyToken_invalid_wrongSig() {
-		const now = __.utc();//.minus( { day: 7, second: 1 } );
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "7d", currentDate: now.toJSDate() } );// currentDate: new Date( Date.now() - ( ( 7 * 24 * 3600 ) - ( 1 * 60 ) ) * 1000 ) } ) );
-		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256.pub, { allowValidationFailure: true } );
-		log.throwCheck( result.isValid === false && result.isExpired === false && result.isSigValid === false, "verify result status checks abnormal" );
-	} );
+			log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
+			log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
+		} );
+		it1( async function tinyToken_validExpire5s_P256_Under255Char() {
+			const maximumData = { billing: "bypass", credits: 1.0, use: "direct", lots: { values: [ "abc", "do re me", 123 ], now: new Date() } };
+			const now = __.utc().minus( { second: 5 } );
+			const token = await xlib.security.tinyToken.sign( maximumData, keyPair_P256.pri, { expires: "10s", currentDate: now.toJSDate() } );
+			const result = await xlib.security.tinyToken.verify<typeof maximumData>( token, keyPair_P256.pub );
+			log.info( "token = ", token.length, token );
+			log.info( "dataLen = ", JSON.stringify( maximumData ).length );
 
-	it1( async function tinyToken_validExpire1sFrom7dAgo() {
-		const now = __.utc().minus( { day: 7 } ).plus( { second: 1 } );
-		const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "7d", currentDate: now.toJSDate() } );
-		const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
-		log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
-		log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
-	} );
+			log.throwCheck( token.length <= 255, "token length too long" );
+			log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
+			log.throwCheck( JSON.stringify( maximumData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
+		} );
+		it1( async function tinyToken_Expired1s() {
+			const now = __.utc().minus( { second: 11 } );
+			const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "10s", currentDate: now.toJSDate() } );
+			let isError = false;
+			try {
+				const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
+			} catch ( _err ) {
+				isError = true;
+			}
 
-	it1( async function jwt_ec_keyPair_basicE2e() {
+			log.throwCheck( isError === true, "token did not fail as test expected" );
+			//log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input" );
+		} );
+		it1( async function tinyToken_Expired1s_resultsAnyway() {
+			const smallTestData = { now: new Date() };
+			const now = __.utc().minus( { second: 11 } );
+			const token = await xlib.security.tinyToken.sign( smallTestData, keyPair_P256_2.pri, { expires: "10s", currentDate: now.toJSDate() } );
 
-		const token = await new __.bb<string>( ( resolve, reject ) => {
-			xlib.security.jwt.sign( tokenTestData, keyPair_P256.pri, { algorithm: "ES256", expiresIn: "5m" }, ( _err, encoded ) => {
-				if ( _err != null ) {
-					reject( _err );
-					return;
-				}
-				resolve( encoded );
-			} );
+			const result = await xlib.security.tinyToken.verify<typeof smallTestData>( token, keyPair_P256_2.pub, { allowValidationFailure: true } );
+
+			log.warnFull( "diagnose payloads", { smallTestData: smallTestData, token, result } );
+
+			log.throwCheck( result.isValid === false && result.isExpired === true && result.isSigValid === true, "verify result status checks abnormal" );
+
+			log.throwCheck( JSON.stringify( smallTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", smallTestData, result.data );
+
 		} );
 
-		// const tokenZipBuff = zlib.deflateRawSync( token );
-
-		// const tokenZip = xlib.util.stringHelper.base64Url.encode( tokenZipBuff );
-
-
-		//log.info( "verifying" );
-		const result = await new __.bb<typeof tokenTestData>( ( resolve, reject ) => {
-			xlib.security.jwt.verify( token, keyPair_P256.pub, {
-				algorithms: [ "ES256" ],
-			}, ( _err, decoded: any ) => {
-				if ( _err != null ) {
-					reject( _err );
-					return;
-				}
-				resolve( decoded );
-			} );
+		it1( async function tinyToken_Expired7d1s() {
+			const now = __.utc().minus( { day: 7, second: 1 } );
+			const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "7d", currentDate: now.toJSDate() } );// currentDate: new Date( Date.now() - ( ( 7 * 24 * 3600 ) - ( 1 * 60 ) ) * 1000 ) } ) );
+			let isError = false;
+			try {
+				const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
+			} catch ( _err ) {
+				isError = true;
+			}
+			log.throwCheck( isError === true, "token did not fail as test expected" );
+			//log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input" );
+		} );
+		it1( async function tinyToken_invalid_wrongSig() {
+			const now = __.utc();//.minus( { day: 7, second: 1 } );
+			const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "7d", currentDate: now.toJSDate() } );// currentDate: new Date( Date.now() - ( ( 7 * 24 * 3600 ) - ( 1 * 60 ) ) * 1000 ) } ) );
+			const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256.pub, { allowValidationFailure: true } );
+			log.throwCheck( result.isValid === false && result.isExpired === false && result.isSigValid === false, "verify result status checks abnormal" );
 		} );
 
+		it1( async function tinyToken_validExpire1sFrom7dAgo() {
+			const now = __.utc().minus( { day: 7 } ).plus( { second: 1 } );
+			const token = await xlib.security.tinyToken.sign( tokenTestData, keyPair_P256_2.pri, { expires: "7d", currentDate: now.toJSDate() } );
+			const result = await xlib.security.tinyToken.verify<typeof tokenTestData>( token, keyPair_P256_2.pub );
+			log.throwCheck( result.isValid === true && result.isExpired === false && result.isSigValid === true, "verify result status checks abnormal" );
+			log.throwCheck( JSON.stringify( tokenTestData ) === JSON.stringify( result.data ), "resulting token data does not match input", tokenTestData, result.data );
+		} );
 
-		//log.infoFull( "jwt_ec_keyPair_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
+		it1( async function jwt_ec_keyPair_basicE2e() {
 
+			const token = await new __.bb<string>( ( resolve, reject ) => {
+				xlib.security.jwt.sign( tokenTestData, keyPair_P256.pri, { algorithm: "ES256", expiresIn: "5m" }, ( _err, encoded ) => {
+					if ( _err != null ) {
+						reject( _err );
+						return;
+					}
+					resolve( encoded );
+				} );
+			} );
+
+			// const tokenZipBuff = zlib.deflateRawSync( token );
+
+			// const tokenZip = xlib.util.stringHelper.base64Url.encode( tokenZipBuff );
+
+
+			//log.info( "verifying" );
+			const result = await new __.bb<typeof tokenTestData>( ( resolve, reject ) => {
+				xlib.security.jwt.verify( token, keyPair_P256.pub, {
+					algorithms: [ "ES256" ],
+				}, ( _err, decoded: any ) => {
+					if ( _err != null ) {
+						reject( _err );
+						return;
+					}
+					resolve( decoded );
+				} );
+			} );
+
+
+			//log.infoFull( "jwt_ec_keyPair_basicE2e done success", { dataLen: JSON.stringify( data ).length, tokenLen: token.length, token, result } );
+
+
+		} );
+		it2( async function jwt_keyPair_basicE2e() {
+
+
+			return new __.bb<void>( ( resolve, reject ) => {
+				//generate RSA key pair
+
+				//from: https://stackoverflow.com/a/52775583/1115220
+				xlib.security.crypto.generateKeyPair( 'rsa', {
+					modulusLength: 4096,
+					publicKeyEncoding: {
+						type: 'spki',
+						format: 'pem'
+					},
+					privateKeyEncoding: {
+						type: 'pkcs8',
+						format: 'pem',
+						cipher: undefined,//'aes-256-cbc',
+						passphrase: undefined, //"secret word"
+					}
+				}, ( err: Error, publicKey: string, privateKey: string ) => {
+					// Handle errors and use the generated key pair.
+					try {
+						log.throwCheck( err == null, "error encountered", err );
+
+						const testData = { hello: "world" };
+						//log.info( "signing" );
+						const jwtPayload = xlib.security.jwt.sign( testData, privateKey, { algorithm: "RS256" } );
+						//log.info( "verifying" );
+						const resultData: typeof testData = xlib.security.jwt.verify( jwtPayload, publicKey, {
+							algorithms: [ "RS256" ],
+							clockTolerance: 600, maxAge: "5m"
+						} ) as any;
+
+						log.throwCheck( resultData.hello === testData.hello, "data is wrong" );
+
+
+						resolve();
+					} catch ( _err ) {
+						reject( _err );
+					}
+				} );
+
+
+				// const rsaPub = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfsPvbmKqU3kPfXn7fz/DS1N2O\nDlrn+2aFche4FacoHL7h16ZpVRFHNllaLO1OenasG8Z9ILZxgKg4s2R+j3ChXajC\nVzbj8MYENDyCne2tc2ztt7Q8HqF75J70LmQ6bLoG39Xadf6MpQYEqkCzkETWxxrL\nsXnPgOXaKY563y9ldQIDAQAB\n-----END PUBLIC KEY-----\n";
+				// const rsaPri = "-----BEGIN PRIVATE KEY-----\nMIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAN+w+9uYqpTeQ99e\nft/P8NLU3Y4OWuf7ZoVyF7gVpygcvuHXpmlVEUc2WVos7U56dqwbxn0gtnGAqDiz\nZH6PcKFdqMJXNuPwxgQ0PIKd7a1zbO23tDweoXvknvQuZDpsugbf1dp1/oylBgSq\nQLOQRNbHGsuxec+A5dopjnrfL2V1AgMBAAECgYEAneC9MdVDeASTpOB97ZtG3pbs\ntGl/UcIHLuJCyWNG8jGvq5hX1Hn80uUSFWomJ0CZ54lHA2OGQP/MOxCqOgUlOPzO\nZxzTXZRLkpRc+RftMVEUU3qYF+0OFhXXQDYHSeudISwWe+Yd0eaBcBHifFB54cNo\n1bktZ4EjqZnKT/iy1BUCQQD6Q0VusaQRnCl7O8MZOEmSpy66HrnQxMpXuhA8d7Yn\nfQa284E5nJ8mWljiZ711jtwZfEdsedDQSzmWqIQsY+l7AkEA5NHFhpK6uUXxXs8e\nDetRPHcQYcRci/WjDkoqpxgczYamXyhh9066cq5QNyqF0HgwuKmvRGx2Zh0fOqw3\ntmphzwJAeIU3BcTkt1pWG7O/FAEoZUi/1v//CkwLCc5gDU61WTT7q9V+sQj9F9JA\npd/BvMBsvJU+LD5J0lW3yRckd+AxywJBAM6v5Vpfo6bDVPms4Jr2GlUhv3xwYKBT\n60t3FvwEPdAwdoux8Hvxc10vs2mBUYozZt8G9zg5OOGYIKNg+JofkeUCQQCIg2hk\naRPniqczmMKn+FuqGr2228w2snLhwIfAQMSI/Zd4/F+9Omn6jEWZqZ+/+XHbsNQ/\nA+bIgi4sCUHTuZ/t\n-----END PRIVATE KEY-----\n";
+
+			} );
+		} ).timeout( 10000 );
 
 	} );
-	it2( async function jwt_keyPair_basicE2e() {
-
-
-		return new __.bb<void>( ( resolve, reject ) => {
-			//generate RSA key pair
-
-			//from: https://stackoverflow.com/a/52775583/1115220
-			xlib.security.crypto.generateKeyPair( 'rsa', {
-				modulusLength: 4096,
-				publicKeyEncoding: {
-					type: 'spki',
-					format: 'pem'
-				},
-				privateKeyEncoding: {
-					type: 'pkcs8',
-					format: 'pem',
-					cipher: undefined,//'aes-256-cbc',
-					passphrase: undefined, //"secret word"
-				}
-			}, ( err: Error, publicKey: string, privateKey: string ) => {
-				// Handle errors and use the generated key pair.
-				try {
-					log.throwCheck( err == null, "error encountered", err );
-
-					const testData = { hello: "world" };
-					//log.info( "signing" );
-					const jwtPayload = xlib.security.jwt.sign( testData, privateKey, { algorithm: "RS256" } );
-					//log.info( "verifying" );
-					const resultData: typeof testData = xlib.security.jwt.verify( jwtPayload, publicKey, {
-						algorithms: [ "RS256" ],
-						clockTolerance: 600, maxAge: "5m"
-					} ) as any;
-
-					log.throwCheck( resultData.hello === testData.hello, "data is wrong" );
-
-
-					resolve();
-				} catch ( _err ) {
-					reject( _err );
-				}
-			} );
-
-
-			// const rsaPub = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfsPvbmKqU3kPfXn7fz/DS1N2O\nDlrn+2aFche4FacoHL7h16ZpVRFHNllaLO1OenasG8Z9ILZxgKg4s2R+j3ChXajC\nVzbj8MYENDyCne2tc2ztt7Q8HqF75J70LmQ6bLoG39Xadf6MpQYEqkCzkETWxxrL\nsXnPgOXaKY563y9ldQIDAQAB\n-----END PUBLIC KEY-----\n";
-			// const rsaPri = "-----BEGIN PRIVATE KEY-----\nMIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAN+w+9uYqpTeQ99e\nft/P8NLU3Y4OWuf7ZoVyF7gVpygcvuHXpmlVEUc2WVos7U56dqwbxn0gtnGAqDiz\nZH6PcKFdqMJXNuPwxgQ0PIKd7a1zbO23tDweoXvknvQuZDpsugbf1dp1/oylBgSq\nQLOQRNbHGsuxec+A5dopjnrfL2V1AgMBAAECgYEAneC9MdVDeASTpOB97ZtG3pbs\ntGl/UcIHLuJCyWNG8jGvq5hX1Hn80uUSFWomJ0CZ54lHA2OGQP/MOxCqOgUlOPzO\nZxzTXZRLkpRc+RftMVEUU3qYF+0OFhXXQDYHSeudISwWe+Yd0eaBcBHifFB54cNo\n1bktZ4EjqZnKT/iy1BUCQQD6Q0VusaQRnCl7O8MZOEmSpy66HrnQxMpXuhA8d7Yn\nfQa284E5nJ8mWljiZ711jtwZfEdsedDQSzmWqIQsY+l7AkEA5NHFhpK6uUXxXs8e\nDetRPHcQYcRci/WjDkoqpxgczYamXyhh9066cq5QNyqF0HgwuKmvRGx2Zh0fOqw3\ntmphzwJAeIU3BcTkt1pWG7O/FAEoZUi/1v//CkwLCc5gDU61WTT7q9V+sQj9F9JA\npd/BvMBsvJU+LD5J0lW3yRckd+AxywJBAM6v5Vpfo6bDVPms4Jr2GlUhv3xwYKBT\n60t3FvwEPdAwdoux8Hvxc10vs2mBUYozZt8G9zg5OOGYIKNg+JofkeUCQQCIg2hk\naRPniqczmMKn+FuqGr2228w2snLhwIfAQMSI/Zd4/F+9Omn6jEWZqZ+/+XHbsNQ/\nA+bIgi4sCUHTuZ/t\n-----END PRIVATE KEY-----\n";
-
-		} );
-	} ).timeout( 10000 );
 
 	it1( function testExceptions() { //causes debugBreak on thrown exceptions when running test
 
@@ -487,6 +491,35 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} ).timeout( 3200 );
 
+	describe( "serialization_mdoule", function serialization_module() {
+
+
+		class TestSymbol {
+			constructor( public name: string, public someVal: number ) { }
+			public toString() { return "TestSymbol"; }
+		}
+
+		it1( function symbolInspection() {
+
+			let x = 0;
+			x++;
+			//let testObj = { author: "Jason", key: Symbol( new TestSymbol( "Ja", 42 ) as any ) };
+
+			//let testObj: { cache: number; cash: number; []:any; } = { cache: 22.2, cash: 88.8 };
+			let testObj = { cache: 22.2, cash: 88.8, [ Symbol( "KEY" ) ]: { name: "Jason", id: 123 }, dumbNotKey: Symbol( "seekreet" ) };
+			//testObj[ Symbol( "KAY" ) ] = { name: "Jason", id: 123 };
+
+			let parsedToInspect = xlib.serialization.jsonX.inspectStringify( testObj, { maxDepth: 999 } );
+
+			log.info( testObj, { parsed: parsedToInspect } );
+
+			log.throwCheck( parsedToInspect.includes( "Symbol(seekreet)" ) && parsedToInspect.includes( "Symbol(KEY)" ) && parsedToInspect.includes( "Jason" ), "Symbol details are missing from jxons.inspectStringify() result", { parsed: parsedToInspect } )
+
+
+		} );
+
+
+	} );
 
 	it2( async function testPerfTimer() {
 
