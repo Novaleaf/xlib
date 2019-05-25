@@ -514,26 +514,28 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		it2( async function ExpiresMap_basic() {
 
-			let expireMap = new xlib.collections.ExpiresMap<number, string>( 100 );
+			let expireMap = new xlib.collections.ExpiresMap<string, string>( 100 );
 
 
-			expireMap.set( 11, "hello" );
-			expireMap.set( 11, "hello again" );
-			log.throwCheck( expireMap.get( 11 ) === "hello again", "didn't find key" );
-			
-			expireMap.set( 0, "bye" );
-			log.throwCheck( expireMap.has( 0 ), "zero key missing" );
-			expireMap.delete( 0 );			
-			log.throwCheck( expireMap.has( 0 ) === false, "zero key should not be there" );
-			expireMap.set( 1, "persist" );
+			//check for setting, and setting null
+			expireMap.set( "null-expires-ok", "hello" );
+			expireMap.set( "null-expires-ok", null );
+			log.throwCheck( expireMap.get( "null-expires-ok" ) === null, "key should have set null value" );
+			log.throwCheck( expireMap.has( "null-expires-ok" ) === true, "null is a valid value" );
+
+			expireMap.set( "del-immediate", "bye" );
+			log.throwCheck( expireMap.has( "del-immediate" ), "del-immediate key missing" );
+			expireMap.delete( "del-immediate" );
+			log.throwCheck( expireMap.has( "del-immediate" ) === false, "del-immediate  key should not be there" );
+			expireMap.set( "persist-past-expire-check", "persist" );
 			await __.bb.delay( 50 );
-			expireMap.set( 1, "persist again" );
+			expireMap.set( "persist-past-expire-check", "persist again" );
 			await __.bb.delay( 50 );
-			expireMap.set( 1, "persist again and again" );
+			expireMap.set( "persist-past-expire-check", "persist again and again" );
 			await __.bb.delay( 50 );
-			log.throwCheck( expireMap.has( 11 ) === false, "still has key 11" );
-			log.throwCheck( expireMap.has( 0 ) === false, "0 key should not exist" );
-			log.throwCheck( expireMap.has( 1 ) === true, "key 1 should not have expired" );
+			log.throwCheck( expireMap.has( "null-expires-ok" ) === false, "still has key 'null-expires-ok'" );
+			log.throwCheck( expireMap.has( "del-immediate" ) === false, "0 key should not exist" );
+			log.throwCheck( expireMap.has( "persist-past-expire-check" ) === true, "key 1 should not have expired" );
 		} );
 
 
