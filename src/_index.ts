@@ -83,6 +83,7 @@ export import lolo = require( "./core/lolo" );
 
 export import diagnostics = require( "./core/diagnostics" );
 
+export import collections = require( "./core/collections" );
 
 const log = diagnostics.log; // new diagnostics.Logger( __filename );
 

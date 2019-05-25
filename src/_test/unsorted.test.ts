@@ -491,7 +491,7 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} ).timeout( 3200 );
 
-	describe( "serialization_mdoule", function serialization_module() {
+	describe( "serialization_module", function serialization_module() {
 
 
 		class TestSymbol {
@@ -510,6 +510,34 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	} );
 
+	describe( "collection_module", function collection_module() {
+
+		it2( async function ExpiresMap_basic() {
+
+			let expireMap = new xlib.collections.ExpiresMap<number, string>( 100 );
+
+
+			expireMap.set( 11, "hello" );
+			expireMap.set( 11, "hello again" );
+			log.throwCheck( expireMap.get( 11 ) === "hello again", "didn't find key" );
+			
+			expireMap.set( 0, "bye" );
+			log.throwCheck( expireMap.has( 0 ), "zero key missing" );
+			expireMap.delete( 0 );			
+			log.throwCheck( expireMap.has( 0 ) === false, "zero key should not be there" );
+			expireMap.set( 1, "persist" );
+			await __.bb.delay( 50 );
+			expireMap.set( 1, "persist again" );
+			await __.bb.delay( 50 );
+			expireMap.set( 1, "persist again and again" );
+			await __.bb.delay( 50 );
+			log.throwCheck( expireMap.has( 11 ) === false, "still has key 11" );
+			log.throwCheck( expireMap.has( 0 ) === false, "0 key should not exist" );
+			log.throwCheck( expireMap.has( 1 ) === true, "key 1 should not have expired" );
+		} );
+
+
+	} );
 	it2( async function testPerfTimer() {
 
 
