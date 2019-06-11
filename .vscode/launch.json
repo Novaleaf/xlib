@@ -11,7 +11,9 @@
 				"--watch",
 				"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
 				//"--trace-warnings",
-				//"--grep",				"testExceptions"
+				//"--grep",				"testExceptions"				
+				"--grep",
+				"collection_module*",
 			],
 			"args": [
 				// 	"logLevel=TRACE",
@@ -49,7 +51,7 @@
 				//"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
 				//	"--trace-warnings",
 				// "--grep",
-				// "tinyToken_*",
+				// "collection_module*",
 				//"jwt_ec_keyPair_basicE2e",
 			],
 			"args": [

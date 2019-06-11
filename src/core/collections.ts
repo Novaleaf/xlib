@@ -12,8 +12,16 @@ export class ExpiresMap<K, V> extends Map<K, V>{
 	constructor(
 		/** how long in Ms before an entity expires */
 		public expireMs: number | { valueOf(): number; },
-		entries?: Iterable<[ K, V ]> | null ) {
-		super( entries );
+		/** optionally allows pre-populating the map. these are still subject to expiration   */
+		entries?: Iterable<[ K, V ]> | null
+	) {
+		super();
+		if ( entries != null ) {
+			for ( const [ key, val ] of entries ) {
+				this.set( key, val );
+			}
+		}
+
 	}
 
 	public set( key: K, value: V ): this {

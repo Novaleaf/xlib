@@ -3,9 +3,9 @@
 
 
 "@types/bluebird@^3.5.26":
-  version "3.5.26"
-  resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.26.tgz#a38c438ae84fa02431d6892edf86e46edcbca291"
-  integrity sha512-aj2mrBLn5ky0GmAg6IPXrQjnN0iB/ulozuJ+oZdrHRAzRbXjGmu4UXsNCjFvPbSaaPZmniocdOzsM392qLOlmQ==
+  version "3.5.27"
+  resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.27.tgz#61eb4d75dc6bfbce51cf49ee9bbebe941b2cb5d0"
+  integrity sha512-6BmYWSBea18+tSjjSC3QIyV93ZKAeNWGM7R6aYt1ryTZXrlHF+QLV0G2yV0viEGVyRkyQsWfMoJ0k/YghBX5sQ==
 
 "@types/d3-dsv@^1.0.33":
   version "1.0.36"
@@ -25,14 +25,14 @@
     "@types/node" "*"
 
 "@types/lodash@^4.14.116":
-  version "4.14.123"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.123.tgz#39be5d211478c8dd3bdae98ee75bb7efe4abfe4d"
-  integrity sha512-pQvPkc4Nltyx7G1Ww45OjVqUsJP4UsZm+GWJpigXgkikZqJgRm4c48g027o6tdgubWHwFRF15iFd+Y4Pmqv6+Q==
+  version "4.14.132"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.132.tgz#8ce45ca8745ff2e004fac0de0ab46f61e390ffa0"
+  integrity sha512-RNUU1rrh85NgUJcjOOr96YXr+RHwInGbaQCZmlitqOaCKXffj8bh+Zxwuq5rjDy5OgzFldDVoqk4pyLEDiwxIw==
 
 "@types/luxon@^1.2.2":
-  version "1.11.1"
-  resolved "https://registry.yarnpkg.com/@types/luxon/-/luxon-1.11.1.tgz#819d730cf8ada52bec9c4a1d94347d1250f22c5d"
-  integrity sha512-XBHQ7rzpOHyJudEQcMyoT67Np61FTb6S2jWqWQER/U7H2NAS+dpC8wv5T+6ygV5g/yJQdaojQbsJQiweool0Aw==
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/@types/luxon/-/luxon-1.13.0.tgz#e92338702d0b1b96e8d5ea6fe39d9938891aacd0"
+  integrity sha512-XmDiRVoJWgVdqX9x1a/GU4p9bSgZY7q8SOyMLs3fx1AdQcxLYAPIt/jfZm2e+PBVRWuEx1FqYNJ37kBZ53TMqA==
 
 "@types/mathjs@^4.4.1":
   version "4.4.5"
@@ -106,9 +106,9 @@ bluebird-retry@^0.11.0:
   integrity sha1-EomrIsu8OgJYe6rTVZU1HdDBwEc=
 
 bluebird@^3.5.2:
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.3.tgz#7d01c6f9616c9a51ab0f8c549a79dfe6ec33efa7"
-  integrity sha512-/qKPUQlaW1OyR51WeCPBvRnAlnZFUJkCSG5HzGnuIqhgyJtF+T94lFnn33eiazjRm2LAHVy2guNnaq48X9SJuw==
+  version "3.5.5"
+  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.5.tgz#a8d0afd73251effbbd5fe384a77d73003c17a71f"
+  integrity sha512-5am6HnnfN+urzt4yfg7IgTbotDjIT/u8AJpEt0sIU9FtXfVeezXAPKswrG+xKUCOYAINpSdgZVDU6QFh+cuH3w==
 
 buffer-equal-constant-time@1.0.1:
   version "1.0.1"
@@ -167,7 +167,12 @@ debug@^3.2.6:
   dependencies:
     ms "^2.1.1"
 
-decimal.js@10.1.1, decimal.js@^10.0.0:
+decimal.js@10.2.0:
+  version "10.2.0"
+  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.2.0.tgz#39466113a9e036111d02f82489b5fd6b0b5ed231"
+  integrity sha512-vDPw+rDgn3bZe1+F/pyEwb1oMG2XTlRVgAa6B4KccTEpYgF8w6eQllVbQcfIJnZyvzFtFpxnpGtx8dd7DJp/Rw==
+
+decimal.js@^10.0.0:
   version "10.1.1"
   resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.1.1.tgz#fb541922a2e8fc618f5e6fbb474e281ed3d2a64c"
   integrity sha512-vEEgyk1fWVEnv7lPjkNedAIjzxQDue5Iw4FeX4UkNUDSVyD/jZTD0Bw2kAO7k6iyyJRAhM9oxxI0D1ET6k0Mmg==
@@ -311,17 +316,17 @@ longjohn@^0.2.12:
     source-map-support "0.3.2 - 1.0.0"
 
 luxon@^1.3.3:
-  version "1.11.4"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-1.11.4.tgz#c5d8c1f795cee26c162e95a4686632abcec50442"
-  integrity sha512-zTQ1DCShOGHIdNpa56yjDpUCowKDsBqeFVuEG2XBcrAM2udxN0g3N5RTZzbw94OkDiBgECsuDgLNnQTo73yghw==
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-1.15.0.tgz#d06643c437982332a3feff4ee7c718bdbbae09fd"
+  integrity sha512-HIpK4zIonObWHj9UC80ElykmM/0jTuuXcbPYBYbDGZ3Cq2bL9rACcmppoc6zm5JnmHpnK5bRMIp8/+ei4O0y2Q==
 
 mathjs@^5.1.2:
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-5.7.0.tgz#2395951429ec9709f361e239f7f58d75c758d6de"
-  integrity sha512-nncb2FKek2HQj7tBcOgZ2l1zrf1YSPX7cUxBZGcFxcOLN0kb2/g9VC1k53vPTEK5+UVshPPeg2ZCQkh1Q2NdVQ==
+  version "5.10.3"
+  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-5.10.3.tgz#e998885f932ea8886db8b40f7f5b199f89b427f1"
+  integrity sha512-ySjg30BC3dYjQm73ILZtwcWzFJde0VU6otkXW/57IjjuYRa3Qaf0Kb8pydEuBZYtqW2OxreAtsricrAmOj3jIw==
   dependencies:
     complex.js "2.0.11"
-    decimal.js "10.1.1"
+    decimal.js "10.2.0"
     escape-latex "1.2.0"
     fraction.js "4.0.12"
     javascript-natural-sort "0.7.1"
@@ -364,10 +369,18 @@ semver@^5.6.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
   integrity sha512-RS9R6R35NYgQn++fkDWaOmqGoj4Ek9gGs+DPxNUZKuwE183xjJroKvyo1IzVFeXvUrvmALy6FWD5xrdJT25gMg==
 
-"source-map-support@0.3.2 - 1.0.0", source-map-support@^0.5.9:
+"source-map-support@0.3.2 - 1.0.0":
   version "0.5.11"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.11.tgz#efac2ce0800355d026326a0ca23e162aeac9a4e2"
   integrity sha512-//sajEx/fGL3iw6fltKMdPvy8kL3kJ2O3iuYlRoT3k9Kb4BjOoZ+BZzaNHeuaruSt+Kf3Zk9tnfAQg9/AJqUVQ==
+  dependencies:
+    buffer-from "^1.0.0"
+    source-map "^0.6.0"
+
+source-map-support@^0.5.9:
+  version "0.5.12"
+  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.12.tgz#b4f3b10d51857a5af0138d3ce8003b201613d599"
+  integrity sha512-4h2Pbvyy15EE02G+JOZpUCmqWJuqrs+sEkzewTm++BPi7Hvn/HwcqLAcNxYAyI0x13CpPPn+kMjl+hplXMHITQ==
   dependencies:
     buffer-from "^1.0.0"
     source-map "^0.6.0"

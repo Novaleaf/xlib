@@ -514,12 +514,16 @@ describe( __filename + " basic xlib unit tests", () => {
 
 		it2( async function ExpiresMap_basic() {
 
-			let expireMap = new xlib.collections.ExpiresMap<string, string>( 100 );
+			let inputMap = new Map();
+			inputMap.set( "null-expires-ok", "hello" );
+			inputMap.set( "null-expires-ok", null );
+
+			let expireMap = new xlib.collections.ExpiresMap<string, string>( 100, inputMap );
 
 
 			//check for setting, and setting null
-			expireMap.set( "null-expires-ok", "hello" );
-			expireMap.set( "null-expires-ok", null );
+			log.throwCheck( expireMap.get( "undefined-not-here" ) === undefined, "key should not have this key" );
+			log.throwCheck( expireMap.has( "undefined-not-here" ) === false, "undefined is not a valid value" );
 			log.throwCheck( expireMap.get( "null-expires-ok" ) === null, "key should have set null value" );
 			log.throwCheck( expireMap.has( "null-expires-ok" ) === true, "null is a valid value" );
 
