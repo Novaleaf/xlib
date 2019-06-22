@@ -325,7 +325,7 @@ export namespace jsonX {
 					for ( let i = 0; i < halfMax; i++ ) {
 						const index = objArray.length - halfMax + i;
 						if ( index < objArray.length ) {
-							toReturn.push( _inspectParse_internal( objArray[ i ], myOptions, seenObjects ) );
+							toReturn.push( _inspectParse_internal( objArray[ index ], myOptions, seenObjects ) );
 						}
 					}
 				}
