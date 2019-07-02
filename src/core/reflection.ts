@@ -78,6 +78,32 @@ export function getType( obj: any ): Type {
 	}
 }
 
+/** get all properties of an object, excluding constructor, Symbols, and props from Object.prototype */
+export function getPropertyNames( obj: any ) {
+
+	let propNames: Set<string> = new Set();
+
+	while ( true ) {
+		let foundNames = Object.getOwnPropertyNames( obj );
+		for ( const name of foundNames ) {
+			switch ( name ) {
+				case "constructor":
+					break;
+				default:
+					propNames.add( name );
+					break;
+			}
+		}
+		obj = Object.getPrototypeOf( obj );
+		if ( obj == null || Object.prototype === obj ) {
+			break;
+		}
+	}
+
+
+	return propNames;
+
+}
 
 /** get the name of an object's type. better than using 'typeof()' because this handles array and null.*/
 export function getTypeName( obj: any ): string {
