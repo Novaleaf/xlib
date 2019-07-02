@@ -78,7 +78,10 @@ export function getType( obj: any ): Type {
 	}
 }
 
-/** get all properties of an object, excluding constructor, Symbols, and props from Object.prototype */
+/** get all properties of an object, excluding constructor, Symbols, and props from Object.prototype 
+ * 
+ * **Why is this useful?** to get fields and functions of a class instantiated object.
+*/
 export function getPropertyNames( obj: any ) {
 
 	let propNames: Set<string> = new Set();
@@ -102,7 +105,6 @@ export function getPropertyNames( obj: any ) {
 
 
 	return propNames;
-
 }
 
 /** get the name of an object's type. better than using 'typeof()' because this handles array and null.*/
