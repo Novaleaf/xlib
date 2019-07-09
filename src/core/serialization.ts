@@ -454,3 +454,16 @@ export namespace jsonX {
 		} );
 	}
 }
+
+/** deseralize a function that was serialized via ```.toString()```.  Works on lambda functions also. */
+export function parseFunction(fcnStr: string ) {
+	const fn_body_idx = fcnStr.indexOf( '{' );
+	const fn_body = fcnStr.substring( fn_body_idx + 1, fcnStr.lastIndexOf( '}' ) );
+	const fn_declare = fcnStr.substring( 0, fn_body_idx );
+	const fn_params = fn_declare.substring( fn_declare.indexOf( '(' ) + 1, fn_declare.lastIndexOf( ')' ) );
+	const args = fn_params.split( ',' );
+
+	args.push( fn_body );
+
+	return new Function( ...args );
+}
