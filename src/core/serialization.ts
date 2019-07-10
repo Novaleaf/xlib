@@ -456,14 +456,44 @@ export namespace jsonX {
 }
 
 /** deseralize a function that was serialized via ```.toString()```.  Works on lambda functions also. */
-export function parseFunction(fcnStr: string ) {
-	const fn_body_idx = fcnStr.indexOf( '{' );
-	const fn_body = fcnStr.substring( fn_body_idx + 1, fcnStr.lastIndexOf( '}' ) );
-	const fn_declare = fcnStr.substring( 0, fn_body_idx );
-	const fn_params = fn_declare.substring( fn_declare.indexOf( '(' ) + 1, fn_declare.lastIndexOf( ')' ) );
-	const args = fn_params.split( ',' );
+export function parseFunction( fcnStr: string ) {
+	//citation: https://gist.github.com/lamberta/3768814  but then heavily modified for proper lambda support
 
-	args.push( fn_body );
+	fcnStr = fcnStr.trim();
 
-	return new Function( ...args );
+	if ( fcnStr.startsWith( "function" ) ) {
+		const fn_body_idx = fcnStr.indexOf( '{' );
+		const fn_body = fcnStr.substring( fn_body_idx + 1, fcnStr.lastIndexOf( '}' ) );
+		const fn_declare = fcnStr.substring( 0, fn_body_idx );
+		const fn_params_start = fn_declare.indexOf( '(' ) + 1;
+		const fn_params = fn_declare.substring( fn_params_start, fn_declare.lastIndexOf( ')' ) );
+		const args = fn_params.split( ',' );
+
+		args.push( fn_body );
+
+		let toReturn = new Function( ...args );
+		return toReturn;
+	} else {
+		//lambda
+		const fn_params = fcnStr.substring( fcnStr.indexOf( '(' ) + 1, fcnStr.indexOf( ')' ) );
+		const args = fn_params.split( ',' );
+
+		let fn_body_idx = fcnStr.indexOf( '=>' ) + 2;
+		let fn_body_end = fcnStr.length;
+
+		if ( fcnStr.endsWith( "}" ) ) {
+			//enclosed lambda body so remove surrounding braces
+			fn_body_idx = fcnStr.indexOf( "{", fn_body_idx ) + 1;
+			fn_body_end--;
+			const fn_body = fcnStr.substring( fn_body_idx, fn_body_end );
+			args.push( fn_body );
+		} else {
+			const fn_body = "return " + fcnStr.substring( fn_body_idx, fn_body_end );
+			args.push( fn_body );
+		}
+
+
+		let toReturn = new Function( ...args );
+		return toReturn;
+	}
 }
