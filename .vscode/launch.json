@@ -12,8 +12,8 @@
 				"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
 				//"--trace-warnings",
 				//"--grep",				"testExceptions"				
-				"--grep",
-				"collection_module*",
+				// "--grep",
+				// "collection_module*",
 			],
 			"args": [
 				// 	"logLevel=TRACE",
