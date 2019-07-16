@@ -454,12 +454,24 @@ export namespace jsonX {
 		} );
 	}
 }
+/** constructor for async functions.
+ * from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction
+ */
+const AsyncFunction: FunctionConstructor = Object.getPrototypeOf( async function () { } ).constructor;
 
 /** deseralize a function that was serialized via ```.toString()```.  Works on lambda functions also. */
 export function parseFunction( fcnStr: string ) {
 	//citation: https://gist.github.com/lamberta/3768814  but then heavily modified for proper lambda support
 
 	fcnStr = fcnStr.trim();
+
+	//! handle possible async function
+	let FcnCtor = Function;
+	if ( fcnStr.startsWith( "async" ) ) {
+		stringHelper.removePrefix( fcnStr, "async" );
+		fcnStr = fcnStr.trim();
+		FcnCtor = AsyncFunction;
+	}
 
 	if ( fcnStr.startsWith( "function" ) ) {
 		const fn_body_idx = fcnStr.indexOf( '{' );
@@ -471,7 +483,7 @@ export function parseFunction( fcnStr: string ) {
 
 		args.push( fn_body );
 
-		let toReturn = new Function( ...args );
+		let toReturn = new FcnCtor( ...args );
 		return toReturn;
 	} else {
 		//lambda
@@ -493,7 +505,7 @@ export function parseFunction( fcnStr: string ) {
 		}
 
 
-		let toReturn = new Function( ...args );
+		let toReturn = new FcnCtor( ...args );
 		return toReturn;
 	}
 }
