@@ -34,6 +34,40 @@ describe( __filename + " basic xlib unit tests", () => {
 
 	// } );
 
+
+	it1( async function parseFunctions() {
+
+
+		// try {
+		// 	await this.goto( "https://opjav.club/v/npjx-a2y5lkyl-4" );
+		// 	this.on( "request", ( details ) => {
+		// 		if ( details.resourceType === "media" ) { page.meta.store.set( details.url, details ); }
+		// 	} );
+		// } catch ( err ) {
+		// 	this.logError( "overseer script unhandled thrown error", { name: err.name, message: err.message, stack: err.stack } );
+		// 	this.done( 400, "overseer script error, check logs" );
+		// }
+
+		async function async88() {
+
+			let x = () => {
+				return 88;
+			};
+			return x();
+		}
+
+		log.throwCheck( ( await xlib.serialization.parseFunction( async88.toString() )() ) === 88 );
+
+
+		// let fcnStr = fcn.toString();
+		// let resultFcn = xlib.serialization.parseFunction( fcnStr ).toString();
+
+		// log.infoFull( fcnStr );
+		// log.infoFull( resultFcn );
+
+
+	} );
+
 	it1( function parameterReassignment() {
 
 		//sanity check to verify assumptions regarding parameter property reassignment  (setting "public" on ctor parameters)

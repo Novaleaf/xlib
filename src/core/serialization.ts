@@ -468,14 +468,14 @@ export function parseFunction( fcnStr: string ) {
 	//! handle possible async function
 	let FcnCtor = Function;
 	if ( fcnStr.startsWith( "async" ) ) {
-		stringHelper.removePrefix( fcnStr, "async" );
+		fcnStr = stringHelper.removePrefix( fcnStr, "async" );
 		fcnStr = fcnStr.trim();
 		FcnCtor = AsyncFunction;
 	}
 
 	if ( fcnStr.startsWith( "function" ) ) {
 		const fn_body_idx = fcnStr.indexOf( '{' );
-		const fn_body = fcnStr.substring( fn_body_idx + 1, fcnStr.lastIndexOf( '}' ) );
+		const fn_body = fcnStr.substring( fn_body_idx + 1, fcnStr.lastIndexOf( '}' ) ).trim();
 		const fn_declare = fcnStr.substring( 0, fn_body_idx );
 		const fn_params_start = fn_declare.indexOf( '(' ) + 1;
 		const fn_params = fn_declare.substring( fn_params_start, fn_declare.lastIndexOf( ')' ) );
