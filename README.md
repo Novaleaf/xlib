@@ -4,7 +4,7 @@
 --------
 # Abstract
 
-**```xlib```** is a monolitic core/utilities library.  It's designed to be a one-stop-shop for professional developers who need functionality that will work across Browser or Server. 
+**```xlib```** is a monolitic core/utilities library.  It's designed to be a one-stop-shop for professional developers who need functionality that will work across Browser or Server.   ***HOWEVER*** Browser isn't currently supported.  Around Sept 2019 browser support will be added again. 
 
 ## Goals
 
@@ -521,7 +521,7 @@ they include:
 > **If you have an idea**, Please add an issue on the Repo so we can discuss!  (pull reqeusts are welcome, but lets make sure the feature is a good fit first)
 
 # Development
-
+If you have Typescript and VSCode installed, just mirror this repo, install dependencies (I use *Yarn*), and open it in VSCode.
 
 ## WORK IN PROGRESS!  
 
