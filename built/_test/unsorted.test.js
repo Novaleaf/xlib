@@ -485,7 +485,7 @@ describe(__filename + " basic xlib unit tests", () => {
         __.log.throwCheck(Object.keys(logData).length === 5 && logData["outside"] != null, "perfTimer.logNowAndClear() should have been awaited, giving other fulfilled promises from stopwatch('outside') a chance to finalize and be reported");
         __.log.throwCheck(logData["outside"].runs === 1 && logData["mainLoop"].runs === 5 && logData["innerAA"].runs === 125 && logData["innerA"].runs === 25 && logData["innerB"].runs === 25);
         __.log.throwCheck(rawData["mainLoop"].raw.length === 5);
-    });
+    }).timeout(5000); //runs long
     mocha_helper_1.it1(function testQuartileCalculations() {
         const input = [500, 468, 454, 469];
         const quantiles = [0, 0.25, 0.5, 0.75, 1];

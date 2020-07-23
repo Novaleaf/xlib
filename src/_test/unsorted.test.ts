@@ -619,7 +619,7 @@ describe( __filename + " basic xlib unit tests", () => {
 		__.log.throwCheck( rawData[ "mainLoop" ].raw.length === 5 );
 
 
-	} );
+	} ).timeout( 5000 ); //runs long
 
 	it1( function testQuartileCalculations() {
 

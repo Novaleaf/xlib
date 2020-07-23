@@ -8,8 +8,8 @@
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": [
-				"--watch",
-				"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
+				//"--watch",
+				//"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
 				//"--trace-warnings",
 				//"--grep",				"testExceptions"				
 				// "--grep",
@@ -20,6 +20,9 @@
 				// 	"envLevel=DEV",
 				// 	"logLevelOverrides={'.*connection':'WARN', '.*xlib.dev.core.net.js':'INFO'}",			
 				"./built/**/*.test.js",
+				"--require source-map-support/register", //make mocha sourcemap aware, but doesn't seem to help
+				"--watch",
+				"--bail",
 			],
 			"name": "mocha watch ./built/**/*.test.js",
 			"runtimeExecutable": "mocha",
