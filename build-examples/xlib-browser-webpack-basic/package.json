@@ -1,0 +1,41 @@
+{
+  "name": "@xlib/xlib-browser-webpack-basic",
+  "version": "0.0.0",
+  "description": "example using xlib in a browser app",
+  "scripts": {
+    "start-node": "node lib/_main.js",
+    "start": "heft start",
+    "build": "heft test",
+    "build-clean": "heft test --clean",
+    "watch": "heft build --clean ; heft test --watch",
+    "eslint-fix": "eslint ./src/**/*.ts* --fix",
+    "dep-check-major": "npm-check-updates --configFilePath ../../common/config",
+    "dep-check": "npm-check-updates --configFilePath ../../common/config --target minor"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@rushstack/heft": "0.13.1",
+    "@types/jest": "~26.0.13",
+    "@types/node": "14.0.27",
+    "@types/react": "16.9.49",
+    "@types/react-dom": "^16.9.8",
+    "@types/webpack-env": "~1.15.2",
+    "@xlib/build-tools": "workspace:*",
+    "@xlib/eslint-config": "workspace:*",
+    "css-loader": "4.3.0",
+    "eslint": "7.9.0",
+    "html-webpack-plugin": "4.4.1",
+    "null-loader": "^4.0.0",
+    "source-map-loader": "^1.1.0",
+    "style-loader": "~1.2.1",
+    "threads-plugin": "^1.3.3",
+    "typescript": "~4.0.2",
+    "webpack": "4.31.0"
+  },
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "xlib": "workspace:*"
+  }
+}

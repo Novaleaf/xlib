@@ -1,0 +1,54 @@
+{
+	"$schema": "http://json.schemastore.org/tsconfig",
+	//"extends": "./node_modules/@xlib/build-tools/includes/tsconfig-node.json",
+	"compilerOptions": {
+		"outDir": "lib",
+		"target": "es5",
+		"module": "commonjs",
+		"sourceMap": true,
+		"types": [
+			"node",
+			"jest"
+		],
+		"esModuleInterop": true,
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx"
+	],
+	"exclude": [
+		"node_modules",
+		"lib"
+	],
+	// "$schema": "http://json.schemastore.org/tsconfig",
+	// "compilerOptions": {
+	// 	"outDir": "lib",
+	// 	"rootDirs": [
+	// 		"src/"
+	// 	],
+	// 	"composite": true,
+	// 	"forceConsistentCasingInFileNames": true,
+	//"declaration": true,
+	//"sourceMap": true,
+	//"declarationMap": true,
+	// 	"inlineSources": true,
+	// 	"strictNullChecks": true,
+	// 	"noUnusedLocals": true,
+	// 	"types": [
+	// 		"node",
+	// 		"jest"
+	// 	],
+	// 	"module": "commonjs",
+	// 	"target": "es2017",
+	// 	"lib": [
+	// 		"es2017"
+	// 	]
+	// },
+	// "include": [
+	// 	"src/**/*.ts"
+	// ],
+	// "exclude": [
+	// 	"node_modules",
+	// 	"lib"
+	// ]
+}

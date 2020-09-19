@@ -1,0 +1,31 @@
+{
+	"$schema": "http://json.schemastore.org/tsconfig",
+	"extends": "./node_modules/@xlib/build-tools/includes/tsconfig-web.json",
+	"compilerOptions": {
+		//"moduleResolution": "Node",
+		"rootDir": "../../libraries/xlib/src",
+		"outDir": "../../libraries/xlib/lib-esm",
+		"types": [
+			"node",
+			"jest"
+		],
+		"lib": [
+			//"es5",
+			"scripthost",
+			// "es2015.collection",
+			// "es2015.promise",
+			// "es2015.iterable",
+			"dom",
+			"ES2017"
+		]
+	},
+	"include": [
+		"../../libraries/xlib/src/**/*.ts",
+		"../../libraries/xlib/src/**/*.tsx"
+	],
+	"exclude": [
+		"node_modules",
+		"lib",
+		"lib-esm"
+	]
+}

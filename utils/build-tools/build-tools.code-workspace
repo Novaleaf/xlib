@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../common/temp/node_modules/.pnpm"
+		}
+	],
+	"settings": {
+		"workbench.colorCustomizations": {
+			"activityBar.background": "#664229",
+			"titleBar.activeBackground": "#664229",
+			//"titleBar.activeForeground": "#FDFCFC",
+			"editor.background": "#66422911"
+		}
+	}
+}

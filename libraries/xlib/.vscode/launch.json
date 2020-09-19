@@ -1,0 +1,55 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			//allows debugging any npm task, though might need to force exit at the end
+			"command": "pnpm test",
+			"name": "pnpm test",
+			"request": "launch",
+			"type": "node-terminal",
+			"internalConsoleOptions": "openOnSessionStart",
+			"outFiles": [
+				"${workspaceFolder}/**/*.js",
+				"!**/node_modules/**"
+			],
+			"skipFiles": [
+				"<node_internals>/**",
+				"**/node_modules/jest-runtime/**",
+			],
+		},
+		{
+			//allows debugging heft actions
+			"name": "heft test (direct debug)",
+			"request": "launch",
+			"type": "node",
+			"program": "${workspaceFolder}/node_modules/@rushstack/heft/lib/start.js",
+			"cwd": "${workspaceFolder}",
+			"args": [
+				"--debug",
+				"test",
+				"--clean"
+			],
+			"console": "integratedTerminal",
+			"skipFiles": [
+				"<node_internals>/**",
+				"**/node_modules/jest-runtime/**",
+			],
+		},
+		{
+			"type": "pwa-node",
+			"request": "launch",
+			"name": "Launch Program",
+			"skipFiles": [
+				"<node_internals>/**",
+				"\\<node_internals>/**"
+			],
+			"program": "${workspaceFolder}/lib/_main.js",
+			"outFiles": [
+				"${workspaceFolder}/**/*.js"
+			]
+		}
+	]
+}

@@ -1,0 +1,35 @@
+{
+  "name": "@xlib/ts-debug-test",
+  "version": "0.0.1",
+  "description": "verify typescript debug",
+  "main": "lib/_main.js",
+  "typings": "lib/_main.d.ts",
+  "scripts": {
+    "start": "node lib/_main.js",
+    "build": "heft test",
+    "build-clean": "heft test --clean",
+    "watch": "heft build --clean ; CI=true heft test --watch",
+    "eslint-fix": "eslint ./src/**/*.ts* --fix",
+    "dep-check-major": "npm-check-updates --configFilePath ../../common/config",
+    "dep-check": "npm-check-updates --configFilePath ../../common/config --target minor"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rushstack/eslint-config": "~1.3.0",
+    "@rushstack/heft": "0.13.1",
+    "@types/jest": "~26.0.13",
+    "@types/node": "14.0.27",
+    "typescript": "~4.0.2",
+    "@xlib/build-tools": "workspace:*",
+    "@xlib/eslint-config": "workspace:*",
+    "@typescript-eslint/eslint-plugin": "4.1.1",
+    "@typescript-eslint/parser": "4.1.1",
+    "eslint": "7.9.0",
+    "eslint-plugin-jest": "24.0.1",
+    "eslint-plugin-react": "~7.20.6"
+  },
+  "dependencies": {
+    "xlib": "workspace:*"
+  }
+}

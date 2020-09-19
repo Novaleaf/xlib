@@ -1,0 +1,23 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "pwa-node",
+			"request": "launch",
+			"name": "Launch Program",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"program": "${workspaceFolder}/lib/_main.js",
+			//use outFiles to allow debugging other projects in this monorepo: https://stackoverflow.com/a/43152616
+			"outFiles": [
+				//"${workspaceFolder}/**/*.js",
+				"!**/node_modules/**/*.js",
+				"**/*.js"
+			]
+		}
+	]
+}

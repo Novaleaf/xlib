@@ -1,0 +1,30 @@
+{
+  "name": "@xlib/build-tools",
+  "version": "0.0.1",
+  "description": "toolchain for this monorepo",
+  "bin": {
+    "my-build": "lib/my-build.js",
+    "my-bulk-command": "lib/my-bulk-command.js"
+  },
+  "scripts": {
+    "build": "heft test",
+    "build-clean": "heft test --clean",
+    "watch": "heft build --clean ; heft test --watch",
+    "eslint-fix": "",
+    "dep-check-major": "npm-check-updates --configFilePath ../../common/config",
+    "dep-check": "npm-check-updates --configFilePath ../../common/config --target minor"
+  },
+  "dependencies": {
+    "@rushstack/eslint-config": "1.3.0",
+    "@rushstack/heft": "0.13.1",
+    "@types/jest": "~26.0.13",
+    "@types/node": "14.0.27",
+    "@typescript-eslint/eslint-plugin": "4.1.1",
+    "@typescript-eslint/parser": "4.1.1",
+    "eslint": "7.9.0",
+    "eslint-plugin-jest": "24.0.1",
+    "eslint-plugin-react": "7.20.6",
+    "typescript": "4.0.3",
+    "@microsoft/api-extractor": "7.8.2-pr1796.0"
+  }
+}

@@ -1,0 +1,76 @@
+{
+	"$schema": "http://json.schemastore.org/tsconfig",
+	"compilerOptions": {
+		"outDir": "lib",
+		"rootDirs": [
+			"src/"
+		],
+		"forceConsistentCasingInFileNames": true,
+		"jsx": "react",
+		"declaration": true,
+		"sourceMap": true,
+		"declarationMap": true,
+		"inlineSources": true,
+		"experimentalDecorators": true,
+		"allowSyntheticDefaultImports": true, //required for exporting sub-modules!
+		"strictNullChecks": true,
+		"noUnusedLocals": true,
+		"types": [
+			"jest",
+			"webpack-env"
+		],
+		"module": "esnext",
+		"moduleResolution": "node",
+		"target": "es5",
+		"lib": [
+			"es5",
+			"scripthost",
+			"es2015.collection",
+			"es2015.promise",
+			"es2015.iterable",
+			"dom"
+		]
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx"
+	],
+	"exclude": [
+		"node_modules",
+		"lib",
+		"dist",
+		"lib-esm"
+	]
+}
+//TODO:  replace above with below.  track and fix related typings bug in ToggleSwitch.tsx
+// {
+// 	"$schema": "http://json.schemastore.org/tsconfig",
+// 	"extends": "./node_modules/@xlib/build-tools/includes/tsconfig-node.json", //HACK:  move to tsconfig-web
+// 	"compilerOptions": {
+// 		"outDir": "lib-esm",
+// 		"module": "esnext", //HACK:  move to tsconfig-web
+// 		"types": [
+// 			"node",
+// 			"jest",
+// 			"webpack-env" //for webpack typings, as per: https://rushstack.io/pages/heft_tasks/webpack/		
+// 		],
+// 		"lib": [
+// 			//"es5",
+// 			"scripthost",
+// 			// "es2015.collection",
+// 			// "es2015.promise",
+// 			// "es2015.iterable",
+// 			"dom",
+// 			"ES2017"
+// 		]
+// 	},
+// 	"include": [
+// 		"src/**/*.ts",
+// 		"src/**/*.tsx"
+// 	],
+// 	"exclude": [
+// 		"node_modules",
+// 		"lib",
+// 		"lib-esm"
+// 	]
+// }

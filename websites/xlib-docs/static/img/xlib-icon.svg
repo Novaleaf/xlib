@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="http://vecta.io" width="241" height="137" viewBox="0 0 241 137">
+    <style>svg{stroke:#000;stroke-linecap:round;stroke-linejoin:round;fill:#fff;fill-rule:evenodd;font-family:Roboto;font-size:14px;text-anchor:middle}svg text{stroke:none}</style>
+    <style>svg{stroke:#000;stroke-linecap:round;stroke-linejoin:round;fill:#fff;fill-rule:evenodd;font-family:Roboto;font-size:14px;text-anchor:middle}svg text{stroke:none}</style>
+    <defs>
+        <filter id="kf5xskxchw.txt.flt" x="-8.0645%" y="-10.8696%" width="118.0645%" height="124.3478%">
+            <feGaussianBlur class="Bevel.eff" in="SourceAlpha" stdDeviation="1"/>
+            <feDiffuseLighting class="Bevel.eff" surfaceScale="10" diffuseConstant="1" lighting-color="#fff" result="highlight" in="bevel_eff">
+                <fePointLight x="-10000" y="-10000" z="13000"/>
+            </feDiffuseLighting>
+            <feComposite class="Bevel.eff" in2="SourceGraphic" in="highlight" operator="arithmetic" k1="0" k2="0.6" k3="0.7" k4="0" result="bevel_eff"/>
+            <feComposite class="Bevel.eff" in="bevel_eff" in2="SourceGraphic" operator="in" result="bevel_eff"/>
+            <feGaussianBlur class="Shadow.eff" in="SourceAlpha" stdDeviation="5" result="shadow"/>
+            <feOffset class="Shadow.eff" in="shadow" dx="3" dy="3" result="shadow_offset"/>
+            <feFlood class="Shadow.eff" flood-color="#000" flood-opacity="1"/>
+            <feComposite class="Shadow.eff" in2="shadow_offset" operator="in" result="shadow_eff"/>
+            <feMerge class="Shadow.eff">
+                <feMergeNode in="shadow_eff"/>
+                <feMergeNode in="bevel_eff"/>
+            </feMerge>
+        </filter>
+        <filter x="-8.0645%" y="-10.8696%" id="kf5y33ylkg.txt.flt" width="118.0645%" height="124.3478%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1" class="Bevel.eff"/>
+            <feDiffuseLighting surfaceScale="10" diffuseConstant="1" lighting-color="#fff" result="highlight" in="bevel_eff" class="Bevel.eff">
+                <fePointLight x="-10000" y="-10000" z="13000"/>
+            </feDiffuseLighting>
+            <feComposite in2="SourceGraphic" in="highlight" operator="arithmetic" k1="0" k2="0.6" k3="0.7" k4="0" result="bevel_eff" class="Bevel.eff"/>
+            <feComposite in="bevel_eff" in2="SourceGraphic" operator="in" result="bevel_eff" class="Bevel.eff"/>
+            <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="shadow" class="Shadow.eff"/>
+            <feOffset in="shadow" dx="3" dy="3" result="shadow_offset" class="Shadow.eff"/>
+            <feFlood flood-color="#000" flood-opacity="1" class="Shadow.eff"/>
+            <feComposite in2="shadow_offset" operator="in" result="shadow_eff" class="Shadow.eff"/>
+            <feMerge class="Shadow.eff">
+                <feMergeNode in="shadow_eff"/>
+                <feMergeNode in="bevel_eff"/>
+            </feMerge>
+        </filter>
+    </defs>
+    <g transform="translate(0.5 15.7)">
+        <rect x="0" y="0" width="155" height="115" fill="none" stroke="none" stroke-width="0"/>
+        <g transform="translate(0 -5)" filter="url(#kf5xskxchw.txt.flt)">
+            <rect x="0" y="0" width="155" height="115" fill="none" stroke="none"/>
+            <text fill="#007fff" fill-opacity="1" font-size="110px" font-weight="bold">
+                <tspan x="77.5" y="93.8">X</tspan>
+            </text>
+        </g>
+    </g>
+    <g transform="translate(85.5 20.7)">
+        <rect x="0" y="0" width="155" height="115" fill="none" stroke="none" stroke-width="0"/>
+        <g filter="url(#kf5y33ylkg.txt.flt)" transform="translate(0 -5)">
+            <rect x="0" y="0" width="155" height="115" fill="none" stroke="none"/>
+            <text fill="#007fff" fill-opacity="1" font-size="90px" font-weight="bold">
+                <tspan x="77.5" y="87.2">lib</tspan>
+            </text>
+        </g>
+        <defs>
+            <filter x="-8.0645%" y="-10.8696%" width="118.0645%" height="124.3478%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="1" class="Bevel.eff"/>
+                <feDiffuseLighting surfaceScale="10" diffuseConstant="1" lighting-color="#fff" result="highlight" in="bevel_eff" class="Bevel.eff">
+                    <fePointLight x="-10000" y="-10000" z="13000"/>
+                </feDiffuseLighting>
+                <feComposite in2="SourceGraphic" in="highlight" operator="arithmetic" k1="0" k2="0.6" k3="0.7" k4="0" result="bevel_eff" class="Bevel.eff"/>
+                <feComposite in="bevel_eff" in2="SourceGraphic" operator="in" result="bevel_eff" class="Bevel.eff"/>
+                <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="shadow" class="Shadow.eff"/>
+                <feOffset in="shadow" dx="3" dy="3" result="shadow_offset" class="Shadow.eff"/>
+                <feFlood flood-color="#000" flood-opacity="1" class="Shadow.eff"/>
+                <feComposite in2="shadow_offset" operator="in" result="shadow_eff" class="Shadow.eff"/>
+                <feMerge class="Shadow.eff">
+                    <feMergeNode in="shadow_eff"/>
+                    <feMergeNode in="bevel_eff"/>
+                </feMerge>
+            </filter>
+        </defs>
+    </g>
+</svg>

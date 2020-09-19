@@ -1,0 +1,47 @@
+{
+  "name": "xlib",
+  "version": "0.0.1",
+  "description": "tutorial proj",
+  "main": "lib/_main.js",
+  "///module": "dist/xlib-bundle.esm.js",
+  "module": "lib-esm/_main.js",
+  "//esnext": "lib-esm/_main.js",
+  "//main": "dist/xlib-bundle.cjs.js",
+  "/module": "lib-esm/xlib-bundle.esm.js",
+  "/browser": "lib-esm/xlib-bundle.umd.js",
+  "libEntry": "lib/_main.js",
+  "libEsmEntry": "lib-esm/_main.js",
+  "typings": "lib/_main.d.ts",
+  "scripts": {
+    "build": "heft test",
+    "build-clean": "heft clean && pnpm run build",
+    "build-rollup": "rollup --config ./lib-esm/_rollup.config.js",
+    "watch-rollup": "rollup --config ./lib-esm/_rollup.config.js --watch --watch.buildDelay 500",
+    "watch-build": "CI=true heft test --watch --verbose",
+    "watch": "pnpm run build-clean && concurrently --kill-others \"pnpm run watch-build\" \"pnpm run watch-rollup\"",
+    "eslint-fix": "eslint ./src/**/*.ts* --fix",
+    "dep-check-major": "npm-check-updates --configFilePath ../../common/config",
+    "dep-check": "npm-check-updates --configFilePath ../../common/config --target minor",
+    "doc-build": "heft test --clean; api-documenter markdown --input-folder temp --output-folder"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^15.0.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@rushstack/eslint-config": "~1.3.0",
+    "@rushstack/heft": "0.13.1",
+    "@types/jest": "~26.0.13",
+    "@types/node": "14.0.27",
+    "@xlib/build-tools": "workspace:*",
+    "@xlib/eslint-config": "workspace:*",
+    "eslint": "^7.9.0",
+    "rollup": "^2.27.1",
+    "rollup-plugin-sourcemaps": "^0.6.2",
+    "ts-node": "^9.0.0"
+  },
+  "dependencies": {
+    "gaxios": "^3.1.0",
+    "threads": "^1.6.3"
+  }
+}

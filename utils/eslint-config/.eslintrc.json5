@@ -1,0 +1,94 @@
+{
+	"$schema": "http://json.schemastore.org/eslintrc",
+	"env": {
+		"browser": true,
+		"es2020": true,
+		"node": true,
+		"jest/globals": true, //https://www.npmjs.com/package/eslint-plugin-jest		
+	},
+	"extends": [
+		"@rushstack/eslint-config",
+		"@rushstack/eslint-config/react",
+		"eslint:recommended",
+		"plugin:react/recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		//"plugin:@typescript-eslint/recommended" //dupe
+	],
+	// "parser": "@typescript-eslint/parser",
+	// "parserOptions": {
+	// 	"ecmaFeatures": {
+	// 		"jsx": true
+	// 	},
+	// 	"ecmaVersion": 11,
+	// 	"sourceType": "module",
+	// 	//tsconfigRootDir: __dirname  //should be set in derived config file!
+	// },
+	"plugins": [
+		"react",
+		"jest",
+		//"@typescript-eslint" //dupe
+	],
+	"overrides": [
+		{
+			"files": [
+				"*.ts",
+				"*.d.ts",
+				"*.tsx"
+			],
+			"excludedFiles": [
+				//"*.d.ts",
+				"**/node_modules/**"
+			],
+			"rules": {
+				"indent": [
+					"warn",
+					"tab"
+				],
+				"linebreak-style": [
+					"warn",
+					"unix"
+				],
+				"quotes": [
+					"warn",
+					"double"
+				],
+				"semi": [
+					"warn",
+					"never"
+				],
+				"no-unused-vars": [
+					"off"
+				],
+				"eqeqeq": [
+					"error",
+					"smart"
+				],
+				"@typescript-eslint/no-unused-vars": [
+					"warn",
+					{
+						"args": "none"
+					}
+				],
+				"@typescript-eslint/no-floating-promises": [
+					//https://github.com/typescript-eslint/typescript-eslint/blob/v3.4.0/packages/eslint-plugin/docs/rules/no-floating-promises.md
+					"error",
+					{
+						"ignoreVoid": true
+					}
+				],
+				//https://github.com/typescript-eslint/typescript-eslint/blob/v3.4.0/packages/eslint-plugin/docs/rules/typedef.md
+				"@typescript-eslint/typedef": "off", //use tsconfig strict errors instead		
+				"no-void": [
+					//https://eslint.org/docs/rules/no-void
+					"error",
+					{
+						"allowAsStatement": true
+					}
+				],
+				"@rushstack/no-null": [
+					"off"
+				]
+			}
+		}
+	],
+}
