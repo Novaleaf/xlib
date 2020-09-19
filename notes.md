@@ -42,3 +42,46 @@ https://addyosmani.com/blog/visualize-data-structures-vscode/
   - find heft webpack version by running it (version is emitted in console output) then update project, for example: ```rush add -p webpack@4.31.0 -m```
 
   
+## development
+
+
+
+### env setup
+- core dev env
+  - install node 14.x
+  - ```npm install -g pnpm @microsoft/rush```
+- supplemental build tooling
+  -  ```npm install -g npm-check-updates  concurrently  ```  //was: jest @microsoft/api-extractor @microsoft/api-documenter
+
+### REWRITE NOTES
+- date
+  - day.js probably (maybe luxon)
+- net io
+  - gaxios
+- webworkers
+  - threads.js
+- serialization
+  - need to add benchmarks for
+    - msgpack
+    - simdjson
+    - json5
+
+
+## scratch
+
+### isomorphic research notes
+- https://source.coveo.com/2016/05/11/isomorphic-typescript-ava-w-coverage/
+- https://jamesmonger.com/2019/09/10/super-robust-api-with-isomorphic-typescript.html
+- https://github.com/happygrammer/isomorphic-typescript-starter
+- https://github.com/ericmasiello/isomorphic-typescript-react-redux-starter
+- https://hackernoon.com/building-isomorphic-javascript-packages-1ba1c7e558c5
+- https://zellwk.com/blog/publishing-npm-packages-that-can-be-used-in-browsers-and-node/
+
+### library extensibility / plugin architecture
+- https://www.npmjs.com/package/tapable
+
+### promises
+- probably can use native promises now (bluebird not needed): https://dev.to/blacksonic/what-does-javascript-promise-us-for-2020-4l1i
+
+
+  

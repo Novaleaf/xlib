@@ -1,7 +1,21 @@
 {
   "name": "xlib",
-  "version": "0.0.1",
-  "description": "tutorial proj",
+  "version": "18.0.0-develop.0",
+  "description": "Your isometric swiss army knife",
+  "private": false,
+  "author": "jason swearingen <jasons@novaleaf.com>",
+  "license": "MIT",
+  "keywords": [
+    "xlib",
+    "monolithic",
+    "corelib",
+    "typescript",
+    "isometric"
+  ],
+  "bugs": {
+    "url": "https://github.com/novaleaf/xlib/issues"
+  },
+  "homepage": "https://github.com/novaleaf/xlib",
   "main": "lib/_main.js",
   "///module": "dist/xlib-bundle.esm.js",
   "module": "lib-esm/_main.js",
@@ -24,8 +38,6 @@
     "dep-check": "npm-check-updates --configFilePath ../../common/config --target minor",
     "doc-build": "heft test --clean; api-documenter markdown --input-folder temp --output-folder"
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^15.0.0",
     "@rollup/plugin-node-resolve": "^9.0.0",

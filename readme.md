@@ -1,7 +1,38 @@
-# THIS IS AN R&D REPO
-monorepo doing R&D for the next version of ```xlib```
+# REWRITE IN PROGRESS
+Xlib is being rewritten from first principles.  The current ```master``` branch of this repo is dedicated to this rewrite.   The current ```npm xlib``` package  points to ```xlib@17.x``` which is a stable, high quality core/util library for node.  See the ```v17``` branch for it's source.
 
-work here will be ported to the current ```xlib``` repository once R&D has met the following goals:
+The ```v17``` branch is:
+- highly stable
+- full featured
+- used in production
+- available as the default ```npm xlib``` package
+
+**The remainder of this readme is dedicated to the ```v18``` rewrite.**
+
+# XLIB v18+
+*Your isomorphic swiss army knife*
+
+## Current Status
+Critical R&D complete.   Now porting most useful xlib features to the new codebase.
+
+## Goals
+- Monorepo: hosting projects related to xlib
+- Docs: full online documentation
+- Promises: ```async / await``` by default
+- Isometric:  full support for node and browser
+- Performance: take advantage of worker threads where it makes sense
+- Full Featured: aim to provide 80% of utility needs
+- Professional:  no hacks, fully documented, deployment environment aware
+- Dev Experience: will include dev-env scafolding scripts and an easy build system
+
+## Non-Goals
+- Full browser support: Ignoring IE, but Edge-Classic support will be attempted
+- Old Node support:  Development targets Node 14.x
+- Tooling Agnostism:  Development targets VSCode on ubuntu.  Should work on windows, but not tested.  (Win10 Tip:  Use WSL)
+
+
+
+## R&D Status
 
 **COMPLETE**: 
 - isomorphic:  xlib feature parity for browser and node projects
@@ -14,60 +45,16 @@ work here will be ported to the current ```xlib``` repository once R&D has met t
   - use ```npm @microsoft/rush```
 - upgradeability: ensure dependent modules can be properly upgraded in a reliable way
   - use ```rush check``` and ```rush dep-check``` and ```rush dep-upgrade``` for this workflow
+- documentation:  proper code documentation, auto-gen from source
+  - functional doc system using ```api-extractor``` via the ```@xlib/xlib-docs``` website project.
+  - if we need to change in the future, consider using https://github.com/tgreyuk/typedoc-plugin-markdown
 
 **PENDING**
 - testing:  can test feature set equally well x-plat
 - publishing:  ensure xlib ecosystem can be published to npm
 - basic react e2e: proof of concept using react to setup a real app (including ssl and dev vs production env)
-- documentation:  proper code documentation, auto-gen from source
-  - functional doc system using ```api-extractor``` via the ```@xlib/xlib-docs``` website project.
-  - if we need to change in the future, consider using https://github.com/tgreyuk/typedoc-plugin-markdown
 - doc site:  a documenation site with full text search and versioning
 - modern promise libary
+  - probably just use builtin promises
 
 
-# development
-
-## tagline
-Your isomorphic, swiss army knife, utility library
-
-
-## env setup
-- core dev env
-  - install node 14.x
-  - ```npm install -g pnpm @microsoft/rush```
-- supplemental build tooling
-  -  ```npm install -g npm-check-updates  concurrently  ```  //was: jest @microsoft/api-extractor @microsoft/api-documenter
-
-# REWRITE NOTES
-- date
-  - day.js probably (maybe luxon)
-- net io
-  - gaxios
-- webworkers
-  - threads.js
-- serialization
-  - need to add benchmarks for
-    - msgpack
-    - simdjson
-    - json5
-
-
-# scratch
-
-## isomorphic research notes
-- https://source.coveo.com/2016/05/11/isomorphic-typescript-ava-w-coverage/
-- https://jamesmonger.com/2019/09/10/super-robust-api-with-isomorphic-typescript.html
-- https://github.com/happygrammer/isomorphic-typescript-starter
-- https://github.com/ericmasiello/isomorphic-typescript-react-redux-starter
-- https://hackernoon.com/building-isomorphic-javascript-packages-1ba1c7e558c5
-- https://zellwk.com/blog/publishing-npm-packages-that-can-be-used-in-browsers-and-node/
-
-## library extensibility / plugin architecture
-- https://www.npmjs.com/package/tapable
-
-## promises
-- probably can use native promises now (bluebird not needed): https://dev.to/blacksonic/what-does-javascript-promise-us-for-2020-4l1i
-
-
-  

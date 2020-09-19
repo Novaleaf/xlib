@@ -1,3 +1,13 @@
+# v17 BRANCH CODE HERE
+
+This folder has the v17 codebase.  features may or may not be ported to the new v18 codebase.
+
+
+
+# original readme.md is below
+
+
+
 *Best used with Typescript 3.x*
 
 
