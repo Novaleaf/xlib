@@ -10,13 +10,13 @@
     - [PENDING](#pending)
 
 # REWRITE IN PROGRESS
-Xlib is being rewritten from first principles.  The current ```master``` branch of this repo is dedicated to this rewrite.   The current ```npm xlib``` package  points to ```xlib@17.x``` which is a stable, high quality core/util library for node.  See the ```v17``` branch for it's source.
+Xlib is being rewritten from first principles.  The current ```master``` branch of this repo is dedicated to this rewrite.   The current [```npm xlib```](https://www.npmjs.com/package/xlib) package  points to ```xlib@17.x``` which is a stable, high quality core/util library for node.  See the [```v17```](https://github.com/Novaleaf/xlib/tree/v17) branch for it's source.
 
-The ```v17``` branch is:
+The [```v17```](https://github.com/Novaleaf/xlib/tree/v17) branch is:
 - highly stable
 - full featured
 - used in production
-- available as the default ```npm xlib``` package
+- available as the default [```npm xlib```](https://www.npmjs.com/package/xlib) package
 
 **The remainder of this readme is dedicated to the ```v18``` rewrite.**
 
@@ -38,7 +38,7 @@ The ```v17``` branch is:
 ## Non-Goals
 - Full browser support: Ignoring IE, but Edge-Classic support will be attempted
 - Old Node support:  Development targets Node 14.x
-- Tooling Agnostism:  Development targets VSCode on ubuntu.  Should work on windows, but not tested.  (Win10 Tip:  Use WSL)
+- Tooling Agnostism:  Development targets VSCode on ubuntu.  Should work on windows, but not tested.  (Win10 Tip:  Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) for development!)
 
 
 
