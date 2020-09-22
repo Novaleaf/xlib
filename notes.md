@@ -66,6 +66,9 @@ https://addyosmani.com/blog/visualize-data-structures-vscode/
     - msgpack
     - simdjson
     - json5
+- future eslint extensions:
+  - https://github.com/sindresorhus/eslint-plugin-unicorn
+  - https://www.npmjs.com/package/eslint-plugin-filenames
 
 
 ## scratch
@@ -80,6 +83,7 @@ https://addyosmani.com/blog/visualize-data-structures-vscode/
 
 ### library extensibility / plugin architecture
 - https://www.npmjs.com/package/tapable
+
 
 ### promises
 - probably can use native promises now (bluebird not needed): https://dev.to/blacksonic/what-does-javascript-promise-us-for-2020-4l1i
