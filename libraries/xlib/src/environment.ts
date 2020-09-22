@@ -4,7 +4,7 @@ import * as nodeHelper from "./_internal/node-helper"
 import { XlibException } from "./diagnostics/exception"
 import * as _ from "lodash"
 
-import { parseEnum } from "./util/enumHelper"
+import { parseEnum } from "./util/enum-helper"
 
 /**
  * pollyfill globalThis.  from https://mathiasbynens.be/notes/globalthis

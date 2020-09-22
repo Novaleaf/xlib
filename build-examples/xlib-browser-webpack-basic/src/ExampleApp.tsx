@@ -25,7 +25,7 @@ const callXlibKyTest = ( async (): Promise<string> => {
 	// }
 	// const result = new TextDecoder( "utf-8" ).decode( reader.value )
 	// return result
-	return ( await xlib.net._internal.gaxios.request<string>( { url: "https://httpbin.org/base64/aGVsbG8gZnJvbSB0aGUgaW50ZXJuZXQ=" } ) ).data
+	return ( await xlib.net.gaxios.request<string>( { url: "https://httpbin.org/base64/aGVsbG8gZnJvbSB0aGUgaW50ZXJuZXQ=" } ) ).data
 
 } )
 

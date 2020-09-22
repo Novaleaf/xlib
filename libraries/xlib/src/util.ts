@@ -1,2 +1,2 @@
-import * as enumHelper from "./util/enumHelper"
+import * as enumHelper from "./util/enum-helper"
 export { enumHelper }

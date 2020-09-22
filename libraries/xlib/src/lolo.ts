@@ -1,3 +1,3 @@
-import { parseEnum } from "./util/enumHelper"
+import { parseEnum } from "./util/enum-helper"
 export { parseEnum }
 

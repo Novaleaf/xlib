@@ -26,7 +26,7 @@ describe( "xlib.net unit tests", () => {
 	describe( "gaxios", () => {
 		it( "basic network connectivity roundtrip", async () => {
 
-			const reqProm = net._internal.gaxios.request<string>( {
+			const reqProm = net.gaxios.request<string>( {
 				url: "https://httpbin.org/base64/aGVsbG8gZnJvbSB0aGUgaW50ZXJuZXQ=",
 			} )
 

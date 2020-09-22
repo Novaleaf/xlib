@@ -322,8 +322,8 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 	} else if ( _.isArray( stack ) ) {
 		//array;
 		stackArray = stack as string[]
-	} else if ( typeof ( stack as any ).toString === "function" ) {
-		stackArray = [ ( stack as any ).toString() ]
+	} else if ( typeof ( stack as object ).toString === "function" ) {
+		stackArray = [ ( stack as object ).toString() ]
 	} else {
 		stackArray = [ "unknown" ]
 	}

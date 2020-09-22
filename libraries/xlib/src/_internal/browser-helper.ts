@@ -261,7 +261,7 @@ export function getQuerystringVariables( { refresh = false } = {} ): Record<stri
 					value = pair[ 1 ]
 				} else {
 					key = pair[ 0 ]
-					value = ( <string>rawVars[ i ] ).substring( key.length )
+					value = rawVars[ i ].substring( key.length )
 					//throw new Error("invalid querystring format.  var= " + rawVars[i]);
 				}
 				_parsedQuerystrings[ key ] = value
