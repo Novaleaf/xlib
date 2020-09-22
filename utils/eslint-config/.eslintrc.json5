@@ -41,8 +41,13 @@
 			],
 			"rules": {
 				"indent": [
-					"warn",
-					"tab"
+					"off", //let vscode auto format on save do it's thing
+					"tab",
+					{
+						"ignoredNodes": [
+							"SwitchCase"
+						]
+					}
 				],
 				"linebreak-style": [
 					"warn",
@@ -63,6 +68,13 @@
 					"error",
 					"smart"
 				],
+				"no-empty": [
+					"warn",
+					{
+						"allowEmptyCatch": true
+					}
+				],
+				"no-lone-blocks": "off",
 				"@typescript-eslint/no-unused-vars": [
 					"warn",
 					{
@@ -87,7 +99,18 @@
 				],
 				"@rushstack/no-null": [
 					"off"
-				]
+				],
+				//"@rushstack/no-new-null": "off",
+				"@typescript-eslint/no-use-before-define": "off",
+				"no-restricted-globals": [
+					"error",
+					{
+						"name": "Error",
+						"message": "Use xlib.diagnostics.Exception or it's descendants instead.  (Error specialization)"
+					}
+				],
+				"@typescript-eslint/no-parameter-properties": "off",
+				"@typescript-eslint/explicit-function-return-type": "off"
 			}
 		}
 	],

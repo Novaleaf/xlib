@@ -60,6 +60,7 @@ https://addyosmani.com/blog/visualize-data-structures-vscode/
   - gaxios
 - webworkers
   - threads.js
+  - maybe https://www.npmjs.com/package/worker-loader
 - serialization
   - need to add benchmarks for
     - msgpack
