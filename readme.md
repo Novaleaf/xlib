@@ -28,7 +28,7 @@ Critical R&D complete.   Now porting most useful xlib features to the new codeba
 ## Non-Goals
 - Full browser support: Ignoring IE, but Edge-Classic support will be attempted
 - Old Node support:  Development targets Node 14.x
-- Tooling Agnostism:  Development targets VSCode on ubuntu.  Should work on windows, but not tested.  (Win10 Tip:  Use WSL)
+- Tooling Agnostism:  Development targets VSCode on ubuntu.  Should work on windows, but not tested.  (Win10 Tip:  Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) for development!)
 
 
 
