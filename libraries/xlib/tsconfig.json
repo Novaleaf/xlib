@@ -6,6 +6,7 @@
 		"types": [
 			"node",
 			"jest",
+			//"chai",
 		],
 		"lib": [ //see: https://www.typescriptlang.org/tsconfig#lib
 			//"es5",

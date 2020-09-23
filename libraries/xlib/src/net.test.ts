@@ -3,7 +3,10 @@ import * as xlib from "./_main"
 
 import net = xlib.net;
 
-
+import chai from "chai"
+import chaiAsPromised from "chai-as-promised"
+chai.use( chaiAsPromised )
+import { expect } from "chai"
 
 
 
@@ -32,7 +35,7 @@ describe( "xlib.net unit tests", () => {
 
 			const resp = await reqProm
 			const result = resp.data
-			expect( result ).toEqual( "hello from the internet" )
+			expect( result ).equals( "hello from the internet" )
 		} )
 	} )
 } )

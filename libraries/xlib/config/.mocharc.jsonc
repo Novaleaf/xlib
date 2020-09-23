@@ -1,0 +1,5 @@
+// https://mochajs.org/#configuring-mocha-nodejs
+{
+	"spec": "lib/**/*.test.js",
+	"enable-source-maps": true
+}

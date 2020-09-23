@@ -73,7 +73,8 @@ https://addyosmani.com/blog/visualize-data-structures-vscode/
 - future eslint extensions:
   - https://github.com/sindresorhus/eslint-plugin-unicorn
   - https://www.npmjs.com/package/eslint-plugin-filenames
-
+- test assertion framework
+  - chai works, but what is better?
 
 ## scratch
 
