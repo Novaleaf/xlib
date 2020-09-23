@@ -61,6 +61,10 @@ https://addyosmani.com/blog/visualize-data-structures-vscode/
 - webworkers
   - threads.js
   - maybe https://www.npmjs.com/package/worker-loader
+  - maybe https://www.npmjs.com/package/comlink
+  - maybe https://isomorphic-git.org/docs/en/webworker
+  - see also: https://stackoverflow.com/questions/10343913/how-to-create-a-web-worker-from-a-string
+  - 
 - serialization
   - need to add benchmarks for
     - msgpack
