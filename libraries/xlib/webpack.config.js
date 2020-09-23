@@ -1,5 +1,7 @@
 'use strict';
 
+const config = require("./package.json")
+
 const path = require('path');
 /** See here for documentation: https://github.com/jantimon/html-webpack-plugin 
  * will automatically inject the webpack bundles into this page
@@ -42,10 +44,43 @@ function createWebpackConfig({ production }) {
 				{
 					test: /\.js$/,
 					enforce: 'pre',
-					use: ['source-map-loader'], //needed to chain sourcemaps.  see: https://webpack.js.org/loaders/source-map-loader/
+					use: [
+						{
+							//needed to chain sourcemaps.  see: https://webpack.js.org/loaders/source-map-loader/
+							loader: 'source-map-loader',
+							options: {
+
+								filterSourceMappingUrl: (url, resourcePath) => {
+									//	console.log({ url, resourcePath }) example:
+									// {
+									// 	url: 'index.js.map',
+									// 	resourcePath: '/repos/xlib-wsl/common/temp/node_modules/.pnpm/https-proxy-agent@5.0.0/node_modules/https-proxy-agent/dist/index.js'
+									// }
+
+									if (/.*\/node_modules\/.*/.test(resourcePath)) {
+										return false
+									}
+									return true
+								}
+
+							}
+						}],
 				},
 			]
 		},
+		// //! stats.warnings doesn't seem to work.   see: https://stackoverflow.com/questions/63195843/webpack-module-warning-failed-to-parse-source-map-from-data-url/64035413#64035413
+		//devServer: {
+		// 	stats: {
+		// 		//ignore source-map failure warnings: https://webpack.js.org/loaders/source-map-loader/#ignoring-warnings
+		// 		//warningsFilter: [/Failed to parse source map/],
+		// 		warnings: false
+		// 	},
+		//stats: 'errors-only'
+		//},
+		// stats: {
+		// 	warnings: false
+		// },
+		//stats: 'errors-only',
 		entry: {
 			app: path.join(__dirname, 'lib-esm', '_main.js'),
 
@@ -53,9 +88,20 @@ function createWebpackConfig({ production }) {
 			//vendor: ['react', 'react-dom']
 		},
 		output: {
-			path: path.join(__dirname, 'dist'),
-			filename: '[name]_[contenthash].js'
+			path: path.join(__dirname, 'lib-browser'),
+			filename: `${config.name}.bundle.js` //'[name]_[contenthash].js'
 		},
+		// optimization: {
+		// 	//puts external libraries in seperate bundle files. see https://webpack.js.org/guides/code-splitting/#prevent-duplication
+		// 	splitChunks: {
+		// 		cacheGroups: {
+		// 			imports: {
+		// 				chunks: 'all',
+		// 				//				name: (module,chunks,cacheGroupKey),
+		// 			}
+		// 		}
+		// 	}
+		// },
 		devtool: production ? undefined : 'source-map',
 		// // not needed:
 		// devServer: {

@@ -68,3 +68,4 @@ common/autoinstallers/*/.npmrc
 **/lib-esm/
 **/lib-cjs/
 **/dist/
+lib-browser/

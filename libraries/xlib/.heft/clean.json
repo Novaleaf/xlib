@@ -10,6 +10,8 @@
     "dist",
     "lib",
     "lib-esm",
-    //"temp"
+    "lib-browser",
+    "temp",
+    "built"
   ]
 }
