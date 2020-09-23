@@ -70,7 +70,7 @@ function createWebpackConfig({ production }) {
       net: 'empty',
       tls: 'empty',
 
-      "ts-node": "empty",
+      //"ts-node": "empty", thought needed for ```threads```, but it's not
     }
 
   };
