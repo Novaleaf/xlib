@@ -73,12 +73,12 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 							}
 						} ],
 				},
-				{
-					//load up mocha tests: https://webpack.js.org/loaders/mocha-loader/
-					test: /\.test\.js$/,
-					use: "mocha-loader",
-					exclude: /node_modules/,
-				}
+				// {
+				// 	//load up mocha tests: https://webpack.js.org/loaders/mocha-loader/
+				// 	test: /\.test\.js$/,
+				// 	use: "mocha-loader",
+				// 	exclude: /node_modules/,
+				// }
 			]
 		},
 		// //! stats.warnings doesn't seem to work.   see: https://stackoverflow.com/questions/63195843/webpack-module-warning-failed-to-parse-source-map-from-data-url/64035413#64035413
@@ -128,7 +128,8 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 		plugins: [
 
 			new HtmlWebpackPlugin( {
-				//	template: 'assets/lib-test-main.html' //useful if loadign react and pointing to a dom element, but can comment out if not
+				template: "assets/lib-test-main.html" //useful if loadign react and pointing to a dom element, but can comment out if not
+
 			} ),
 			new ThreadsPlugin(),
 		],
