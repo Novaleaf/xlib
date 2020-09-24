@@ -22,7 +22,6 @@ devDependencies:
   eslint: 7.9.0
   html-webpack-plugin: 4.5.0_webpack@4.31.0
   mocha: 8.1.3
-  mocha-loader: 5.1.2_mocha@8.1.3+webpack@4.31.0
   null-loader: 4.0.0_webpack@4.31.0
   rollup: 2.27.1
   rollup-plugin-sourcemaps: 0.6.2_rollup@2.27.1
@@ -3714,22 +3713,6 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==
-  /mocha-loader/5.1.2_mocha@8.1.3+webpack@4.31.0:
-    dependencies:
-      css-loader: 4.3.0_webpack@4.31.0
-      loader-utils: 2.0.0
-      mocha: 8.1.3
-      schema-utils: 2.7.1
-      style-loader: 1.2.1_webpack@4.31.0
-      webpack: 4.31.0_webpack@4.31.0
-    dev: true
-    engines:
-      node: '>= 10.13.0'
-    peerDependencies:
-      mocha: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
-      webpack: ^4.0.0 || ^5.0.0
-    resolution:
-      integrity: sha512-pu75nZypWWUUMnyayu0D1siw0N+6wo9whdKdfe+gNPcxof2r5RJsGYr4PNVU7rzfZg/PEXMRCYzbKVqWGJmbsg==
   /mocha/8.1.3:
     dependencies:
       ansi-colors: 4.1.1
@@ -6053,7 +6036,6 @@ specifiers:
   html-webpack-plugin: ^4.5.0
   lodash: ^4.17.20
   mocha: ^8.1.3
-  mocha-loader: ^5.1.2
   null-loader: ^4.0.0
   platform: ^1.3.6
   rollup: ^2.27.1

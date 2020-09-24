@@ -1,3 +1,7 @@
+/** 
+ * @packageDocumentation
+ * utilize http consistently across browser and node
+ */
 
 import * as _imports from "./_imports"
 

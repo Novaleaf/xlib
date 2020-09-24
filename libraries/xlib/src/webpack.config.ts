@@ -1,3 +1,14 @@
+/** 
+ * @packageDocumentation
+ * webpack configured for:
+ * - isomorphic library
+ * - generating tests as a seperate bundle
+ * - tweaks for 3rd party modules
+ *   - gaxios
+ *   - threads
+ */
+
+
 import * as webpack from "webpack" //using typescript with webpack configs: https://medium.com/webpack/unambiguous-webpack-config-with-typescript-8519def2cac7
 
 import * as wds from "webpack-dev-server"

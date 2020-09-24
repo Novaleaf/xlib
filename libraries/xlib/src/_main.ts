@@ -1,3 +1,8 @@
+/** 
+ * @packageDocumentation
+ * isomorphic swiss army knife
+*/
+
 console.trace( "xlib entrypoint (_main)" )
 
 
