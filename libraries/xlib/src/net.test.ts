@@ -9,6 +9,7 @@ chai.use( chaiAsPromised )
 import { expect } from "chai"
 
 
+console.log( "in net tests" )
 
 
 describe( "xlib.net unit tests", () => {

@@ -34,9 +34,9 @@ async function asyncHuh(): Promise<void> {
 	//expect( update2Count ).toEqual( 2 )
 	await Thread.terminate( counter )
 
-	console.log( `threads!  noice!!!  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
+	console.log( `threads!  noice!!!?!!  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
 
 }
 
 void asyncHuh()
-console.log( "called asyncHuh" )
+console.log( "called asyncHuh!!" )

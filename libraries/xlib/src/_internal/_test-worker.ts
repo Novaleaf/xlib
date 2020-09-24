@@ -17,6 +17,7 @@ const counter = {
 	}
 }
 
+console.warn( "mystery!" )
 export type Counter = typeof counter
 
 expose( counter )

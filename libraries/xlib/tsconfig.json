@@ -1,12 +1,16 @@
+//! details, see: https://www.typescriptlang.org/tsconfig
 {
 	"$schema": "http://json.schemastore.org/tsconfig",
 	"extends": "./node_modules/@xlib/build-tools/includes/tsconfig-node.json",
 	"compilerOptions": {
 		"outDir": "lib",
+		//"rootDir": "src",		
 		"types": [
 			"node",
-			"jest",
+			//"jest",
+			//"webpack"
 			//"chai",
+			"mocha",
 		],
 		"lib": [ //see: https://www.typescriptlang.org/tsconfig#lib
 			//"es5",
@@ -23,7 +27,8 @@
 	},
 	"include": [
 		"src/**/*.ts",
-		"src/**/*.tsx"
+		"src/**/*.tsx",
+		"**/*.config.ts"
 	],
 	"exclude": [
 		"node_modules",
