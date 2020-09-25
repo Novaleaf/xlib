@@ -1,10 +1,10 @@
 /* eslint-disable no-restricted-globals */
-// import * as xlib from "./_main"
+import * as xlib from "./_main"
 
 // import chai from "chai"
 // import chaiAsPromised from "chai-as-promised"
 // chai.use( chaiAsPromised )
-// import { expect } from "chai"
+//import { expect } from "chai"
 
 
 
@@ -22,29 +22,63 @@
 
 // // } )
 
-// import threads = xlib._imports.threads
-// import * as testWorker from "./_internal/_test-worker"
+import threads = xlib._imports.threads
+import * as testWorker from "./_internal/_test-worker"
+const testWorkerSpawn = new threads.Worker( "./_internal/_test-worker" )
 
-// describe( "threads import", () => {
+let jobsDone = false
+const counterPromise = threads.spawn<testWorker.Counter>( testWorkerSpawn ).finally( () => { jobsDone = true } )
 
-// 	it( "threads basic e2e", async () => {
+describe( "threads import", () => {
 
 
-// 		const counter = await threads.spawn<testWorker.Counter>( new threads.Worker( "./_internal/_test-worker" ) )
-// 		const initialCount = await counter.getCount()
-// 		expect( initialCount ).equals( 0 )
-// 		await counter.increment()
-// 		const update1Count = await counter.getCount()
-// 		expect( update1Count ).equals( 1 )
-// 		void counter.increment()
-// 		const update2Count = await counter.getCount()
-// 		expect( update2Count ).equals( 2 )
-// 		await threads.Thread.terminate( counter )
 
-// 		console.log( `threads!  noice!  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
+	it( "threads basic e2e", async () => {
 
-// 	} )
-// } )
+
+		return new Promise( ( resolve, reject ) => {
+
+			setInterval( () => {
+				console.log( `is jobsDone?  ${ jobsDone }` )
+				if ( jobsDone === true ) {
+					resolve()
+				}
+			}, 100 )
+			// 	return await counterPromise
+		} )
+
+		// async function getCounter() {
+		// 	const counter = await counterPromise
+		// 	console.warn( "SHMERE" )
+		// 	return counter
+		// }
+
+		// //Promise.any( [async () => { }])
+
+		// // const counter = await new Promise( ( resolve, reject ) => {
+
+		// // 	//setTimeout( () => { resolve() }, 100 )
+		// // 	return await counterPromise
+
+		// // } )
+		// //const counter = ( await Promise.all( [ counterPromise ] ) )[ 0 ]
+		// const counter = await getCounter()
+		// //const counter = await async()=> { return await counterPromise }
+		// const initialCount = await counter.getCount()
+		// expect( initialCount ).equals( 0 )
+		// await counter.increment()
+		// const update1Count = await counter.getCount()
+		// expect( update1Count ).equals( 1 )
+		// void counter.increment()
+		// const update2Count = await counter.getCount()
+		// expect( update2Count ).equals( 2 )
+		// await threads.Thread.terminate( counter )
+
+		// console.log( `threads!  noice! TEST  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
+
+
+	} )
+} )
 
 describe( "Test", () => {
 	it( "should succeed", ( done ) => {

@@ -1,0 +1,8 @@
+//rules for markdown lint:  https://github.com/DavidAnson/vscode-markdownlint#configure
+{
+	"default": true,
+	"MD013": { //line-length
+		"line_length": 200
+	},
+	"MD025": false
+}

@@ -11,7 +11,7 @@
 
 import * as webpack from "webpack" //using typescript with webpack configs: https://medium.com/webpack/unambiguous-webpack-config-with-typescript-8519def2cac7
 
-import * as wds from "webpack-dev-server"
+import "webpack-dev-server"
 
 
 
@@ -130,12 +130,22 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 		// 	}
 		// },
 		devtool: production ? undefined : "source-map",
-		// need @types/webpack-dev-server installed for this to work
-		// devServer: {
-		// 	//contentBase: path.join( __dirname, "../.." ),
-		// 	watchContentBase: true,
-		// 	hot: true,
-		// },
+		//! only used when running the WDS  (webpack dev server)
+		//need @types/webpack-dev-server installed for this to work
+		devServer: {
+			//contentBase: path.join( __dirname, "../.." ),
+			//watchContentBase: true,
+			//hot: true,
+			open: true,
+
+		},
+		optimization: {
+			/**  because modules can be initialized multiple times if webpack creates more than 1 chunk.
+			 * similar issue here: https://github.com/webpack/webpack/issues/7375
+			 * docs on optimizing here: https://webpack.js.org/configuration/optimization/#optimizationruntimechunk
+			 */
+			runtimeChunk: "single"
+		},
 		plugins: [
 
 			new HtmlWebpackPlugin( {
@@ -158,6 +168,7 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 			"ts-node": "empty", //thought needed for ```threads```, but it's not
 		}
 
+
 	}
 
 
@@ -177,7 +188,7 @@ module.exports = ( { production = false } = {} ) => {
 
 		entry: {
 			bundle: path.normalize( path.join( __dirname, "..", packageConfig.module ) ),
-			tests: path.normalize( path.join( __dirname, "..", packageConfig.moduleTestEntry ) ),
+			tests: path.normalize( path.join( __dirname, "..", packageConfig.webpackBrowserTestEntry ) ),
 		},
 		output: {
 			path: path.normalize( path.join( __dirname, "../lib-browser" ) ),

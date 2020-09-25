@@ -71,6 +71,10 @@ The following signifiers will be attached to the v18 rewrite as work progresses
 - documentation:  proper code documentation, auto-gen from source
   - functional doc system using ```api-extractor``` via the ```@xlib/xlib-docs``` website project.
   - if we need to change in the future, consider using https://github.com/tgreyuk/typedoc-plugin-markdown
+- testing:  isometric testing supported:  ```mocha``` used in browsers, ```jest``` used in node
+  - jest doesn't work in browsers.  didn't switch to full mocha because ```heft``` nicely runs jest tests when it builds typescript, and I don't want to spend the time figuring out to do similar with mocha.
+  - however there is a problem, in that jest's ```expect``` library isn't available cross-platform and it doesn't seem easy to register another assertion lib to globally override jest's in node.
+  - so currently working on building the ```xlib.diagnostics.logging``` module to handle this kind of work.
 
 ### PENDING
 - testing:  can test feature set equally well x-plat

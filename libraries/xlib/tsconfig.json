@@ -10,7 +10,8 @@
 			//"jest",
 			//"webpack"
 			//"chai",
-			"mocha",
+			//"chai-as-promised",
+			//"mocha",
 		],
 		"lib": [ //see: https://www.typescriptlang.org/tsconfig#lib
 			//"es5",
@@ -28,7 +29,8 @@
 	"include": [
 		"src/**/*.ts",
 		"src/**/*.tsx",
-		"**/*.config.ts"
+		"**/*.config.ts",
+		"global.d.ts"
 	],
 	"exclude": [
 		"node_modules",

@@ -19,7 +19,7 @@
   "main": "lib/_main.js",
   "module": "lib-esm/_main.js",
   "browser": "lib-browser/xlib-bundle.js",
-  "moduleTestEntry": "lib-esm/_internal/_test-main.js",
+  "webpackBrowserTestEntry": "lib-esm/_internal/_test-main.browser.js",
   "typings": "lib/_main.d.ts",
   "scripts": {
     "build": "heft build",
