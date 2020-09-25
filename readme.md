@@ -21,11 +21,11 @@ The [```v17```](https://github.com/Novaleaf/xlib/tree/v17) branch is:
 **The remainder of this readme is dedicated to the ```v18``` rewrite.**
 
 # XLIB v18+
-*Your isomorphic swiss army knife*
+*Your isomorphic toolbox*
 
 
 ## Goals
-- Monorepo: hosting projects related to xlib
+- Monorepo: the core ```xlib```, tooling, and build verification projects all live in this repo
 - Docs: full online documentation
 - Promises: ```async / await``` by default
 - Isometric:  full support for node and browser
@@ -37,13 +37,14 @@ The [```v17```](https://github.com/Novaleaf/xlib/tree/v17) branch is:
 
 ## Non-Goals
 - Full browser support: Ignoring IE, but Edge-Classic support will be attempted
-- Old Node support:  Development targets Node 14.x
-- Tooling Agnostism:  Development targets VSCode on ubuntu.  Should work on windows, but not tested.  (Win10 Tip:  Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) for development!)
+- Old Node support:  Development is done on Node 14.x.    Node 12.x should work fine.
+- Tooling Agnostism:  Development is done on VSCode via ubuntu.  You should be able to build/dev on windows, but it's not tested.  
+  - *Win10 Tip:  Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) for development!*
 
 
 
 ## R&D Status
-Current ```v18.x``` is of ```develop``` build quality.  
+Current ```v18.x``` is of ```develop``` build quality (meaning: ***do not use this right now***).  
 
 Critical R&D complete.   Now porting most useful xlib features to the new codebase.
 
