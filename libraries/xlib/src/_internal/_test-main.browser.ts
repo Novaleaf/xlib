@@ -39,7 +39,6 @@ mocha.setup( {
 } )
 mocha.growl() // enable web notification
 
-
 //it( "", (done) => { done() })
 
 //import * as chai from "chai-as-promised"
@@ -50,33 +49,33 @@ mocha.growl() // enable web notification
 
 // }
 
-//sham mocha's it function to match jest's signature
+//import "./mocha-jest-interop"
+
+// if ( globalThis.describe == null ) {
+// 	throw new Error( "no global ```describe``` function to perform interop conversions on" )
+// 	//globalThis.describe = () => { }
+// }
+// if ( globalThis.it == null ) {
+// 	throw new Error( "no global ```it``` function to perform interop conversions on" )
+// 	//globalThis.it = () => { }
+// }
+
+/** Allows using Jest's ```it``` and ```describe``` definitions, even if using mocha.
+ * only does this if the jest global is not present and the mocha global is
+ * @packageDocumentation
+ */
 {
 	const mochaIt: ANY = it
-	// // eslint-disable-next-line @typescript-eslint/ban-types
-	// const shamIt = ( name: string, fn?: Function, timeout?: number ): void => {
-	// 	// const doneCallback = () => {
-	// 	// 	const isDone: IDoneCallback = ( args ) => {
-	// 	// 		_test
-	// 	// 	 }
-
-
-	// 	//  }
-	// 	const _test = mochaIt( name, () => { fn() }    //fn as never )
-	// 	if ( timeout != null ) {
-	// 		_test.timeout( timeout )
-	// 	}
-	// }
-	globalThis.it = ( name, fn, timeout ) => {
+	globalThis.it = ( ( name, fn, timeout ) => {
 
 		const _test = mochaIt( name, fn )
 		if ( timeout != null ) {
 			_test.timeout( timeout )
 		}
-
-
-	}
+	} )
 }
+
+
 
 //load up all test files following general advice from: https://stackoverflow.com/questions/32385219/mocha-tests-dont-run-with-webpack-and-mocha-loader
 {

@@ -80,55 +80,61 @@ import * as xlib from "./_main"
 // // // 	} )
 // // // } )
 
+//import { describe, it } from "mocha"
+//import {describe, it} from "jest"
+
+
 import pino from "pino"
-const logger = pino()
+const logger = pino( {
 
-logger.info( "info from pino" )
-
-describe( "Test", () => {
-
-	// it( "should fail", () => {
-	// 	//		throw new Error( "Failed" )
-	// 	setTimeout( () => {
-	// 		throw new Error( "Failed" )
-	// 	}, 1000 )
-	// } )
-
-	it( "should success cb", ( done ) => {
-		setTimeout( () => {
-			done()
-		}, 100 )
-	} )
-	it( "should fail cb timeout", ( done ) => {
-		setTimeout( () => {
-			done()
-		}, 300 )
-	}, 200 )
-	it( "should success cb timeout 3000", ( done ) => {
-		setTimeout( () => {
-			done()
-		}, 300 )
-	}, 350 )
-
-	it( "should fail cb", ( done ) => {
-		//		throw new Error( "Failed" )
-		setTimeout( () => {
-			//throw new Error( "Failed" )
-			done( new Error( "fail in setTimeout expected" ) )
-		}, 100 )
-	} )
-
-
-	it( "should log", async () => {
-
-
-	} )
-
-	// it( "should randomly fail", () => {
-	// 	if ( require( "./module" ) ) {
-	// 		throw new Error( "Randomly failed" )
-	// 	}
-	// } )
 } )
 
-// module.exports = true
+logger.info( "info from pino!!" )
+
+describe( "meta tests", () => {
+	describe( "'it' method verification", () => {
+
+		// it( "should fail", () => {
+		// 	//		throw new Error( "Failed" )
+		// 	setTimeout( () => {
+		// 		throw new Error( "Failed" )
+		// 	}, 1000 )
+		// } )
+
+		it( "should success cb", ( done ) => {
+			setTimeout( () => {
+				done()
+			}, 100 )
+		} )
+		// it( "should fail cb timeout", ( done ) => {
+		// 	setTimeout( () => {
+		// 		done()
+		// 	}, 300 )
+		// }, 200 )
+		it( "should success cb timeout 300", ( done ) => {
+			setTimeout( () => {
+				done()
+			}, 150 )
+		}, 350 )
+
+		// it( "should fail cb", ( done ) => {
+		// 	//		throw new Error( "Failed" )
+		// 	setTimeout( () => {
+		// 		//throw new Error( "Failed" )
+		// 		done( new Error( "fail in setTimeout expected" ) )
+		// 	}, 100 )
+		// } )
+
+
+		it( "should log", async () => {
+
+
+		} )
+
+		// it( "should randomly fail", () => {
+		// 	if ( require( "./module" ) ) {
+		// 		throw new Error( "Randomly failed" )
+		// 	}
+		// } )
+	} )
+} )

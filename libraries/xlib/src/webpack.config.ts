@@ -99,7 +99,7 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 		// 		//warningsFilter: [/Failed to parse source map/],
 		// 		warnings: false
 		// 	},
-		//stats: 'errors-only'
+		//stats: "errors-only",
 		//},
 		// stats: {
 		// 	warnings: false
@@ -136,8 +136,8 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 			//contentBase: path.join( __dirname, "../.." ),
 			//watchContentBase: true,
 			//hot: true,
-			open: true,
-
+			//open: true,
+			//stats: "errors-only"
 		},
 		optimization: {
 			/**  because modules can be initialized multiple times if webpack creates more than 1 chunk.

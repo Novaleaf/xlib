@@ -1,5 +1,9 @@
 // https://mochajs.org/#configuring-mocha-nodejs
+//https://mochajs.org/#command-line-usage
 {
 	"spec": "lib/**/*.test.js",
-	"enable-source-maps": true
+	"enable-source-maps": true,
+	//"require": "./lib/_internal/mocha-jest-interop.js",
+	//match jest
+	"timeout": 5000
 }
