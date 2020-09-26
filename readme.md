@@ -59,27 +59,26 @@ The following signifiers will be attached to the v18 rewrite as work progresses
 
 
 ### COMPLETE
-- isomorphic:  xlib feature parity for browser and node projects
+- **isomorphic**:  xlib feature parity for browser and node projects
   - needed to setup a mock ```xlib-browser``` project to build esm version of library
-- typings:  ensure dependent projects get sub-package typings automatically
+- **typings**:  ensure dependent projects get sub-package typings automatically
   - basically, ```tsconfig.json``` has to be setup properly.   for example, ```esModuleInterop:true```
-- debugging:  ensure dependent projects can debug into xlib's *.ts source files
+- **debugging**:  ensure dependent projects can debug into xlib's *.ts source files
   - dependent project's ```launch.json``` needs to properly setup the ```outFiles``` setting.   see ```build-examples/xlib-node-basic```
-- monorepo: develop xlib ecosystem as seperate projects within the same repository
+  - browser debugging properly sourcemaps to original ```.ts``` files
+- **monorepo**: develop xlib ecosystem as seperate projects within the same repository
   - use ```npm @microsoft/rush```
-- upgradeability: ensure dependent modules can be properly upgraded in a reliable way
+- **upgradeability**: ensure dependent modules can be properly upgraded in a reliable way
   - use ```rush check``` and ```rush dep-check``` and ```rush dep-upgrade``` for this workflow
-- documentation:  proper code documentation, auto-gen from source
+- **documentation**:  proper code documentation, auto-gen from source
   - functional doc system using ```api-extractor``` via the ```@xlib/xlib-docs``` website project.
   - if we need to change in the future, consider using https://github.com/tgreyuk/typedoc-plugin-markdown
-- testing:  isometric testing supported:  ```mocha``` used in browsers, ```jest``` used in node
+- **testing**:  isometric testing supported:  ```mocha``` used in browsers, ```jest``` used in node
   - jest doesn't work in browsers.  didn't switch to full mocha because ```heft``` nicely runs jest tests when it builds typescript, and I don't want to spend the time figuring out to do similar with mocha.
   - however there is a problem, in that jest's ```expect``` library isn't available cross-platform and it doesn't seem easy to register another assertion lib to globally override jest's in node.
   - so currently working on building the ```xlib.diagnostics.logging``` module to handle this kind of work.
 
 ### PENDING
-- testing:  can test feature set equally well x-plat
-  - need a browser based testing framework.  mocha?
 - publishing:  ensure xlib ecosystem can be published to npm
 - basic react e2e: proof of concept using react to setup a real app (including ssl and dev vs production env)
 - doc site:  a documenation site with full text search and versioning
@@ -87,6 +86,7 @@ The following signifiers will be attached to the v18 rewrite as work progresses
   - probably just use builtin promises
 - enterprise grade logging system (without the enterprise plumbing requirement)
   - ??? some plugable listener lib probably
+- isomorphic worker threads:  currently using ```npm threads``` which works, but is brittle
 
 
 
