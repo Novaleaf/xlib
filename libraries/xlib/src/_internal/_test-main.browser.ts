@@ -33,11 +33,14 @@ declare interface NodeRequire {
 // }
 const mocha = require( "mocha" )
 //import "mocha"
-mocha.setup( "bdd" )
+mocha.setup( {
+	ui: "bdd",
+	timeout: 5000, //match jest default
+} )
 mocha.growl() // enable web notification
 
 
-
+//it( "", (done) => { done() })
 
 //import * as chai from "chai-as-promised"
 
@@ -65,10 +68,13 @@ mocha.growl() // enable web notification
 	// 	}
 	// }
 	globalThis.it = ( name, fn, timeout ) => {
+
 		const _test = mochaIt( name, fn )
 		if ( timeout != null ) {
 			_test.timeout( timeout )
 		}
+
+
 	}
 }
 
