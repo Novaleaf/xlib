@@ -7,16 +7,21 @@ console.warn( "xlib entrypoint (_main)" )
 
 
 import * as _imports from "./_imports"
+export { _imports }
 import * as net from "./net"
+export { net }
 import * as util from "./util"
+export { util }
 
 //export * as lodash from "lodash"
 
 //import * as _ from "lodash"
 
 import * as lolo from "./lolo"
+export { lolo }
+import * as diagnostics from "./diagnostics"
+export { diagnostics }
 
-export { _imports, net, util, lolo }
 
 
 

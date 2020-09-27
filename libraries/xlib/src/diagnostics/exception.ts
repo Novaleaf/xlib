@@ -44,6 +44,13 @@ export interface IExceptionOptions {
 }
 
 
+export function getStackTrace(): string[] {
+	const stackStr = Error().stack
+	if ( stackStr == null ) {
+		return []
+	}
+	return stackStr.split( "\n" ).slice( 2 ) //ln 0 is "Error", ln 1 is self.
+}
 
 /** An `Error` object that includes improved features
  * @remarks
@@ -329,9 +336,9 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 	}
 
 	//sanitize: remove stack traces if in production
-	if ( options.alwaysShowFullStack !== true && environment.isProd() && environment.getLogLevel() > environment.LogLevel.DEBUG ) {
+	if ( options.alwaysShowFullStack !== true && environment.isProd() && environment.isDebug()===false ) {
 		switch ( environment.getLogLevel() ) {
-			case environment.LogLevel.INFO:
+			case "info":
 				options.maxStacks = Math.min( options.maxStacks ?? 2, 2 )
 				stackArray[ 1 ] = "only 1 stackFrame is shown because env=PROD && log=INFO"
 				break

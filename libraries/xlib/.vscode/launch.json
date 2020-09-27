@@ -6,8 +6,8 @@
 	"configurations": [
 		{
 			//allows debugging any npm task, though might need to force exit at the end
-			"command": "pnpm test",
-			"name": "pnpm test",
+			"command": "pnpm test-node",
+			"name": "pnpm test-node",
 			"request": "launch",
 			"type": "node-terminal",
 			"internalConsoleOptions": "openOnSessionStart",
@@ -16,8 +16,9 @@
 				"!**/node_modules/**"
 			],
 			"skipFiles": [
-				"<node_internals>/**",
+				//"<node_internals>/**",
 				"**/node_modules/jest-runtime/**",
+				//"<node_internals>/.pnpm/**",
 			],
 		},
 		{
@@ -34,9 +35,10 @@
 			],
 			"console": "integratedTerminal",
 			"skipFiles": [
-				"<node_internals>/**",
-				"**/node_modules/jest-runtime/**",
+				//	"<node_internals>/**",
+				//	"**/node_modules/jest-runtime/**",
 			],
+			"sourceMaps": true
 		},
 		{
 			"type": "pwa-node",

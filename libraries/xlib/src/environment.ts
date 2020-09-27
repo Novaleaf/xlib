@@ -4,7 +4,7 @@ import * as nodeHelper from "./_internal/node-helper"
 import { XlibException } from "./diagnostics/exception"
 import * as _ from "lodash"
 
-import { parseEnum } from "./util/enum-helper"
+//import { parseEnum } from "./util/enum-helper"
 
 /**
  * pollyfill globalThis.  from https://mathiasbynens.be/notes/globalthis
@@ -40,28 +40,41 @@ import * as platformJs from "platform"
  * @remarks
  * see {@link getEnvVar} 
 	*/
-export enum EnvLevel {
-	/** the default if no envVar is detected */
-	DEV = 10,
-	TEST = 20,
-	UAT = 30,
-	PROD = 40,
-}
+// export enum EnvLevel {
+// 	/** the default if no envVar is detected */
+// 	DEV = 10,
+// 	TEST = 20,
+// 	UAT = 30,
+// 	PROD = 40,
+// }
+export type EnvLevel = "dev" | "test" | "uat" | "prod"
 
 /** read specific enVar key `LOG_LEVEL`  used by the xlib.diagnostics.logging system to determine what messages to filter out */
-export enum LogLevel {
+// export enum LogLevel {
 
-	TRACE = 10,
+// 	TRACE = 10,
+// 	/** Exception details default to include a full stack trace */
+// 	DEBUG = 20,
+// 	/** Exception details default to include the first frame of the stack */
+// 	INFO = 30,
+// 	/** Exception details default to include no stack */
+// 	WARN = 40,
+// 	ERROR = 50,
+// 	FATAL = 60,
+
+// 	SILENT = 70,
+// }
+
+
+export type LogLevel = "trace" |
 	/** Exception details default to include a full stack trace */
-	DEBUG = 20,
+	"debug" |
 	/** Exception details default to include the first frame of the stack */
-	INFO = 30,
+	"info" |
 	/** Exception details default to include no stack */
-	WARN = 40,
-	ERROR = 50,
-	FATAL = 60,
-	ASSERT = 70,
-}
+	"warn" |
+	"error" | "fatal" | "silent"
+
 
 export type PlatformType = "browser" | "node" | "embedded" | "unknown"
 
@@ -227,8 +240,8 @@ export function getEnvInfo( {
 				return "unknown"
 			} )(),
 
-			env: EnvLevel.DEV,  //need to set after creating _envInfo due to race condition
-			log: LogLevel.TRACE, //need to set after creating _envInfo due to race condition
+			env: "dev",  //need to set after creating _envInfo due to race condition
+			log: "trace", //need to set after creating _envInfo due to race condition
 
 			rawDetails: {
 				platformJs: _.cloneDeep( platformJs ),// JSON.parse( JSON.stringify( platformJs ) ),
@@ -239,50 +252,22 @@ export function getEnvInfo( {
 
 
 
-		//set env details
-		_envInfo.env = ( () => {
-			const foundEnvVar = getEnvironmentVariable( "NODE_ENV" ) ?? getEnvironmentVariable( "ENV" ) ?? "DEV"
-			switch ( foundEnvVar.slice( 0, 3 ).toLowerCase() ) {
-				case "dev":
-					return EnvLevel.DEV
-				case "tes":
-					return EnvLevel.TEST
-				case "uat":
-					return EnvLevel.UAT
-				case "pro":
-					return EnvLevel.PROD
-				default:
-					console.warn( `unknown envLevel found in "NODE_ENV" | "ENV" envVars.  found "${ foundEnvVar }".  defaulting to DEV` )
-					return EnvLevel.DEV
-			}
-		} )()
-		//_envInfo.rawDetails.initialEnv = _envInfo.env
-
-		//set log details
-		_envInfo.log = ( () => {
-			const foundEnvVar = getEnvironmentVariable( "LOG_LEVEL" )
-			const toReturn = parseEnum( LogLevel, foundEnvVar )
-			if ( toReturn == null ) {
-				console.warn( `unknown logLevel found in "LOG_LEVEL" envVar.  found "${ foundEnvVar }".  defaulting to TRACE` )
-				return LogLevel.TRACE
-			}
-			return toReturn
-
-			// // LogLevel[ foundEnvVar?.toUpperCase() as never ]
-			// if ( typeof toReturn === "string" ) return LogLevel[ toReturn as never ] as never as LogLevel
-			// if ( typeof toReturn === "number" ) return toReturn as never as LogLevel
-			// console.warn( `unknown logLevel found in envVars.  found "${ foundEnvVar }".  defaulting to TRACE` )
-			// return LogLevel.TRACE
-		} )()
-
-
 		//last minute fixup detections
 		{
-			if ( _envInfo.platform === "unknown" ) {
-				if ( typeof ( window ) !== "undefined" ) {
-					_envInfo.platform = "browser"
+			//force node if node explicit values found, assuming platform.js didn't detect some fancy embedded
+			if ( _envInfo.platform !== "embedded" ) {
+				if ( typeof process !== "undefined" && /node|io\.js/.test( process?.release?.name ) ) {
+					//detect node, from: https://www.geeksforgeeks.org/how-to-check-whether-a-script-is-running-under-node-js-or-not/				
+					_envInfo.platform = "node"
 				}
 			}
+
+			// if ( _envInfo.platform === "unknown" ) {
+
+			// 	if ( typeof ( window ) !== "undefined" ) {
+			// 		_envInfo.platform = "browser"
+			// 	}
+			// }
 
 			if ( platformJs.os?.family != null ) {
 				const fam = platformJs.os.family.toLowerCase()
@@ -311,6 +296,66 @@ export function getEnvInfo( {
 				}
 			}
 		}
+
+
+
+		//set env details
+		_envInfo.env = ( (): EnvLevel => {
+			const foundEnvVar = getEnvironmentVariable( "NODE_ENV" ) ?? getEnvironmentVariable( "ENV" ) ?? "DEV"
+			switch ( foundEnvVar?.trim().slice( 0, 3 ).toLowerCase() ) {
+				case "dev":
+					return "dev"
+				case "tes":
+					return "test"
+				case "uat":
+					return "uat"
+				case "pro":
+					return "prod"
+				default:
+					console.warn( `unknown envLevel found in "NODE_ENV" | "ENV" envVars.  found "${ foundEnvVar }".  defaulting to DEV` )
+					return "dev"
+			}
+		} )()
+		//_envInfo.rawDetails.initialEnv = _envInfo.env
+
+		//set log details
+		_envInfo.log = ( (): LogLevel => {
+			const foundEnvVar = getEnvironmentVariable( "LOG_LEVEL" )
+
+			switch ( foundEnvVar?.trim().slice( 0, 3 ).toLowerCase() ) {
+				case "tra":
+					return "trace"
+				case "deb":
+					return "debug"
+				case "inf":
+					return "info"
+				case "war":
+					return "warn"
+				case "err":
+					return "error"
+				case "fat":
+					return "fatal"
+				case "sil":
+					return "silent"
+				default:
+					console.warn( `unknown logLevel found in "LOG_LEVEL" envVar.  found "${ foundEnvVar }".  defaulting to TRACE` )
+					return "trace"
+			}
+
+			// const toReturn = parseEnum( LogLevel, foundEnvVar )
+			// if ( toReturn == null ) {
+			// 	console.warn( `unknown logLevel found in "LOG_LEVEL" envVar.  found "${ foundEnvVar }".  defaulting to TRACE` )
+			// 	return LogLevel.TRACE
+			// }
+			// return toReturn
+
+			// // LogLevel[ foundEnvVar?.toUpperCase() as never ]
+			// if ( typeof toReturn === "string" ) return LogLevel[ toReturn as never ] as never as LogLevel
+			// if ( typeof toReturn === "number" ) return toReturn as never as LogLevel
+			// console.warn( `unknown logLevel found in envVars.  found "${ foundEnvVar }".  defaulting to TRACE` )
+			// return LogLevel.TRACE
+		} )()
+
 	}
 
 
@@ -345,8 +390,14 @@ export function getEnvLevel(): EnvLevel {
 	return _envInfo?.env ?? getEnvInfo().env
 }
 
+/** returns true if "prod" envLevel */
 export function isProd(): boolean {
-	return getEnvLevel() === EnvLevel.PROD
+	return getEnvLevel() === "prod"
+}
+
+/** returns true if "trace" || "debug" logLevel. */
+export function isDebug(): boolean {
+	return _.includes( [ "trace", "debug" ], getLogLevel() )
 }
 
 export function getLogLevel(): LogLevel {

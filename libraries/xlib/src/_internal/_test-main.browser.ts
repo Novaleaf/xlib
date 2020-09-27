@@ -2,7 +2,10 @@
 /* eslint-disable dot-notation */
 //entrypoint into all tests.
 
-
+try {
+	//when testing, use source maps
+	require( "source-map-support/register" ).install()
+} catch { }
 /** see: https://webpack.js.org/guides/dependency-management/#requirecontext */
 declare interface IRequireContextResolve {
 	resolve: ( key: string ) => string;

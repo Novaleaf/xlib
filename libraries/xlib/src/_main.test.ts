@@ -84,12 +84,28 @@ import * as xlib from "./_main"
 //import {describe, it} from "jest"
 
 
-import pino from "pino"
-const logger = pino( {
+// import pino from "pino"
+// const logger = pino( {
+// 	browser: {
+// 		asObject: true
+// 	}
+// } )
 
-} )
+// logger.info( "info from pino!!", { some: "data" } )
+// logger.info( "info from pino!! w error", { some: "data", someErr: new Error( "boom" ) } )
+// logger.info( "info from pino!! just str" )
+// logger.info( { msg: "info from pino!! w error", some: "data", someErr: new Error( "boom" ), stack: xlib.diagnostics.exception.getStackTrace() } )
 
-logger.info( "info from pino!!" )
+// logger.info( { arg1: "fish", taco: "arg2" }, "an extra message" )
+
+const myLog = new xlib.diagnostics.Logger( "first!" )
+myLog.info( "full roundtrip!  just  a msg" )
+
+myLog.info( { some: "data", someErr: new Error( "boom" ) } )
+myLog.info( "info from pino!! just str" )
+myLog.info( { msg: "info from pino!! w error", some: "data", err: new Error( "boom" ), stack: xlib.diagnostics.exception.getStackTrace() } )
+
+myLog.info( { arg1: "fish", taco: "arg2" }, "an extra message" )
 
 describe( "meta tests", () => {
 	describe( "'it' method verification", () => {
@@ -125,6 +141,22 @@ describe( "meta tests", () => {
 		// 	}, 100 )
 		// } )
 
+		it( "async", () => {
+			return new Promise( ( resolve ) => {
+				setTimeout( () => {
+					resolve()
+				}, 150 )
+			} )
+		}, 350 )
+		it( "async no work", () => {
+		}, 100 )
+		// it( "FAIL:  async cb timeout", () => {
+		// 	return new Promise( ( resolve ) => {
+		// 		setTimeout( () => {
+		// 			resolve()
+		// 		}, 350 )
+		// 	} )
+		// }, 350 )
 
 		it( "should log", async () => {
 
