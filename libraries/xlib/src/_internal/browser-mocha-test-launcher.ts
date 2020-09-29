@@ -1,6 +1,17 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
-//entrypoint into all tests.
+
+/** @packageDocumentation
+ * launcher for mocha tests in the browser
+ * @remarks
+ * Two reasons for this:
+ * 1) tests internally are coded to match jest style tests.  so this contains shims for converting the jest `it` function to be usable by mocha
+ * 2) there isn't a standard way to launch mocha from webpack (the ```mocha-loader``` plugin is broken) so this loads mocha, then finds all test files and runs them
+ *   - see: https://github.com/webpack-contrib/mocha-loader/issues/83
+	*/
+
+
 
 try {
 	//when testing, use source maps
@@ -63,6 +74,8 @@ mocha.growl() // enable web notification
 // 	//globalThis.it = () => { }
 // }
 
+declare const before: ( fn: Function ) => ANY
+
 /** Allows using Jest's ```it``` and ```describe``` definitions, even if using mocha.
  * only does this if the jest global is not present and the mocha global is
  * @packageDocumentation
@@ -73,9 +86,22 @@ mocha.growl() // enable web notification
 
 		const _test = mochaIt( name, fn )
 		if ( timeout != null ) {
-			_test.timeout( timeout )
+			_test?.timeout?.( timeout )
 		}
+		return _test
 	} )
+
+	if ( globalThis.beforeAll == null ) {
+		globalThis.beforeAll = ( fn, timeout ) => {
+
+			const mochaFn = before( fn )
+			if ( timeout != null ) {
+				mochaFn?.timeout?.( timeout )
+			}
+			return mochaFn
+
+		}
+	}
 }
 
 
@@ -85,7 +111,7 @@ mocha.growl() // enable web notification
 	const foundTestsRequire = ( require as unknown as NodeRequire ).context( "..", true, /.*\.test\.js?$/ )
 	//console.log( `keys found = ${ foundTestsRequire.keys().length }` )
 	for ( const key of foundTestsRequire.keys() ) {
-		console.log( key )
+		console.info( `MOCHA-TEST-LAUNCHER:  about to load tests for ${ key }` )
 		foundTestsRequire( key )
 	}
 }

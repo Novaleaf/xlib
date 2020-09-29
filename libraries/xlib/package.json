@@ -19,7 +19,7 @@
   "main": "lib/_main.js",
   "module": "lib-esm/_main.js",
   "browser": "lib-browser/xlib-bundle.js",
-  "webpackBrowserTestEntry": "lib-esm/_internal/_test-main.browser.js",
+  "webpackBrowserTestEntry": "lib-esm/_internal/browser-mocha-test-launcher.js",
   "typings": "lib/_main.d.ts",
   "scripts": {
     "build": "heft build && webpack --config ./lib/webpack.config.js",

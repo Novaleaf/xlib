@@ -107,7 +107,11 @@ myLog.info( { msg: "info from pino!! w error", some: "data", err: new Error( "bo
 
 myLog.info( { arg1: "fish", taco: "arg2" }, "an extra message" )
 
+
+
 describe( "meta tests", () => {
+
+
 	describe( "'it' method verification", () => {
 
 		// it( "should fail", () => {
@@ -127,7 +131,7 @@ describe( "meta tests", () => {
 		// 		done()
 		// 	}, 300 )
 		// }, 200 )
-		it( "should success cb timeout 300", ( done ) => {
+		it( "async done() in 150ms. timeout 350", ( done ) => {
 			setTimeout( () => {
 				done()
 			}, 150 )
@@ -141,7 +145,7 @@ describe( "meta tests", () => {
 		// 	}, 100 )
 		// } )
 
-		it( "async", () => {
+		it( "async Promise resolve in 150ms.  timeout 350", () => {
 			return new Promise( ( resolve ) => {
 				setTimeout( () => {
 					resolve()
