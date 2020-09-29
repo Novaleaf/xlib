@@ -16,10 +16,13 @@ export interface ILoggerOptions {
 
 	/** if not specified, defaults to env.logLevel */
 	level?: env.LogLevel
-	/** ignore some keys when printing to console.   defaults to "pid,hostname" */
+	/** ignore some keys when printing to console.   defaults to "pid,hostname" 
+	 * disabled for UAT or PROD
+	*/
 	ignore?: string,
 	/** defaults to "yyyymmdd_HHMM:ss.l"
 	 * if set to false, will be unix epoch tick.
+	 * disabled for UAT or PROD
 	 * @remarks
 	 * [format docs here](https://www.npmjs.com/package/dateformat)
 	*/
@@ -78,7 +81,7 @@ export class Logger {
 				}
 
 				return {
-					//colorize: chalk.supportsColor as boolean, // --colorize
+					//colorize: chalk.supportsColor as boolean, // --colorize  already the default so can disable this option
 					//crlf: false, // --crlf
 					errorLikeObjectKeys: [ "err" ], // --errorLikeObjectKeys
 					//errorProps: "type,message", // --errorProps
@@ -95,11 +98,11 @@ export class Logger {
 
 				} as pino.PrettyOptions
 			} )(),
-			//browser options here: https://github.com/pinojs/pino/blob/master/docs/browser.md
-			browser: {
-				//asObject: true,
-				//serialize: true,
-			}
+			// //browser options here: https://github.com/pinojs/pino/blob/master/docs/browser.md
+			// browser: {
+			// 	//asObject: true,
+			// 	//serialize: true,
+			// },
 		} )
 
 		if ( envInfo.platform === "browser" && _.includes( options.browserConsoleEnvLevel, envInfo.env ) && _.includes( options.browserConsoleLogLevel, envInfo.log ) ) {

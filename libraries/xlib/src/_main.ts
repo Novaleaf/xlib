@@ -2,9 +2,15 @@
  * @packageDocumentation
  * isomorphic swiss army knife
 */
+import "./_internal/polyfill"
+
 
 console.warn( "xlib entrypoint (_main)" )
 
+
+
+import * as environment from "./environment"
+export { environment }
 
 import * as _imports from "./_imports"
 export { _imports }

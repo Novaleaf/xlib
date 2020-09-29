@@ -95,5 +95,7 @@ pnpm install -g npm-check-updates #per-project command added in config/rush/comm
 
 ## todo
 
-- implement pino options: https://github.com/pinojs/pino/blob/master/docs/api.md#options
+- logging:  async logging, and transports to 3rd party such as datadog / papertrail
+  - also review all pino options: https://github.com/pinojs/pino/blob/master/docs/api.md#options
 - expose chalk in stringHelper
+- 

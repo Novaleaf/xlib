@@ -6,35 +6,16 @@ import * as _ from "lodash"
 
 //import { parseEnum } from "./util/enum-helper"
 
-/**
- * pollyfill globalThis.  from https://mathiasbynens.be/notes/globalthis
- */
 
-// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-explicit-any
-declare const __magic__: any
-( function () {
-	if ( typeof globalThis === "object" ) return
-	// eslint-disable-next-line no-extend-native
-	Object.defineProperty( Object.prototype, "__magic__", {
-		get: function () {
-			return this
-		},
-		configurable: true // This makes it possible to `delete` the getter later.
-	} )
-	__magic__.globalThis = __magic__ // lolwat
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	delete ( Object.prototype as any ).__magic__
-}() )
-/** explicitly get the  ```globalThis``` object. 
+import * as platformJs from "platform"
+
+/** get the consistent `globalThis` object
  * @remarks
- * see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
-*/
+ * pollyfill found in "./internal/pollyfill.ts"
+ */
 export function getGlobal(): typeof globalThis {
 	return globalThis
 }
-
-
-import * as platformJs from "platform"
 
 /** reads specific envVar keys `NODE_ENV` or `ENV` for values that specify an environment.
  * @remarks
@@ -252,7 +233,7 @@ export function getEnvInfo( {
 
 
 
-		//last minute fixup detections
+		//last minute fixup detections:  platform.js sucks, doesn't set platform properly quite often.  fix it up for browsers and node
 		{
 			//force node if node explicit values found, assuming platform.js didn't detect some fancy embedded
 			if ( _envInfo.platform !== "embedded" ) {
@@ -262,12 +243,11 @@ export function getEnvInfo( {
 				}
 			}
 
-			// if ( _envInfo.platform === "unknown" ) {
-
-			// 	if ( typeof ( window ) !== "undefined" ) {
-			// 		_envInfo.platform = "browser"
-			// 	}
-			// }
+			if ( _envInfo.platform === "unknown" ) {
+				if ( typeof ( window ) !== "undefined" ) {
+					_envInfo.platform = "browser"
+				}
+			}
 
 			if ( platformJs.os?.family != null ) {
 				const fam = platformJs.os.family.toLowerCase()
