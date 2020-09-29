@@ -1,14 +1,13 @@
+/** general purpose shape of an enum */
 interface IEnum<T> {
 	[ key: string ]: T | string;
 	[ nu: number ]: string;
 }
 
 /**
+ * parse a string or num into an enum value.  Designed for "standard" enums that map to numerical values.  not for string enums.
  * @remarks
- * 
- * @param enumClass 
- * @param key 
- * @param param2 
+ * for string enums, just do a keys lookup
  */
 export function parseEnum<TEnum extends IEnum<T>, T>( enumClass: TEnum, key: ( keyof TEnum ) | string | number | undefined, { caseSensitive = false } = {} ): TEnum[ keyof TEnum ] | undefined {
 	//definition hint (return type) from :https://github.com/Microsoft/TypeScript/issues/18869#issuecomment-333339975

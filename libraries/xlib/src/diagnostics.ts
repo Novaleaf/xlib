@@ -48,10 +48,12 @@ export interface ILoggerOptions {
 	browserConsoleLogLevel?: env.LogLevel[],
 }
 
-export type LoggerMethod = "trace" | "debug" | "info" | "warn" | "error"
 
 export class Logger {
 
+	/**
+	 * logging subsystem.   see https://github.com/pinojs/pino
+	 */
 	public _pino: pino.Logger
 	constructor( public name: string, public options: ILoggerOptions = {} ) {
 
