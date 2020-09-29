@@ -10,7 +10,7 @@
 		"@rushstack/eslint-config",
 		"@rushstack/eslint-config/react",
 		"eslint:recommended",
-		"plugin:react/recommended",
+		//"plugin:react/recommended",  //! REACT: conflict w/heft on 20200928.  maybe need to toggle rushstack's version off instead of this.
 		"plugin:@typescript-eslint/eslint-recommended",
 		//"plugin:@typescript-eslint/recommended" //dupe
 	],
@@ -24,7 +24,7 @@
 	// 	//tsconfigRootDir: __dirname  //should be set in derived config file!
 	// },
 	"plugins": [
-		"react",
+		//"react",  //! REACT: conflict w/heft on 20200928.  maybe need to toggle rushstack's version off instead of this.
 		"jest",
 		//"@typescript-eslint" //dupe
 	],
