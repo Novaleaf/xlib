@@ -23,12 +23,12 @@ declare const __magic__: any
  * see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
 */
 
-//https://github.com/GoogleChrome/proxy-polyfill
-import "proxy-polyfill"
+// //https://github.com/GoogleChrome/proxy-polyfill
+// import "proxy-polyfill"
 
-//https://github.com/zloirock/core-js
-import "core-js"
+// //https://github.com/zloirock/core-js
+// import "core-js"
 
 
-//https://www.npmjs.com/package/regenerator-runtime
-import "regenerator-runtime/runtime"
+// //https://www.npmjs.com/package/regenerator-runtime
+// import "regenerator-runtime/runtime"
