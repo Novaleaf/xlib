@@ -107,7 +107,7 @@ export class Exception extends Error {
 		//}
 
 		/** split up the stack for manipulation during ```.ctor()```.  will recombine at end of  ```.ctor()```. */
-		let splitStack = super.stack?.split( "\n" ) ?? []
+		let splitStack = ( this as ANY ).stack?.split( "\n" ) ?? []
 
 		if ( options.innerError != null && typeof ( options.innerError.stack ) === "string" ) {
 			const newStack = options.innerError.stack.split( "\n" )
@@ -336,7 +336,7 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 	}
 
 	//sanitize: remove stack traces if in production
-	if ( options.alwaysShowFullStack !== true && environment.isProd() && environment.isDebug()===false ) {
+	if ( options.alwaysShowFullStack !== true && environment.isProd() && environment.isDebug() === false ) {
 		switch ( environment.getLogLevel() ) {
 			case "info":
 				options.maxStacks = Math.min( options.maxStacks ?? 2, 2 )

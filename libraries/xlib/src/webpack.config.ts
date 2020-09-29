@@ -44,7 +44,9 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 		mode: production ? "production" : "development",
 		resolve: {
 			extensions: [ ".js", ".jsx", ".json" ],
+
 		},
+
 
 
 		module: {
@@ -59,8 +61,14 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 					test: /node_modules\/https-proxy-agent\//,
 					use: "null-loader",
 				},
+				// {
+				// 	//from https://github.com/googleapis/gaxios/blob/master/webpack.config.js
+				// 	//needed to support gaxios
+				// 	test: /node_modules\/proxy-polyfill\//,
+				// 	use: "null-loader",
+				// },
 				{
-					test: /\.js$/,
+					test: /\.m?js$/,
 					enforce: "pre",
 					use: [
 						{
@@ -84,8 +92,23 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 							}
 						} ],
 				},
+				{
+					//babel loader to transpile to es5: https://webpack.js.org/loaders/babel-loader/
+					test: /\.m?js$/,
+					//exclude: /(node_modules|bower_components)/,
+					exclude: /node_modules(?!\/gaxios)/,
+					use: {
+						loader: "babel-loader",
+						options: {
+							presets: [ "@babel/preset-env" ],
+							plugins: [ "@babel/plugin-proposal-object-rest-spread",
+								"@babel/plugin-transform-runtime" ]
+						}
+					}
+				},
 				// {
 				// 	//load up mocha tests: https://webpack.js.org/loaders/mocha-loader/
+				//  //! mocha-loader sucks and is broken as of 202009.  Jason wrote a custom test entrypoint that loads mocha and the tests instead and that works. more info: search this file for "webpackBrowserTestEntry"
 				// 	test: /\.test\.js$/,
 				// 	use: "mocha-loader",
 				// 	exclude: /node_modules/,
@@ -129,7 +152,7 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 		// 		}
 		// 	}
 		// },
-		devtool: production ? undefined : "source-map",
+		devtool: undefined, // production ? undefined : "source-map",
 		//! only used when running the WDS  (webpack dev server)
 		//need @types/webpack-dev-server installed for this to work
 		devServer: {
@@ -144,7 +167,8 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 			 * similar issue here: https://github.com/webpack/webpack/issues/7375
 			 * docs on optimizing here: https://webpack.js.org/configuration/optimization/#optimizationruntimechunk
 			 */
-			runtimeChunk: "single"
+			runtimeChunk: "single",
+
 		},
 		plugins: [
 
@@ -153,9 +177,11 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 
 			} ),
 			new ThreadsPlugin(),
+
 		],
 
 
+		/** what to do about node modules being packed */
 		node: {
 			//from https://github.com/googleapis/gaxios/blob/master/webpack.config.js
 			//needed to support gaxios
@@ -167,6 +193,8 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 
 			"ts-node": "empty", //thought needed for ```threads```, but it's not
 		}
+
+
 
 
 	}

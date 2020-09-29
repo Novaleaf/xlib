@@ -3,6 +3,7 @@
 	"$schema": "http://json.schemastore.org/tsconfig",
 	"extends": "./node_modules/@xlib/build-tools/includes/tsconfig-node.json",
 	"compilerOptions": {
+		"target": "ES5",
 		"outDir": "lib",
 		//"rootDir": "src",		
 		"types": [
