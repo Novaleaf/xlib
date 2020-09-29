@@ -5,6 +5,7 @@
 
 import * as _imports from "./_imports"
 
+// eslint-disable-next-line @rushstack/typedef-var
 export const _gaxios = _imports.gaxios
 
 //const _gaxios2 = _imports.gaxios

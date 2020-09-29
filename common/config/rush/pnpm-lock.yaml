@@ -5,7 +5,7 @@ importers:
     dependencies:
       xlib: 'link:../../libraries/xlib'
     devDependencies:
-      '@rushstack/eslint-config': 1.4.2_eslint@7.10.0+typescript@4.0.3
+      '@rushstack/eslint-config': 2.1.1_eslint@7.10.0+typescript@4.0.3
       '@rushstack/heft': 0.13.9
       '@types/jest': 26.0.14
       '@types/node': 14.0.27
@@ -18,7 +18,7 @@ importers:
       eslint-plugin-react: 7.21.2_eslint@7.10.0
       typescript: 4.0.3
     specifiers:
-      '@rushstack/eslint-config': 1.4.2
+      '@rushstack/eslint-config': 2.1.1
       '@rushstack/heft': 0.13.9
       '@types/jest': 26.0.14
       '@types/node': 14.0.27
@@ -79,7 +79,7 @@ importers:
     dependencies:
       xlib: 'link:../../libraries/xlib'
     devDependencies:
-      '@rushstack/eslint-config': 1.4.2_eslint@7.10.0
+      '@rushstack/eslint-config': 2.1.1_eslint@7.10.0
       '@rushstack/heft': 0.13.9
       '@types/jest': 26.0.14
       '@types/node': 14.0.27
@@ -87,7 +87,7 @@ importers:
       '@xlib/eslint-config': 'link:../../utils/eslint-config'
       eslint: 7.10.0
     specifiers:
-      '@rushstack/eslint-config': 1.4.2
+      '@rushstack/eslint-config': 2.1.1
       '@rushstack/heft': 0.13.9
       '@types/jest': 26.0.14
       '@types/node': 14.0.27
@@ -108,7 +108,7 @@ importers:
       threads: 1.6.3
     devDependencies:
       '@babel/types': 7.11.5
-      '@rushstack/eslint-config': 1.4.2_eslint@7.10.0
+      '@rushstack/eslint-config': 2.1.1_eslint@7.10.0
       '@rushstack/heft': 0.13.9_webpack-cli@3.3.12
       '@types/lodash': 4.14.161
       '@types/mocha': 8.0.3
@@ -132,7 +132,7 @@ importers:
       webpack-dev-server: 3.11.0_93ca2875a658e9d1552850624e6b91c7
     specifiers:
       '@babel/types': ^7.11.5
-      '@rushstack/eslint-config': 1.4.2
+      '@rushstack/eslint-config': 2.1.1
       '@rushstack/heft': 0.13.9
       '@types/lodash': ^4.14.161
       '@types/mocha': ^8.0.3
@@ -166,7 +166,7 @@ importers:
   ../../utils/build-tools:
     dependencies:
       '@microsoft/api-extractor': 7.8.2-pr1796.0
-      '@rushstack/eslint-config': 1.4.2_eslint@7.10.0+typescript@4.0.3
+      '@rushstack/eslint-config': 2.1.1_eslint@7.10.0+typescript@4.0.3
       '@rushstack/heft': 0.13.9
       '@types/jest': 26.0.14
       '@types/node': 14.0.27
@@ -178,7 +178,7 @@ importers:
       typescript: 4.0.3
     specifiers:
       '@microsoft/api-extractor': 7.8.2-pr1796.0
-      '@rushstack/eslint-config': 1.4.2
+      '@rushstack/eslint-config': 2.1.1
       '@rushstack/heft': 0.13.9
       '@types/jest': 26.0.14
       '@types/node': 14.0.27
@@ -192,7 +192,7 @@ importers:
     dependencies:
       json5: 2.1.3
     devDependencies:
-      '@rushstack/eslint-config': 1.4.2_eslint@7.10.0+typescript@4.0.3
+      '@rushstack/eslint-config': 2.1.1_eslint@7.10.0+typescript@4.0.3
       '@typescript-eslint/eslint-plugin': 4.3.0_60de305021300fed1989a0be1a9284d2
       '@typescript-eslint/parser': 4.3.0_eslint@7.10.0+typescript@4.0.3
       eslint: 7.10.0
@@ -200,7 +200,7 @@ importers:
       eslint-plugin-react: 7.21.2_eslint@7.10.0
       typescript: 4.0.3
     specifiers:
-      '@rushstack/eslint-config': 1.4.2
+      '@rushstack/eslint-config': 2.1.1
       '@typescript-eslint/eslint-plugin': 4.3.0
       '@typescript-eslint/parser': 4.3.0
       eslint: 7.10.0
@@ -737,10 +737,10 @@ packages:
       node: '>= 8'
     resolution:
       integrity: sha512-1V9XOY4rDW0rehzbrcqAmHnz8e7SKvX27gh8Gt2WgB0+pdzdiLV83p72kZPU+jvMbS1qU5mauP2iOvO8rhmurQ==
-  /@rushstack/eslint-config/1.4.2_eslint@7.10.0:
+  /@rushstack/eslint-config/2.1.1_eslint@7.10.0:
     dependencies:
       '@rushstack/eslint-patch': 1.0.3
-      '@rushstack/eslint-plugin': 0.6.3_eslint@7.10.0
+      '@rushstack/eslint-plugin': 0.7.0_eslint@7.10.0
       '@rushstack/eslint-plugin-security': 0.1.1_eslint@7.10.0
       '@typescript-eslint/eslint-plugin': 3.4.0_45b756ecdfeb9438b4c6e420c3fe6361
       '@typescript-eslint/experimental-utils': 3.4.0_eslint@7.10.0
@@ -755,11 +755,11 @@ packages:
       eslint: ^6.0.0 || ^7.0.0
       typescript: '>=3.0.0'
     resolution:
-      integrity: sha512-+MbUZHHnWQ8E7RkQxG+WT0/zohFjMNEfU9VnfVwa2SZrz0oI1/V5M175EZ+gO2y1xsslRpEi3V8a2uBjQhewfQ==
-  /@rushstack/eslint-config/1.4.2_eslint@7.10.0+typescript@4.0.3:
+      integrity: sha512-da+MYQVtr9EaKky3I1ifCFg4h64f0WYAX5867NAK+/fNqFI5bBIheXOQNyBz2qv9LLXhkKvcyM1cGvQUkpRaBw==
+  /@rushstack/eslint-config/2.1.1_eslint@7.10.0+typescript@4.0.3:
     dependencies:
       '@rushstack/eslint-patch': 1.0.3
-      '@rushstack/eslint-plugin': 0.6.3_eslint@7.10.0
+      '@rushstack/eslint-plugin': 0.7.0_eslint@7.10.0
       '@rushstack/eslint-plugin-security': 0.1.1_eslint@7.10.0
       '@typescript-eslint/eslint-plugin': 3.4.0_b254a4ce908ba80cc033d52cfee46c67
       '@typescript-eslint/experimental-utils': 3.4.0_eslint@7.10.0+typescript@4.0.3
@@ -774,7 +774,7 @@ packages:
       eslint: ^6.0.0 || ^7.0.0
       typescript: '>=3.0.0'
     resolution:
-      integrity: sha512-+MbUZHHnWQ8E7RkQxG+WT0/zohFjMNEfU9VnfVwa2SZrz0oI1/V5M175EZ+gO2y1xsslRpEi3V8a2uBjQhewfQ==
+      integrity: sha512-da+MYQVtr9EaKky3I1ifCFg4h64f0WYAX5867NAK+/fNqFI5bBIheXOQNyBz2qv9LLXhkKvcyM1cGvQUkpRaBw==
   /@rushstack/eslint-patch/1.0.3:
     resolution:
       integrity: sha512-Oq5EYosOGfqE8r2tuRMfJSeZKO+M3QozrYKs5bPuqyWB9pHhclS/Kp8boyu/pPwskE9PtPkagc+qwW+yO2b9Kw==
@@ -786,14 +786,14 @@ packages:
       eslint: ^6.0.0 || ^7.0.0
     resolution:
       integrity: sha512-h3XeAvFiP11XvkWTJmzaLUG+M5furqtKyhcV4Mu2UUnwYxv4qWOWIoZfdIgfCgNV6S3d6Lk307mDQy3dHSXZsQ==
-  /@rushstack/eslint-plugin/0.6.3_eslint@7.10.0:
+  /@rushstack/eslint-plugin/0.7.0_eslint@7.10.0:
     dependencies:
       '@rushstack/tree-pattern': 0.1.0
       eslint: 7.10.0
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0
     resolution:
-      integrity: sha512-vAyt4Kkp4wS+h9vVCyGx9ZGo4vATVdBh+JRRuOW84MfF9jRKlJRXUrYwHh0TQwMLWiRZ8zbkOms6BaHKC2k13g==
+      integrity: sha512-Yz0NtcUyM9sLcI/TnWhS8dEpaULUFIo7sXbMa4ovqACj3RfKzFOetbOgl3UIcQkSTIb4cLmllnqh8UkBELda/g==
   /@rushstack/heft-config-file/0.2.7:
     dependencies:
       '@rushstack/node-core-library': 3.33.6

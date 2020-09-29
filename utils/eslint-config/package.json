@@ -13,7 +13,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@rushstack/eslint-config": "1.4.2",
+    "@rushstack/eslint-config": "2.1.1",
     "@typescript-eslint/eslint-plugin": "4.3.0",
     "@typescript-eslint/parser": "4.3.0",
     "eslint": "7.10.0",
