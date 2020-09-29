@@ -176,7 +176,7 @@ export class Logger {
 	// }
 }
 interface ILogObj {
-	[ key: string ]: ANY
+	[ key: string ]: unknown
 	/** if provided, will be considered the "main" message for presentation purposes */
 	msg?: string
 	/** if provided, logs error details

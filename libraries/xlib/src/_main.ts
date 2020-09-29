@@ -5,7 +5,7 @@
 import "./_internal/polyfill"
 
 
-console.warn( "xlib entrypoint (_main)" )
+//console.warn( "xlib entrypoint (_main)" )
 
 
 

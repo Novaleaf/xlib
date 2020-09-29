@@ -1,8 +1,6 @@
 import * as xlib from "xlib"
 
-const x = {}
 
-	; ( () => { return "hi" } )()
 
 
 

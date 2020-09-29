@@ -35,11 +35,16 @@ import * as xlib from "xlib"
 
 //console.log( result )
 
-console.log( "first" )
+//console.log( "first" )
 
 
 
-console.log( "hi from verify-node watched two hmmhmm...." )
+//console.log( "hi from verify-node watched two hmmhmm...." )
+
+
+const log = new xlib.diagnostics.Logger( "xlib verify, main" )
+log.info( "first" )
+
 
 export function f(): void { // neeeeeee
 

@@ -22,7 +22,8 @@
   "webpackBrowserTestEntry": "lib-esm/_internal/browser-mocha-test-launcher.js",
   "typings": "lib/_main.d.ts",
   "scripts": {
-    "build": "heft build && webpack --config ./lib/webpack.config.js",
+    "build": "heft test && webpack --config ./lib/webpack.config.js",
+    "build-fast": "heft build && webpack --config ./lib/webpack.config.js",
     "build-clean": "heft clean && pnpm run build",
     "test-browser": "heft build --clean && pnpx webpack-dev-server --config ./lib/webpack.config.js",
     "test-node": "heft test --clean",
@@ -32,7 +33,7 @@
     "dep-check-major": "npm-check-updates --configFilePath ../../common/config",
     "dep-check": "npm-check-updates --configFilePath ../../common/config --target minor",
     "doc-build": "heft test --clean; api-documenter markdown --input-folder temp --output-folder",
-    "watch-test": "heft build --clean && concurrently --kill-others \"heft test --watch\" \"webpack-dev-server --config ./lib/webpack.config.js\""
+    "watch-test": "heft build && concurrently --kill-others \"heft test --watch\" \"webpack-dev-server --config ./lib/webpack.config.js\""
   },
   "devDependencies": {
     "@babel/types": "^7.11.5",

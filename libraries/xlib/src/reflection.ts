@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-globals */
 
@@ -113,7 +114,7 @@ export function getPropertyNames<T>( obj: unknown ) {
 }
 
 /** get the name of an object's type. better than using 'typeof()' because this handles array and null.*/
-export function getTypeName( obj: ANY ): string {
+export function getTypeName( obj: any ): string {
 	const type = getType( obj )
 	switch ( type ) {
 		case Type.object:
