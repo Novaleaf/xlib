@@ -413,16 +413,16 @@
       "projectFolder": "libraries/xlib",
       "reviewCategory": "libraries"
     },
-    {
-      "packageName": "@xlib/browser-build",
-      "projectFolder": "utils/xlib-browser-build",
-      "reviewCategory": "libraries"
-    },
-    {
-      "packageName": "@xlib/xlib-docs",
-      "projectFolder": "websites/xlib-docs",
-      "reviewCategory": "websites"
-    },
+    // {  //// moved to _obsolete/monorepo-graveyard as no longer needed:  lib-esm can now be watch-built in the xlib project directly
+    //   "packageName": "@xlib/browser-build",
+    //   "projectFolder": "utils/xlib-browser-build",
+    //   "reviewCategory": "libraries"
+    // },
+    // { //// disabled for now until we have a working base library.  then will do a doc solution
+    //   "packageName": "@xlib/xlib-docs",
+    //   "projectFolder": "websites/xlib-docs",
+    //   "reviewCategory": "websites"
+    // },
     {
       "packageName": "@xlib/xlib-node-basic",
       "projectFolder": "build-examples/xlib-node-basic",
