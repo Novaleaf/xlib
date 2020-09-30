@@ -43,6 +43,12 @@
 			"rules": {
 				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  DISABLE THESE RULES ONCE XLIB v18 REACHES BETA STATUS //
 				"@typescript-eslint/no-unused-vars": "off",
+				// "@typescript-eslint/no-unused-vars": [
+				// 	"warn",
+				// 	{
+				// 		"args": "none"
+				// 	}
+				// ],
 				///////////////////////////  STANDARD RULES BELOW FOR SANE DEVELOPMENT !!!!!!!!! ///////////////////
 				"indent": [
 					"off", //let vscode auto format on save do it's thing
@@ -79,12 +85,6 @@
 					}
 				],
 				"no-lone-blocks": "off",
-				"@typescript-eslint/no-unused-vars": [
-					"warn",
-					{
-						"args": "none"
-					}
-				],
 				"@typescript-eslint/no-floating-promises": [
 					//https://github.com/typescript-eslint/typescript-eslint/blob/v3.4.0/packages/eslint-plugin/docs/rules/no-floating-promises.md
 					"error",

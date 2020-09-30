@@ -28,57 +28,66 @@ import * as xlib from "./_main"
 
 // // // let jobsDone = false
 // // // const counterPromise = threads.spawn<testWorker.Counter>( testWorkerSpawn ).finally( () => { jobsDone = true } )
+// import * as comlink from "comlink"
+// import * as testWorker from "./_internal/_test-worker"
+// import { Worker } from "worker_threads"
 
-// // // describe( "threads import", () => {
-
-
-
-// // // 	it( "threads basic e2e", async () => {
-
-
-// // // 		return new Promise( ( resolve, reject ) => {
-
-// // // 			setInterval( () => {
-// // // 				console.log( `is jobsDone?  ${ jobsDone }` )
-// // // 				if ( jobsDone === true ) {
-// // // 					resolve()
-// // // 				}
-// // // 			}, 100 )
-// // // 			// 	return await counterPromise
-// // // 		} )
-
-// // // 		// async function getCounter() {
-// // // 		// 	const counter = await counterPromise
-// // // 		// 	console.warn( "SHMERE" )
-// // // 		// 	return counter
-// // // 		// }
-
-// // // 		// //Promise.any( [async () => { }])
-
-// // // 		// // const counter = await new Promise( ( resolve, reject ) => {
-
-// // // 		// // 	//setTimeout( () => { resolve() }, 100 )
-// // // 		// // 	return await counterPromise
-
-// // // 		// // } )
-// // // 		// //const counter = ( await Promise.all( [ counterPromise ] ) )[ 0 ]
-// // // 		// const counter = await getCounter()
-// // // 		// //const counter = await async()=> { return await counterPromise }
-// // // 		// const initialCount = await counter.getCount()
-// // // 		// expect( initialCount ).equals( 0 )
-// // // 		// await counter.increment()
-// // // 		// const update1Count = await counter.getCount()
-// // // 		// expect( update1Count ).equals( 1 )
-// // // 		// void counter.increment()
-// // // 		// const update2Count = await counter.getCount()
-// // // 		// expect( update2Count ).equals( 2 )
-// // // 		// await threads.Thread.terminate( counter )
-
-// // // 		// console.log( `threads!  noice! TEST  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
+describe( "threads import", () => {
 
 
-// // // 	} )
-// // // } )
+
+	it( "threads basic e2e", async () => {
+
+
+		// const worker = new Worker( "./_internal/_test-worker" )
+		// const obj = comlink.wrap<testWorker.Counter>( worker )
+
+
+
+
+		// return new Promise( ( resolve, reject ) => {
+
+		// 	setInterval( () => {
+		// 		console.log( `is jobsDone?  ${ jobsDone }` )
+		// 		if ( jobsDone === true ) {
+		// 			resolve()
+		// 		}
+		// 	}, 100 )
+		// 	// 	return await counterPromise
+		// } )
+
+		// async function getCounter() {
+		// 	const counter = await counterPromise
+		// 	console.warn( "SHMERE" )
+		// 	return counter
+		// }
+
+		// //Promise.any( [async () => { }])
+
+		// // const counter = await new Promise( ( resolve, reject ) => {
+
+		// // 	//setTimeout( () => { resolve() }, 100 )
+		// // 	return await counterPromise
+
+		// // } )
+		// //const counter = ( await Promise.all( [ counterPromise ] ) )[ 0 ]
+		// const counter = await getCounter()
+		// //const counter = await async()=> { return await counterPromise }
+		// const initialCount = await counter.getCount()
+		// expect( initialCount ).equals( 0 )
+		// await counter.increment()
+		// const update1Count = await counter.getCount()
+		// expect( update1Count ).equals( 1 )
+		// void counter.increment()
+		// const update2Count = await counter.getCount()
+		// expect( update2Count ).equals( 2 )
+		// await threads.Thread.terminate( counter )
+
+		// console.log( `threads!  noice! TEST  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
+
+
+	} )
+} )
 
 //import { describe, it } from "mocha"
 //import {describe, it} from "jest"
@@ -98,14 +107,14 @@ import * as xlib from "./_main"
 
 // logger.info( { arg1: "fish", taco: "arg2" }, "an extra message" )
 
-const myLog = new xlib.diagnostics.Logger( "first!" )
-myLog.info( "full roundtrip!  just  a msg" )
+// const myLog = new xlib.diagnostics.Logger( "first!" )
+// myLog.info( "full roundtrip!  just  a msg" )
 
-myLog.info( { some: "data", someErr: new Error( "boom" ) } )
-myLog.info( "info from pino!! just str" )
-myLog.info( { msg: "info from pino!! w error", some: "data", err: new Error( "boom" ), stack: xlib.diagnostics.exception.getStackTrace() } )
+// myLog.info( { some: "data", someErr: new Error( "boom" ) } )
+// myLog.info( "info from pino!! just str" )
+// myLog.info( { msg: "info from pino!! w error", some: "data", err: new Error( "boom" ), stack: xlib.diagnostics.exception.getStackTrace() } )
 
-myLog.info( { arg1: "fish", taco: "arg2" }, "an extra message" )
+// myLog.info( { arg1: "fish", taco: "arg2" }, "an extra message" )
 
 
 

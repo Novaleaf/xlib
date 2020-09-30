@@ -174,6 +174,8 @@ export class Logger {
 
 
 	// }
+
+	//public expect(condition:boolean)
 }
 interface ILogObj {
 	[ key: string ]: unknown

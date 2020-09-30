@@ -22,7 +22,7 @@
 			"DOM",
 			//"ES2017",
 			"ESNext",
-			"WebWorker",
+			//"WebWorker",
 		],
 		"resolveJsonModule": true
 	},

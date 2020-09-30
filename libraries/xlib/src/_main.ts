@@ -37,6 +37,43 @@ export { reflection }
 // import { spawn, Thread, Worker } from "threads"
 
 
+import * as comlink from "comlink"
+import * as testWorker from "./_internal/test.worker"
+
+import Worker from "web-worker"
+
+//let nodeEndpoint = ( worker: Worker ) => worker
+// if ( globalThis.Worker == null ) {
+// 	const workerThreads = require( ( () => "worker_threads" )() )
+// 	globalThis.Worker = workerThreads.Worker as never
+// 	nodeEndpoint = require( "comlink/dist/umd/node-adapter" )
+// }
+
+
+
+//import 
+
+async function asyncHuh(): Promise<void> {
+	const worker = new Worker( "./lib/_internal/test.worker.js" )
+	//const counter = comlink.wrap<testWorker.Counter>( nodeEndpoint( worker ) )
+	const counter = comlink.wrap<testWorker.Counter>( worker )
+	const initialCount = await counter.getCount()
+	//expect( initialCount ).toEqual( 0 )
+	await counter.increment()
+	const update1Count = await counter.getCount()
+	//expect( update1Count ).toEqual( 1 )
+	void counter.increment()
+	const update2Count = await counter.getCount()
+	//expect( update2Count ).toEqual( 2 )
+	await worker.terminate()
+
+	console.log( `threads!  noice!!!?!!  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
+
+}
+
+void asyncHuh()
+console.log( "called asyncHuh!!" )
+
 
 // async function asyncHuh(): Promise<void> {
 // 	const counter = await spawn<testWorker.Counter>( new Worker( "./_internal/_test-worker" ) )

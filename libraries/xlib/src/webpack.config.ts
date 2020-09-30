@@ -15,6 +15,7 @@ import "webpack-dev-server"
 
 
 
+
 const packageConfig = require( "../package.json" )
 
 import path = require( "path" )
@@ -22,14 +23,11 @@ import path = require( "path" )
  * will automatically inject the webpack bundles into this page
  */
 import HtmlWebpackPlugin = require( "html-webpack-plugin" )
-/**
- * ```npm threads``` requires a lot of annoyances to get working.    see: https://threads.js.org/getting-started#when-using-typescript and https://threads.js.org/usage#typescript-workers-in-nodejs
- * 
- * If you have problems, be sure to read webpack warning outputs.
- * 
- * pretty annoying, probably need to switch with a web-worker shim
- */
-const ThreadsPlugin = require( "threads-plugin" )
+/** needed to support comlink: packs worker thread files into the bundle.
+ * see: https://www.npmjs.com/package/worker-plugin
+	 */
+const WorkerPlugin = require( "worker-plugin" )
+
 
 /**
  * If the "--production" command-line parameter is specified when invoking Heft, then the
@@ -56,7 +54,11 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 				{
 					//from https://github.com/googleapis/gaxios/blob/master/webpack.config.js
 					//needed to support gaxios
-					test: /node_modules\/https-proxy-agent\//,
+					test: [
+						/node_modules\/https-proxy-agent\//,
+						///worker_threads/,
+						//require.resolve( "worker_threads" ),
+					],
 					use: "null-loader",
 				},
 				{
@@ -83,6 +85,14 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 
 							}
 						} ],
+				},
+				{
+					// see: https://www.npmjs.com/package/worker-loader
+					test: /\.worker\.(c|m)?js$/i,
+					loader: "worker-loader",
+					options: {
+						//inline: "no-fallback", //inline BLOB only
+					},
 				},
 				// {
 				// 	//load up mocha tests: https://webpack.js.org/loaders/mocha-loader/
@@ -152,7 +162,9 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 				template: "assets/lib-test-main.html" //useful if loadign react and pointing to a dom element, but can comment out if not
 
 			} ),
-			new ThreadsPlugin(),
+			new WorkerPlugin( {
+				//preserveTypeModule: true
+			} )
 		],
 
 
@@ -164,8 +176,7 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 			crypto: "empty",
 			net: "empty",
 			tls: "empty",
-
-			"ts-node": "empty", //thought needed for ```threads```, but it's not
+			//worker_threads: "mock",
 		}
 
 
