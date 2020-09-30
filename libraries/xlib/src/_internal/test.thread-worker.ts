@@ -1,6 +1,4 @@
 //helper used for testing the threads import
-
-// counter.ts
 import { expose } from "threads/worker"
 
 let currentCount = 0
@@ -16,8 +14,7 @@ const counter = {
 		return --currentCount
 	}
 }
+console.warn( "finished loading worker" )
 
-console.warn( "mystery!" )
 export type Counter = typeof counter
-
 expose( counter )

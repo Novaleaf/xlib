@@ -41,6 +41,7 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 	//production = false
 	const webpackConfig: webpack.Configuration = {
 		// Documentation: https://webpack.js.org/configuration/mode/
+		target: "web",
 		mode: production ? "production" : "development",
 		resolve: {
 			extensions: [ ".js", ".jsx", ".json" ],
@@ -49,6 +50,18 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 
 		module: {
 			rules: [
+				// {
+				// 	//raw-loader for worker threads to blob inline
+				// 	test: /\.thread-worker/,
+				// 	use: {
+				// 		loader: "raw-loader",
+				// 		options: {
+				// 			//esModule: false,
+				// 			plugins: [ new ThreadsPlugin() ]
+				// 		},
+
+				// 	},
+				// },
 				{
 					test: /\.css$/,
 					use: [ require.resolve( "style-loader" ), require.resolve( "css-loader" ) ]

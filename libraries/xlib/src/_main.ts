@@ -30,36 +30,32 @@ export { reflection }
 
 
 
-const log = new diagnostics.Logger( "main" )
+//const log = new diagnostics.Logger( "main" )
 
 
+import * as testWorker from "./_internal/test.thread-worker"
+import { spawn, Thread, Worker, BlobWorker } from "threads"
 
-//import threads = _imports.threads
-import * as testWorker from "./_internal/_test-worker"
+async function threadTest(): Promise<void> {
+	const counter = await ( async () => {
+		if ( environment.getEnvInfo().platform === "browser" ) {
+			const testWorkerBlob = require( "raw-loader!./_internal/test.thread-worker" )
+			return await spawn<testWorker.Counter>( BlobWorker.fromText( testWorkerBlob.default ) ) 
+		} else {
+			return await spawn<testWorker.Counter>( new Worker( "./_internal/test.thread-worker" ) )
+		}
 
-import { spawn, Thread, Worker } from "threads"
+	} )()
 
-
-
-async function asyncHuh(): Promise<void> {
-	const counter = await spawn<testWorker.Counter>( new Worker( "./_internal/_test-worker" ) )
 	const initialCount = await counter.getCount()
-	//expect( initialCount ).toEqual( 0 )
 	await counter.increment()
 	const update1Count = await counter.getCount()
-	//expect( update1Count ).toEqual( 1 )
 	void counter.increment()
 	const update2Count = await counter.getCount()
-	//expect( update2Count ).toEqual( 2 )
 	await Thread.terminate( counter )
 
 	console.log( `threads!  noice!!!?!!  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
-
 }
 
-void asyncHuh()
-console.error( "called asyncHuh!! ################################################################################################################################################################################################### " )
-
-
-
-log.error( "whut" )
+void threadTest()
+console.error( "called threadTest " )
