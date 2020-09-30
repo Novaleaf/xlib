@@ -30,29 +30,36 @@ export { reflection }
 
 
 
-
-// //import threads = _imports.threads
-// import * as testWorker from "./_internal/_test-worker"
-
-// import { spawn, Thread, Worker } from "threads"
+const log = new diagnostics.Logger( "main" )
 
 
 
-// async function asyncHuh(): Promise<void> {
-// 	const counter = await spawn<testWorker.Counter>( new Worker( "./_internal/_test-worker" ) )
-// 	const initialCount = await counter.getCount()
-// 	//expect( initialCount ).toEqual( 0 )
-// 	await counter.increment()
-// 	const update1Count = await counter.getCount()
-// 	//expect( update1Count ).toEqual( 1 )
-// 	void counter.increment()
-// 	const update2Count = await counter.getCount()
-// 	//expect( update2Count ).toEqual( 2 )
-// 	await Thread.terminate( counter )
+//import threads = _imports.threads
+import * as testWorker from "./_internal/_test-worker"
 
-// 	console.log( `threads!  noice!!!?!!  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
+import { spawn, Thread, Worker } from "threads"
 
-// }
 
-// void asyncHuh()
-// console.log( "called asyncHuh!!" )
+
+async function asyncHuh(): Promise<void> {
+	const counter = await spawn<testWorker.Counter>( new Worker( "./_internal/_test-worker" ) )
+	const initialCount = await counter.getCount()
+	//expect( initialCount ).toEqual( 0 )
+	await counter.increment()
+	const update1Count = await counter.getCount()
+	//expect( update1Count ).toEqual( 1 )
+	void counter.increment()
+	const update2Count = await counter.getCount()
+	//expect( update2Count ).toEqual( 2 )
+	await Thread.terminate( counter )
+
+	console.log( `threads!  noice!!!?!!  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
+
+}
+
+void asyncHuh()
+console.error( "called asyncHuh!! ################################################################################################################################################################################################### " )
+
+
+
+log.error( "whut" )

@@ -174,6 +174,16 @@ export class Logger {
 
 
 	// }
+
+	public assert( condition: boolean, msgOrObj: string | ILogObj ): void
+	public assert( condition: boolean, obj: ILogObj, msg: string ): void
+	public assert( condition: boolean, obj: ANY, msg?: string ): void {
+		if ( condition === true ) {
+			return
+		}
+		this.error( obj, msg as string )
+		throw new exception.Exception( "assert failed", { details:{msg, ...obj}} )
+	}
 }
 interface ILogObj {
 	[ key: string ]: unknown

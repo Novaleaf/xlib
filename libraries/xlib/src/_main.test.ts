@@ -98,18 +98,20 @@ import * as xlib from "./_main"
 
 // logger.info( { arg1: "fish", taco: "arg2" }, "an extra message" )
 
-const myLog = new xlib.diagnostics.Logger( "first!" )
-myLog.info( "full roundtrip!  just  a msg" )
+// const myLog = new xlib.diagnostics.Logger( "first!" )
+// myLog.info( "full roundtrip!  just  a msg" )
 
-myLog.info( { some: "data", someErr: new Error( "boom" ) } )
-myLog.info( "info from pino!! just str" )
-myLog.info( { msg: "info from pino!! w error", some: "data", err: new Error( "boom" ), stack: xlib.diagnostics.exception.getStackTrace() } )
+// myLog.info( { some: "data", someErr: new Error( "boom" ) } )
+// myLog.info( "info from pino!! just str" )
+// myLog.info( { msg: "info from pino!! w error", some: "data", err: new Error( "boom" ), stack: xlib.diagnostics.exception.getStackTrace() } )
 
-myLog.info( { arg1: "fish", taco: "arg2" }, "an extra message" )
+// myLog.info( { arg1: "fish", taco: "arg2" }, "an extra message" )
 
 
 
 describe( "meta tests", () => {
+
+
 
 
 	describe( "'it' method verification", () => {
@@ -172,5 +174,30 @@ describe( "meta tests", () => {
 		// 		throw new Error( "Randomly failed" )
 		// 	}
 		// } )
+	} )
+} )
+
+describe( "xlib basic features", () => {
+	it( "log basic", () => {
+
+		const tempLog = new xlib.diagnostics.Logger( "test main temp" )
+		tempLog.debug( "debug message" )
+
+		try {
+			tempLog.assert( true, "should do nothing" )
+		} catch {
+			throw new Error( "assert true should not have threw" )
+		}
+		let didFail = false
+		try {
+			tempLog.assert( false, "should throw" )
+		} catch {
+			didFail = true
+		}
+		if ( didFail !== true ) {
+			throw new Error( "assert false should have threw" )
+		}
+
+
 	} )
 } )

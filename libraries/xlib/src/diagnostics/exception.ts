@@ -4,13 +4,15 @@ import * as _ from "lodash"
 /** shape of all errors.   either derived from the ```Error``` object, or Error objects serialized to JSON */
 export interface IError {
 	/** the name of the Error class (typeName) */
-	name: string;
+	name: string
 	/** human readable and ***actionable*** error message */
-	message: string;
+	message: string
 	/** while almost always available, it may not be set under unusual circumstances */
-	stack?: string;
+	stack?: string
 	/** may be set if the error was created via xlib.diagnostics.Exception  */
-	innerError?: IError;
+	innerError?: IError
+	/** may be set if the error was created via xlib.diagnostics.Exception  */
+	details?: { [ key: string ]: unknown }
 }
 
 /** the shape of Errors that xlib serializes (the same as normal Error serialization, except the stack is an array, not a single string)*/
@@ -26,6 +28,9 @@ export interface IErrorJson {
 
 	// /** additional fields may be attached to your error object.  if so, they will be serialized here */
 	// [ keys: string ]: any;
+
+	/** may be set if the error was created via xlib.diagnostics.Exception  */
+	details?: { [ key: string ]: unknown }
 }
 
 
@@ -41,6 +46,9 @@ export interface IExceptionOptions {
 	maxStackFrames?: number;
 	// /** set to true if you wish additional properties of your exception to be included when the exception is serialized (to json or string).  This may be a security risk, so is false by default. */
 	// logProperties?: boolean;
+
+	/** additional details you want present in the error object.  found under .details */
+	details?: { [ key: string ]: unknown }
 }
 
 
@@ -76,6 +84,8 @@ export class Exception extends Error {
 	// /** extra custom data you wish to attach to your error object that you want logged. */
 	// public data?: any;
 
+	public details?: { [ key: string ]: unknown }
+
 	public constructor( public message: string, options: IExceptionOptions = {} ) {
 
 		super( message )
@@ -97,6 +107,7 @@ export class Exception extends Error {
 			//make sure that what's passed is actually an error object
 			options.innerError = toError( options.innerError )
 		}
+		this.details = options.details
 
 		//if (environment.logLevel > environment.LogLevel.DEBUG) {
 		//	innerException = null;
@@ -228,6 +239,16 @@ export class HttpStatusCodeException extends Exception {
 */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function toError( ex: any | Error ): Error {
+	return toError_worker( ex, new Set() )
+}
+
+function toError_worker( ex: any | Error, /** prevent infinite recursion */ _innerErrorRecursionTracker: Set<any> ): Error {
+
+	if ( _innerErrorRecursionTracker.has( ex ) ) {
+		return new Error( "circular reference in innerError" )
+	}
+	_innerErrorRecursionTracker.add( ex )
+
 	if ( ex == null ) {
 		throw new XlibException( "missing argument 'ex'" )
 	}
@@ -252,9 +273,17 @@ export function toError( ex: any | Error ): Error {
 
 	const toReturn = new Exception( message, { maxStackFrames: 0 } )
 	//apply other properties
-	if ( typeof ( ex.innerError ) === "string" ) {
-		toReturn.innerError = ex.innerError
+	// if ( typeof ( ex.innerError ) === "string" ) {
+	// 	toReturn.innerError = toError(ex.innerError)
+	// }
+	if ( ex.innerError != null ) {
+		toReturn.innerError = toError_worker( ex.innerError, _innerErrorRecursionTracker )
 	}
+	toReturn.details = ex.details
+
+
+
+
 	if ( typeof ( ex.name ) === "string" ) {
 		toReturn.name = ex.name
 	}
@@ -302,6 +331,19 @@ import * as environment from "../environment"
 /** convert an error and all it's properties to JSON.   */
 export function errorToJson<TError extends Error>( error: TError | IError, options: IErrorToJsonOptions = {} ): ErrorAsJson<TError> {
 
+	return errorToJson_worker( error, options, new Set() )
+
+}
+function errorToJson_worker<TError extends Error>( error: TError | IError, options: IErrorToJsonOptions = {}, _circularRefDetection: Set<any> ): ErrorAsJson<TError> {
+
+	if ( _circularRefDetection.has( error ) ) {
+		return {
+			name: "circular reference",
+			message: "error converting innerError to json due to circular reference",
+
+		} as ANY
+	}
+	_circularRefDetection.add( error )
 
 	options = { ...options }
 
@@ -336,7 +378,7 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 	}
 
 	//sanitize: remove stack traces if in production
-	if ( options.alwaysShowFullStack !== true && environment.isProd() && environment.isDebug()===false ) {
+	if ( options.alwaysShowFullStack !== true && environment.isProd() && environment.isDebug() === false ) {
 		switch ( environment.getLogLevel() ) {
 			case "info":
 				options.maxStacks = Math.min( options.maxStacks ?? 2, 2 )
@@ -377,7 +419,7 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 	//common values
 	serialized.stack = stackArray
 	if ( innerError != null ) {
-		serialized.innerError = errorToJson( innerError, options )
+		serialized.innerError = errorToJson_worker( innerError, options, _circularRefDetection )
 	}
 
 	return serialized as never
