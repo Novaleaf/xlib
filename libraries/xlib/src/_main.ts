@@ -38,9 +38,15 @@ export { reflection }
 
 
 import * as comlink from "comlink"
-import * as testWorker from "./_internal/test.worker"
+//import * as testWorker from "./_internal/test.worker"
 
-import Worker from "web-worker"
+
+
+if ( globalThis.Worker == null ) {
+	const webWorker = require( "web-worker" )
+	globalThis.Worker = webWorker
+}
+//import Worker from "web-worker"
 
 //let nodeEndpoint = ( worker: Worker ) => worker
 // if ( globalThis.Worker == null ) {
@@ -49,14 +55,15 @@ import Worker from "web-worker"
 // 	nodeEndpoint = require( "comlink/dist/umd/node-adapter" )
 // }
 
-
+import * as path from "path"
 
 //import 
 
 async function asyncHuh(): Promise<void> {
-	const worker = new Worker( "./lib/_internal/test.worker.js" )
+	//const worker = new Worker( path.normalize( path.join( __dirname, "./_internal/test.worker.js" ) ), { type: "module" } )
+	const worker = new Worker( "./_internal/test.worker", { type: "module" } )
 	//const counter = comlink.wrap<testWorker.Counter>( nodeEndpoint( worker ) )
-	const counter = comlink.wrap<testWorker.Counter>( worker )
+	const counter = comlink.wrap<ANY>( worker )
 	const initialCount = await counter.getCount()
 	//expect( initialCount ).toEqual( 0 )
 	await counter.increment()

@@ -22,18 +22,22 @@
   "webpackBrowserTestEntry": "lib-esm/_internal/browser-mocha-test-launcher.js",
   "typings": "lib/_main.d.ts",
   "scripts": {
-    "build": "heft test && webpack --config ./lib/webpack.config.js",
+    "build": "pnpm run build-node && pnpm run build-browser && pnpm run test-node",
+    "build-node": "heft build",
+    "build-browser": "webpack --config ./lib/webpack.config.js",
     "build-fast": "heft build && webpack --config ./lib/webpack.config.js",
     "build-clean": "heft clean && pnpm run build",
-    "test-browser": "heft build --clean && pnpx webpack-dev-server --config ./lib/webpack.config.js",
-    "test-node": "heft test --clean",
-    "watch-build": "CI=true heft test --watch --verbose",
-    "watch-old": "pnpm run build-clean && concurrently --kill-others \"pnpm run watch-build\" \"pnpm run watch-rollup\"",
+    "test-browser": "pnpx webpack-dev-server --config ./lib/webpack.config.js",
+    "test-node": "pnpx mocha --config ./config/.mocharc.jsonc",
     "eslint-fix": "eslint ./src/**/*.ts* --fix",
     "dep-check-major": "npm-check-updates --configFilePath ../../common/config",
     "dep-check": "npm-check-updates --configFilePath ../../common/config --target minor",
     "doc-build": "heft test --clean; api-documenter markdown --input-folder temp --output-folder",
-    "watch-test": "heft build && concurrently --kill-others \"heft test --watch\" \"webpack-dev-server --config ./lib/webpack.config.js\""
+    "watch-test": "heft build && concurrently --kill-others \"pnpm run test-node -- --watch\" \"pnpm run test-browser\""
+  },
+  "obsolete-scripts": {
+    "watch-build": "CI=true heft test --watch --verbose",
+    "watch-old": "pnpm run build-clean && concurrently --kill-others \"pnpm run watch-build\" \"pnpm run watch-rollup\""
   },
   "devDependencies": {
     "@babel/types": "^7.11.5",

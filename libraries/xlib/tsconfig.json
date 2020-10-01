@@ -5,6 +5,7 @@
 	"compilerOptions": {
 		"outDir": "lib",
 		//"rootDir": "src",		
+		//"target": "ES5",
 		"types": [
 			"node",
 			//"jest",

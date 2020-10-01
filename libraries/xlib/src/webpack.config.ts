@@ -88,10 +88,10 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 				},
 				{
 					// see: https://www.npmjs.com/package/worker-loader
-					test: /\.worker\.(c|m)?js$/i,
+					test: /\.worker/,
 					loader: "worker-loader",
 					options: {
-						//inline: "no-fallback", //inline BLOB only
+						inline: "no-fallback", //inline BLOB only
 					},
 				},
 				// {
@@ -102,6 +102,16 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 				// }
 			]
 		},
+		plugins: [
+
+			new HtmlWebpackPlugin( {
+				template: "assets/lib-test-main.html" //useful if loadign react and pointing to a dom element, but can comment out if not
+
+			} ),
+			new WorkerPlugin( {
+				preserveTypeModule: true
+			} )
+		],
 		// //! stats.warnings doesn't seem to work.   see: https://stackoverflow.com/questions/63195843/webpack-module-warning-failed-to-parse-source-map-from-data-url/64035413#64035413
 		//devServer: {
 		// 	stats: {
@@ -156,16 +166,6 @@ function createBaseConfig( { production = false } ): webpack.Configuration {
 			 */
 			runtimeChunk: "single"
 		},
-		plugins: [
-
-			new HtmlWebpackPlugin( {
-				template: "assets/lib-test-main.html" //useful if loadign react and pointing to a dom element, but can comment out if not
-
-			} ),
-			new WorkerPlugin( {
-				//preserveTypeModule: true
-			} )
-		],
 
 
 		node: {

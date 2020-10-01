@@ -92,10 +92,32 @@ pnpm install -g npm-check-updates #per-project command added in config/rush/comm
 
 ### after v18
 - rename to isol?
+- worker threads:  so far threads.js is the easiest to work with.
+  - but even with that, can not easily bundle into a single webpack file:  https://github.com/andywer/threads.js/issues/307
+  - if other solutions are needed here is a summary as of 202009:
+  - 
+```
+web-worker:  isomorphic worker implementaiton.   https://github.com/developit/web-worker
+	doesn't seem to do much in browser?
+	
+worker-loader: embed workers as blobs into webpack bundle.  https://webpack.js.org/loaders/worker-loader/
+
+
+
+comlink:  warpper over worker: https://github.com/GoogleChromeLabs/comlink#readme
+
+
+comlink-loader:  load comlink into webpack  https://www.npmjs.com/package/comlink-loader
+	author thinks worker-plugin is better.
+	author also wrote web-worker
+worker-plugin:  load comlink into webpack  https://www.npmjs.com/package/worker-plugin
+	threads-loader is a copy of this
+```
+    -
 
 ## todo
 
 - logging:  async logging, and transports to 3rd party such as datadog / papertrail
   - also review all pino options: https://github.com/pinojs/pino/blob/master/docs/api.md#options
 - expose chalk in stringHelper
-- 
+

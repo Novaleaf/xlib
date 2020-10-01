@@ -4,6 +4,8 @@
 //import { expose } from "threads/worker"
 
 
+console.warn( "start myst!" )
+
 import { parentPort } from "worker_threads"
 import * as comlink from "comlink"
 import nodeEndpoint from "comlink/dist/umd/node-adapter"
@@ -26,5 +28,5 @@ console.warn( "mystery!" )
 export type Counter = typeof counter
 
 //expose( counter )
-
-comlink.expose( counter, nodeEndpoint( parentPort as never ) )
+comlink.expose( counter )
+//comlink.expose( counter, nodeEndpoint( parentPort as never ) )
