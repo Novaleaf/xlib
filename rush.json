@@ -433,11 +433,11 @@
       "projectFolder": "build-examples/ts-debug-test",
       "reviewCategory": "build-examples"
     },
-    {
-      "packageName": "@xlib/xlib-browser-webpack-basic",
-      "projectFolder": "build-examples/xlib-browser-webpack-basic",
-      "reviewCategory": "build-examples"
-    },
+    // {  /////// disabled for now until we get into react / web development.  (basic webpack build/test is now done integral to xlib)
+    //   "packageName": "@xlib/xlib-browser-webpack-basic",
+    //   "projectFolder": "build-examples/xlib-browser-webpack-basic",
+    //   "reviewCategory": "build-examples"
+    // },
     {
       "packageName": "@xlib/build-tools",
       "projectFolder": "utils/build-tools",
