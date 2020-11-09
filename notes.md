@@ -47,6 +47,10 @@ pnpm install -g npm-check-updates #per-project command added in config/rush/comm
 - supplemental build tooling
   - ```npm install -g npm-check-updates  concurrently```  //was: jest @microsoft/api-extractor @microsoft/api-documenter
 
+
+### upgrading dependencies
+see xlib's ```package.json``` for list of scripts to run.  in particular:  ```rush dep-check --verbose```
+
 ### REWRITE NOTES
 
 - date

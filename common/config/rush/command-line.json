@@ -98,7 +98,7 @@
     {
       "commandKind": "bulk",
       "name": "dep-check",
-      "summary": "run npm-check-updates: shows semver minor/patch updates available",
+      "summary": "run npm-check --verbose: shows semver minor/patch updates available",
       "description": "To upgrade a package to latest: `rush dep-check --package PACKAGENAME --upgrade`.   To pick a specific version, switch to a project folder and run `rush add -p PACKAGE@VER -m`.  To ignore a package, edit the config file \"./common/config/.ncurc.js\".   ",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true,
@@ -109,7 +109,7 @@
     {
       "commandKind": "bulk",
       "name": "dep-check-major",
-      "summary": "run npm-check-updates: also shows semver major upgrades",
+      "summary": "shows semver major upgrades",
       "description": "see `dep-check` description for more info.",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true,
