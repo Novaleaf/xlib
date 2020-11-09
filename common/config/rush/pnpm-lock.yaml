@@ -55,7 +55,7 @@ importers:
     dependencies:
       '@types/pino': 6.3.3
       chalk: 4.1.0
-      gaxios: 3.2.0
+      gaxios: 4.0.1
       lodash: 4.17.20
       pino: 6.7.0
       pino-pretty: 4.3.0
@@ -102,7 +102,7 @@ importers:
       chalk: ^4.1.0
       css-loader: ^4.3.0
       eslint: 7.13.0
-      gaxios: 3.2.0
+      gaxios: 4.0.1
       html-webpack-plugin: ^4.5.0
       lodash: ^4.17.20
       mocha: 8.2.1
@@ -1633,7 +1633,7 @@ packages:
       integrity: sha512-+G7P8jJmCHr+S+cLfQxygbWhXy+8YTVGzAkpEbcLo2mLoL7tij/VG41QSHACSf5QgYRhMZYHuNc6drJaO0Da+w==
   /agent-base/6.0.1:
     dependencies:
-      debug: 4.1.1
+      debug: 4.2.0
     dev: false
     engines:
       node: '>= 6.0.0'
@@ -3847,7 +3847,7 @@ packages:
       wide-align: 1.1.3
     resolution:
       integrity: sha1-LANAXHU4w51+s3sxcCLjJfsBi/c=
-  /gaxios/3.2.0:
+  /gaxios/4.0.1:
     dependencies:
       abort-controller: 3.0.0
       extend: 3.0.2
@@ -3858,7 +3858,7 @@ packages:
     engines:
       node: '>=10'
     resolution:
-      integrity: sha512-+6WPeVzPvOshftpxJwRi2Ozez80tn/hdtOUag7+gajDHRJvAblKxTFSSMPtr2hmnLy7p0mvYz0rMXLBl8pSO7Q==
+      integrity: sha512-jOin8xRZ/UytQeBpSXFqIzqU7Fi5TqgPNLlUsSB8kjJ76+FiGBfImF8KJu++c6J4jOldfJUtt0YmkRj2ZpSHTQ==
   /gaze/1.1.3:
     dependencies:
       globule: 1.3.2
@@ -4310,7 +4310,7 @@ packages:
   /https-proxy-agent/5.0.0:
     dependencies:
       agent-base: 6.0.1
-      debug: 4.1.1
+      debug: 4.2.0
     dev: false
     engines:
       node: '>= 6'
