@@ -17,7 +17,7 @@ const counter = {
 	}
 }
 
-console.warn( "mystery!" )
+console.warn( "Thread Test:  this is an async call, from within the worker thread." )
 export type Counter = typeof counter
 
 expose( counter )

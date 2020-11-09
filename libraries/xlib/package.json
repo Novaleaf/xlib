@@ -1,7 +1,7 @@
 {
   "name": "xlib",
   "version": "18.0.0-develop.0",
-  "description": "Your isometric swiss army knife",
+  "description": "Your isometric toolbox",
   "private": false,
   "author": "jason swearingen <jasons@novaleaf.com>",
   "license": "MIT",

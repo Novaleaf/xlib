@@ -53,12 +53,12 @@ async function asyncHuh(): Promise<void> {
 	//expect( update2Count ).toEqual( 2 )
 	await Thread.terminate( counter )
 
-	console.log( `threads!  noice!!!?!!  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
+	console.log( `Thread test, got callback from worker thread!!!  ${ JSON.stringify( { initialCount, update1Count, update2Count } ) }` )
 
 }
 
 void asyncHuh()
-console.error( "called asyncHuh!! ################################################################################################################################################################################################### " )
+console.error( "Thread test:  called asyncHuh() test function ################################################################################################################################################################################################### " )
 
 
 
