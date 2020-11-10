@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "xlib",
+      "comment": "testing monorepo publishing",
+      "type": "none"
+    }
+  ],
+  "packageName": "xlib",
+  "email": "jasons-pc"
+}
