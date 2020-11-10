@@ -89,7 +89,7 @@
   {
     "policyName": "xlib-dev",
     "definitionName": "lockStepVersion",
-    "version": "18.0.0-dev.1",
+    "version": "18.0.0-dev.2",
     "nextBump": "prerelease",
     "mainProject": "xlib"
   }
