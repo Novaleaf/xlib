@@ -412,7 +412,7 @@
       "packageName": "xlib",
       "projectFolder": "libraries/xlib",
       "reviewCategory": "libraries",
-      //"shouldPublish": true
+      "shouldPublish": true,
       "versionPolicyName": "xlib-dev"
     },
     // {  //// moved to _obsolete/monorepo-graveyard as no longer needed:  lib-esm can now be watch-built in the xlib project directly
