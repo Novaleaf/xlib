@@ -1,7 +1,16 @@
 {
   "name": "@novaleaf/xlib-build-tools",
-  "version": "0.0.1",
+  "version": "0.0.2-dev.10",
   "description": "toolchain for this monorepo",
+  "private": false,
+  "bugs": {
+    "url": "https://github.com/novaleaf/xlib/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/novaleaf/xlib.git"
+  },
+  "homepage": "https://github.com/novaleaf/xlib",
   "bin": {
     "my-build": "lib/my-build.js",
     "my-bulk-command": "lib/my-bulk-command.js"

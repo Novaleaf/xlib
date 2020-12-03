@@ -443,7 +443,9 @@
     {
       "packageName": "@novaleaf/xlib-build-tools",
       "projectFolder": "utils/xlib-build-tools",
-      "reviewCategory": "utils"
+      "reviewCategory": "utils",
+      "shouldPublish": true,
+      "versionPolicyName": "xlib-build-tools-dev"
     },
     {
       "packageName": "@xlib/eslint-config",

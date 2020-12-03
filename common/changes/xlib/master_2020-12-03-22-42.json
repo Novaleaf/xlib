@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "xlib",
+      "comment": "testing publish again",
+      "type": "none"
+    }
+  ],
+  "packageName": "xlib",
+  "email": "jasons@novaleaf.com"
+}
