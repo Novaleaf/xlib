@@ -1,6 +1,6 @@
 {
 	"$schema": "http://json.schemastore.org/tsconfig",
-	"extends": "./node_modules/@xlib/build-tools/includes/tsconfig-web.json",
+	"extends": "./node_modules/@novaleaf/xlib-build-tools/includes/tsconfig-web.json",
 	"compilerOptions": {
 		//"moduleResolution": "Node",
 		"rootDir": "../../libraries/xlib/src",

@@ -16,7 +16,7 @@
     "@rushstack/heft": "0.13.1",
     "@types/jest": "~26.0.13",
     "@types/node": "14.0.27",
-    "@xlib/build-tools": "workspace:*",
+    "@novaleaf/xlib-build-tools": "workspace:*",
     "xlib": "workspace:*",
     "@xlib/eslint-config": "workspace:*"
   }

@@ -57,7 +57,7 @@
      * The default value is false to avoid legacy compatibility issues.
      * It is strongly recommended to set strictPeerDependencies=true.
      */
-    "strictPeerDependencies": true,
+    "strictPeerDependencies": false, //! @rushstack/eslint-config still requires ts 3.x so setting this to false.
     /**
      * Configures the strategy used to select versions during installation.
      *
@@ -441,8 +441,8 @@
     //   "reviewCategory": "build-examples"
     // },
     {
-      "packageName": "@xlib/build-tools",
-      "projectFolder": "utils/build-tools",
+      "packageName": "@novaleaf/xlib-build-tools",
+      "projectFolder": "utils/xlib-build-tools",
       "reviewCategory": "utils"
     },
     {

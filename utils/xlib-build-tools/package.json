@@ -1,5 +1,5 @@
 {
-  "name": "@xlib/build-tools",
+  "name": "@novaleaf/xlib-build-tools",
   "version": "0.0.1",
   "description": "toolchain for this monorepo",
   "bin": {

@@ -28,7 +28,7 @@
     "@microsoft/api-documenter": "^7.8.53",
     "@rushstack/eslint-config": "~1.3.0",
     "@rushstack/heft": "0.13.1",
-    "@xlib/build-tools": "workspace:*",
+    "@novaleaf/xlib-build-tools": "workspace:*",
     "@xlib/eslint-config": "workspace:*",
     "eslint": "^7.9.0"
   },

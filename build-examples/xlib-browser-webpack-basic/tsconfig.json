@@ -45,7 +45,7 @@
 //TODO:  replace above with below.  track and fix related typings bug in ToggleSwitch.tsx
 // {
 // 	"$schema": "http://json.schemastore.org/tsconfig",
-// 	"extends": "./node_modules/@xlib/build-tools/includes/tsconfig-node.json", //HACK:  move to tsconfig-web
+// 	"extends": "./node_modules/@novaleaf/xlib-build-tools/includes/tsconfig-node.json", //HACK:  move to tsconfig-web
 // 	"compilerOptions": {
 // 		"outDir": "lib-esm",
 // 		"module": "esnext", //HACK:  move to tsconfig-web

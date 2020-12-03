@@ -21,7 +21,7 @@
     "@types/react": "16.9.49",
     "@types/react-dom": "^16.9.8",
     "@types/webpack-env": "1.15.3",
-    "@xlib/build-tools": "workspace:*",
+    "@novaleaf/xlib-build-tools": "workspace:*",
     "@xlib/eslint-config": "workspace:*",
     "css-loader": "4.3.0",
     "eslint": "7.10.0",
