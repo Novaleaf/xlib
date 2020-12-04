@@ -21,9 +21,10 @@ pnpm install -g npm-check-updates #per-project command added in config/rush/comm
 
 - core dev env
   - install node 14.x
-  - ```npm install -g pnpm @microsoft/rush```
+  - ```npm install -g pnpm ```
+  - ```pnpm install -g @microsoft/rush```
 - supplemental build tooling
-  - ```npm install -g npm-check-updates  concurrently```  //was: jest @microsoft/api-extractor @microsoft/api-documenter
+  - ```pnpm install -g npm-check-updates  concurrently```  //was: jest @microsoft/api-extractor @microsoft/api-documenter
 
 # secrets management (for Novaleaf internal use only)
 secrets used for internal Novaleaf processes.  For the open source xlib projects this is not at all needed, but if you don't have a secrets workflow, you can copy this!
