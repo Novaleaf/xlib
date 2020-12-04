@@ -1,5 +1,5 @@
 {
-  "name": "@xlib/eslint-config",
+  "name": "@novaleaf/xlib-eslint-config",
   "version": "0.0.1",
   "description": "default ruleset for eslint",
   "main": ".eslintrc.js",

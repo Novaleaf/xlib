@@ -102,7 +102,7 @@
      *
      * This option is experimental. The default value is false.
      */
-    "useWorkspaces": true
+    "useWorkspaces": false
   },
   /**
    * Older releases of the Node.js engine may be missing features required by your system.
@@ -448,8 +448,8 @@
       "versionPolicyName": "xlib-build-tools-dev"
     },
     {
-      "packageName": "@xlib/eslint-config",
-      "projectFolder": "utils/eslint-config",
+      "packageName": "@novaleaf/xlib-eslint-config",
+      "projectFolder": "utils/xlib-eslint-config",
       "reviewCategory": "utils"
     }
   ]

@@ -5,7 +5,7 @@ module.exports = {
 	"$schema": "http://json.schemastore.org/eslintrc",
 	//"root": true,  //no impact?
 	"extends": [
-		"@xlib/eslint-config"
+		"@novaleaf/xlib-eslint-config"
 	],
 	"parserOptions": {
 		"tsconfigRootDir": __dirname //required to find the tsconfig.json

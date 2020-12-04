@@ -82,3 +82,28 @@ sourcetree doesn't have a good merge tool.  winmerge is good
   - find heft webpack version by running it (version is emitted in console output) then update project, for example: ```rush add -p webpack@4.31.0 -m```
 
 
+# publishing
+
+make sure ```./common/config/rush/.npmrc-publish``` is setup with an envVar ref to your npm auth token.
+
+## new project
+
+- make sure all up to date:  ```rush update --full --purge```
+- make sure project has entry in ```common/config/rush/version-policies.json```
+- 
+
+
+
+
+## bumping versions
+
+2. follow instructions here (follow instructions for setting up version policies):  https://rushjs.io/pages/maintainer/publishing/
+   - add policy to ```common/config/rush/version-policies.json```
+3. 
+
+```
+# publish
+rush publish --apply --publish --add-commit-details --tag dev --include-all
+
+# 
+```
