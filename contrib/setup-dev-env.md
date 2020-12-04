@@ -90,7 +90,7 @@ make sure ```./common/config/rush/.npmrc-publish``` is setup with an envVar ref 
 
 - make sure all up to date:  ```rush update --full --purge```
 - make sure project has entry in ```common/config/rush/version-policies.json```
-- 
+- publish via ```npm publish --access public```
 
 
 
