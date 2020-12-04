@@ -22,7 +22,7 @@
     "@types/node": "14.0.27",
     "@novaleaf/xlib-build-tools": "0.0.2-dev.10",
     "eslint": "7.13.0",
-    "@novaleaf/xlib-eslint-config": "0.0.1"
+    "@novaleaf/eslint-config": "0.0.1"
   },
   "dependencies": {
     "xlib": "18.0.0-dev.10"

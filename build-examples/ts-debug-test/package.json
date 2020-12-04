@@ -22,7 +22,7 @@
     "@types/node": "14.0.27",
     "typescript": "4.0.5",
     "@novaleaf/xlib-build-tools": "0.0.2-dev.10",
-    "@novaleaf/xlib-eslint-config": "0.0.1",
+    "@novaleaf/eslint-config": "0.0.1",
     "@typescript-eslint/eslint-plugin": "4.6.1",
     "@typescript-eslint/parser": "4.6.1",
     "eslint": "7.13.0",

@@ -101,7 +101,7 @@
     "mainProject": "xlib"
   },
   {
-    "policyName": "xlib-eslint-config",
+    "policyName": "eslint-config",
     "definitionName": "lockStepVersion",
     "version": "0.0.2-dev.10",
     "nextBump": "prerelease",
