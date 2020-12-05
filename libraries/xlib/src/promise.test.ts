@@ -70,4 +70,52 @@ describe( __filename, () => {
 
 	} )
 
+
+	describe( "xlib.promise.exposeStatus()", () => {
+		it( "basic success", async () => {
+
+			let promiseDelay100 = promise.delay( 50 )
+			let statusEnabled = promise.exposeStatus( promiseDelay100 )
+			let status = statusEnabled.status()
+			log.assert( status.isResolved === false && status.error == null && status.isSuccess == null && status.result == null, { status } )
+			await promise.delay( 50 )
+			let newStatus = statusEnabled.status()
+			log.assert( newStatus.isResolved === true && newStatus.error == null && newStatus.isSuccess === true && newStatus.result == null, { newStatus } )
+		} )
+
+		it( "basic fail", async () => {
+
+			let promiseDelayFail = new Promise( ( resolve, reject ) => { setTimeout( () => { reject() }, 50 ) } )
+			let statusEnabled = promise.exposeStatus( promiseDelayFail )
+			let status = statusEnabled.status()
+			log.assert( status.isResolved === false && status.error == null && status.isSuccess == null && status.result == null, { status } )
+			await promise.delay( 60 )
+			let newStatus = statusEnabled.status()
+			log.assert( newStatus.isResolved === true && newStatus.error == null && newStatus.isSuccess === false && newStatus.result == null, { newStatus } )
+		} )
+
+	} )
+
+	describe( "xlib.promise.createMutablePromise()", () => {
+
+		it( "basic success", async () => {
+
+			let mutablePromise = promise.createMutablePromise<string>()
+			let status = mutablePromise.status()
+			log.assert( status.isResolved === false && status.error == null && status.isSuccess == null && status.result == null, { status } )
+			mutablePromise.resolve( "OK" )
+			let newStatus = mutablePromise.status()
+			log.assert( newStatus.isResolved === true && newStatus.error == null && newStatus.isSuccess == true && newStatus.result == "OK", { newStatus } )
+		} )
+		it( "basic fail", async () => {
+
+			let mutablePromise = promise.createMutablePromise<string>()
+			let status = mutablePromise.status()
+			log.assert( status.isResolved === false && status.error == null && status.isSuccess == null && status.result == null, { status } )
+			mutablePromise.reject( new Error( "boom" ) )
+			let newStatus = mutablePromise.status()
+			log.assert( newStatus.isResolved === true && newStatus.error != null && newStatus.isSuccess == false && newStatus.result == null && newStatus.error.message === "boom", { newStatus } )
+		} )
+	} )
+
 } )
