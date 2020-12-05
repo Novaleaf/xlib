@@ -108,3 +108,14 @@ rush publish --apply --publish --add-commit-details --tag dev --include-all
 
 # 
 ```
+
+# using / debugging from external projects
+
+kind of buggy.   see: https://github.com/microsoft/rushstack/issues/2378
+- need to be sure that ```rush.json``` has ```useWorkspaces:false``` set
+- need to be sure that all workspace projects are registered with npm
+- call ```pnpm link``` in the project you want to reference externally   (like for ```xlib```)
+- call ```pnpm link xlib``` in the project referencing xlib.
+
+notes:
+- call ```rush link``` if referenced workspace projects don't seem to be pointing to source code

@@ -79,6 +79,12 @@
 					}
 				],
 				"no-lone-blocks": "off",
+				"no-constant-condition": [
+					"warn",
+					{
+						"checkLoops": false
+					}
+				],
 				"@typescript-eslint/no-unused-vars": [
 					"warn",
 					{

@@ -28,10 +28,13 @@ export { diagnostics }
 import * as reflection from "./reflection"
 export { reflection }
 
+import * as promise from "./promise"
+export { promise }
 
 
 const log = new diagnostics.Logger( "main" )
 
+export const HELLO = "world12"
 
 
 //import threads = _imports.threads
