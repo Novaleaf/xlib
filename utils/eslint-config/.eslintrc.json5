@@ -78,6 +78,12 @@
 						"allowEmptyCatch": true
 					}
 				],
+				"prefer-const": [ //https://eslint.org/docs/rules/prefer-const
+					"warn",
+					{
+						"destructuring": "all"
+					}
+				],
 				"no-lone-blocks": "off",
 				"no-constant-condition": [
 					"warn",

@@ -182,7 +182,7 @@ export class Logger {
 			return
 		}
 		this.error( obj, msg as string )
-		throw new exception.Exception( "assert failed", { details:{msg, ...obj}} )
+		throw new exception.Exception( "assert failed", { details: { msg, ...obj } } )
 	}
 }
 interface ILogObj {
@@ -201,3 +201,11 @@ interface ILogObj {
 // 	( msg: string ): void;
 // 	( obj: object, msg?: string ): void;
 // }
+
+/** @internal helper to throw a XlibException if the condition !==true */
+export function assert( condition: boolean, errorMsg: string ) {
+
+	if ( condition !== true ) {
+		throw new exception.XlibException( errorMsg, { stackFramesToTruncate: 1 } )
+	}
+}
