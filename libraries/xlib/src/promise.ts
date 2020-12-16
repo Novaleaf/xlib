@@ -2,7 +2,7 @@
 
 import * as _imports from "./_imports"
 import * as diag from "./diagnostics"
-
+import * as _ from "lodash"
 
 /** a promise that resolves after an amount of time.   good for delaying execution
  */
@@ -151,7 +151,7 @@ export function exposeStatus<TResult, TPromise extends PromiseLike<TResult>>( pr
 	const toReturn = promise as TPromise & IInspectablePromise<TResult>
 
 	if ( toReturn.status != null ) {
-		throw new diag.exception.XlibException( `can not expose promise status because the given promise already has a .status property` );
+		throw new diag.exception.XlibException( "can not expose promise status because the given promise already has a .status property" )
 	}
 
 	const status: IPromiseStatus<TResult> = {
@@ -198,8 +198,8 @@ export function createMutablePromise<TResult = void>(): ( Promise<TResult> & IMu
 	const status: IPromiseStatus<TResult> = {
 		isPending: true
 	}
-	let _resolve: ( result: TResult ) => void = null as any;
-	let _reject: ( reason: any ) => void = null as any;
+	let _resolve: ( result: TResult ) => void = null as any
+	let _reject: ( reason: any ) => void = null as any
 	const toReturn = new Promise<TResult>( ( resolve, reject ) => {
 		_resolve = async ( result ) => {
 			status.isPending = false
@@ -251,7 +251,7 @@ export class AsyncReaderWriterLock<TValue = void> {
 	private _value: TValue | undefined;
 
 	constructor( options?: { /** set to true to set the initial state to blocking (a single write already in progress)*/ writeInProgress: boolean; } ) {
-		options = { writeInProgress: false, ...options };
+		options = { writeInProgress: false, ...options }
 
 		if ( options.writeInProgress === true ) {
 			this.tryWriteBegin()
@@ -259,7 +259,7 @@ export class AsyncReaderWriterLock<TValue = void> {
 	}
 	public toJson() {
 		return {
-			currentWrite: this._currentWrite != null ? this._currentWrite.tags : null,
+			currentWrite: this._currentWrite, // != null ? this._currentWrite.tags : null,
 			pendingWrites: this._pendingWrites.length,
 			currentReads: this._currentReads.length,
 			pendingReads: this._pendingReadCount,
@@ -292,14 +292,14 @@ export class AsyncReaderWriterLock<TValue = void> {
 
 		if ( this._pendingWrites.length > 0 ) {
 			//this.pendingReads.push(promise.CreateExposedPromise());
-			this._pendingReadCount++;
+			this._pendingReadCount++
 			while ( this._pendingWrites.length > 0 ) {
-				await Promise.all( this._pendingWrites );
+				await Promise.all( this._pendingWrites )
 			}
-			this._pendingReadCount--;
+			this._pendingReadCount--
 		}
-		diag.assert( this._pendingWrites.length === 0, "expect writeQueue to be zero length" )
-		diag.assert( this._currentWrite == null, "race, current write should not be possible while start reading" )
+		diag.throwCheck( this._pendingWrites.length === 0, "expect writeQueue to be zero length" )
+		diag.throwCheck( this._currentWrite == null, "race, current write should not be possible while start reading" )
 		this._currentReads.push( createMutablePromise() )
 
 		return this._value
@@ -307,8 +307,8 @@ export class AsyncReaderWriterLock<TValue = void> {
 
 	/** release your read lock */
 	public readEnd() {
-		diag.assert( this._currentReads.length > 0, "out of current reads, over decremented?" );
-		diag.assert( this._currentWrite == null, "race, current write should not be possible while reading" );
+		diag.throwCheck( this._currentReads.length > 0, "out of current reads, over decremented?" )
+		diag.throwCheck( this._currentWrite == null, "race, current write should not be possible while reading" )
 		const readToken = this._currentReads.pop()
 		if ( readToken != null ) {
 			readToken.resolve()
@@ -322,21 +322,21 @@ export class AsyncReaderWriterLock<TValue = void> {
 		}
 
 		//do sync writeBegin
-		diag.assert( this._currentWrite == null, "race, current write should not be possible while start writing (tryWriteBegin)" );
-		const writeId = this._writeCounter++;
+		diag.throwCheck( this._currentWrite == null, "race, current write should not be possible while start writing (tryWriteBegin)" )
+		const writeId = this._writeCounter++
 		const thisWrite = { promise: createMutablePromise(), writeId }
 		this._pendingWrites.push( thisWrite )
 		this._currentWrite = thisWrite
-		diag.assert( this._currentWrite === this._pendingWrites[ 0 ], "current write should be at head of queue.  (tryWriteBegin)" );
+		diag.throwCheck( this._currentWrite === this._pendingWrites[ 0 ], "current write should be at head of queue.  (tryWriteBegin)" )
 
 		return true
 	}
 
 	/** take a write lock.   returned promise resolves once your lock is aquired. */
 	public async writeBegin() {
-		const writeId = this._writeCounter++;
+		const writeId = this._writeCounter++
 		const thisWrite = { promise: createMutablePromise(), writeId }
-		this._pendingWrites.push( thisWrite );
+		this._pendingWrites.push( thisWrite )
 		//wait until it's this write's turn
 		while ( this._pendingWrites[ 0 ].writeId !== writeId ) {
 			await this._pendingWrites[ 0 ]
@@ -346,9 +346,9 @@ export class AsyncReaderWriterLock<TValue = void> {
 			await Promise.all( this._currentReads )
 		}
 		//now on the item
-		diag.assert( this._currentWrite == null, "race, current write should not be possible while start writing" );
-		this._currentWrite = thisWrite;
-		diag.assert( this._currentWrite === this._pendingWrites[ 0 ], "current write should be at head of queue.  (writeBegin)" );
+		diag.throwCheck( this._currentWrite == null, "race, current write should not be possible while start writing" )
+		this._currentWrite = thisWrite
+		diag.throwCheck( this._currentWrite === this._pendingWrites[ 0 ], "current write should be at head of queue.  (writeBegin)" )
 	}
 
 	/** finish the write lock, allowing writing of the stored [[value]] when doing so */
@@ -369,8 +369,8 @@ export class AsyncReaderWriterLock<TValue = void> {
 			// }
 			this._value = await Promise.resolve( valueOrWritePromise )
 		} finally {
-			diag.assert( this._currentWrite != null, "race, current write should be set" );
-			diag.assert( this._currentWrite === this._pendingWrites[ 0 ], "current write should be at head of queue.  (writeEnd)" );
+			diag.throwCheck( this._currentWrite != null, "race, current write should be set" )
+			diag.throwCheck( this._currentWrite === this._pendingWrites[ 0 ], "current write should be at head of queue.  (writeEnd)" )
 			const thisWrite = this._pendingWrites.shift()
 			this._currentWrite = undefined
 			thisWrite?.promise.resolve()
@@ -412,9 +412,214 @@ export class AsyncReaderWriterLock<TValue = void> {
 }
 
 
+export interface IAutoscalerOptions {
+	/** minimum parallel requests (maxActive) you allow, regardless of how long the autoscaler has been idle.  should be 1 or more.
+	*/
+	minParallel: number;
+	/** optional.  set a max to number of parallel requests (maxActive) no matter how active the calls
+		* @default undefined (no limit)
+	*/
+	maxParallel?: number;
+	/** if we get a "TOO_BUSY" rejection (from the ```failureListener```), how long we should wait before trying to expand our maxActive again. */
+	busyGrowDelayMs: number;
+	/** when we are at max parallel and still able to successfully submit requests (not getting "TOO_BUSY" errors), how long to delay before increasing our maxActive by 1. */
+	growDelayMs: number;
+	/** when we are under our max parallel, how long before our max should decrease by 1 .   Also, when we are consistently getting "TOO_BUSY" rejections, we will decrease our maxActive by 1 this often.  pass null to never decay (not recomended).*/
+	idleOrBusyDecreaseMs: number;
+	/** optional.  when we first get a "TOO_BUSY" rejection, we will reduce maxActive by this amount.  interval to check if we should penalize resets after ```busyWaitMs```
+		 * Note: when too busy, we also reduce maxActive via the ```decayDelayMs``` parameter every so often (as set by decayDelayMs)..   set to 0 to have no penalty except that set by decayDelayMs
+		* @default 1
+	 */
+	busyExtraPenalty?: number;
 
-export class Autoscaler<TResult, TWorkerFcn extends () => PromiseLike<TResult>>{
 
+	// /** while there is pending work, how often to wakeup and see if we can submit more.  should be less than half of grow/decay delayMs
+	//  * @default 1/10th of the minimum of  grow/decay delayMs
+	//  */
+	// heartbeatMs?: number,
+}
+
+export class Autoscaler<TResult, TWorkerFunc extends () => PromiseLike<TResult>>{
+
+
+	private _metrics: {
+		/** the max number of active parallel requests we currently allow.   increases and decreases based on the growDelayMs and decayDelayMs */
+		maxActive: number;
+		/** time in which we decided to stop growing (based on options.busyWaitMs ) */
+		tooBusyWaitStart: Date;
+		/** the current number of parallel requests active in our backendWorker */
+		activeCount: number;
+		/** the last time we grew our maxActive count  */
+		lastGrow: Date;
+		/** the last time we were at our maxActive count */
+		lastMax: Date;
+		/** the last time we got a "TOO_BUSY" rejection from the backendWorker.  note that this could happen while in a options.busyWaitMs interval, if the backend is sufficently overwhelmed */
+		lastTooBusy: Date;
+		/** the last time we decayed our maxActive */
+		lastDecay: Date;
+	};
+
+	private pendingCalls: Array<{ args: Array<any>; requesterPromise: IMutablePromise; }> = [];
+
+	private activeCalls: Array<{ args: Array<any>; requesterPromise: IMutablePromise; activeMonitorPromise: Promise<any>; }> = [];
+
+
+	/** submit a request to the backend worker.
+	 *
+	 * **Important note**: to avoid "unhandled promise rejections" you need to make sure the returned Promise has a catch() applied to it.
+	 * **NOT** just store the promise in an array to inspect later.  This is because if the request fails, the returned promise gets rejected, and if the Promise internal logic doesn't see a .catch() it will show the global "unhandled rejected promse" soft error message.
+	 */
+	public submitRequest: TWorkerFunc =
+		//a worker with generic input/return args, cast to our specific worker function's sig
+		( async ( ...args: Array<any> ): Promise<any> => {
+			const requesterPromise = createMutablePromise()
+			this.pendingCalls.push( { args, requesterPromise } )
+			this._tryCallBackend()
+			return requesterPromise
+		} ) as ANY;
+
+
+	private _lastTryCallTime = new Date();
+	constructor(
+		private options: IAutoscalerOptions,
+		private backendWorker: TWorkerFunc,
+		/** will be used to intercept failures (promise rejections) from the ```backendWorker``` function.  should return "FAIL" if it's a normal failure (to be returned to the caller) or "TOO_BUSY" if the request should be retried  */
+		private failureListener: ( ( err: Error ) => "FAIL" | "TOO_BUSY" ),
+	) {
+
+		//apply defaults
+		this.options = {
+			busyExtraPenalty: 1,
+			//heartbeatMs: Math.min( options.growDelayMs, options.idleOrBusyDecreaseMs ) / 10,
+			...options
+		}
+
+		diag.throwCheck( this.options.minParallel >= 1, "minParallel needs to be 1 or more" )
+
+		this._metrics = { activeCount: 0, tooBusyWaitStart: new Date( 0 ), lastGrow: new Date( 0 ), lastMax: new Date( 0 ), maxActive: options.minParallel, lastDecay: new Date( 0 ), lastTooBusy: new Date( 0 ) }
+
+
+	}
+
+
+
+	public toJson() {
+		return { pendingCalls: this.pendingCalls.length, activeCalls: this.activeCalls.length, metrics: this._metrics, options: this.options }
+	}
+
+	private _tryCallBackend() {
+		const now = new Date()
+		try {
+			while ( true ) {
+
+				// ! /////////////  do housekeeping ///////////////////
+
+				//check if we have to abort for various reasons
+				if ( this.pendingCalls.length === 0 ) {
+					//nothing to do
+					return
+				}
+				if ( this._metrics.activeCount >= this._metrics.maxActive ) {
+					//make note that we are at our limit of requests
+					this._metrics.lastMax = now
+				}
+				if ( this.options.maxParallel != null && this._metrics.activeCount >= this.options.maxParallel ) {
+					//at our hard limit of parallel requests
+					return
+				}
+				if ( this._metrics.activeCount >= this._metrics.maxActive //we are at our max...
+					&& ( this._metrics.lastGrow.getTime() + this.options.growDelayMs < now.getTime() ) //we haven't grew recently...
+					&& ( this._metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < now.getTime() ) //we are not in a options.busyWaitMs interval (haven't recieved a "TOO_BUSY" rejection recently...)
+				) {
+					//time to grow
+					this._metrics.maxActive++
+					this._metrics.lastGrow = now
+				}
+				const lastTryMsAgo = now.getTime() - this._lastTryCallTime.getTime()
+				if ( this.options.idleOrBusyDecreaseMs != null && this._metrics.lastDecay.getTime() + ( this.options.idleOrBusyDecreaseMs + lastTryMsAgo ) < now.getTime() ) {
+					//havent decayed recently
+					if (
+						( this._metrics.lastMax.getTime() + ( this.options.idleOrBusyDecreaseMs + lastTryMsAgo ) < now.getTime() ) //havent been at max recently
+						|| ( this._metrics.lastTooBusy.getTime() + this.options.idleOrBusyDecreaseMs > now.getTime() ) //OR we have gotten "TOO_BUSY" rejections since our last decay, so backoff
+					) {
+						//time to reduce our maxActive
+						const reduceCount = 1 + Math.round( ( now.getTime() - this._metrics.lastMax.getTime() ) / this.options.idleOrBusyDecreaseMs )//accumulating decays in case the autoScaler has been idle
+						diag.throwCheck( reduceCount >= 0, "active workers is <0.  should always be >=0" )
+						this._metrics.maxActive = Math.max( this.options.minParallel, this._metrics.maxActive - reduceCount )
+						//pretend we are at max, to properly delay growing.
+						this._metrics.lastMax = now
+						this._metrics.lastDecay = now
+					}
+
+				}
+
+				if ( this._metrics.activeCount >= this._metrics.maxActive ) {
+					//we are at our maxActive, wait for a free slot
+					return
+				}
+
+				// ! ////////// Done with housekeeping and didn't early abort.   time to call the backend  /////////////////
+
+				diag.throwCheck( this.pendingCalls.length > 0, "race condition, expected pendingCalls length to be 1 or more" )
+				const { args, requesterPromise } = this.pendingCalls.shift()!
+				const activeMonitorPromise = Promise.resolve( ( this.backendWorker as ANY )( ...args ) )
+					.then( ( result ) => {
+						requesterPromise.resolve( result )
+					}, ( err ) => {
+						//failure, see what to do about it
+						const verdict = this.failureListener( err )
+						switch ( verdict ) {
+							case "TOO_BUSY":
+								{
+									const tooBusyNow = new Date()
+									this._metrics.lastTooBusy = tooBusyNow
+									//apply special backoffPenaltyCount options, if they exist
+									if ( this.options.busyExtraPenalty != null && this._metrics.tooBusyWaitStart.getTime() + this.options.busyGrowDelayMs < tooBusyNow.getTime() ) {
+										//this is a "fresh" backoff.
+										//we have exceeded backend capacity and been notified with a "TOO_BUSY" failure.  reduce our maxParallel according to the options.backoffPenaltyCount
+										this._metrics.maxActive = Math.max( this.options.minParallel, this._metrics.maxActive - this.options.busyExtraPenalty )
+
+										//set our "fresh" tooBusy time
+										this._metrics.tooBusyWaitStart = tooBusyNow
+									}
+									//put request in front to try again
+									this.pendingCalls.unshift( { args, requesterPromise } )
+								}
+								break
+							case "FAIL":
+								requesterPromise.reject( err )
+								break
+							default:
+								throw new diag.exception.XlibException( `Autoscaler error.  failureListener() return value unexpected ("${ verdict }").  must return "TOO_BUSY" or "FAIL".  ` )
+						}
+						return Promise.resolve()
+					} )
+					.finally( () => {
+						//remove this from actives array
+						this._metrics.activeCount--
+						_.remove( this.activeCalls, ( activeCall ) => activeCall.requesterPromise === requesterPromise )
+						//try another pass
+						this._tryCallBackend()
+					} )
+
+				this._metrics.activeCount++
+				this.activeCalls.push( { args, requesterPromise, activeMonitorPromise } )
+			}
+
+		} catch ( _err ) {
+			//throw _err
+			throw new diag.exception.XlibException( "Austoscaler error.  backend error occured.", { innerError: _err } )
+			//log.error( _err );
+		} finally {
+			this._lastTryCallTime = now
+			if ( this.pendingCalls.length > 0 && this._metrics.activeCount >= this._metrics.maxActive ) {
+				//we have pending work, try again at minimum our next potential grow interval
+				clearTimeout( this._heartbeatHandle ) //only 1 pending callback, regardless of how many calls there were
+				this._heartbeatHandle = setTimeout( () => { this._tryCallBackend() }, this.options.growDelayMs )
+			}
+		}
+	}
+	private _heartbeatHandle: any;
 
 
 }
