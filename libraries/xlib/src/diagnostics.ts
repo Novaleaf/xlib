@@ -203,7 +203,7 @@ interface ILogObj {
 // }
 
 /** @internal helper to throw a XlibException if the condition !==true */
-export function assert( condition: boolean, errorMsg: string ) {
+export function throwCheck( condition: boolean, errorMsg: string ) {
 
 	if ( condition !== true ) {
 		throw new exception.XlibException( errorMsg, { stackFramesToTruncate: 1 } )
