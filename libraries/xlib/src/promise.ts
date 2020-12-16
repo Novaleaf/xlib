@@ -47,13 +47,13 @@ export async function retry<TResult, TPromise extends PromiseLike<TResult>>( opt
 		acceptResult: ( { isSuccess, err, result, promise } ) => { return isSuccess === true },
 		//maxRetries: 1,
 		minDelay: 0,
-		maxDelay: Number.MAX_SAFE_INTEGER,
+		maxDelay: 100,
 		expGrowDelay: 1.5,
 		maxJitter: 100,
 		...options
 
 	} //as Required<IRetryOptions>
-
+	///
 	let attempts = 0
 	let lastDelayMs = 0
 
@@ -64,12 +64,21 @@ export async function retry<TResult, TPromise extends PromiseLike<TResult>>( opt
 		//calc delay amount
 		let delayMs = Math.max( options.minDelay!, lastDelayMs )
 		delayMs = Math.pow( delayMs, options.expGrowDelay! )
-		delayMs += Math.floor( options.maxJitter! * Math.random() )
-		//clamp
+		//clamp within min/max		
 		delayMs = Math.max( options.minDelay!, delayMs )
 		delayMs = Math.min( delayMs, options.maxDelay! )
 
+		//apply jitter 
+		const jitter = Math.floor( ( options.maxJitter! * ( Math.random() - 0.5 ) ) * 2 )
+		delayMs += jitter
+
+		//clamp again
+		delayMs = Math.max( options.minDelay!, delayMs )
+		delayMs = Math.min( delayMs, options.maxDelay! )
+
+		delayMs = Math.floor( delayMs )
 		//do the delay
+		//console.log( `${ attempts } about to delay: ${ delayMs }, ${ JSON.stringify( { ...options, jitter } ) }` )
 		await delay( delayMs )
 		// eslint-disable-next-line require-atomic-updates
 		lastDelayMs = delayMs
