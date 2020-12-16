@@ -39,6 +39,7 @@
     "dep-check": "npm-check-updates --configFilePath ../../common/config --target minor",
     "doc-build": "heft test --clean; api-documenter markdown --input-folder temp --output-folder",
     "watch": "heft build --watch",
+    "watch-test-node": "heft build && concurrently --kill-others \"pnpm run watch\" \"pnpm run test-node -- --watch\"",
     "watch-and-test": "heft build && concurrently --kill-others \"pnpm run watch\" \"pnpm run test\""
   },
   "obsolete-scripts": {

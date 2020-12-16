@@ -144,11 +144,11 @@ interface IPromiseStatus<TResult> {
 
 
 /** adds a ```.status()``` property to your existing promise, allowing inspection of it's current state.   If the promise already has a ```status``` property, an XlibException is thrown. */
-export function exposeStatus<TResult, TPromise extends PromiseLike<TResult>>( promise: TPromise ): ( TPromise & IInspectablePromise<TResult> ) {
+export function exposeStatus<TResult>( promise: PromiseLike<TResult> ): IInspectablePromise<TResult> {
 
 
 
-	const toReturn = promise as TPromise & IInspectablePromise<TResult>
+	const toReturn = promise as IInspectablePromise<TResult>
 
 	if ( toReturn.status != null ) {
 		throw new diag.exception.XlibException( "can not expose promise status because the given promise already has a .status property" )
@@ -198,8 +198,8 @@ export function createMutablePromise<TResult = void>(): ( Promise<TResult> & IMu
 	const status: IPromiseStatus<TResult> = {
 		isPending: true
 	}
-	let _resolve: ( result: TResult ) => void = null as any
-	let _reject: ( reason: any ) => void = null as any
+	let _resolve: ( result: TResult ) => void = null as ANY
+	let _reject: ( reason: Error ) => void = null as ANY
 	const toReturn = new Promise<TResult>( ( resolve, reject ) => {
 		_resolve = async ( result ) => {
 			status.isPending = false
@@ -229,187 +229,182 @@ export const CreateExposedPromise = createMutablePromise
 export type IExposedPromise = IMutablePromise
 
 
-/** an async+promise capable, readerwriter lock.
- *
- * allows multiple readers (non-exclusive read lock) and single-writers (exclusive write lock)
- *
- * additionally, allows storage of a value that is atomically written (a helper shortcut for common use: using this value is not required)
- *
- * when a race occurs, writes take precidence
+/** @deprecated use [[ReadWriteLock]] instead  */
+export type AsyncReaderWriterLock = ReadWriteLock
+
+
+/** Synchronization construct.  Allows for exclusive writes and parallel reads.  requests are processed in a FIFO order.
+ * 
+ * Usage notes:  
+ * - You should hold a lock for as little time as possible to avoid blocking other users.
+ * - Be sure to call .[[readEnd]] or .[[writeEnd]] to avoid deadlocks
+ * @example
+ * const lock = new ReadWriteLock("start")
+ * try{
+ * 	const initialValue = lock.writeBegin()
+ * 	console.log("initialValue==='start'",initialValue==="start")
+ * }finally{
+ * 	lock.writeEnd("finish")
+ * }
+ * 
  */
-export class AsyncReaderWriterLock<TValue = void> {
+export class ReadWriteLock<TValue = void>{
 
+	/** multiple reads can occur at the same time */
+	private _currentReads: Array<IMutablePromise> = []
 
-	private _writeCounter = 0
-	private _currentReads: Array<IMutablePromise> = [];
-	private _pendingReadCount = 0;
+	/** requests are processed FIFO.  pending requests are stored here. */
+	private _pendingTransactions: Array<{ promise: IMutablePromise, isRead: boolean }> = []
 
-	private _pendingWrites: Array<{ promise: IMutablePromise; writeId: number; }> = [];
-
-	private _currentWrite: { promise: IMutablePromise; writeId: number; } | undefined;
-
-	private _value: TValue | undefined;
-
-	constructor( options?: { /** set to true to set the initial state to blocking (a single write already in progress)*/ writeInProgress: boolean; } ) {
-		options = { writeInProgress: false, ...options }
-
-		if ( options.writeInProgress === true ) {
-			this.tryWriteBegin()
-		}
-	}
-	public toJson() {
-		return {
-			currentWrite: this._currentWrite, // != null ? this._currentWrite.tags : null,
-			pendingWrites: this._pendingWrites.length,
-			currentReads: this._currentReads.length,
-			pendingReads: this._pendingReadCount,
-			value: this._value != null ? "yes" : "no",
-		}
-	}
-	// /** if no writes are waiting, will quickly return. otherwise will do a normal blocking wait
-	//  *
-	//  * returns the
-	// */
-	// public pulseRead() {
-	//     if ( this.currentWrite != null ) {
-	//         throw new Error( "AsyncReaderWriterLock: you are attempting to read the value while a write is occuring.  call .readBegin() first" );
-	//     }
-	//     return this._value;// as Readonly<TValue>;
-	// }
-
-	/** returns true if a write is pending (in progress or queued). if false, you can read without being blocked. */
-	public isWritePending() {
-		return this._pendingWrites.length > 0
-	}
-
-
-	/** begin a read lock.   the returned promise resolves once the lock is aquired
-	 *
-	 * many simulatanious read locks are allowed, and be sure to call [[readEnd]] for each call of [[readBegin]]
+	/** if the lock sychronizes data, it can be stored here */
+	private _value: TValue
+	private _currentWrite?: IMutablePromise
+	/**
+	 * 
+	 * @param value optional data to synchronize access to
 	 */
-	public async readBegin(): Promise<TValue | undefined> {
-		//let readToken =
-
-		if ( this._pendingWrites.length > 0 ) {
-			//this.pendingReads.push(promise.CreateExposedPromise());
-			this._pendingReadCount++
-			while ( this._pendingWrites.length > 0 ) {
-				await Promise.all( this._pendingWrites )
-			}
-			this._pendingReadCount--
-		}
-		diag.throwCheck( this._pendingWrites.length === 0, "expect writeQueue to be zero length" )
-		diag.throwCheck( this._currentWrite == null, "race, current write should not be possible while start reading" )
-		this._currentReads.push( createMutablePromise() )
-
-		return this._value
+	constructor( value?: TValue ) {
+		this._value = value!
 	}
 
-	/** release your read lock */
+
+	private _tryProcessNext() {
+
+		if ( this._currentWrite?.status().isPending === true ) return
+		if ( this._currentReads.length > 0 && this._pendingTransactions[ 0 ]?.isRead === false ) return
+
+		const nextTrans = this._pendingTransactions.shift()
+		void nextTrans?.promise.then( () => { this._tryProcessNext() } )
+		nextTrans?.promise.resolve()
+
+
+	}
+
+
+	public async read<TReturn>( readFcn: ( value: TValue ) => void | PromiseLike<void> ): Promise<void> {
+		// return Promise.resolve<TReturn>(
+		// 	this.readBegin().then( ( val ) => {
+		// 	return readFcn( val )
+		// } )
+		// ).finally( () => { this.readEnd() } )
+
+
+		const val = await this.readBegin()
+		const toReturn = await readFcn( val )
+		return this.readEnd()
+		//return toReturn
+
+
+	}
+	public async write( writeFcn: ( value: TValue ) => ( TValue | PromiseLike<TValue> ) ): Promise<void> {
+		//console.log( "write:start" )
+		const val = await this.writeBegin()
+		//console.log( "write:writeBegin()->", val )
+		const newVal = await writeFcn( val )
+		//console.log( "write:writeFcn()->", newVal )
+		return this.writeEnd( newVal )
+	}
+
+	public tryReadBegin(): ( { lockAquired: false } | { lockAquired: true; value: TValue } ) {
+
+		if ( this._currentWrite != null || this._pendingTransactions.length > 0 ) {
+			return { lockAquired: false }
+		}
+		this._currentReads.push( createMutablePromise() )
+		return { lockAquired: true, value: this._value }
+	}
+
+	public async readBegin(): Promise<TValue> {
+
+		const fastTry = this.tryReadBegin()
+		if ( fastTry.lockAquired === true ) {
+			return fastTry.value
+		}
+
+		try {
+			//enquue our read in a FIFO order
+			//if ( this._pendingTransactions.length > 0 ) {
+			const readTransaction = createMutablePromise()
+			const toReturn = new Promise<TValue>( ( resolve, reject ) => {
+				void readTransaction.then( () => {
+					diag.throwCheck( this._currentWrite == null, "race, current write should not be possible while start reading" )
+					this._currentReads.push( createMutablePromise() )
+					resolve( this._value )
+				} )
+			} )
+			this._pendingTransactions.push( { promise: readTransaction, isRead: true } )
+			return toReturn
+			//}
+		} finally {
+			this._tryProcessNext()
+		}
+
+
+		// diag.throwCheck( this._currentWrite == null, "race, current write should not be possible while start reading" )
+
+		// this._currentReads.push( createMutablePromise() )
+		// return this._value
+	}
+
 	public readEnd() {
 		diag.throwCheck( this._currentReads.length > 0, "out of current reads, over decremented?" )
 		diag.throwCheck( this._currentWrite == null, "race, current write should not be possible while reading" )
-		const readToken = this._currentReads.pop()
-		if ( readToken != null ) {
-			readToken.resolve()
-		}
+		this._currentReads.pop()!.resolve()
+		this._tryProcessNext()
 	}
 
-	/** returns true, if able to instantly obtain a write lock, false if any reads or writes are in progress */
-	public tryWriteBegin(): boolean {
-		if ( this._pendingWrites.length > 0 || this._currentReads.length > 0 ) {
-			return false
+	public tryWriteBegin(): ( { lockAquired: false } | { lockAquired: true; value: TValue } ) {
+
+		if ( this._currentReads.length > 0 || this._currentWrite != null || this._pendingTransactions.length > 0 ) {
+			return { lockAquired: false }
 		}
-
-		//do sync writeBegin
-		diag.throwCheck( this._currentWrite == null, "race, current write should not be possible while start writing (tryWriteBegin)" )
-		const writeId = this._writeCounter++
-		const thisWrite = { promise: createMutablePromise(), writeId }
-		this._pendingWrites.push( thisWrite )
-		this._currentWrite = thisWrite
-		diag.throwCheck( this._currentWrite === this._pendingWrites[ 0 ], "current write should be at head of queue.  (tryWriteBegin)" )
-
-		return true
+		this._currentWrite = createMutablePromise()
+		return { lockAquired: true, value: this._value }
 	}
 
-	/** take a write lock.   returned promise resolves once your lock is aquired. */
-	public async writeBegin() {
-		const writeId = this._writeCounter++
-		const thisWrite = { promise: createMutablePromise(), writeId }
-		this._pendingWrites.push( thisWrite )
-		//wait until it's this write's turn
-		while ( this._pendingWrites[ 0 ].writeId !== writeId ) {
-			await this._pendingWrites[ 0 ]
+	public async writeBegin(): Promise<TValue> {
+
+		const fastTry = this.tryWriteBegin()
+		if ( fastTry.lockAquired === true ) {
+			return fastTry.value
 		}
-		//wait while there are still active reads
-		while ( this._currentReads.length > 0 ) {
-			await Promise.all( this._currentReads )
-		}
-		//now on the item
-		diag.throwCheck( this._currentWrite == null, "race, current write should not be possible while start writing" )
-		this._currentWrite = thisWrite
-		diag.throwCheck( this._currentWrite === this._pendingWrites[ 0 ], "current write should be at head of queue.  (writeBegin)" )
-	}
-
-	/** finish the write lock, allowing writing of the stored [[value]] when doing so */
-	public async writeEnd(
-		/**write the data [[value]], or if a promise is passed, an exclusive write lock will be held until it exits*/
-		valueOrWritePromise: TValue | PromiseLike<TValue> ) {
-
-
 
 		try {
-
-			// //log.assertIf( thisWrite._tags.writeId === writeId, "writeId mismatch" );
-			// // tslint:disable-next-line: no-unbound-method
-			// if ( valueOrWritePromise instanceof bb || ( _.isObject( valueOrWritePromise ) && _.isFunction( ( valueOrWritePromise as any as bb<any> ).then ) ) ) {
-			// 	this._value = await bb.resolve( valueOrWritePromise );
-			// } else {
-			// 	this._value = valueOrWritePromise as any;
-			// }
-			this._value = await Promise.resolve( valueOrWritePromise )
+			const writeTransaction = createMutablePromise()
+			const toReturn = new Promise<TValue>( ( resolve, reject ) => {
+				void writeTransaction.then( () => {
+					diag.throwCheck( this._currentReads.length === 0, "should be no reads" )
+					diag.throwCheck( this._currentWrite == null, "should be no other writes" )
+					this._currentWrite = createMutablePromise()
+					resolve( this._value )
+				} )
+			} )
+			this._pendingTransactions.push( { promise: writeTransaction, isRead: false } )
+			return toReturn
 		} finally {
+			this._tryProcessNext()
+		}
+
+	}
+
+	public async writeEnd( value: TValue | PromiseLike<TValue> ) {
+		try {
 			diag.throwCheck( this._currentWrite != null, "race, current write should be set" )
-			diag.throwCheck( this._currentWrite === this._pendingWrites[ 0 ], "current write should be at head of queue.  (writeEnd)" )
-			const thisWrite = this._pendingWrites.shift()
+			diag.throwCheck( this._currentReads.length === 0, "should be no reads" )
+			this._value = await Promise.resolve( value )
+			const curWrite = this._currentWrite!
 			this._currentWrite = undefined
-			thisWrite?.promise.resolve()
-		}
-
-	}
-
-	/** hold a non-exclusive read lock for the duration of the promise. */
-	public async read(/** until this promise returns, a non-exclusive read lock will be held*/ readFcn?: ( value?: TValue ) => ( PromiseLike<ANY> | ANY ) ) {
-
-		if ( readFcn == null && this._currentWrite == null ) {
-			//high performance scenario where we just return the value without doing awaits
-			return this._value
-		}
-		await this.readBegin()
-
-		try {
-			if ( readFcn != null ) {
-
-				//await Promise.resolve( this._value ).then( readFcn );
-				await Promise.resolve( readFcn( this._value ) )
-			}
-			return this._value
+			curWrite.resolve()
 		} finally {
-			this.readEnd()
+			this._tryProcessNext()
 		}
 	}
-	/** hold an exclusive write lock for the duration of the promise. */
-	public async write(/**write the data, or if a promise is passed, an exclusive write lock will be held until it exits*/ valueOrWritePromise: TValue | PromiseLike<TValue> ) {
-
-		let toWrite: TValue
-		await this.writeBegin()
-		return this.writeEnd( valueOrWritePromise )
 
 
-	}
 
 
 }
+
 
 
 export interface IAutoscalerOptions {

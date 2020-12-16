@@ -7,13 +7,16 @@
 
 declare type ANY = typeof any
 
+declare type Numeric = { valueOf(): number }
+
+
 
 /** jest style test scafolding.  converted into mocha for the browser by the ```./_internal/browser-mocha-test-launcher``` file */
 declare function describe( name: string, fn: Function ): void
 /** jest style test scafolding.  converted into mocha for the browser by the ```./_internal/browser-mocha-test-launcher``` file */
 declare function it( name: string, fn?: ( cb: IDoneCallback ) => ANY, timeout?: number ): void
 /** jest style test scafolding.  converted into mocha for the browser by the ```./_internal/browser-mocha-test-launcher``` file */
-declare function beforeAll(fn:Function, timeout?:number):void
+declare function beforeAll( fn: Function, timeout?: number ): void
 
 
 interface IDoneCallback {
