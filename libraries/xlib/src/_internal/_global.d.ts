@@ -7,8 +7,6 @@
 
 declare type ANY = typeof any
 
-declare type Numeric = { valueOf(): number }
-
 
 
 /** jest style test scafolding.  converted into mocha for the browser by the ```./_internal/browser-mocha-test-launcher``` file */

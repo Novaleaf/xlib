@@ -16,7 +16,7 @@ const logger = pino()
 
 logger.info( "info from pino NET" )
 
-describe( "xlib.net unit tests", () => {
+describe( __filename, () => {
 	// describe( "ky", () => {
 	// 	it( "basic network connectivity roundtrip", async () => {
 	// 		const resp = await net.ky.get( "https://httpbin.org/base64/aGVsbG8gZnJvbSB0aGUgaW50ZXJuZXQ=" )
@@ -33,23 +33,41 @@ describe( "xlib.net unit tests", () => {
 	// } )
 
 
-	// describe( "gaxios", () => {
-	// 	it( "basic network connectivity roundtrip", async () => {
+	describe( "xlib.net.gaxios", () => {
+		it( "basic network connectivity roundtrip", async () => {
 
-	// 		const reqProm = net.gaxios.request<string>( {
-	// 			url: "https://httpbin.org/base64/aGVsbG8gZnJvbSB0aGUgaW50ZXJuZXQ=",
-	// 		} )
+			const reqProm = net.gaxios.request<string>( {
+				url: "https://httpbin.org/base64/aGVsbG8gZnJvbSB0aGUgaW50ZXJuZXQ=",
+			} )
 
-	// 		const resp = await reqProm
-	// 		const result = resp.data
-	// 		if ( result !== "hello from the internet" ) {
-	// 			// eslint-disable-next-line no-restricted-globals
-	// 			throw Error( "did not match" )
-	// 		}
-	// 		//expect( result ).toEqual(  )
+			const resp = await reqProm
+			const result = resp.data
+			if ( result !== "hello from the internet" ) {
+				// eslint-disable-next-line no-restricted-globals
+				throw Error( "did not match" )
+			}
+			//expect( result ).toEqual(  )
 
-	// 	} )
-	// } )
+		} )
+	} )
 
-	it( "should success", () => { } )
+	
+	describe( "xlib.net.RemoteHttpEndpoint", () => {
+		it( "basic network connectivity roundtrip", async () => {
+
+			const reqProm = net.gaxios.request<string>( {
+				url: "https://httpbin.org/base64/aGVsbG8gZnJvbSB0aGUgaW50ZXJuZXQ=",
+			} )
+
+			const resp = await reqProm
+			const result = resp.data
+			if ( result !== "hello from the internet" ) {
+				// eslint-disable-next-line no-restricted-globals
+				throw Error( "did not match" )
+			}
+			//expect( result ).toEqual(  )
+
+		} )
+	} )
+
 } )

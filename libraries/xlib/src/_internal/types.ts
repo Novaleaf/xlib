@@ -33,3 +33,9 @@ export type PropsRemove<TTarget, TPropToRemove = never> = Pick<TTarget, _PropsRe
  * ***BUG NOTE*** due to a bug in Typescript, this does not work on types with index signatures.  See: https://github.com/Microsoft/TypeScript/issues/30293   As a **workaround**,  usually with this ```PropsUnion``` type you can remove your index signature.  But if you still need it and control the object, move your index sig to a explicit property (like a ```tags``` collection)
 */
 export type PropsUnion<TPri, TSec> = TPri & PropsUnique<TSec, TPri>;
+
+declare type Numeric = { valueOf(): number }
+
+type DeepPartial<T> = {
+	[ P in keyof T ]?: DeepPartial<T[ P ]>
+}

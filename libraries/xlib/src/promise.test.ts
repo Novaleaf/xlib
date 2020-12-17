@@ -55,16 +55,39 @@ describe( __filename, () => {
 					//log.info( { msg: "retrying", tries } )
 					tries++
 					if ( tries <= 10 ) {
+						//cause a retry
 						return Promise.reject()
 					}
 					return Promise.resolve()
 				} )
 			} catch ( err ) {
-				log.assert( xlib.reflection.getTypeName( err ) === promise.RetryExceededError.name, { msg: `expected to get back typeof ${ promise.RetryExceededError.name }`, err } )
+				log.assert( xlib.reflection.getTypeName( err ) === promise.RetryStopError.name, { msg: `expected to get back typeof ${ promise.RetryStopError.name }`, err } )
 				//log.info( err )
 			}
 
 			log.assert( tries === 10, { tries } )
+
+		} )
+		it( "throw RetryStopError causes abort", async () => {
+
+			let tries = 0
+
+			try {
+				await promise.retry( { maxRetries: 9 }, () => {
+					//log.info( { msg: "retrying", tries } )
+					tries++
+					if ( tries <= 5 ) {
+						//cause a retry
+						return Promise.reject()
+					}
+					return Promise.reject( new promise.RetryStopError( "custom abort" ) )
+				} )
+			} catch ( err ) {
+				log.assert( xlib.reflection.getTypeName( err ) === promise.RetryStopError.name && err instanceof promise.RetryStopError && err.message === "custom abort", { msg: `expected to get back typeof ${ promise.RetryStopError.name }`, err } )
+				//log.info( err )
+			}
+
+			log.assert( tries === 6, { tries } )
 
 		} )
 
@@ -232,6 +255,103 @@ describe( __filename, () => {
 
 
 		} )
+
+
+	} )
+
+	describe( "xlib.promise.Autoscaler", () => {
+
+
+		// it("basic autoscale test",async ()=> {
+
+		// 	const chanceOfBusy = 0.01
+		// 	const chanceOfFail = 0.01
+		// 	const replyDelay = 30
+		// 	const replyDelaySpread = 30
+
+		// 	/** how often our backendWorker reports too busy */
+		// 	interface ITestAutoscaleOptions { chanceOfBusy: number; }
+		// 	class TestAutoScaleError extends xlib.diagnostics.exception.XlibException {
+		// 		public shouldRejectBusy: boolean;
+		// 		constructor( message: string, options: xlib.diagnostics.IExceptionOptions & { shouldRejectBusy: boolean; } ) {
+		// 			super( message, options )
+		// 			this.shouldRejectBusy = options.shouldRejectBusy
+		// 		}
+
+
+		// 	}
+
+		// 	const testScaler = new xlib.threading.Autoscaler( { busyGrowDelayMs: 100, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 30, growDelayMs: 5, minParallel: 4 },
+		// 		async ( _chanceOfBusy: number, _chanceOfFail: number, _replyDelay: number, _replyDelaySpread: number ) => {
+		// 			//this is the "backendWorker" that is being autoscaled
+		// 			const delay = _replyDelay + __.num.randomInt( 0, _replyDelaySpread )
+		// 			await __.bb.delay( _replyDelay )
+		// 			const isBusy = __.num.randomBool( _chanceOfBusy )
+		// 			if ( isBusy ) {
+		// 				return xlib.promise.bluebird.reject( new TestAutoScaleError( "backend busy", { shouldRejectBusy: true } ) )
+		// 			}
+		// 			const isFail = __.num.randomBool( _chanceOfFail )
+		// 			if ( isFail ) {
+		// 				return __.bb.reject( new TestAutoScaleError( "backend failure", { shouldRejectBusy: false } ) )
+		// 			}
+		// 			return xlib.promise.bluebird.resolve( "backend success" )
+		// 		},
+		// 		( ( err: TestAutoScaleError ) => {
+		// 			if ( err.shouldRejectBusy === true ) {
+		// 				return "TOO_BUSY"
+		// 			}
+
+		// 			return "FAIL"
+		// 		} ) )
+
+
+		// 	const awaitsArray: Array<Promise<string>> = []
+		// 	for ( let i = 0; i < 1000; i++ ) {
+		// 		const toAwait = testScaler.submitRequest( chanceOfBusy, chanceOfFail, replyDelay, replyDelaySpread )
+		// 		toAwait.catch( () => Promise.resolve() )//mark this promise as being "handled"
+		// 		awaitsArray.push( toAwait )
+
+		// 	}
+
+		// 	const handle = setInterval( () => {
+		// 		__.log.info( "while testing autoscaler, log it's internal state every 1000ms", testScaler.toJson() )
+		// 	}, 1000 )
+
+		// 	try {
+		// 		//wait for all
+
+		// 		// await xlib.promise.bluebird.each( awaitsArray, ( toInspect ) => {
+
+
+		// 		//  } );
+		// 		for ( const toInspectPromise of awaitsArray ) {
+		// 			// 	try {
+		// 			// 		const result = await awaitsArray[ i ];
+		// 			// 		__.log.throwIf( result === "backend success" );
+		// 			// 	} catch ( _err ) {
+		// 			// 		const err = xlib.diagnostics.toError( _err );
+		// 			// 		__.log.throwIf( err instanceof TestAutoScaleError );
+		// 			// 		__.log.throwIf( err.message === "backend failure" );
+		// 			// 	}
+
+
+		// 			const { toInspect } = await xlib.promise.awaitInspect( toInspectPromise ).timeout( ( replyDelay + replyDelaySpread ) + 5000, "reply took too long, while this could be because of debugging overhead, should investigate" )
+		// 			__.log.throwCheck( toInspect.isResolved() )
+		// 			if ( toInspect.isFulfilled() ) {
+		// 				__.log.throwCheck( toInspect.value() === "backend success" )
+		// 			} else {
+		// 				const err = xlib.diagnostics.toError( toInspect.reason() )
+		// 				__.log.throwCheck( err instanceof TestAutoScaleError )
+		// 				__.log.throwCheck( err.message === "backend failure" )
+		// 			}
+		// 		}
+		// 	} finally {
+		// 		clearTimeout( handle )
+		// 	}
+
+
+		// } ).timeout( 10000 )  //end it()
+
 
 
 	} )

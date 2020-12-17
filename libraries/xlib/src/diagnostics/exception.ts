@@ -1,4 +1,5 @@
 import * as _ from "lodash"
+import * as types from "../_internal/types"
 
 /* eslint-disable no-restricted-globals */
 /** shape of all errors.   either derived from the ```Error``` object, or Error objects serialized to JSON */
@@ -318,7 +319,6 @@ export interface IErrorToJsonOptions {
 	alwaysShowProperties?: boolean;
 }
 
-import * as types from "../_internal/types"
 
 type ErrorAsJson<TError extends Error> =
 	//IErrorJson & TError; //inaccurate, as it unions all properties (that are actually overridden, not unioned)

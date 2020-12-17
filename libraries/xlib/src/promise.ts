@@ -26,20 +26,24 @@ export interface IRetryOptions {
 	maxJitter?: number;
 
 	expGrowDelay?: number;
+
+	/** if errors occur and all retries are unsuccessful, we default by throwing a {@link RetryExceededError}.  set to true to throw first error returned instead. */
+	throw_original?: boolean;
 }
 
-/** error that is thrown by the [[retry]] method if number of retries is exceeded */
-export class RetryExceededError<TResult> extends diag.exception.XlibException {
+/** error that is thrown by the [[retry]] method if number of retries is exceeded.  You may also manually reject with this to abort execution of the retry() logic */
+export class RetryStopError<TResult> extends diag.exception.XlibException {
 	// constructor( message: string, result: { err?: Error, value?: TResult }, innerError?: Error ) {
 	// 	super( message, { details: { result }, innerError } );
 	// }
 }
 /**
- * retries a failed promise untill success or exit condition occurs
+ * retries a failed promise untill success or exit condition occurs.
+ * to abort early, throw or reject with an { @link xlib.promise.RetryStopError }
  * @param options 
  * @param fn 
  */
-export async function retry<TResult, TPromise extends PromiseLike<TResult>>( options: IRetryOptions, fn: () => TPromise ): Promise<TResult> {
+export async function retry<TResult>( options: IRetryOptions, fn: () => PromiseLike<TResult> ): Promise<TResult> {
 
 	options = {
 		//default implementation
@@ -56,10 +60,17 @@ export async function retry<TResult, TPromise extends PromiseLike<TResult>>( opt
 	///
 	let attempts = 0
 	let lastDelayMs = 0
+	/** used if the options.throw_original is set to true */
+	let firstRejectedResult: ANY
 
 	/** decide if should retry, and if should delay, does so */
 	async function shouldRetry() {
-		if ( attempts > options.maxRetries ) throw new RetryExceededError( `too many attempts.   maxRetries=${ options.maxRetries }  attempts=${ attempts }` )
+		if ( attempts > options.maxRetries ) {
+			if ( options.throw_original === true ) {
+				return Promise.reject( firstRejectedResult )
+			}
+			return Promise.reject( new RetryStopError( `too many attempts.   maxRetries=${ options.maxRetries }  attempts=${ attempts }` ) )
+		}
 
 		//calc delay amount
 		let delayMs = Math.max( options.minDelay!, lastDelayMs )
@@ -104,13 +115,19 @@ export async function retry<TResult, TPromise extends PromiseLike<TResult>>( opt
 				return promise
 			} else {
 				//try again
+				firstRejectedResult = firstRejectedResult ?? result
 				continue
 			}
 		} catch ( err ) {
+			if ( err instanceof RetryStopError ) {
+				//if caller rejects with a stopError, abort
+				return Promise.reject( err )
+			}
 			if ( options.acceptResult!( { isSuccess: false, err, promise } ) ) {
 				return promise
 			} else {
 				//try again
+				firstRejectedResult = firstRejectedResult ?? err
 				continue
 			}
 		}
@@ -434,7 +451,7 @@ export interface IAutoscalerOptions {
 	// heartbeatMs?: number,
 }
 
-export class Autoscaler<TResult, TWorkerFunc extends () => PromiseLike<TResult>>{
+export class Autoscaler<TResult, TWorkerFunc extends ( ...args: any[] ) => PromiseLike<TResult>>{
 
 
 	private _metrics: {
