@@ -1,6 +1,7 @@
 dependencies:
   '@types/pino': 6.3.3
   '@types/uuid': 8.3.0
+  base64url: 3.0.1
   chalk: 4.1.0
   gaxios: 4.0.1
   lodash: 4.17.20
@@ -2007,6 +2008,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-mLQ4i2QO1ytvGWFWmcngKO//JXAQueZvwEKtjgQFM4jIK0kU+ytMfplL8j+n5mspOfjHwoAg+9yhb7BwAHm36g==
+  /base64url/3.0.1:
+    dev: false
+    engines:
+      node: '>=6.0.0'
+    resolution:
+      integrity: sha512-ir1UPr3dkwexU7FdV8qBBbNDRUhMmIekYMFZfi+C/sLNnRESKPl23nB9b2pltqfOQNnGzsDdId90AEtG5tCx4A==
   /batch/0.6.1:
     dev: true
     resolution:
@@ -9476,6 +9483,7 @@ specifiers:
   '@types/uuid': ^8.3.0
   '@types/webpack': 4.41.24
   '@types/webpack-dev-server': 3.11.1
+  base64url: ^3.0.1
   chalk: ^4.1.0
   css-loader: ^4.3.0
   eslint: 7.13.0

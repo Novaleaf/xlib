@@ -262,95 +262,109 @@ describe( __filename, () => {
 	describe( "xlib.promise.Autoscaler", () => {
 
 
-		// it("basic autoscale test",async ()=> {
+		it( "basic autoscale test", async () => {
 
-		// 	const chanceOfBusy = 0.01
-		// 	const chanceOfFail = 0.01
-		// 	const replyDelay = 30
-		// 	const replyDelaySpread = 30
+			const chanceOfBusy = 0.01
+			const chanceOfFail = 0.01
+			const replyDelay = 30
+			const replyDelaySpread = 30
 
-		// 	/** how often our backendWorker reports too busy */
-		// 	interface ITestAutoscaleOptions { chanceOfBusy: number; }
-		// 	class TestAutoScaleError extends xlib.diagnostics.exception.XlibException {
-		// 		public shouldRejectBusy: boolean;
-		// 		constructor( message: string, options: xlib.diagnostics.IExceptionOptions & { shouldRejectBusy: boolean; } ) {
-		// 			super( message, options )
-		// 			this.shouldRejectBusy = options.shouldRejectBusy
-		// 		}
-
-
-		// 	}
-
-		// 	const testScaler = new xlib.threading.Autoscaler( { busyGrowDelayMs: 100, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 30, growDelayMs: 5, minParallel: 4 },
-		// 		async ( _chanceOfBusy: number, _chanceOfFail: number, _replyDelay: number, _replyDelaySpread: number ) => {
-		// 			//this is the "backendWorker" that is being autoscaled
-		// 			const delay = _replyDelay + __.num.randomInt( 0, _replyDelaySpread )
-		// 			await __.bb.delay( _replyDelay )
-		// 			const isBusy = __.num.randomBool( _chanceOfBusy )
-		// 			if ( isBusy ) {
-		// 				return xlib.promise.bluebird.reject( new TestAutoScaleError( "backend busy", { shouldRejectBusy: true } ) )
-		// 			}
-		// 			const isFail = __.num.randomBool( _chanceOfFail )
-		// 			if ( isFail ) {
-		// 				return __.bb.reject( new TestAutoScaleError( "backend failure", { shouldRejectBusy: false } ) )
-		// 			}
-		// 			return xlib.promise.bluebird.resolve( "backend success" )
-		// 		},
-		// 		( ( err: TestAutoScaleError ) => {
-		// 			if ( err.shouldRejectBusy === true ) {
-		// 				return "TOO_BUSY"
-		// 			}
-
-		// 			return "FAIL"
-		// 		} ) )
+			/** how often our backendWorker reports too busy */
+			interface ITestAutoscaleOptions { chanceOfBusy: number; }
+			class TestAutoScaleError extends xlib.diagnostics.exception.XlibException {
+				public shouldRejectBusy: boolean;
+				constructor( message: string, options: xlib.diagnostics.exception.IExceptionOptions & { shouldRejectBusy: boolean; } ) {
+					super( message, options )
+					this.shouldRejectBusy = options.shouldRejectBusy
+				}
 
 
-		// 	const awaitsArray: Array<Promise<string>> = []
-		// 	for ( let i = 0; i < 1000; i++ ) {
-		// 		const toAwait = testScaler.submitRequest( chanceOfBusy, chanceOfFail, replyDelay, replyDelaySpread )
-		// 		toAwait.catch( () => Promise.resolve() )//mark this promise as being "handled"
-		// 		awaitsArray.push( toAwait )
+			}
 
-		// 	}
+			const testScaler = new xlib.promise.Autoscaler( { busyGrowDelayMs: 100, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 30, growDelayMs: 5, minParallel: 4 },
+				async ( _chanceOfBusy: number, _chanceOfFail: number, _replyDelay: number, _replyDelaySpread: number ) => {
+					//this is the "backendWorker" that is being autoscaled
+					const delay = _replyDelay + xlib.util.numHelper.randomInt( 0, _replyDelaySpread )
+					await xlib.promise.delay( _replyDelay )
+					const isBusy = xlib.util.numHelper.randomBool( _chanceOfBusy )
+					if ( isBusy ) {
+						return Promise.reject( new TestAutoScaleError( "backend busy", { shouldRejectBusy: true } ) )
+					}
+					const isFail = xlib.util.numHelper.randomBool( _chanceOfFail )
+					if ( isFail ) {
+						return Promise.reject( new TestAutoScaleError( "backend failure", { shouldRejectBusy: false } ) )
+					}
+					return Promise.resolve( "backend success" )
+				},
+				( ( err ) => {
+					if ( err instanceof TestAutoScaleError && err.shouldRejectBusy === true ) {
+						return "TOO_BUSY"
+					}
 
-		// 	const handle = setInterval( () => {
-		// 		__.log.info( "while testing autoscaler, log it's internal state every 1000ms", testScaler.toJson() )
-		// 	}, 1000 )
-
-		// 	try {
-		// 		//wait for all
-
-		// 		// await xlib.promise.bluebird.each( awaitsArray, ( toInspect ) => {
-
-
-		// 		//  } );
-		// 		for ( const toInspectPromise of awaitsArray ) {
-		// 			// 	try {
-		// 			// 		const result = await awaitsArray[ i ];
-		// 			// 		__.log.throwIf( result === "backend success" );
-		// 			// 	} catch ( _err ) {
-		// 			// 		const err = xlib.diagnostics.toError( _err );
-		// 			// 		__.log.throwIf( err instanceof TestAutoScaleError );
-		// 			// 		__.log.throwIf( err.message === "backend failure" );
-		// 			// 	}
+					return "FAIL"
+				} ) )
 
 
-		// 			const { toInspect } = await xlib.promise.awaitInspect( toInspectPromise ).timeout( ( replyDelay + replyDelaySpread ) + 5000, "reply took too long, while this could be because of debugging overhead, should investigate" )
-		// 			__.log.throwCheck( toInspect.isResolved() )
-		// 			if ( toInspect.isFulfilled() ) {
-		// 				__.log.throwCheck( toInspect.value() === "backend success" )
-		// 			} else {
-		// 				const err = xlib.diagnostics.toError( toInspect.reason() )
-		// 				__.log.throwCheck( err instanceof TestAutoScaleError )
-		// 				__.log.throwCheck( err.message === "backend failure" )
-		// 			}
-		// 		}
-		// 	} finally {
-		// 		clearTimeout( handle )
-		// 	}
+			const awaitsArray: Array<Promise<string>> = []
+			for ( let i = 0; i < 1000; i++ ) {
+				const toAwait = testScaler.submitRequest( chanceOfBusy, chanceOfFail, replyDelay, replyDelaySpread )
+				toAwait.catch( () => Promise.resolve() )//mark this promise as being "handled"
+				awaitsArray.push( toAwait )
+
+			}
+
+			const handle = setInterval( () => {
+				log.info( testScaler.toJson(), "while testing autoscaler, log it's internal state every 1000ms" )
+			}, 100 )
+
+			try {
+				//wait for all
+
+				// await xlib.promise.bluebird.each( awaitsArray, ( toInspect ) => {
 
 
-		// } ).timeout( 10000 )  //end it()
+				//  } );
+				for ( const toInspectPromise of awaitsArray ) {
+					// 	try {
+					// 		const result = await awaitsArray[ i ];
+					// 		__.log.throwIf( result === "backend success" );
+					// 	} catch ( _err ) {
+					// 		const err = xlib.diagnostics.toError( _err );
+					// 		__.log.throwIf( err instanceof TestAutoScaleError );
+					// 		__.log.throwIf( err.message === "backend failure" );
+					// 	}
+
+
+					//const { toInspect } = await xlib.promise.exposeStatus( toInspectPromise ).timeout( ( replyDelay + replyDelaySpread ) + 5000, "reply took too long, while this could be because of debugging overhead, should investigate" )
+
+
+					const timeoutPromise = xlib.promise.timeout( ( replyDelay + replyDelaySpread ) + 5000, toInspectPromise, "reply took too long, while this could be because of debugging overhead, should investigate" )
+					try {
+						const result = await timeoutPromise
+						xlib.diagnostics.throwCheck( result === "backend success" )
+					} catch ( err ) {
+						if ( err instanceof promise.TimeoutRejectError ) throw err
+						xlib.diagnostics.throwCheck( err instanceof TestAutoScaleError && err.message === "backend failure" )
+					}
+
+					// const toInspect = await promise.exposeStatus( timeoutPromise )
+					// const status = 
+
+					// __.log.throwCheck( toInspect.isResolved() )
+					// if ( toInspect.isFulfilled() ) {
+					// 	__.log.throwCheck( toInspect.value() === "backend success" )
+					// } else {
+					// 	const err = xlib.diagnostics.exception.toError( toInspect.reason() )
+					// 	xlib.diagnostics.throwCheck( err instanceof TestAutoScaleError )
+					// 	xlib.diagnostics.throwCheck( err.message === "backend failure" )
+					// }
+				}
+			} finally {
+				clearTimeout( handle )
+			}
+
+
+		}, 10000 )  //end it()
 
 
 

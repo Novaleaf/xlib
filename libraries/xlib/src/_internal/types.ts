@@ -34,7 +34,6 @@ export type PropsRemove<TTarget, TPropToRemove = never> = Pick<TTarget, _PropsRe
 */
 export type PropsUnion<TPri, TSec> = TPri & PropsUnique<TSec, TPri>;
 
-declare type Numeric = { valueOf(): number }
 
 type DeepPartial<T> = {
 	[ P in keyof T ]?: DeepPartial<T[ P ]>

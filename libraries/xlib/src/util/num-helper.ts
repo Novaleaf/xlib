@@ -365,7 +365,7 @@ export function parseFloat( toParse: any,/** invalid strings are returned as thi
 
     let result: number
     if ( isStrict === true ) {
-        if ( /^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/
+        if ( /^(-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/
             .test( toParse ) ) {
             result = Number( toParse )
         } else {

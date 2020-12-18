@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 
 
 // tslint:disable: no-bitwise
@@ -377,10 +378,11 @@ export function tryRemoveBom( str: string ): string {
 copied from http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
 */
 export function escapeRegExp( str: string ): string {
-    return str.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&" )
+    return str.replace( /[-[\]/{}()*+?.\\^$|]/g, "\\$&" )
 }
 
 
+import base64url from "base64url"
 /**
  *  Converting to, and from, base64url https://en.wikipedia.org/wiki/Base64#RFC_4648
 example:   base64=```'qL8R4QIcQ/ZsRqOAbeRfcZhilN/MksRtDaErMA=='``` base64Url=```'qL8R4QIcQ_ZsRqOAbeRfcZhilN_MksRtDaErMA'```
@@ -425,7 +427,11 @@ Example
 <Buffer 73 70 69 72 69 74 75 61 6c 69 7a 65 64>
     ```*/
     toBuffer( b64UrlEncoded: string ): Buffer;
-} = require( "base64url" )
+} = base64url
+
+
+
+//export const base64Url = _base64Url.default
 
 /**
  *  base64 encode and decode functions
@@ -473,7 +479,7 @@ export namespace base64 {
 export function hash( input: string ): number {
     /* tslint:disable */
     let hash = 0, i, c, l
-    if ( input.length == 0 ) { return hash }
+    if ( input.length === 0 ) { return hash }
     for ( i = 0, l = input.length; i < l; i++ ) {
         c = input.charCodeAt( i )
         hash = ( ( hash << 5 ) - hash ) + c

@@ -12,6 +12,16 @@ export function delay( ms: number ): Promise<void> {
 	} )
 }
 
+/** returns a new promise that will reject with a {@link TimeoutRejectError} if the initial promise does not resolve in the required timeframe
+ * Important:  if a timeout occurs, the initial promise is not aborted.  It may later resolve successfully even though it won't be listened to.
+ */
+export function timeout<TResult>( ms: Numeric, initial: PromiseLike<TResult>, rejectMessage = `xlib.promise.timeout(${ ms.valueOf() }) exceeded` ): Promise<TResult> {
+	return Promise.race( [ initial, delay( ms.valueOf() ).then( () => { return Promise.reject( new TimeoutRejectError( rejectMessage ) ) } ) ] )
+}
+
+/** rejection raised by {@ timeout} */
+export class TimeoutRejectError extends diag.exception.XlibException { }
+
 /** options passes to the retry method
  * @see retry  */
 export interface IRetryOptions {
@@ -158,7 +168,12 @@ interface IPromiseStatus<TResult> {
 	result?: TResult;
 	error?: Error;
 }
-
+/** 
+ * @deprecated 
+ * use {@link exposeStatus} instead 
+ * @obsolete
+ * */
+export const awaitInspect = exposeStatus
 
 /** adds a ```.status()``` property to your existing promise, allowing inspection of it's current state.   If the promise already has a ```status``` property, an XlibException is thrown. */
 export function exposeStatus<TResult>( promise: PromiseLike<TResult> ): IInspectablePromise<TResult> {
@@ -194,6 +209,11 @@ export function exposeStatus<TResult>( promise: PromiseLike<TResult> ): IInspect
 	return toReturn
 
 }
+
+// /** allows awaiting on a promise without throwing in the case of an error  */
+// export function awaitResult<TResult>( promise: PromiseLike<TResult> ): IInspectablePromise<TResult>{
+
+// }
 
 
 

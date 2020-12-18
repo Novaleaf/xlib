@@ -203,7 +203,9 @@ interface ILogObj {
 // }
 
 /** @internal helper to throw a XlibException if the condition !==true */
-export function throwCheck( condition: boolean, errorMsg: string ) {
+export function throwCheck( condition: boolean, errorMsg?: string ) {
+
+	errorMsg = errorMsg ?? "xlib.diagnostics.throwCheck(false) input condition was false.  Inspect callsite (see error's callstack)"
 
 	if ( condition !== true ) {
 		throw new exception.XlibException( errorMsg, { stackFramesToTruncate: 1 } )

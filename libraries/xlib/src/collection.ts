@@ -11,7 +11,7 @@ export class ExpiresMap<K, V> extends Map<K, V>{
 
 	constructor(
 		/** how long in Ms before an entity expires */
-		public expireMs: number | { valueOf(): number; },
+		public expireMs: Numeric,
 		/** optionally allows pre-populating the map. these are still subject to expiration   */
 		entries?: Iterable<[ K, V ]>
 	) {
@@ -24,7 +24,9 @@ export class ExpiresMap<K, V> extends Map<K, V>{
 
 	}
 
-	public set( key: K, value: V ): this {
+	public set( key: K, value: V, customExpireMs?: Numeric ): this {
+
+		customExpireMs = customExpireMs || this.expireMs
 
 		//remove existing handle, if any
 		{
@@ -43,7 +45,7 @@ export class ExpiresMap<K, V> extends Map<K, V>{
 				clearTimeout( handle )
 				this._handleMap.delete( key )
 				this.delete( key )
-			}, this.expireMs.valueOf() )
+			}, customExpireMs.valueOf() )
 			this._handleMap.set( key, handle )
 		}
 
