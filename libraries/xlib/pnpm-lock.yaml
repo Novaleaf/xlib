@@ -1,5 +1,6 @@
 dependencies:
   '@types/pino': 6.3.3
+  '@types/uuid': 8.3.0
   chalk: 4.1.0
   gaxios: 4.0.1
   lodash: 4.17.20
@@ -8,6 +9,7 @@ dependencies:
   platform: 1.3.6
   source-map-support: 0.5.19
   threads: 1.6.3
+  uuid: 8.3.2
 devDependencies:
   '@babel/types': 7.12.6
   '@novaleaf/eslint-config': 0.0.1
@@ -1080,6 +1082,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-KswB5C7Kwduwjj04Ykz+AjvPcfgv/37Za24O2EDzYNbwyzOo8+ydtvzUfZ5UMguiVu29Gx44l1A6VsPPcmYu9w==
+  /@types/uuid/8.3.0:
+    dev: false
+    resolution:
+      integrity: sha512-eQ9qFW/fhfGJF8WKHGEHZEyVWfZxrT+6CLIJGBcZPfxUh/+BnEj+UCGYMlr9qZuX/2AltsvwrGqp0LhEW8D0zQ==
   /@types/webpack-dev-server/3.11.1:
     dependencies:
       '@types/connect-history-api-fallback': 1.3.3
@@ -8966,6 +8972,11 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
+  /uuid/8.3.2:
+    dev: false
+    hasBin: true
+    resolution:
+      integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
   /v8-compile-cache/2.1.1:
     dev: true
     resolution:
@@ -9462,6 +9473,7 @@ specifiers:
   '@types/node': 14.0.27
   '@types/pino': 6.3.3
   '@types/platform': ^1.3.3
+  '@types/uuid': ^8.3.0
   '@types/webpack': 4.41.24
   '@types/webpack-dev-server': 3.11.1
   chalk: ^4.1.0
@@ -9481,6 +9493,7 @@ specifiers:
   threads: ^1.6.3
   threads-plugin: ^1.3.3
   ts-node: ^9.0.0
+  uuid: ^8.3.2
   webpack: 4.44.2
   webpack-cli: ^3.3.12
   webpack-dev-server: ^3.11.0
