@@ -11,10 +11,10 @@ import net = xlib.net;
 
 // console.log( "in net tests" )
 
-import pino from "pino"
-const logger = pino()
+// import pino from "pino"
+// const logger = pino()
 
-logger.info( "info from pino NET" )
+// logger.info( "info from pino NET" )
 
 describe( __filename, () => {
 	// describe( "ky", () => {
@@ -51,7 +51,7 @@ describe( __filename, () => {
 		} )
 	} )
 
-	
+
 	describe( "xlib.net.RemoteHttpEndpoint", () => {
 		it( "basic network connectivity roundtrip", async () => {
 

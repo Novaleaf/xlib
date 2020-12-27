@@ -145,7 +145,7 @@ export function getDomElement( elementType: string,
 ////	document.getElementsByTagName("head")[0].appendChild(link);
 ////}
 
-import { XlibException } from "../diagnostics/exception"
+import { XlibException } from "../exception"
 /** cached query so we only get cookies once per pageload*/
 let _parsedCookies: { [ key: string ]: string }
 

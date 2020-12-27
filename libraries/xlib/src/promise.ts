@@ -1,8 +1,11 @@
 
 
 import * as _imports from "./_imports"
-import * as diag from "./diagnostics"
+import * as exception from "./exception"
 import * as _ from "lodash"
+import * as diag from "./diagnostics"
+
+
 
 /** a promise that resolves after an amount of time.   good for delaying execution
  */
@@ -20,7 +23,7 @@ export function timeout<TResult>( ms: Numeric, initial: PromiseLike<TResult>, re
 }
 
 /** rejection raised by {@ timeout} */
-export class TimeoutRejectError extends diag.exception.XlibException { }
+export class TimeoutRejectError extends exception.XlibException { }
 
 /** options passes to the retry method
  * @see retry  */
@@ -42,7 +45,7 @@ export interface IRetryOptions {
 }
 
 /** error that is thrown by the [[retry]] method if number of retries is exceeded.  You may also manually reject with this to abort execution of the retry() logic */
-export class RetryStopError<TResult> extends diag.exception.XlibException {
+export class RetryStopError<TResult> extends exception.XlibException {
 	// constructor( message: string, result: { err?: Error, value?: TResult }, innerError?: Error ) {
 	// 	super( message, { details: { result }, innerError } );
 	// }
@@ -145,7 +148,7 @@ export async function retry<TResult>( options: IRetryOptions, fn: () => PromiseL
 
 	}
 	//too many attempts
-	throw new diag.exception.XlibException( "should not get here" )
+	throw new exception.XlibException( "should not get here" )
 
 
 }
@@ -183,7 +186,7 @@ export function exposeStatus<TResult>( promise: PromiseLike<TResult> ): IInspect
 	const toReturn = promise as IInspectablePromise<TResult>
 
 	if ( toReturn.status != null ) {
-		throw new diag.exception.XlibException( "can not expose promise status because the given promise already has a .status property" )
+		throw new exception.XlibException( "can not expose promise status because the given promise already has a .status property" )
 	}
 
 	const status: IPromiseStatus<TResult> = {
@@ -471,7 +474,7 @@ export interface IAutoscalerOptions {
 	// heartbeatMs?: number,
 }
 
-export class Autoscaler<TResult, TWorkerFunc extends ( ...args: any[] ) => PromiseLike<TResult>>{
+export class Autoscaler<TResult, TWorkerFunc extends ( ...args: ANY[] ) => PromiseLike<TResult>>{
 
 
 	private _metrics: {
@@ -622,7 +625,7 @@ export class Autoscaler<TResult, TWorkerFunc extends ( ...args: any[] ) => Promi
 								requesterPromise.reject( err )
 								break
 							default:
-								throw new diag.exception.XlibException( `Autoscaler error.  failureListener() return value unexpected ("${ verdict }").  must return "TOO_BUSY" or "FAIL".  ` )
+								throw new exception.XlibException( `Autoscaler error.  failureListener() return value unexpected ("${ verdict }").  must return "TOO_BUSY" or "FAIL".  ` )
 						}
 						return Promise.resolve()
 					} )
@@ -640,7 +643,7 @@ export class Autoscaler<TResult, TWorkerFunc extends ( ...args: any[] ) => Promi
 
 		} catch ( _err ) {
 			//throw _err
-			throw new diag.exception.XlibException( "Austoscaler error.  backend error occured.", { innerError: _err } )
+			throw new exception.XlibException( "Austoscaler error.  backend error occured.", { innerError: _err } )
 			//log.error( _err );
 		} finally {
 			this._lastTryCallTime = now

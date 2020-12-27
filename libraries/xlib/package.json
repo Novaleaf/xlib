@@ -78,6 +78,7 @@
     "base64url": "^3.0.1",
     "chalk": "^4.1.0",
     "gaxios": "4.0.1",
+    "isomorphic-webcrypto": "^2.3.6",
     "lodash": "^4.17.20",
     "mathjs": "^8.1.0",
     "pino": "6.7.0",

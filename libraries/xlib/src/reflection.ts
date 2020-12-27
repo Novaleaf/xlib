@@ -6,7 +6,7 @@
 //import stringHelper = require("../stringhelper");
 //import arrayHelper = require("../arrayhelper");
 
-import * as ex from "./diagnostics/exception"
+import * as ex from "./exception"
 
 
 /** primitive types as identified by javascript, plus well known object types */

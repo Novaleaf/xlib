@@ -130,6 +130,13 @@
 				"@typescript-eslint/member-ordering": "off",
 				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  DISABLE THESE RULES ONCE XLIB v18 REACHES BETA STATUS //
 				"@typescript-eslint/no-unused-vars": "off",
+				// "@typescript-eslint/naming-convention": [
+				// 	//https://github.com/typescript-eslint/typescript-eslint/blob/v3.4.0/packages/eslint-plugin/docs/rules/naming-convention.md
+				// 	"error",
+				// 	{
+				// 		"ignoreVoid": true
+				// 	}
+				// ],
 			}
 		}
 	],

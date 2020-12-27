@@ -5,6 +5,7 @@ dependencies:
   base64url: 3.0.1
   chalk: 4.1.0
   gaxios: 4.0.1
+  isomorphic-webcrypto: 2.3.6
   lodash: 4.17.20
   mathjs: 8.1.0
   pino: 6.7.0
@@ -665,6 +666,35 @@ packages:
       webpack-cli: '*'
     resolution:
       integrity: sha512-BSymlU8B0UOXHKOTGlYCMz+5Zl4QRWeZdgfiYZIdFnphKMJ8wepV6wPUI/dDFxw+r3a4JdEnWP32ifXwS4kl4g==
+  /@peculiar/asn1-schema/2.0.27:
+    dependencies:
+      '@types/asn1js': 2.0.0
+      asn1js: 2.0.26
+      pvtsutils: 1.1.1
+      tslib: 2.0.3
+    dev: false
+    resolution:
+      integrity: sha512-1tIx7iL3Ma3HtnNS93nB7nhyI0soUJypElj9owd4tpMrRDmeJ8eZubsdq1sb0KSaCs5RqZNoABCP6m5WtnlVhQ==
+  /@peculiar/json-schema/1.1.12:
+    dependencies:
+      tslib: 2.0.3
+    dev: false
+    engines:
+      node: '>=8.0.0'
+    resolution:
+      integrity: sha512-coUfuoMeIB7B8/NMekxaDzLhaYmp0HZNPEjYRm9goRou8UZIC3z21s0sL9AWoCw4EG876QyO3kYrc61WNF9B/w==
+  /@peculiar/webcrypto/1.1.4:
+    dependencies:
+      '@peculiar/asn1-schema': 2.0.27
+      '@peculiar/json-schema': 1.1.12
+      pvtsutils: 1.1.1
+      tslib: 2.0.3
+      webcrypto-core: 1.1.8
+    dev: false
+    engines:
+      node: '>=10.12.0'
+    resolution:
+      integrity: sha512-gEVxfbseFDV0Za3AmjTrRB+wigEMOejHDzoo571e8/YWD33Ejmk0XPF3+G+VaN8+5C5IWZx4CPvxQZ7mF2dvNA==
   /@rushstack/eslint-config/2.3.0_eslint@7.13.0:
     dependencies:
       '@rushstack/eslint-patch': 1.0.6
@@ -859,6 +889,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==
+  /@types/asn1js/2.0.0:
+    dev: false
+    resolution:
+      integrity: sha512-Jjzp5EqU0hNpADctc/UqhiFbY1y2MqIxBVa2S4dBlbnZHTLPMuggoL5q43X63LpsOIINRDirBjP56DUUKIUWIA==
   /@types/babel__core/7.1.12:
     dependencies:
       '@babel/parser': 7.12.7
@@ -1404,6 +1438,24 @@ packages:
     dev: true
     resolution:
       integrity: sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==
+  /@unimodules/core/6.0.0:
+    dependencies:
+      compare-versions: 3.6.0
+    dev: false
+    optional: true
+    resolution:
+      integrity: sha512-+KCVh+NjU33lkHOFiRfJZR6dDsSF8zCY1CVARMYJbQ7w1epRsalpKnCK08JoNYHQqkPR79d2zQSWMxd20zBvoA==
+  /@unimodules/react-native-adapter/5.7.0:
+    dependencies:
+      invariant: 2.2.4
+      lodash: 4.17.20
+    dev: false
+    optional: true
+    peerDependencies:
+      react-native: '*'
+      react-native-web: ~0.13.7
+    resolution:
+      integrity: sha512-L557/+sc8ZKJVgo1734HF1QNCxrt/fpqdmdNgySJT+kErux/AJNfPq3flsK0fyJduVmniTutYIMyW48cFoPKDA==
   /@webassemblyjs/ast/1.9.0:
     dependencies:
       '@webassemblyjs/helper-module-context': 1.9.0
@@ -1840,6 +1892,10 @@ packages:
       node: '>= 0.4'
     resolution:
       integrity: sha512-OOEk+lkePcg+ODXIpvuU9PAryCikCJyo7GlDG1upleEpQRx6mzL9puEBkozQ5iAx20KV0l3DbyQwqciJtqe5Pg==
+  /asmcrypto.js/0.22.0:
+    dev: false
+    resolution:
+      integrity: sha512-usgMoyXjMbx/ZPdzTSXExhMPur2FTdz/Vo5PVx2gIaBcdAAJNOFlsdgqveM8Cff7W0v+xrf9BwjOV26JSAF9qA==
   /asn1.js/5.4.1:
     dependencies:
       bn.js: 4.11.9
@@ -1855,6 +1911,14 @@ packages:
     dev: true
     resolution:
       integrity: sha512-jxwzQpLQjSmWXgwaCZE9Nz+glAG01yF1QnWgbhGwHI5A6FRIEY6IVqtHhIepHqI7/kyEyQEagBC5mBEFlIYvdg==
+  /asn1js/2.0.26:
+    dependencies:
+      pvutils: 1.0.17
+    dev: false
+    engines:
+      node: '>=6.0.0'
+    resolution:
+      integrity: sha512-yG89F0j9B4B0MKIcFyWWxnpZPLaNTjCj4tkE3fjbAoo0qmpGw0PYYqSbX/4ebnd9Icn8ZgK4K1fvDyEtW1JYtQ==
   /assert-plus/1.0.0:
     dev: true
     engines:
@@ -1923,6 +1987,18 @@ packages:
     dev: true
     resolution:
       integrity: sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
+  /b64-lite/1.4.0:
+    dependencies:
+      base-64: 0.1.0
+    dev: false
+    resolution:
+      integrity: sha512-aHe97M7DXt+dkpa8fHlCcm1CnskAHrJqEfMI0KN7dwqlzml/aUe1AGt6lk51HzrSfVD67xOso84sOpr+0wIe2w==
+  /b64u-lite/1.1.0:
+    dependencies:
+      b64-lite: 1.4.0
+    dev: false
+    resolution:
+      integrity: sha512-929qWGDVCRph7gQVTC6koHqQIpF4vtVaSbwLltFQo44B1bYUquALswZdBKFfrJCPEnsCOvWkJsPdQYZ/Ukhw8A==
   /babel-jest/25.5.1_@babel+core@7.12.9:
     dependencies:
       '@babel/core': 7.12.9
@@ -1998,6 +2074,10 @@ packages:
     dev: true
     resolution:
       integrity: sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
+  /base-64/0.1.0:
+    dev: false
+    resolution:
+      integrity: sha1-eAqZyE59YAJgNhURxId2E78k9rs=
   /base/0.11.2:
     dependencies:
       cache-base: 1.0.1
@@ -2016,6 +2096,11 @@ packages:
     dev: true
     resolution:
       integrity: sha512-mLQ4i2QO1ytvGWFWmcngKO//JXAQueZvwEKtjgQFM4jIK0kU+ytMfplL8j+n5mspOfjHwoAg+9yhb7BwAHm36g==
+  /base64-js/1.5.1:
+    dev: false
+    optional: true
+    resolution:
+      integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
   /base64url/3.0.1:
     dev: false
     engines:
@@ -2549,6 +2634,11 @@ packages:
     dev: true
     resolution:
       integrity: sha1-3dgA2gxmEnOTzKWVDqloo6rxJTs=
+  /compare-versions/3.6.0:
+    dev: false
+    optional: true
+    resolution:
+      integrity: sha512-W6Af2Iw1z4CB7q4uU4hv646dW9GQuBM+YpC0UvUCWSD8w90SJjp+ujJuXaEMtAXBtSqGfMPuFOVn4/+FlaqfBA==
   /complex.js/2.0.11:
     dev: false
     resolution:
@@ -3672,6 +3762,13 @@ packages:
       node: '>= 8.3'
     resolution:
       integrity: sha512-w7KAXo0+6qqZZhovCaBVPSIqQp7/UTcx4M9uKt2m6pd2VB1voyC8JizLRqeEqud3AAVP02g+hbErDu5gu64tlA==
+  /expo-random/10.0.0:
+    dependencies:
+      base64-js: 1.5.1
+    dev: false
+    optional: true
+    resolution:
+      integrity: sha512-7x0fDAZGDUUVhlfZ3lbYIfSYb6TIPq0VglbDRXvAZjvfHgefbCW2/+iZWTDYNA0ZOtzoM5dwWg4Z5fiXuAdsrQ==
   /express/4.17.1:
     dependencies:
       accepts: 1.3.7
@@ -4761,6 +4858,13 @@ packages:
       node: '>= 0.10'
     resolution:
       integrity: sha512-agE4QfB2Lkp9uICn7BAqoscw4SZP9kTE2hxiFI3jBPmXJfdqiahTbUuKGsMoN2GtqL9AxhYioAcVvgsb1HvRbA==
+  /invariant/2.2.4:
+    dependencies:
+      loose-envify: 1.4.0
+    dev: false
+    optional: true
+    resolution:
+      integrity: sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==
   /ip-regex/2.1.0:
     dev: true
     engines:
@@ -5114,6 +5218,23 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-TkMekrEalzFjaqH5yNHMvP2reN8=
+  /isomorphic-webcrypto/2.3.6:
+    dependencies:
+      '@peculiar/webcrypto': 1.1.4
+      asmcrypto.js: 0.22.0
+      b64-lite: 1.4.0
+      b64u-lite: 1.1.0
+      msrcrypto: 1.5.8
+      str2buf: 1.3.0
+      webcrypto-shim: 0.1.6
+    dev: false
+    optionalDependencies:
+      '@unimodules/core': 6.0.0
+      '@unimodules/react-native-adapter': 5.7.0
+      expo-random: 10.0.0
+      react-native-securerandom: 0.1.1
+    resolution:
+      integrity: sha512-d1prB3b0UMWOao5DK3+O2Dr5ZJCakzB5Q+2kCWNkNuM9ln7VB8TSw2SwUjbnErzg7cgsYja+VPQaeBtXEojpew==
   /isstream/0.1.2:
     dev: true
     resolution:
@@ -5596,7 +5717,6 @@ packages:
     resolution:
       integrity: sha512-pZe//GGmwJndub7ZghVHz7vjb2LgC1m8B07Au3eYqeqv9emhESByMXxaEgkUkEqJe87oBbSniGYoQNIBklc7IQ==
   /js-tokens/4.0.0:
-    dev: true
     resolution:
       integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
   /js-yaml/3.14.0:
@@ -5903,7 +6023,6 @@ packages:
   /loose-envify/1.4.0:
     dependencies:
       js-tokens: 4.0.0
-    dev: true
     hasBin: true
     resolution:
       integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==
@@ -6254,6 +6373,10 @@ packages:
   /ms/2.1.2:
     resolution:
       integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
+  /msrcrypto/1.5.8:
+    dev: false
+    resolution:
+      integrity: sha512-ujZ0TRuozHKKm6eGbKHfXef7f+esIhEckmThVnz7RNyiOJd7a6MXj2JGBoL9cnPDW+JMG16MoTUh5X+XXjI66Q==
   /multicast-dns-service-types/1.1.0:
     dev: true
     resolution:
@@ -7333,6 +7456,18 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
+  /pvtsutils/1.1.1:
+    dependencies:
+      tslib: 2.0.3
+    dev: false
+    resolution:
+      integrity: sha512-Evbhe6L4Sxwu4SPLQ4LQZhgfWDQO3qa1lju9jM5cxsQp8vE10VipcSmo7hiJW48TmiHgVLgDtC2TL6/+ND+IVg==
+  /pvutils/1.0.17:
+    dev: false
+    engines:
+      node: '>=6.0.0'
+    resolution:
+      integrity: sha512-wLHYUQxWaXVQvKnwIDWFVKDJku9XDCvyhhxoq8dc5MFdIlRenyPI9eSfEtcvgHgD7FlvCyGAlWgOzRnZD99GZQ==
   /qs/6.5.2:
     dev: true
     engines:
@@ -7403,6 +7538,15 @@ packages:
     dev: true
     resolution:
       integrity: sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
+  /react-native-securerandom/0.1.1:
+    dependencies:
+      base64-js: 1.5.1
+    dev: false
+    optional: true
+    peerDependencies:
+      react-native: '*'
+    resolution:
+      integrity: sha1-8TBiOkEsM4sK+t7bwgTFy7i/IHA=
   /read-pkg-up/1.0.1:
     dependencies:
       find-up: 1.1.2
@@ -8286,6 +8430,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-NbCYdbT/SfJqd35QmzCQoyJr8ks=
+  /str2buf/1.3.0:
+    dev: false
+    resolution:
+      integrity: sha512-xIBmHIUHYZDP4HyoXGHYNVmxlXLXDrtFHYT0eV6IOdEj3VO9ccaF1Ejl9Oq8iFjITllpT8FhaXb4KsNmw+3EuA==
   /stream-browserify/2.0.2:
     dependencies:
       inherits: 2.0.4
@@ -8801,6 +8949,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-i/6DQjL8Xf3be4K/E6Wgpekn5Qasl1usyw++dAA35Ue5orEn65VIxOA+YvNNl9HV3qv70T7CNwjODHZrLwvd1Q==
+  /tslib/2.0.3:
+    dev: false
+    resolution:
+      integrity: sha512-uZtkfKblCEQtZKBF6EBXVZeQNl82yqtDQdv+eck8u7tdPxjLu2/lp5/uPW+um2tpuxINHWy3GhiccY7QgEaVHQ==
   /tsutils/3.17.1:
     dependencies:
       tslib: 1.13.0
@@ -9134,6 +9286,20 @@ packages:
     dev: true
     resolution:
       integrity: sha512-O84QOnr0icsbFGLS0O3bI5FswxzRr8/gHwWkDlQFskhSPryQXvrTMxjxGP4+iWYoauLoBvfDpkrOauZ+0iZpDA==
+  /webcrypto-core/1.1.8:
+    dependencies:
+      '@peculiar/asn1-schema': 2.0.27
+      '@peculiar/json-schema': 1.1.12
+      asn1js: 2.0.26
+      pvtsutils: 1.1.1
+      tslib: 2.0.3
+    dev: false
+    resolution:
+      integrity: sha512-hKnFXsqh0VloojNeTfrwFoRM4MnaWzH6vtXcaFcGjPEu+8HmBdQZnps3/2ikOFqS8bJN1RYr6mI2P/FJzyZnXg==
+  /webcrypto-shim/0.1.6:
+    dev: false
+    resolution:
+      integrity: sha512-0o612s3S5z3IkDSRghIwd3Ul4X8NRmmZDpt6PWGI9gSM+nygVvrfzGjhIh4vwzlOJxYxS0fcFD1wh3yznuVzFg==
   /webidl-conversions/4.0.2:
     dev: true
     resolution:
@@ -9548,6 +9714,7 @@ specifiers:
   eslint: 7.13.0
   gaxios: 4.0.1
   html-webpack-plugin: ^4.5.0
+  isomorphic-webcrypto: ^2.3.6
   lodash: ^4.17.20
   mathjs: ^8.1.0
   mocha: 8.2.1

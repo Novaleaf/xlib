@@ -1,5 +1,5 @@
 import * as _ from "lodash"
-import * as types from "../_internal/types"
+import * as types from "./_internal/types"
 
 /* eslint-disable no-restricted-globals */
 /** shape of all errors.   either derived from the ```Error``` object, or Error objects serialized to JSON */
@@ -239,11 +239,11 @@ export class HttpStatusCodeException extends Exception {
  ```
 */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function toError( ex: any | Error ): Error {
+export function toError( ex: ANY | Error ): Error {
 	return toError_worker( ex, new Set() )
 }
 
-function toError_worker( ex: any | Error, /** prevent infinite recursion */ _innerErrorRecursionTracker: Set<any> ): Error {
+function toError_worker( ex: ANY | Error, /** prevent infinite recursion */ _innerErrorRecursionTracker: Set<ANY> ): Error {
 
 	if ( _innerErrorRecursionTracker.has( ex ) ) {
 		return new Error( "circular reference in innerError" )
@@ -325,7 +325,7 @@ type ErrorAsJson<TError extends Error> =
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	types.PropsUnion<IErrorJson, types.PropsRemove<TError, Function>>;
 
-import * as environment from "../environment"
+import * as environment from "./environment"
 // let t1: ErrorAsJson<MyException>;
 
 /** convert an error and all it's properties to JSON.   */
@@ -334,7 +334,7 @@ export function errorToJson<TError extends Error>( error: TError | IError, optio
 	return errorToJson_worker( error, options, new Set() )
 
 }
-function errorToJson_worker<TError extends Error>( error: TError | IError, options: IErrorToJsonOptions = {}, _circularRefDetection: Set<any> ): ErrorAsJson<TError> {
+function errorToJson_worker<TError extends Error>( error: TError | IError, options: IErrorToJsonOptions = {}, _circularRefDetection: Set<ANY> ): ErrorAsJson<TError> {
 
 	if ( _circularRefDetection.has( error ) ) {
 		return {

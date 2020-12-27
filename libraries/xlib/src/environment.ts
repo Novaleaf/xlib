@@ -1,7 +1,7 @@
 import * as browserHelper from "./_internal/browser-helper"
 import * as nodeHelper from "./_internal/node-helper"
 
-import { XlibException } from "./diagnostics/exception"
+import { XlibException } from "./exception"
 import * as _ from "lodash"
 
 //import { parseEnum } from "./util/enum-helper"

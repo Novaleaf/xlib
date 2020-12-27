@@ -1,8 +1,8 @@
 /* tslint:disable:no-bitwise */
 
-import * as ex from "../diagnostics/exception"
+import * as exception from "./exception"
 
-import * as crypto from "crypto"
+//import * as crypto from "crypto"
 // import crypto = require( "crypto" );
 /** max for a signed 8bit integer. (127) */
 export const INT8_MAX = 127
@@ -14,12 +14,12 @@ export const INT16_MAX = 32767
 export const INT16_MIN = -32768
 export const INT32_MAX = 2147483647
 export const INT32_MIN = -2147483648
-/** largest exact integer supported in javascript.  2^53.  (53 bit mantissa) after this, floating point rounding will occur
+/** largest exact integer supported in javascript.  2^53 -1.  (53 bit mantissa) after this, floating point rounding will occur
 from http://stackoverflow.com/questions/307179/what-is-javascripts-max-int-whats-the-highest-integer-value-a-number-can-go-t */
-export const INT_MAX = 9007199254740992
-/** largest exact integer supported in javascript.  2^53.  (53 bit mantissa) after this, floating point rounding will occur
+export const INT_MAX = 9007199254740991
+/** largest exact integer supported in javascript.  2^53 -1.  (53 bit mantissa) after this, floating point rounding will occur
 from http://stackoverflow.com/questions/307179/what-is-javascripts-max-int-whats-the-highest-integer-value-a-number-can-go-t */
-export const INT_MIN = -9007199254740992
+export const INT_MIN = -9007199254740991
 
 
 
@@ -38,31 +38,6 @@ export function format( value: number,/** default=5 */significantDigits = 5, sep
     return toStringDigitGroupings( value, separatorChar )
 }
 
-import * as uuid from "uuid"
-export { uuid }
-
-
-/** create a deterministic guid by hashing string input.   If you want a random guid, use {@link uuid.v4() } */
-export function guidDeterministic( str: string ) {
-    if ( !str || str.length < 1 ) { // no parameter supplied
-        //return uuid.v4()          // return node-uuid v4() uuid
-        throw new ex.XlibException( "blank/null input.  creating a deterministic guid requires an input string" )
-    }
-    else { // create a consistent (non-random!) UUID
-        const hash = crypto.createHash( "sha256" ).update( str.toString() ).digest( "hex" ).substring( 0, 36 )
-        const chars = hash.split( "" )
-        chars[ 8 ] = "-"
-        chars[ 13 ] = "-"
-        chars[ 14 ] = "4"
-        chars[ 18 ] = "-"
-        chars[ 19 ] = "8"
-        chars[ 23 ] = "-"
-        const guid = chars.join( "" )
-        return guid
-    }
-}
-
-
 
 
 
@@ -70,7 +45,7 @@ export function guidDeterministic( str: string ) {
 /** fast hash a int32, not very great spread */
 export function hash( input: number ): number {
     //from http://stackoverflow.com/questions/9624963/java-simplest-integer-hash
-    if ( !( input <= INT32_MAX && input % 1 === 0 ) ) { throw new ex.XlibException( "must supply integer" ) }
+    if ( !( input <= INT32_MAX && input % 1 === 0 ) ) { throw new exception.XlibException( "must supply integer" ) }
     input ^= ( input >>> 20 ) ^ ( input >>> 12 )
     return input ^ ( input >>> 7 ) ^ ( input >>> 4 )
 }
@@ -81,19 +56,6 @@ export function hash( input: number ): number {
 export function isReal( x: number ): boolean {
     if ( isNaN( x ) || !isFinite( x ) ) { return false }
     return true
-}
-
-export function randomFloat( min_inc = 0.0, max_exc = 1.0 ) {
-    //implementation from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
-    return Math.random() * ( max_exc - min_inc ) + min_inc
-}
-export function randomInt( min_inc = 0, max_exc = INT32_MAX ) {
-    //implementation from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
-    return Math.floor( Math.random() * ( max_exc - min_inc ) ) + min_inc
-}
-export function randomBool(/** the probability that true will be returned.  default 0.5 (50%) */trueChance = 0.5 ): boolean {
-    return Math.random() < trueChance
-    //return randomInt(0, 2) === 0;
 }
 
 export function round( value: number,
@@ -119,104 +81,6 @@ export function aboutEqual( input: number, checkAgainst: number,
         && ( ( input * ( 1 - percentTollerance ) ) - spreadTollerance ) <= checkAgainst )
 }
 
-/** randomize order of elements in this array */
-export function randomizeArray( myArray: [] ) {
-    //from here http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
-    // tslint:disable-next-line:one-variable-per-declaration
-    let i = myArray.length, j, temp
-    if ( i === 0 ) { return }
-    while ( ( --i ) > 0 ) {
-        j = Math.floor( Math.random() * ( i + 1 ) )
-        temp = myArray[ i ]
-        myArray[ i ] = myArray[ j ]
-        myArray[ j ] = temp
-    }
-}
-/**
- *  ex: randomString(20, 'ABCDEFG'); // Returns 'CCBAAGDGBBEGBDBECDCE' which is 20 characters length.
- * @param length
- * @param chars
- */
-export function randomStringCrypto( length: number, chars: string ) {
-    if ( chars == null ) {
-        throw new ex.XlibException( "Argument 'chars' is undefined" )
-    }
-
-    const charsLength = chars.length
-    if ( charsLength > 256 ) {
-        throw new ex.XlibException( "Argument 'chars' should not have more than 256 characters"
-            + ", otherwise unpredictability will be broken" )
-    }
-
-    const randomBytes = crypto.randomBytes( length )
-    const result = new Array( length )
-
-    let cursor = 0
-    for ( let i = 0; i < length; i++ ) {
-        cursor += randomBytes[ i ]
-        result[ i ] = chars[ cursor % charsLength ]
-    }
-
-    return result.join( "" )
-}
-/**
- *  ex: randomAsciiString(20); // Returns 'rmRptK5niTSey7NlDk5y' which is 20 characters length.
- * @param length
- */
-export function randomAsciiStringCrypto( length: number ) {
-    return randomStringCrypto( length,
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" )
-}
-/**
- *  create a random number output as a string, with the specified number of digits.
- * @param minDigits
- * @param maxDigits set to minDigits if not specified
- * @param radix
- */
-export function randomIntDigits( digits: number, radix = 10 ) {
-
-    const output: Array<string> = []
-
-    for ( let i = 0; i < digits; i++ ) {
-        const num = randomInt( 0, radix )
-        output.push( num.toString( radix ) )
-    }
-    const toReturn = output.join( "" )
-    return toReturn
-
-    //var minValueInc = Math.pow(radix, minDigits-1);//  minDigits * radix;
-    //var maxValueExc = Math.pow(radix, maxDigits);//(maxDigits + 1) * radix;
-    //var randValue = randomInt(minValueInc, maxValueExc);
-
-    //var toReturn = randValue.toString(radix);
-
-    ////console.log("randomIntDigits", minValueInc, maxValueExc, randValue, toReturn);
-    //return toReturn;
-}
-
-/**
- *  create a random number output as a string, with the specified number of digits.
- *  uses crypto, so slower but secure.
- * @param minDigits
- * @param maxDigits set to minDigits if not specified
- * @param radix
- */
-export function randomIntDigitsCrypto( digits: number, radix = 10 ) {
-
-    const output: Array<string> = []
-
-    const hexBuffer = crypto.randomBytes( digits ).toString( "hex" )
-
-    for ( let i = 0; i < digits; i++ ) {
-        const hex = hexBuffer.substring( i * 2, ( i + 1 ) * 2 )
-        const byte = parseInt( hex, undefined, 16 )
-        const num = byte % radix
-
-        output.push( num.toString( radix ) )
-    }
-    const toReturn = output.join( "" )
-    return toReturn
-}
 /**
  *  count number of digits in a number
  * @param value
@@ -287,7 +151,7 @@ export function clamp( value: number, min_inc: number, max_inc: number, /** defa
             }
 
         default:
-            throw new ex.XlibException( "unknown ClampType: " + ClampType[ clampType ] )
+            throw new exception.XlibException( "unknown ClampType: " + ClampType[ clampType ] )
     }
 }
 
@@ -396,7 +260,7 @@ export function parseBoolean( toParse: string | number, invalidResult = false, t
                 return false
             default:
                 if ( throwOnInvalid === true ) {
-                    throw new ex.XlibException( "unable to parseBoolean on input value= " + toParse )
+                    throw new exception.XlibException( "unable to parseBoolean on input value= " + toParse )
                 }
                 return invalidResult
         }
@@ -405,7 +269,7 @@ export function parseBoolean( toParse: string | number, invalidResult = false, t
         return toParse !== 0
     }
     if ( throwOnInvalid === true ) {
-        throw new ex.XlibException( `unable to parseBoolean on input value= ${ toParse }` )
+        throw new exception.XlibException( `unable to parseBoolean on input value= ${ toParse }` )
     }
     return invalidResult
 }

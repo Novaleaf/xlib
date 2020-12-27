@@ -1,5 +1,5 @@
 
-import { XlibException } from "../diagnostics/exception"
+import { XlibException } from "../exception"
 //"use strict";
 //import ex = require("../core/exception");
 

@@ -74,8 +74,9 @@ export { gaxios }
 //import Bluebird from "bluebird";
 import * as promise from "./promise"
 import * as _ from "lodash"
-import * as diag from "./diagnostics"
-const log = new diag.Logger( __filename )
+import * as exception from "./exception"
+import * as diagnostics from "./diagnostics"
+const log = new diagnostics.Logger( __filename )
 
 export type IRemoteHttpEndpointOptions<TRecievePayload = ANY> = IRemoteHttpEndpointOverrideOptions<TRecievePayload> & {
 	/** by default, all HTTP requests are made as soon as they are requested.  pass autoscaler options if your endpoint supports autoscaling.
@@ -261,7 +262,7 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 
 		if ( finalOptions.endpoint!.origin == null || finalOptions.endpoint!.path == null ) {
 			//log.error( { endpoint: finalOptions.endpoint }, "can not make endpoint request.  missing required endpoint options.  need both origin and path specified." )
-			throw new diag.exception.XlibException( "can not make endpoint request.  missing required endpoint options.  need both origin and path specified.", { details: { endpoint: finalOptions.endpoint } } )
+			throw new exception.XlibException( "can not make endpoint request.  missing required endpoint options.  need both origin and path specified.", { details: { endpoint: finalOptions.endpoint } } )
 		}
 
 
@@ -311,7 +312,7 @@ export class RemoteHttpEndpoint<TSubmitPayload, TRecievePayload>{
 					case "OK":
 						return Promise.resolve( result )
 					case "ABORT":
-						return Promise.reject( new promise.RetryStopError( "ABORT by responseInspector()" ) )
+						return Promise.reject( new promise.RetryStopError("ABORT by responseInspector()" ) )
 				}
 			}
 			return result

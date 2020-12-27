@@ -1,5 +1,5 @@
-import * as exception from "./diagnostics/exception"
-export { exception }
+import * as exception from "./exception"
+
 
 import * as env from "./environment"
 import _ from "lodash"

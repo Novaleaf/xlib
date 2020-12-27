@@ -271,9 +271,9 @@ describe( __filename, () => {
 
 			/** how often our backendWorker reports too busy */
 			interface ITestAutoscaleOptions { chanceOfBusy: number; }
-			class TestAutoScaleError extends xlib.diagnostics.exception.XlibException {
+			class TestAutoScaleError extends xlib.ex.XlibException {
 				public shouldRejectBusy: boolean;
-				constructor( message: string, options: xlib.diagnostics.exception.IExceptionOptions & { shouldRejectBusy: boolean; } ) {
+				constructor( message: string, options: xlib.ex.IExceptionOptions & { shouldRejectBusy: boolean; } ) {
 					super( message, options )
 					this.shouldRejectBusy = options.shouldRejectBusy
 				}
@@ -281,16 +281,17 @@ describe( __filename, () => {
 
 			}
 
+
 			const testScaler = new xlib.promise.Autoscaler( { busyGrowDelayMs: 100, busyExtraPenalty: 4, idleOrBusyDecreaseMs: 30, growDelayMs: 5, minParallel: 4 },
 				async ( _chanceOfBusy: number, _chanceOfFail: number, _replyDelay: number, _replyDelaySpread: number ) => {
 					//this is the "backendWorker" that is being autoscaled
-					const delay = _replyDelay + xlib.util.numHelper.randomInt( 0, _replyDelaySpread )
+					const delay = _replyDelay + xlib.rand.randomInt( 0, _replyDelaySpread )
 					await xlib.promise.delay( _replyDelay )
-					const isBusy = xlib.util.numHelper.randomBool( _chanceOfBusy )
+					const isBusy = xlib.rand.randomBool( _chanceOfBusy )
 					if ( isBusy ) {
 						return Promise.reject( new TestAutoScaleError( "backend busy", { shouldRejectBusy: true } ) )
 					}
-					const isFail = xlib.util.numHelper.randomBool( _chanceOfFail )
+					const isFail = xlib.rand.randomBool( _chanceOfFail )
 					if ( isFail ) {
 						return Promise.reject( new TestAutoScaleError( "backend failure", { shouldRejectBusy: false } ) )
 					}

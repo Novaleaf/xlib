@@ -11,6 +11,8 @@ describe( "Example Test", () => {
 
 		//const result = xlib.hello
 		//console.log( `xlib result hello=${ result } ${ x }` )
-		expect( xlib.util.enumHelper != null ).toBeTruthy()
+		expect( xlib.enum != null ).toBeTruthy()
 	} )
 } )
+
+
