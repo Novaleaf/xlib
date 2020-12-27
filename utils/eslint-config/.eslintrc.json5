@@ -41,8 +41,6 @@
 				"**/node_modules/**"
 			],
 			"rules": {
-				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  DISABLE THESE RULES ONCE XLIB v18 REACHES BETA STATUS //
-				"@typescript-eslint/no-unused-vars": "off",
 				///////////////////////////  STANDARD RULES BELOW FOR SANE DEVELOPMENT !!!!!!!!! ///////////////////
 				"indent": [
 					"off", //let vscode auto format on save do it's thing
@@ -92,7 +90,7 @@
 					}
 				],
 				"@typescript-eslint/no-unused-vars": [
-					"warn",
+					"off",
 					{
 						"args": "none"
 					}
@@ -130,6 +128,8 @@
 				"@typescript-eslint/explicit-function-return-type": "off",
 				"@typescript-eslint/explicit-member-accessibility": "off",
 				"@typescript-eslint/member-ordering": "off",
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  DISABLE THESE RULES ONCE XLIB v18 REACHES BETA STATUS //
+				"@typescript-eslint/no-unused-vars": "off",
 			}
 		}
 	],

@@ -314,8 +314,8 @@ describe( __filename, () => {
 			}
 
 			const handle = setInterval( () => {
-				log.info( testScaler.toJson(), "while testing autoscaler, log it's internal state every 1000ms" )
-			}, 100 )
+				log.info( testScaler.toJson(), "while testing autoscaler, log it's internal state every 2.5sec" )
+			}, 2500 )
 
 			try {
 				//wait for all

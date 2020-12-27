@@ -5,6 +5,7 @@
 - [XLIB v18+](#xlib-v18)
   - [Goals](#goals)
   - [Non-Goals](#non-goals)
+  - [The problems with ```v17```](#the-problems-with-v17)
   - [R&D Status](#rd-status)
     - [COMPLETE](#complete)
     - [PENDING](#pending)
@@ -23,8 +24,8 @@ The [```v17```](https://github.com/Novaleaf/xlib/tree/v17) branch is:
 
 **The remainder of this readme is dedicated to the ```v18``` rewrite.**
 
-# XLIB v18+
 
+# XLIB v18+
 *Your isomorphic toolbox*
 
 ## Goals
@@ -46,6 +47,13 @@ The [```v17```](https://github.com/Novaleaf/xlib/tree/v17) branch is:
 - Tooling Agnostism:  Development is done on VSCode via ubuntu.  You should be able to build/dev on windows, but it's not tested.  
   - *Win10 Tip:  Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) for development!*
 
+## The problems with ```v17```
+- **too opinionated**: had debugging and logging interactions built into the runtime.  v18 includes a logger and source-map-support but doesn't do these automatically.
+- **obsolete features**
+  - **required Bluebird promises**: bluebird was great before promises became a native part of javascript.  v18 has ```xlib.promise``` which supports any promise implementation you use.
+  - **brittle axios**: axios "works" but fails for advanced features (proxy, network failures, authentication).  v18 uses ```gaxios``` instead and is less strongly tied to it.
+  - **no use of async/await**: not in itself a reason to rewrite, but supporting ```async/await``` by default simplifies the api
+- **node only**: v18 targets browsers and node equally
 ## R&D Status
 
 Current ```v18.x``` is of ```develop``` build quality (meaning: ***do not use this right now***).  
@@ -78,6 +86,7 @@ The following signifiers will be attached to the v18 rewrite as work progresses
   - jest doesn't work in browsers.  didn't switch to full mocha because ```heft``` nicely runs jest tests when it builds typescript, and I don't want to spend the time figuring out to do similar with mocha.
   - however there is a problem, in that jest's ```expect``` library isn't available cross-platform and it doesn't seem easy to register another assertion lib to globally override jest's in node.
   - so currently working on building the ```xlib.diagnostics.logging``` module to handle this kind of work.
+
 
 ### PENDING
 
