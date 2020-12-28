@@ -42,7 +42,7 @@ import * as xlib from "xlib"
 //console.log( "hi from verify-node watched two hmmhmm...." )
 
 
-const log = new xlib.diagnostics.Logger( "xlib verify, main" )
+const log = new xlib.diag.Logger( "xlib verify, main" )
 log.info( "first" )
 
 

@@ -102,8 +102,9 @@ make sure ```./common/config/rush/.npmrc-publish``` is setup with an envVar ref 
    - add policy to ```common/config/rush/version-policies.json```
 3. 
 
-```
+```bash
 # publish
+rush version --bump
 rush publish --apply --publish --add-commit-details --tag dev --include-all
 
 # 

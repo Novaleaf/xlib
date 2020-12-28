@@ -20,11 +20,11 @@
     "@rushstack/heft": "0.20.0",
     "@types/jest": "26.0.15",
     "@types/node": "14.0.27",
-    "@novaleaf/xlib-build-tools": "0.0.2-dev.10",
+    "@novaleaf/xlib-build-tools": "0.0.2-dev.11",
     "eslint": "7.13.0",
     "@novaleaf/eslint-config": "0.0.1"
   },
   "dependencies": {
-    "xlib": "18.0.0-dev.10"
+    "xlib": "18.0.0-dev.11"
   }
 }

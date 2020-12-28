@@ -1,6 +1,6 @@
 {
   "name": "xlib",
-  "version": "18.0.0-dev.10",
+  "version": "18.0.0-dev.11",
   "description": "Your isometric toolbox",
   "private": false,
   "author": "jason swearingen <jasons@novaleaf.com>",
@@ -49,7 +49,7 @@
   "devDependencies": {
     "@babel/types": "7.12.6",
     "@novaleaf/eslint-config": "0.0.1",
-    "@novaleaf/xlib-build-tools": "0.0.2-dev.10",
+    "@novaleaf/xlib-build-tools": "0.0.2-dev.11",
     "@rushstack/eslint-config": "2.3.0",
     "@rushstack/heft": "0.20.0",
     "@types/lodash": "4.14.165",
