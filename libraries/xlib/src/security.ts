@@ -1,7 +1,18 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
-import * as crypto from "isomorphic-webcrypto"
+import crypto from "isomorphic-webcrypto"
 export { crypto }
+
+//bugfix crypto.ensureSecure() which is missing if not running on React Native
+if ( crypto.ensureSecure == null ) {
+	crypto.ensureSecure = () => Promise.resolve()
+}
+
+import * as jwt from "jsonwebtoken"
+export { jwt }
+
+
+
 
 import * as hex from "./hex"
 import * as exception from "./exception"
@@ -20,17 +31,13 @@ export type HASH_ALGO_NAMES = "SHA-256" | "SHA-384" | "SHA-512"
  * @param input
  */
 export async function hash( msg: string, algoName: HASH_ALGO_NAMES = "SHA-512" ) {
+	//await crypto.ensureSecure()
 	//code from: https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#Basic_example
 	const encoder = new TextEncoder()
 	const data = encoder.encode( msg )
 	const hashBuffer = await crypto.subtle.digest( { name: algoName }, data )
 	return hex.from( hashBuffer )
 }
-
-
-
-import * as jwt from "jsonwebtoken"
-export { jwt }
 
 
 /**
@@ -194,7 +201,7 @@ export type ECNamedCurves =
 export type AsymAlgoName = ECNamedCurves
 
 export async function genECKey( namedCurve: ECNamedCurves ) {
-	await crypto.ensureSecure()
+	//await crypto.ensureSecure()
 	return crypto.subtle.generateKey( {
 		name: "ECDSA",
 		namedCurve
@@ -209,7 +216,7 @@ export async function exportKeyPkcs8( cryptoKeyPair: CryptoKeyPair | PromiseLike
 	//from: https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/exportKey#PKCS_8_export
 	//can also see: https://stackoverflow.com/a/55188241
 
-	await crypto.ensureSecure()
+	//await crypto.ensureSecure()
 	const pair = await Promise.resolve( cryptoKeyPair )
 	const priBuffer = await crypto.subtle.exportKey( "pkcs8", pair.privateKey )
 	const priStr = convert.arrayBufferToString( priBuffer )
