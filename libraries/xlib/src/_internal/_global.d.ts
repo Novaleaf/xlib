@@ -25,8 +25,8 @@ interface IDoneCallback {
 	//fail( error?: string | { message: string } ): ANY;
 }
 
-/** allows passing a "number" or a custom types that contain number information.   
- * Note: you don't need to pass a fancy custom Numeric type.  you can always just use a normal Javascript Number, as it also has the .valueOf() method.
+/** allows passing a ```number``` or a custom types that contain numeric information.   
+ * **Note**: you don't need to pass a fancy custom Numeric type.  you can always just use a normal Javascript ```Number```, as it also has the ```.valueOf()``` method.
  */
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 declare type Numeric = { valueOf(): number }

@@ -1,7 +1,7 @@
 import * as xlib from "./_main"
 
 
-const log = new xlib.diagnostics.Logger( __filename )
+const log = new xlib.diag.Logger( __filename )
 
 describe( __filename, () => {
 

@@ -56,10 +56,6 @@ see xlib's ```package.json``` for list of scripts to run.  in particular:  ```ru
 
 - <https://www.npmjs.com/package/tapable>
 
-### promises
-
-- probably can use native promises now (bluebird not needed): <https://dev.to/blacksonic/what-does-javascript-promise-us-for-2020-4l1i>
-
 ### after v18
 - rename to isol?
 
@@ -91,3 +87,5 @@ worker-plugin:  load comlink into webpack  https://www.npmjs.com/package/worker-
   - also review all pino options: https://github.com/pinojs/pino/blob/master/docs/api.md#options
 - expose chalk in stringHelper
 - extra types:  https://github.com/sindresorhus/type-fest
+- documenation:  look at day.js, nice docs website based on docusaurus 1.x.    https://github.com/dayjs/dayjs-website
+  - also see their typsescript definitions which include default method

@@ -1,18 +1,13 @@
-///// <reference path="../../../typings/all.d.ts" />
+/* eslint-disable no-inner-declarations */
+/* eslint-disable @typescript-eslint/no-namespace */
 
-import * as reflection from "./reflection";
-import * as diagnostics from "./diagnostics";
 
-import * as stringHelper from "./_util/stringhelper";
-import * as bb from "bluebird";
-import * as _ from "lodash";
-
-import * as numHelper from "./_util/numhelper";
-
-import * as d3Dsv from "d3-dsv";
-
-import * as time from "./time";
-
+import * as reflection from "./reflection"
+import * as _ from "lodash"
+import * as stringHelper from "./str"
+import * as dsv from "d3-dsv"
+import * as time from "./time"
+import * as exception from "./exception"
 
 /** parse comma or tab seperated values.   see https://www.npmjs.com/package/d3-dsv
 	*
@@ -34,11 +29,15 @@ var psv = d3.dsvFormat("|");
 
 console.log(psv.parse("foo|bar\n1|2")); // [{foo: "1", bar: "2"}, columns: ["foo", "bar"]]
 ```
-  */
-export const dsv = d3Dsv;
+	*/
+export { dsv }
+
+import * as json5 from "json5"
+//export const json5: JSON = _json5 as ANY
 
 
-import * as json5 from "json5";
+
+
 
 /** awesome json parse and stringify capabilities */
 export namespace jsonX {
@@ -50,30 +49,30 @@ export namespace jsonX {
 							* @param reviver A function that transforms the results. This function is called for each member of the object.
 							* If a member contains nested objects, the nested objects are transformed before the parent object is.
 							*/
-	export const parse: ( text: string, reviver?: ( key: any, value: any ) => any ) => any = json5.parse.bind( json5 );
+	export const parse: typeof JSON.parse = json5.parse.bind( json5 ) //  ( text: string, reviver?: ( key: ANY, value: ANY ) => ANY ) => ANY = json5.parse.bind( json5 );
 
 
 	/** parses your object using ```json5```, then attempts to parse string values in your object.  failed parse() calls will return the original string for that variable */
 	export function parseRecursive(
-		textOrObj: any,
-		reviver?: ( key: any, value: any ) => any
-	): any {
+		textOrObj: ANY,
+		reviver?: ( key: ANY, value: ANY ) => ANY
+	): ANY {
 
 
 		if ( typeof ( textOrObj ) === "string" ) {
 			try {
-				textOrObj = parse( textOrObj, reviver );
+				textOrObj = parse( textOrObj, reviver )
 			} catch ( ex ) {
-				return textOrObj;
+				return textOrObj
 			}
 		}
 		_.forOwn( textOrObj, ( value, key, obj ) => {
 			if ( typeof ( value ) === "string" ) {
-				obj[ key ] = parseRecursive( value, reviver );
+				obj[ key ] = parseRecursive( value, reviver )
 			}
-		} );
+		} )
 
-		return textOrObj;
+		return textOrObj
 	}
 
 
@@ -84,33 +83,33 @@ export namespace jsonX {
 			* @param space A String or Number object that's used to insert white space into the output JSON5 string for readability purposes. If this is a Number, it indicates the number of space characters to use as white space; this number is capped at 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used. If this is a String, the string (or the first 10 characters of the string, if it's longer than that) is used as white space. If this parameter is not provided (or is null), no white space is used. If white space is used, trailing commas will be used in objects and arrays.  @default "\t"
 		 * @param quote  A String representing the quote character to use when serializing strings.
 			*/
-	export function stringify( value: any,
-		replacer?: ( key: string, value: any ) => any | Array<number | string>,
+	export function stringify( value: ANY,
+		replacer?: ( key: string, value: ANY ) => ANY | Array<number | string>,
 		space?: string | number,
 		quote?: string,
 	): string;
-	export function stringify( value: any, options?: {
-		replacer?: ( key: string, value: any ) => any | Array<number | string>;
+	export function stringify( value: ANY, options?: {
+		replacer?: ( key: string, value: ANY ) => ANY | Array<number | string>;
 		space?: string | number;
 		quote?: string;
 	} ): string;
-	export function stringify( value: any, ...args: Array<any> ) {
+	export function stringify( value: ANY, ...args: Array<ANY> ) {
 		let options: {
-			replacer?: ( key: string, value: any ) => any | Array<number | string>;
+			replacer?: ( key: string, value: ANY ) => ANY | Array<number | string>;
 			space?: string | number;
 			quote?: string;
-		};
+		}
 
 		if ( reflection.getType( args[ 0 ] ) === reflection.Type.object ) {
-			options = args[ 0 ];
+			options = args[ 0 ]
 		} else {
 			options = {
 				replacer: args[ 0 ],
 				space: _.defaultTo( args[ 1 ], "\t" ),
 				quote: args[ 2 ],
-			};
+			}
 		}
-		return json5.stringify( value, options );
+		return json5.stringify( value, options )
 	}
 
 
@@ -128,126 +127,152 @@ export namespace jsonX {
 		/** true to not show typeNames we don't have a ```typeProcessor``` for. (Note that POJO objects will not have their typeName ("Object") shown regardless)*/
 		hideTypeNames?: boolean;
 
-		/** allows custom parsing of your own types.  return ```undefined``` or ```null``` to skip processing*/
-		typeProcessor?: ( obj: any, typeName: string, options: IInspectOptions ) => any;
+		/** allows custom parsing of your own types.  return ```undefined``` or ```null``` to do default processing*/
+		typeProcessor?: ( value: ANY, type: reflection.Type, typeName: string, key: string, options: IInspectOptions ) => ANY;
 
 	}
-	export function inspectStringify( obj: any, options?: IInspectOptions
+
+
+	export function inspectStringify( obj: ANY, options?: IInspectOptions
 	) {
-		const outputJson = inspectParse( obj, options );
-		return JSON.stringify( outputJson, undefined, "  " );
+		const outputJson = inspectParse( obj, options )
+		return JSON.stringify( outputJson, undefined, "  " )
 	}
 	/** debug inspection helper. outputs human readable JSON (but won't round-trip with .parse()).  handles circular references gracefully */
-	export function inspectParse( obj: any, options?: IInspectOptions
-	) {
+	export function inspectParse( obj: ANY, options?: IInspectOptions ) {
 
-		options = { maxArrayElements: 10, maxDepth: 1, summarizeLength: 120, ...options };
+		options = { maxArrayElements: 10, maxDepth: 1, summarizeLength: 120, ...options }
 
-		return _inspectParse_internal( obj, options, [] );
+		return _inspectParse_internal( obj, options as Required<IInspectOptions>, [], "" )
 	}
 	/** internal helper to do actual parse work */
-	function _inspectParse_internal( obj: any, parentOptions: IInspectOptions,
+	function _inspectParse_internal( obj: ANY, parentOptions: Required<IInspectOptions>,
 		/** for internal recursive use, tracking circular references. */
-		parentSeenObjects: any,
-	): any {
-		let myOptions = _.clone( parentOptions );
+		parentSeenObjects: ANY,
+		key: string
+	): ANY {
+		const myOptions = _.clone( parentOptions )
 		try {
-			myOptions.maxDepth--;
+			myOptions.maxDepth--
 			// ! circular reference detection
 			/** cache of all objects to check for circular references.   see https://stackoverflow.com/questions/14962018/detecting-and-fixing-circular-references-in-javascript */
-			const seenObjects = _.clone( parentSeenObjects );
+			const seenObjects = _.clone( parentSeenObjects )
 			if ( _.isObject( obj ) ) {
 				if ( parentSeenObjects.indexOf( obj ) !== -1 ) {
-					return `[CIRCULAR REFERENCE type=${ reflection.getTypeName( obj ) }]`;
+					return `[CIRCULAR REFERENCE type=${ reflection.getTypeName( obj ) }]`
 				}
-				seenObjects.push( obj );
+				seenObjects.push( obj )
 			}
 
 			// ! output string value of node if possible
-			const Type = reflection.Type;
-			const type = reflection.getType( obj );
+			const Type = reflection.Type
+			const type = reflection.getType( obj )
+			//if it's well known types, generate friendly values
+			const typeName = reflection.getTypeName( obj )
+
+			if ( myOptions.typeProcessor != null ) {
+				const customProcessorResult = myOptions.typeProcessor( obj, type, typeName, key, myOptions )
+				if ( customProcessorResult != null ) {
+					return customProcessorResult
+				}
+			}
+
 			switch ( type ) {
 				case Type.boolean:
 				case Type.number:
 				case Type.null:
-					return obj;
+					return obj
 				case Type.symbol:
 					if ( Symbol.keyFor( obj ) != null ) {
-						return obj.toString() + "[GLOBAL]";
+						return obj.toString() + "[GLOBAL]"
 					} else {
-						return obj.toString();
+						return obj.toString()
 					}
 				case Type.undefined:
-					return "[UNDEFINED]";
+					return "[UNDEFINED]"
 				case Type.string:
-					return stringHelper.summarize( obj, myOptions.summarizeLength );
+					return stringHelper.summarize( obj, myOptions.summarizeLength )
 				case Type.Date:
 					{
-						const asDate = obj as Date;
+						const asDate = obj as Date
 						//	return asDate.toISOString();
 						//const ago = time.luxon.DateTime.fromJSDate( asDate ).until( time.luxon.DateTime.utc() ).toDuration().toFormat( "hh:mm:ss.SS" );
 
-						const diffNow = time.luxon.DateTime.fromMillis( asDate.valueOf() ).diffNow();
+						const diffNow = time.dayjs( asDate ).diff( Date.now() )  // .luxon.DateTime.fromMillis( asDate.valueOf() ).diffNow()
 						//let ago = diffNow.toISO();
 						//  let ago = diffNow.valueOf() < 0 ? "-" : "";
 						// ago += diffNow.toFormat( "hh:mm:ss.SS" );
-						let ago = diffNow.toFormat( "hh:mm:ss.SS" );
+						const ago = time.dayjs.duration( diffNow ).format( "hh:mm:ss.SS" )
 						// //numHelper.format((Date.now()-asDate.getTime())/1000)
-						return `${ asDate.toISOString() } (deltaNow:${ ago })`;
+						return `${ asDate.toISOString() } (deltaNow:${ ago })`
 					}
-				case Type.Error:
-					const errOptions = { ...myOptions, maxDepth: myOptions.maxDepth + 1 };
-					return _inspectParse_internal( diagnostics.errorToJson( obj ), errOptions, seenObjects );
+				case Type.Error: {
+					const errOptions = { ...myOptions, maxDepth: myOptions.maxDepth + 1 }
+					//retry using an error JSON
+					return _inspectParse_internal( exception.errorToJson( obj ), errOptions, seenObjects, key )
+				}
 				case Type.function:
-					const asFunction = obj as Function;
-					let funcStr = asFunction.toString();
-					funcStr = stringHelper.removeAfter( funcStr, ")", true );
-					funcStr = "[FUNCTION " + stringHelper.removeBefore( funcStr, "function " ) + "]";
-					return stringHelper.summarize( funcStr, myOptions.summarizeLength );
+					{
+						// eslint-disable-next-line @typescript-eslint/ban-types
+						const asFunction = obj as Function
+						let funcStr = asFunction.toString()
+						funcStr = stringHelper.removeAfter( funcStr, ")", true )
+						funcStr = "[FUNCTION " + stringHelper.removeBefore( funcStr, "function " ) + "]"
+						return stringHelper.summarize( funcStr, myOptions.summarizeLength )
+					}
 				case Type.RegExp:
-					const asRegEx = obj as RegExp;
-					return stringHelper.summarize( asRegEx.toString(), myOptions.summarizeLength );
+					{
+						const asRegEx = obj as RegExp
+						return stringHelper.summarize( asRegEx.toString(), myOptions.summarizeLength )
+					}
 				case Type.classCtor:
-					return `[CLASS ${ reflection.getTypeName( obj ) }]`;
+					return `[CLASS ${ reflection.getTypeName( obj ) }]`
 				default:
-					return `[INSPECT_TYPE_NOT_HANDLED  type=${ Type[ type ] }]`;
+					return `[INSPECT_TYPE_NOT_HANDLED  type=${ Type[ type ] }]`
 				case Type.Array:
 				case Type.object:
+					{
 
-					//if it's well known types, generate friendly values
-					const typeName = reflection.getTypeName( obj );
-
-					if ( myOptions.typeProcessor != null ) {
-						let customProcessorResult = myOptions.typeProcessor( obj, typeName, myOptions );
-						if ( customProcessorResult != null ) {
-							return customProcessorResult;
+						if ( obj.asMilliseconds != null ) {
+							//guess it's a duration object of some sort
+							const ms = obj.asMilliseconds()
+							return time.dayjs.duration( ms ).format( "hh:mm:ss.SS" )
 						}
+
+						if ( obj.toISOString != null && obj.year != null ) {
+							//guess it's a date object of some sort
+							const asDate = time.dayjs( obj.toISOString() )
+							const diffNow = time.dayjs.duration( asDate.diff( Date.now() ) ) //time.luxon.DateTime.fromMillis( asDate.valueOf() ).diffNow()
+							const ago = diffNow.format( "hh:mm:ss.SS" )
+							return `${ asDate.toISOString() } (deltaNow:${ ago })`
+
+						}
+
+						//handle specific known types
+						switch ( typeName ) {
+							// case "Duration":
+							// case "DateTime":
+
+							// 	if ( obj.valueOf != null ) {
+							// 		const asDate = new Date( obj.valueOf() )
+							// 		const diffNow = time.luxon.DateTime.fromMillis( asDate.valueOf() ).diffNow()
+							// 		//let ago = diffNow.toISO();
+							// 		// let ago = diffNow.valueOf() < 0 ? "-" : "";
+							// 		// ago += diffNow.toFormat( "hh:mm:ss.SS" );
+							// 		const ago = diffNow.toFormat( "hh:mm:ss.SS" )
+							// 		// //numHelper.format((Date.now()-asDate.getTime())/1000)
+							// 		return `${ asDate.toISOString() } (deltaNow:${ ago })`
+							// 	}
+							// 	break
+							case "Timeout":
+								return "[Timer Handle (typename=\"Timeout\")]"
+						}
+
+
+
+						//for other object cases, we need to recursively walk them.   see below
+						break
 					}
-
-					switch ( typeName ) {
-						case "Duration":
-						case "DateTime":
-							if ( obj.valueOf != null ) {
-								let asDate = new Date( obj.valueOf() );
-								const diffNow = time.luxon.DateTime.fromMillis( asDate.valueOf() ).diffNow();
-								//let ago = diffNow.toISO();
-								// let ago = diffNow.valueOf() < 0 ? "-" : "";
-								// ago += diffNow.toFormat( "hh:mm:ss.SS" );
-								let ago = diffNow.toFormat( "hh:mm:ss.SS" );
-								// //numHelper.format((Date.now()-asDate.getTime())/1000)
-								return `${ asDate.toISOString() } (deltaNow:${ ago })`;
-							}
-							break;
-						case "Timeout":
-							return `[Timer Handle (typename="Timeout")]`;
-					}
-
-
-
-					//for these cases, we need to recursively walk them.   see below
-
-
-					break;
 			}
 
 			// ! the obj is an array, or object
@@ -256,76 +281,76 @@ export namespace jsonX {
 			if ( myOptions.maxDepth < 0 ) {
 				//at max depth.  output typename
 				if ( type === Type.Array ) {
-					const asArray = obj as Array<any>;
-					return `[ARRAY len=${ asArray.length }]`;
+					const asArray = obj as Array<any>
+					return `[ARRAY len=${ asArray.length }]`
 				} else {
-					return `[OBJECT typeName="${ reflection.getTypeName( obj ) }"]`;
+					return `[OBJECT typeName="${ reflection.getTypeName( obj ) }"]`
 				}
 			}
 
-			let testMap = new Map<string, number>();
-			let testSet = new Set<number>();
-			let testArray = [];
+			const testMap = new Map<string, number>()
+			const testSet = new Set<number>()
+			const testArray = []
 			//testArray.forE
 			//testSet.forEach()
 			// //testMap
 
 
-			let arrayOrigType = "ARRAY";
+			let arrayOrigType = "ARRAY"
 			try {
 				/** if this has a forEach method and not an array, convert it to an array for parsing */
 				if ( _.isArray( obj ) === false && obj.forEach != null && typeof ( obj.forEach ) === "function" ) {
-					arrayOrigType = reflection.getTypeName( obj );
-					let tempArray: any[] = [];
+					arrayOrigType = reflection.getTypeName( obj )
+					const tempArray: any[] = []
 					obj.forEach( ( val: any, key: any ) => {
 						if ( val === key || key === obj ) {
 							//if no key, just push val
-							tempArray.push( val );
+							tempArray.push( val )
 						} else {
-							tempArray.push( { key, val } );
+							tempArray.push( { key, val } )
 						}
-					} );
-					obj = tempArray;
+					} )
+					obj = tempArray
 				}
-			} catch{
+			} catch {
 				//eat errors
 			}
 
 			//if there are symbols present, convert those to keys that can be inspected.
-			let symbols = Object.getOwnPropertySymbols( obj );
+			const symbols = Object.getOwnPropertySymbols( obj )
 			if ( symbols != null && symbols.length > 0 ) {
-				obj = _.clone( obj );
+				obj = _.clone( obj )
 				for ( let i = 0; i < symbols.length; i++ ) {
-					obj[ symbols[ i ].toString() ] = obj[ symbols[ i ] ];
+					obj[ symbols[ i ].toString() ] = obj[ symbols[ i ] ]
 					// tslint:disable-next-line: no-dynamic-delete
-					delete obj[ symbols[ i ] ];
+					delete obj[ symbols[ i ] ]
 				}
 			}
 
 			//recursivly walk children			
 			if ( _.isArray( obj ) === true ) {
-				const objArray = obj as Array<any>;
-				const toReturn = [];
+				const objArray = obj as Array<ANY>
+				const toReturn = []
 				if ( objArray.length <= myOptions.maxArrayElements ) {
 					//output all
 					for ( let i = 0; i < objArray.length; i++ ) {
-						toReturn.push( _inspectParse_internal( objArray[ i ], myOptions, seenObjects ) );
+						toReturn.push( _inspectParse_internal( objArray[ i ], myOptions, seenObjects, i.toString() ) )
 					}
 				} else {
 					//output top and bottom
 
 					//top half
-					let halfMax = Math.round( myOptions.maxArrayElements / 2 );
+					const halfMax = Math.round( myOptions.maxArrayElements / 2 )
 					for ( let i = 0; i < halfMax; i++ ) {
-						toReturn.push( _inspectParse_internal( objArray[ i ], myOptions, seenObjects ) );
+						toReturn.push( _inspectParse_internal( objArray[ i ], myOptions, seenObjects, i.toString() ) )
 					}
 					//missing middle
-					toReturn.push( `[${ arrayOrigType }_TRUNCATED len=${ objArray.length }]` );
+					toReturn.push( `[${ arrayOrigType }_TRUNCATED len=${ objArray.length }]` )
 					//bottom half
 					for ( let i = 0; i < halfMax; i++ ) {
-						const index = objArray.length - halfMax + i;
+						const index = objArray.length - halfMax + i
 						if ( index < objArray.length ) {
-							toReturn.push( _inspectParse_internal( objArray[ index ], myOptions, seenObjects ) );
+							toReturn.push( _inspectParse_internal( objArray[ index ], myOptions, seenObjects, index.toString() ) )
 						}
 					}
 				}
@@ -337,52 +362,52 @@ export namespace jsonX {
 				// }
 
 
-				return toReturn;
+				return toReturn
 			} else {
 				//loop through object
-				let functs: Array<string> = [];
-				let toReturn: { [ key: string ]: any; } = {};
+				const functs: Array<string> = []
+				const toReturn: { [ key: string ]: ANY; } = {}
 				_.forIn( obj, ( value, key ) => {
-					const val = _inspectParse_internal( value, myOptions, seenObjects );
+					const val = _inspectParse_internal( value, myOptions, seenObjects, key )
 
 					//reduce verbosity of functions in the object
 					if ( myOptions.aggrigateFunctions === true && ( typeof val === "string" ) && val.indexOf( "[FUNCTION" ) === 0 ) {
-						let results = /^\[FUNCTION\s*([\S\s]{1,})\]$/.exec( val );
+						const results = /^\[FUNCTION\s*([\S\s]{1,})\]$/.exec( val )
 						if ( results != null ) {
-							let funcDetails = results[ 1 ];
+							const funcDetails = results[ 1 ]
 							if ( funcDetails.indexOf( key ) === 0 ) {
 								//name of func is name as key, so don't display the redundant key
-								functs.push( results[ 1 ] );
+								functs.push( results[ 1 ] )
 							} else {
 								//function name is different display key
-								functs.push( `${ key }=${ results[ 1 ] }` );
+								functs.push( `${ key }=${ results[ 1 ] }` )
 							}
 						} else {
 							//didnt' work, report it normally
-							toReturn[ key ] = val;
+							toReturn[ key ] = val
 						}
 
 					} else {
-						toReturn[ key ] = val;
+						toReturn[ key ] = val
 					}
-				} );
+				} )
 				if ( functs.length > 0 ) {
-					toReturn[ `[FUNCTIONS count=${ functs.length }]` ] = functs.join( ", " );
+					toReturn[ `[FUNCTIONS count=${ functs.length }]` ] = functs.join( ", " )
 				}
 				if ( myOptions.hideTypeNames !== true ) {
-					const typeName = reflection.getTypeName( obj );
+					const typeName = reflection.getTypeName( obj )
 					if ( typeName !== "Object" ) {
-						toReturn[ "[TYPENAME]" ] = typeName;
+						toReturn[ "[TYPENAME]" ] = typeName
 					}
 				}
 
-				return toReturn;
+				return toReturn
 			}
 
 
 		} catch ( _err ) {
-			const err = diagnostics.toError( _err );
-			return `[ERROR_PARSING name="${ err.name }", message="${ stringHelper.summarize( err.message, myOptions.summarizeLength ) }"]`;
+			const err = exception.toError( _err )
+			return `[ERROR_PARSING name="${ err.name }", message="${ stringHelper.summarize( err.message, myOptions.summarizeLength ) }"]`
 		}
 
 
@@ -398,16 +423,16 @@ export namespace jsonX {
 	replaceNodes(tree, ["a.aa", "b.ba"],"*REMOVED*");
 	// tree = {a[aa:"*REMOVED*",ab:1], b:{ ba:"*REMOVED", bb:"there"}};
 		*/
-	export function replaceNodes( targetObject: any,
+	export function replaceNodes( targetObject: ANY,
 		/** example:  'a.b.c.d' will remove the d node, replacing it (with null by default, effectively deleting)*/
-		nodeHiearchyStrings: Array<string>, replaceWith: any = null, replaceEmptyLeafNodes: boolean = false ) {
+		nodeHiearchyStrings: Array<string>, replaceWith: ANY = null, replaceEmptyLeafNodes: boolean = false ) {
 
 		/** recursive helper for walking through the current hiearchy, replacing as it goes*/
-		function currentNodeProcessor( previousNode: any, nodeName: string, hiearchyIndex: number, hiearchy: Array<string> ) {
+		function currentNodeProcessor( previousNode: ANY, nodeName: string, hiearchyIndex: number, hiearchy: Array<string> ) {
 
 			if ( previousNode == null || _.isString( previousNode ) ) {
 				//if our previous node is null (or a string), nothing to do.
-				return;
+				return
 			}
 
 
@@ -415,23 +440,23 @@ export namespace jsonX {
 				//the node is the last node in our hiearchy,
 				//so we are on the node to remove.remove it and we are done
 				if ( previousNode[ nodeName ] != null || replaceEmptyLeafNodes === true ) {
-					previousNode[ nodeName ] = replaceWith;
+					previousNode[ nodeName ] = replaceWith
 				}
-				return;
+				return
 			}
 
 			//walk down the hiearchy
-			let thisNode = previousNode[ nodeName ];
-			let nextHiearchyIndex = hiearchyIndex + 1;
-			let nextNodeName = hiearchy[ nextHiearchyIndex ];
+			const thisNode = previousNode[ nodeName ]
+			const nextHiearchyIndex = hiearchyIndex + 1
+			const nextNodeName = hiearchy[ nextHiearchyIndex ]
 			if ( _.isArray( thisNode ) === true && _.isString( thisNode ) === false ) {
 				//walk each element in the array automatically
 				_.forEach( thisNode, ( element ) => {
-					currentNodeProcessor( element, nextNodeName, nextHiearchyIndex, hiearchy );
-				} );
-				return;
+					currentNodeProcessor( element, nextNodeName, nextHiearchyIndex, hiearchy )
+				} )
+				return
 			} else {
-				currentNodeProcessor( thisNode, nextNodeName, nextHiearchyIndex, hiearchy );
+				currentNodeProcessor( thisNode, nextNodeName, nextHiearchyIndex, hiearchy )
 			}
 
 		}
@@ -440,72 +465,77 @@ export namespace jsonX {
 		//loop through all nodeHiearchyStrings to remove, removing the leaf.
 		_.forEach( nodeHiearchyStrings, ( hiearchyString ) => {
 			if ( hiearchyString == null ) {
-				return;
+				return
 			}
 
-			let hiearchy = hiearchyString.split( "." );
+			const hiearchy = hiearchyString.split( "." )
 
 			if ( hiearchy.length < 1 ) {
-				return;
+				return
 			}
 
-			currentNodeProcessor( targetObject, hiearchy[ 0 ], 0, hiearchy );
+			currentNodeProcessor( targetObject, hiearchy[ 0 ], 0, hiearchy )
 
-		} );
+		} )
 	}
 }
+
+
 /** constructor for async functions.
  * from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction
  */
-const AsyncFunction: FunctionConstructor = Object.getPrototypeOf( async function () { } ).constructor;
+const AsyncFunction: FunctionConstructor = Object.getPrototypeOf( async function () { } ).constructor
 
 /** deseralize a function that was serialized via ```.toString()```.  Works on lambda functions also. */
 export function parseFunction( fcnStr: string ) {
 	//citation: https://gist.github.com/lamberta/3768814  but then heavily modified for proper lambda support
 
-	fcnStr = fcnStr.trim();
+	fcnStr = fcnStr.trim()
 
 	//! handle possible async function
-	let FcnCtor = Function;
+	let FcnCtor = Function
 	if ( fcnStr.startsWith( "async" ) ) {
-		fcnStr = stringHelper.removePrefix( fcnStr, "async" );
-		fcnStr = fcnStr.trim();
-		FcnCtor = AsyncFunction;
+		fcnStr = stringHelper.removePrefix( fcnStr, "async" )
+		fcnStr = fcnStr.trim()
+		FcnCtor = AsyncFunction
 	}
 
 	if ( fcnStr.startsWith( "function" ) ) {
-		const fn_body_idx = fcnStr.indexOf( '{' );
-		const fn_body = fcnStr.substring( fn_body_idx + 1, fcnStr.lastIndexOf( '}' ) ).trim();
-		const fn_declare = fcnStr.substring( 0, fn_body_idx );
-		const fn_params_start = fn_declare.indexOf( '(' ) + 1;
-		const fn_params = fn_declare.substring( fn_params_start, fn_declare.lastIndexOf( ')' ) );
-		const args = fn_params.split( ',' );
+		const fn_body_idx = fcnStr.indexOf( "{" )
+		const fn_body = fcnStr.substring( fn_body_idx + 1, fcnStr.lastIndexOf( "}" ) ).trim()
+		const fn_declare = fcnStr.substring( 0, fn_body_idx )
+		const fn_params_start = fn_declare.indexOf( "(" ) + 1
+		const fn_params = fn_declare.substring( fn_params_start, fn_declare.lastIndexOf( ")" ) )
+		const args = fn_params.split( "," )
 
-		args.push( fn_body );
+		args.push( fn_body )
 
-		let toReturn = new FcnCtor( ...args );
-		return toReturn;
+		const toReturn = new FcnCtor( ...args )
+		return toReturn
 	} else {
 		//lambda
-		const fn_params = fcnStr.substring( fcnStr.indexOf( '(' ) + 1, fcnStr.indexOf( ')' ) );
-		const args = fn_params.split( ',' );
+		const fn_params = fcnStr.substring( fcnStr.indexOf( "(" ) + 1, fcnStr.indexOf( ")" ) )
+		const args = fn_params.split( "," )
 
-		let fn_body_idx = fcnStr.indexOf( '=>' ) + 2;
-		let fn_body_end = fcnStr.length;
+		let fn_body_idx = fcnStr.indexOf( "=>" ) + 2
+		let fn_body_end = fcnStr.length
 
 		if ( fcnStr.endsWith( "}" ) ) {
 			//enclosed lambda body so remove surrounding braces
-			fn_body_idx = fcnStr.indexOf( "{", fn_body_idx ) + 1;
-			fn_body_end--;
-			const fn_body = fcnStr.substring( fn_body_idx, fn_body_end );
-			args.push( fn_body );
+			fn_body_idx = fcnStr.indexOf( "{", fn_body_idx ) + 1
+			fn_body_end--
+			const fn_body = fcnStr.substring( fn_body_idx, fn_body_end )
+			args.push( fn_body )
 		} else {
-			const fn_body = "return " + fcnStr.substring( fn_body_idx, fn_body_end );
-			args.push( fn_body );
+			const fn_body = "return " + fcnStr.substring( fn_body_idx, fn_body_end )
+			args.push( fn_body )
 		}
 
 
-		let toReturn = new FcnCtor( ...args );
-		return toReturn;
+		const toReturn = new FcnCtor( ...args )
+		return toReturn
 	}
 }
+
+
+

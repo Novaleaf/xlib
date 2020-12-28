@@ -180,7 +180,7 @@ describe( "meta tests", () => {
 describe( "xlib basic features", () => {
 	it( "log basic", () => {
 
-		const tempLog = new xlib.diagnostics.Logger( "test main temp" )
+		const tempLog = new xlib.diag.Logger( "test main temp" )
 		tempLog.debug( "debug message" )
 
 		try {

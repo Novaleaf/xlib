@@ -1,8 +1,8 @@
 import * as xlib from "./_main"
 
-import security = xlib.security
+import security = xlib.sec
 
-const log = new xlib.diagnostics.Logger( __filename )
+const log = new xlib.diag.Logger( __filename )
 
 describe( __filename, () => {
 

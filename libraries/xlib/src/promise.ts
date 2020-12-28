@@ -5,13 +5,18 @@ import * as exception from "./exception"
 import * as _ from "lodash"
 import * as diag from "./diagnostics"
 
+import * as rx from "rxjs"
+export { rx }
+
+
+
 
 
 /** a promise that resolves after an amount of time.   good for delaying execution
  */
-export function delay( ms: number ): Promise<void> {
+export function delay( ms: Numeric ): Promise<void> {
 	return new Promise( ( resolve, reject ) => {
-		setTimeout( () => resolve(), ms )
+		setTimeout( () => resolve(), ms.valueOf() )
 	} )
 }
 
@@ -155,7 +160,7 @@ export async function retry<TResult>( options: IRetryOptions, fn: () => PromiseL
 
 
 
-export interface IInspectablePromise<TResult> extends PromiseLike<TResult> {
+export interface IInspectablePromise<TResult> extends Promise<TResult> {
 
 	status(): IPromiseStatus<TResult>
 

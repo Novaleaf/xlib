@@ -10,7 +10,7 @@ import "./_internal/polyfill"
 
 
 import * as environment from "./environment"
-export { environment }
+export { environment as env }
 
 import * as _imports from "./_imports"
 export { _imports }
@@ -24,7 +24,7 @@ export { lodash }
 // import * as lolo from "./lolo"
 // export { lolo }
 import * as diagnostics from "./diagnostics"
-export { diagnostics }
+export { diagnostics as diag }
 import * as reflection from "./reflection"
 export { reflection }
 
@@ -36,9 +36,6 @@ export { numeric }
 
 import * as collection from "./collection"
 export { collection }
-
-import * as security from "./security"
-export { security }
 
 
 import * as  _enum from "./enum"
@@ -64,6 +61,20 @@ export { exception as ex }
 
 import * as rand from "./rand"
 export { rand }
+
+import * as convert from "./convert"
+export { convert }
+
+import * as security from "./security"
+export { security as sec }
+
+import * as serialization from "./serialization"
+export { serialization }
+
+import * as time from "./time"
+export { time }
+
+
 
 
 const log = new diagnostics.Logger( "main" )
@@ -100,3 +111,4 @@ console.error( "Thread test:  called asyncHuh() test function ##################
 
 
 log.error( "TEMP: done executing xlib _.main.ts..." )
+

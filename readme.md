@@ -2,10 +2,10 @@
 
 - [ToC](#toc)
 - [REWRITE IN PROGRESS](#rewrite-in-progress)
+  - [The problems with ```v17```](#the-problems-with-v17)
 - [XLIB v18+](#xlib-v18)
   - [Goals](#goals)
   - [Non-Goals](#non-goals)
-  - [The problems with ```v17```](#the-problems-with-v17)
   - [R&D Status](#rd-status)
     - [COMPLETE](#complete)
     - [PENDING](#pending)
@@ -21,6 +21,15 @@ The [```v17```](https://github.com/Novaleaf/xlib/tree/v17) branch is:
 - full featured
 - used in production
 - available as the default [```npm xlib```](https://www.npmjs.com/package/xlib) package
+
+
+## The problems with ```v17```
+- **too opinionated**: had debugging and logging interactions built into the runtime.  v18 includes a logger and source-map-support but doesn't do these automatically.
+- **obsolete features**
+  - **required Bluebird promises**: bluebird was great before promises became a native part of javascript.  v18 has ```xlib.promise``` which supports any promise implementation you use.
+  - **brittle axios**: axios "works" but fails for advanced features (proxy, network failures, authentication).  v18 uses ```gaxios``` instead and is less strongly tied to it.
+  - **no use of async/await**: not in itself a reason to rewrite, but supporting ```async/await``` by default simplifies the api
+- **node only**: v18 targets browsers and node equally
 
 **The remainder of this readme is dedicated to the ```v18``` rewrite.**
 
@@ -42,18 +51,11 @@ The [```v17```](https://github.com/Novaleaf/xlib/tree/v17) branch is:
 
 ## Non-Goals
 
-- Full browser support: Ignoring IE, but Edge-Classic support will be attempted
-- Old Node support:  Development is done on Node 14.x.    Node 12.x should work fine.
-- Tooling Agnostism:  Development is done on VSCode via ubuntu.  You should be able to build/dev on windows, but it's not tested.  
+- Legacy browser support: Ignoring IE, but Edge-Classic support will be attempted
+- Legacy Node support:  Development is done on Node 14.x.    Node 12.x should work fine.
+- Dev Tooling Agnostism:  Development is done on VSCode via ubuntu.  You should be able to build/dev on windows, but it's not tested.  
   - *Win10 Tip:  Use [WSL](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) for development!*
 
-## The problems with ```v17```
-- **too opinionated**: had debugging and logging interactions built into the runtime.  v18 includes a logger and source-map-support but doesn't do these automatically.
-- **obsolete features**
-  - **required Bluebird promises**: bluebird was great before promises became a native part of javascript.  v18 has ```xlib.promise``` which supports any promise implementation you use.
-  - **brittle axios**: axios "works" but fails for advanced features (proxy, network failures, authentication).  v18 uses ```gaxios``` instead and is less strongly tied to it.
-  - **no use of async/await**: not in itself a reason to rewrite, but supporting ```async/await``` by default simplifies the api
-- **node only**: v18 targets browsers and node equally
 ## R&D Status
 
 Current ```v18.x``` is of ```develop``` build quality (meaning: ***do not use this right now***).  

@@ -2,7 +2,7 @@ import * as xlib from "./_main"
 
 
 import promise = xlib.promise
-const log = new xlib.diagnostics.Logger( __filename )
+const log = new xlib.diag.Logger( __filename )
 
 
 
@@ -342,10 +342,10 @@ describe( __filename, () => {
 					const timeoutPromise = xlib.promise.timeout( ( replyDelay + replyDelaySpread ) + 5000, toInspectPromise, "reply took too long, while this could be because of debugging overhead, should investigate" )
 					try {
 						const result = await timeoutPromise
-						xlib.diagnostics.throwCheck( result === "backend success" )
+						xlib.diag.throwCheck( result === "backend success" )
 					} catch ( err ) {
 						if ( err instanceof promise.TimeoutRejectError ) throw err
-						xlib.diagnostics.throwCheck( err instanceof TestAutoScaleError && err.message === "backend failure" )
+						xlib.diag.throwCheck( err instanceof TestAutoScaleError && err.message === "backend failure" )
 					}
 
 					// const toInspect = await promise.exposeStatus( timeoutPromise )
