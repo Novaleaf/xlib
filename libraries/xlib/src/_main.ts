@@ -74,7 +74,8 @@ export { serialization }
 import * as time from "./time"
 export { time }
 
-
+import * as validation from "./validation"
+export { validation }
 
 
 const log = new diagnostics.Logger( "main" )

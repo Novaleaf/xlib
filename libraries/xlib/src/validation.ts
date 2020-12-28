@@ -1,29 +1,19 @@
-"use strict";
-import * as stringHelper from "./_util/stringhelper";
-import * as numHelper from "./_util/numhelper";
-import * as ex from "./_diagnostics/exception";
-import * as _ from "lodash";
-import * as serialization from "./serialization";
-import * as reflection from "./reflection";
 
+import * as reflection from "./reflection"
+import * as _ from "lodash"
+import * as stringHelper from "./str"
+import * as numHelper from "./num"
+import * as dsv from "d3-dsv"
+import * as time from "./time"
+import * as exception from "./exception"
 
-// /** https://www.npmjs.com/package/validator  this is wrapped by our custom "scrub" framework, so we recommend using that instead for additional error/recovery options  */
-// export import validator = require( "validator" );
-
-// export import sanitizeHtml = require( "sanitize-html" );
-
-import * as diagnostics from "./diagnostics";
-
-import { URL } from "url";
-
-const log = diagnostics.log; // var log = new diagnostics.Logger( __filename );
 
 export class UrlValidator {
 
 	public isValid = true;
-	public errorMessage: string;
+	public errorMessage?: string;
 
-	public url: URL;
+	public url?: URL;
 
 	constructor(
 		input: string | URL,
@@ -49,34 +39,34 @@ export class UrlValidator {
 			allowUnicodeDomain: false,
 			//merge in user defined options
 			...options
-		};
-		options = this.options;
+		}
+		options = this.options
 
 		try {
 			if ( input instanceof URL ) {
-				this.url = new URL( input.toString() );
+				this.url = new URL( input.toString() )
 			} else if ( typeof ( input ) === "string" ) {
-				let inputString = input.trim();
-				this.url = new URL( inputString );
+				const inputString = input.trim()
+				this.url = new URL( inputString )
 			} else {
-				throw new Error( "input is not string or URL" );
+				throw new exception.XlibException( "input is not string or URL" )
 			}
 
 			if ( this.url.protocol !== "data:" ) {
 				//check hostname
-				const hostname = this.url.hostname.toLowerCase();
+				const hostname = this.url.hostname.toLowerCase()
 				if ( hostname.length === 0 ) {
-					throw new Error( `invalid hostname blank: "${ hostname }"` );
+					throw new exception.XlibException( `invalid hostname blank: "${ hostname }"` )
 				}
 				if ( options.allowUnicodeDomain === true ) {
 					//ok
 				} else if ( isAscii( hostname ) !== true ) {
-					throw new Error( `invalid hostname characters of "${ hostname }"` );
+					throw new exception.XlibException( `invalid hostname characters of "${ hostname }"` )
 				}
 				if ( options.allowLocalhost === true ) {
 					//ok
 				} else if ( hostname === "localhost" || hostname === "127.0.0.1" ) {
-					throw new Error( `invalid hostname of "${ hostname }"` );
+					throw new exception.XlibException( `invalid hostname of "${ hostname }"` )
 				}
 
 
@@ -87,7 +77,7 @@ export class UrlValidator {
 						if ( options.allowLocalhost === true && hostname === "127.0.0.1" ) {
 							//ok, we allow localhost
 						} else {
-							throw new Error( `invalid hostname ip of "${ hostname }"` );
+							throw new exception.XlibException( `invalid hostname ip of "${ hostname }"` )
 						}
 					}
 				}
@@ -95,19 +85,19 @@ export class UrlValidator {
 
 
 			//check protocol
-			const protocol = this.url.protocol;
+			const protocol = this.url.protocol
 			switch ( protocol ) {
 				case "gopher:":
 					if ( options.allowGopherProtocol === true ) {
-						break;
+						break
 					} else {
-						throw new Error( `invalid protocol of "${ protocol }"` );
+						throw new exception.XlibException( `invalid protocol of "${ protocol }"` )
 					}
 				case "file:":
 					if ( options.allowFileProtocol === true ) {
-						break;
+						break
 					} else {
-						throw new Error( `invalid protocol of "${ protocol }"` );
+						throw new exception.XlibException( `invalid protocol of "${ protocol }"` )
 					}
 				case "http:":
 				case "https:":
@@ -116,16 +106,16 @@ export class UrlValidator {
 				case "wss:":
 				case "data:":
 					//ok;
-					break;
+					break
 				default:
-					throw new Error( `invalid protocol of "${ protocol }"` );
+					throw new exception.XlibException( `invalid protocol of "${ protocol }"` )
 			}
 		} catch ( ex ) {
-			this.isValid = false;
-			if ( ex instanceof Error ) {
-				this.errorMessage = ex.message;
+			this.isValid = false
+			if ( ex instanceof exception.XlibException ) {
+				this.errorMessage = ex.message
 			} else {
-				this.errorMessage = `unknown error: ${ ex }`;
+				this.errorMessage = `unknown error: ${ ex }`
 			}
 		}
 	}
@@ -136,9 +126,9 @@ export class UrlValidator {
 
 /** from  https://stackoverflow.com/questions/8113546/how-to-determine-whether-an-ip-address-in-private*/
 export function isPrivateIp( ipV4Address: string ) {
-	const ipParts = ipV4Address.trim().split( "." ).map( ( str ) => numHelper.parseInt( str ) );
+	const ipParts = ipV4Address.trim().split( "." ).map( ( str ) => numHelper.parseInt( str ) )
 	if ( ipParts.length !== 4 ) {
-		return false;
+		return false
 	}
 	if (
 		( ipParts[ 0 ] === 10 ) // single class A network
@@ -148,31 +138,33 @@ export function isPrivateIp( ipV4Address: string ) {
 		|| ( ipParts[ 0 ] === 100 && ipParts[ 1 ] === 64 && ipParts[ 2 ] <= 192 ) // 100.64.0.0/10 for use in carrier-grade NAT environments. see https://en.wikipedia.org/wiki/Carrier-grade_NAT
 		|| ( ipParts[ 0 ] === 127 ) // localhost
 	) {
-		return true;
+		return true
 	}
-	return false;
+	return false
 }
 /** verify that a string only contains ascii characters (no unicode) */
 function isAscii(
 	toCheck: string,
 	/** default is "printable" */
 	charSet: "standard" | "extended" | "printable" = "printable" ) {
-	if ( typeof ( toCheck as any ) !== "string" ) {
-		return false;
+	if ( typeof ( toCheck as ANY ) !== "string" ) {
+		return false
 	}
 	if ( toCheck.length === 0 ) {
-		return true;
+		return true
 	}
 	//test regex from https://stackoverflow.com/questions/14313183/javascript-regex-how-do-i-check-if-the-string-is-ascii-only
 	switch ( charSet ) {
 		case "printable":
-			return /^[\x20-\x7F]*$/.test( toCheck );
+			return /^[\x20-\x7F]*$/.test( toCheck )
 		case "extended":
-			return /^[\x00-\xFF]*$/.test( toCheck );
+			// eslint-disable-next-line no-control-regex
+			return /^[\x00-\xFF]*$/.test( toCheck )
 		case "standard":
-			return /^[\x00-\x7F]*$/.test( toCheck );
+			// eslint-disable-next-line no-control-regex
+			return /^[\x00-\x7F]*$/.test( toCheck )
 		default:
-			throw new Error( "invalid charSet option to validation.isAscii()" );
+			throw new exception.XlibException( "invalid charSet option to validation.isAscii()" )
 	}
 }
 
